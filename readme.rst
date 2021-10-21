@@ -1,5 +1,5 @@
 About ``hdl_registers``
-=====================
+=======================
 
 |pic_website| |pic_gitlab| |pic_gitter| |pic_license|
 
@@ -20,7 +20,6 @@ About ``hdl_registers``
   :target: https://hdl-registers.com/license_information.html
 
 The ``hdl_registers`` project is a HDL register generator fast enough to be run in real time.
-
 
 **See documentation on the website**: https://hdl-registers.com
 

@@ -36,7 +36,11 @@ pytest:
   image: tsfpga/ci_py_sim
   script:
     - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
-    - python3 -m pytest -v hdl_registers/test
+    - python3 -m pytest -v --cov hdl_registers --cov-report xml:generated/python_coverage.xml --cov-report html:generated/python_coverage_html hdl_registers/
+  artifacts:
+    paths:
+      - generated/python_coverage.xml
+      - generated/python_coverage_html
 
 
 build_pypi:

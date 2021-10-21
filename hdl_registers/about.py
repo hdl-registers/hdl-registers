@@ -13,7 +13,8 @@ import hdl_registers
 
 def get_slogan():
     return (
-        "The hdl_registers project is a HDL register generator fast enough to be run in real time."
+        "The ``hdl_registers`` project is a HDL register generator "
+        "fast enough to be run in real time."
     )
 
 
@@ -33,7 +34,7 @@ def get_readme_rst(include_website_link, verify=True):
 
     def get_rst(include_link):
         extra_rst = (
-            "**See documentation on the website**: https://hdl-modules.com\n"
+            "**See documentation on the website**: https://hdl-registers.com\n"
             if include_link
             else ""
         )
@@ -60,8 +61,8 @@ About ``hdl_registers``
   :target: https://hdl-registers.com/license_information.html
 
 {get_slogan()}
-{extra_rst}
 
+{extra_rst}
 TBC...
 """
 
@@ -70,10 +71,11 @@ TBC...
     if verify:
         readme_rst = get_rst(include_link=True)
         if read_file(hdl_registers.REPO_ROOT / "readme.rst") != readme_rst:
-            file_path = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", readme_rst
-            create_file(file_path)
-            assert (
-                False
-            ), f"readme.rst in repo root not correct. Compare to reference in python: {file_path}"
+            file_path = create_file(
+                hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", readme_rst
+            )
+            raise ValueError(
+                f"readme.rst in repo root not correct. Compare to reference in python: {file_path}"
+            )
 
     return get_rst(include_link=include_website_link)
