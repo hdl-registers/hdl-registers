@@ -9,6 +9,7 @@
 import pickle
 
 from tsfpga.system_utils import create_file
+
 from .register_code_generator import RegisterCodeGenerator
 
 

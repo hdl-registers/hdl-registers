@@ -8,7 +8,7 @@
 
 import pytest
 
-from tsfpga.registers.register_array import RegisterArray
+from hdl_registers.register_array import RegisterArray
 
 
 def test_registers_are_appended_properly_and_can_be_edited_in_place():

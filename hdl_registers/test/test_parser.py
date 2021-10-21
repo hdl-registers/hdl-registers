@@ -10,8 +10,9 @@ import unittest
 import pytest
 
 from tsfpga.system_utils import create_file
-from tsfpga.registers.parser import from_toml, load_toml_file
-from tsfpga.registers.register import Register
+
+from hdl_registers.parser import from_toml, load_toml_file
+from hdl_registers.register import Register
 
 
 def get_test_default_registers():

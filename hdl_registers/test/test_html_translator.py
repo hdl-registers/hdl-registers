@@ -8,7 +8,7 @@
 
 import unittest
 
-from tsfpga.registers.html_translator import HtmlTranslator
+from hdl_registers.html_translator import HtmlTranslator
 
 
 class TestTranslator(unittest.TestCase):

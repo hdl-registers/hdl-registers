@@ -13,10 +13,10 @@ Some happy path tests to show that all register code generation can run without 
 import pytest
 
 import tsfpga
-from tsfpga.system_utils import read_file
-from tsfpga.registers.parser import from_toml
-
 from tsfpga.examples.example_env import get_default_registers
+from tsfpga.system_utils import read_file
+
+from hdl_registers.parser import from_toml
 
 
 # Test with the two example TOML files that we have available

@@ -12,7 +12,8 @@ import pytest
 
 import tsfpga
 from tsfpga.system_utils import read_file
-from tsfpga.registers.parser import from_toml
+
+from hdl_registers.parser import from_toml
 
 
 @pytest.mark.usefixtures("fixture_tmp_path")

@@ -8,7 +8,7 @@
 
 import pytest
 
-from tsfpga.registers.bit import Bit
+from hdl_registers.bit import Bit
 
 
 def test_get_value():

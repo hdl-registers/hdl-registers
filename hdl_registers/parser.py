@@ -10,6 +10,7 @@ import copy
 import tomlkit
 
 from tsfpga.system_utils import read_file
+
 from .register_list import RegisterList
 from .constant import Constant
 

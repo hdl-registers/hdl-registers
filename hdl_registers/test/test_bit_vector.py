@@ -8,7 +8,7 @@
 
 import pytest
 
-from tsfpga.registers.bit_vector import BitVector
+from hdl_registers.bit_vector import BitVector
 
 
 def test_get_value():

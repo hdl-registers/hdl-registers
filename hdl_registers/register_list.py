@@ -18,6 +18,7 @@ from tsfpga import DEFAULT_FILE_ENCODING
 from tsfpga.git_utils import git_commands_are_available, get_git_commit
 from tsfpga.svn_utils import svn_commands_are_available, get_svn_revision_information
 from tsfpga.system_utils import create_directory, create_file, read_file
+
 from . import __version__
 from .constant import Constant
 from .register import Register

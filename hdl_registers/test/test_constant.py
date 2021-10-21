@@ -6,7 +6,7 @@
 # https://gitlab.com/tsfpga/tsfpga
 # --------------------------------------------------------------------------------------------------
 
-from tsfpga.registers.constant import Constant
+from hdl_registers.constant import Constant
 
 
 def test_repr():

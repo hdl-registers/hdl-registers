@@ -18,8 +18,9 @@ import pytest
 
 import tsfpga
 from tsfpga.system_utils import read_file
-from tsfpga.registers.parser import from_toml
-from tsfpga.registers.register_list import RegisterList
+
+from hdl_registers.parser import from_toml
+from hdl_registers.register_list import RegisterList
 
 
 class RegisterConfiguration:

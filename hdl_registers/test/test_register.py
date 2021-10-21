@@ -7,7 +7,8 @@
 # --------------------------------------------------------------------------------------------------
 
 import pytest
-from tsfpga.registers.register import Register
+
+from hdl_registers.register import Register
 
 
 def test_repr_basic():

@@ -14,9 +14,10 @@ from unittest.mock import patch
 import pytest
 
 from tsfpga.system_utils import create_file
-from tsfpga.registers.parser import from_toml
-from tsfpga.registers.register import Register
-from tsfpga.registers.register_list import RegisterList
+
+from hdl_registers.parser import from_toml
+from hdl_registers.register import Register
+from hdl_registers.register_list import RegisterList
 
 
 def test_from_default_registers():
@@ -38,10 +39,10 @@ def test_from_default_registers():
     assert register_list.get_register("b").name == "b"
 
 
-@patch("tsfpga.registers.register_list.git_commands_are_available", autospec=True)
-@patch("tsfpga.registers.register_list.get_git_commit", autospec=True)
-@patch("tsfpga.registers.register_list.svn_commands_are_available", autospec=True)
-@patch("tsfpga.registers.register_list.get_svn_revision_information", autospec=True)
+@patch("hdl_registers.register_list.git_commands_are_available", autospec=True)
+@patch("hdl_registers.register_list.get_git_commit", autospec=True)
+@patch("hdl_registers.register_list.svn_commands_are_available", autospec=True)
+@patch("hdl_registers.register_list.get_svn_revision_information", autospec=True)
 def test_generated_source_info(
     get_svn_revision_information,
     svn_commands_are_available,
@@ -332,7 +333,7 @@ description = "My register"
         register_list = from_toml(self.module_name, self.toml_file)
         register_list.add_constant(name="apa", value=3)
         with patch(
-            "tsfpga.registers.register_list.RegisterList._create_vhdl_package", autospec=True
+            "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package:
             register_list.create_vhdl_package(self.tmp_path)
             mocked_create_vhdl_package.assert_not_called()
@@ -348,7 +349,7 @@ description = "My register"
 
         register_list = from_toml(self.module_name, self.toml_file)
         with patch(
-            "tsfpga.registers.register_list.RegisterList._create_vhdl_package", autospec=True
+            "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package:
             register_list.create_vhdl_package(self.tmp_path)
             mocked_create_vhdl_package.assert_called_once()
@@ -366,7 +367,7 @@ value = 3
         )
         register_list = from_toml(self.module_name, self.toml_file)
         with patch(
-            "tsfpga.registers.register_list.RegisterList._create_vhdl_package", autospec=True
+            "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package:
             register_list.create_vhdl_package(self.tmp_path)
             mocked_create_vhdl_package.assert_called_once()
@@ -378,7 +379,7 @@ value = 3
         register_list = from_toml(self.module_name, self.toml_file)
         register_list.add_constant(name="apa", value=3)
         with patch(
-            "tsfpga.registers.register_list.RegisterList._create_vhdl_package", autospec=True
+            "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package:
             register_list.create_vhdl_package(self.tmp_path)
             mocked_create_vhdl_package.assert_called_once()
@@ -388,9 +389,9 @@ value = 3
         register_list.create_vhdl_package(self.tmp_path)
 
         with patch(
-            "tsfpga.registers.register_list.RegisterList._create_vhdl_package", autospec=True
+            "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package, patch(
-            "tsfpga.registers.register_list.__version__", autospec=True
+            "hdl_registers.register_list.__version__", autospec=True
         ) as _:
             register_list.create_vhdl_package(self.tmp_path)
             mocked_create_vhdl_package.assert_called_once()
