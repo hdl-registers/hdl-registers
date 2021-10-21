@@ -1,0 +1,14 @@
+black
+flake8
+GitPython
+packaging
+pybadges
+pylint
+pytest
+pytest-cov
+pytest-xdist
+sphinx
+sphinx-rtd-theme
+sphinx_sitemap
+tomlkit
+twine
