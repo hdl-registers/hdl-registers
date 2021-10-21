@@ -244,9 +244,7 @@ class RegisterList:
         """
         Returns `None` if nothing found, otherwise the matching strings in a tuple.
         """
-        regexp = re.compile(
-            r"\n-- Register hash ([0-9a-f]+), generator version (\d+\.\d+\.\d+)\.\n"
-        )
+        regexp = re.compile(r"\n-- Register hash ([0-9a-f]+), generator version (\S+)\.\n")
         existing_file_content = read_file(vhd_file)
         match = regexp.search(existing_file_content)
         if match is None:
