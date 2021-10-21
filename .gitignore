@@ -1,0 +1,11 @@
+*~
+
+*.pyc
+
+.svn
+
+.cache
+
+.vscode
+
+generated
