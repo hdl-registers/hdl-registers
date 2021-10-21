@@ -5,6 +5,7 @@
 
 stages:
   - test
+  - build_documentation
   - deploy
 
 
@@ -47,15 +48,18 @@ build_pypi:
   stage: test
   image: tsfpga/ci_py_sim
   script:
-    - python3 tools/build_pypi_release.py
+    - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
+    - python3 setup.py sdist
   artifacts:
     paths:
       - dist
 
 
 build_pages:
-  stage: test
+  stage: build_documentation
   image: tsfpga/ci_py_sim_sphinx
+  # Start as soon as pytest job is done. Even if build_pypi in previous stage is not.
+  needs: ["pytest"]
   script:
     - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
     - python3 tools/build_docs.py
