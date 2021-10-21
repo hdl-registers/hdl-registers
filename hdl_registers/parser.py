@@ -33,8 +33,8 @@ def from_toml(module_name, toml_file, default_registers=None):
 
     Arguments:
         module_name (str): The name of the module that these registers belong to.
-        toml_file (`pathlib.Path`): The TOML file path.
-        default_registers (list(:class:`.Register`)): List of default registers.
+        toml_file (pathlib.Path): The TOML file path.
+        default_registers (list(Register)): List of default registers.
 
     Returns:
         :class:`.RegisterList`: The resulting register list.

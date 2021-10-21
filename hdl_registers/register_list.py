@@ -41,7 +41,7 @@ class RegisterList:
         Arguments:
             name (str): The name of this register list. Typically the name of the module that uses
                 it.
-            source_definition_file (`pathlib.Path`): The TOML source file that defined this
+            source_definition_file (pathlib.Path): The TOML source file that defined this
                 register list. Will be displayed in generated source code and documentation
                 for traceability.
         """
@@ -58,7 +58,7 @@ class RegisterList:
 
         Arguments:
             name (str): The name of this register list.
-            source_definition_file (`pathlib.Path`): The source file that defined this
+            source_definition_file (pathlib.Path): The source file that defined this
                 register list. Will be displayed in generated source code and documentation
                 for traceability.
 
@@ -222,7 +222,7 @@ class RegisterList:
         generated again if something has changed.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         vhd_file = output_path / (self.name + "_regs_pkg.vhd")
 
@@ -268,7 +268,7 @@ class RegisterList:
         Create a C header file with register and field definitions.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         output_file = output_path / (self.name + "_regs.h")
         register_c_generator = RegisterCGenerator(self.name, self.generated_source_info())
@@ -282,7 +282,7 @@ class RegisterList:
         interface header contains only virtual methods.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         output_file = output_path / ("i_" + self.name + ".h")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -295,7 +295,7 @@ class RegisterList:
         Create a C++ class header file.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         output_file = output_path / (self.name + ".h")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -306,7 +306,7 @@ class RegisterList:
         Create a C++ class implementation file.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         output_file = output_path / (self.name + ".cpp")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -319,7 +319,7 @@ class RegisterList:
         :meth:`.create_html_constant_table`.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
 
@@ -341,7 +341,7 @@ class RegisterList:
         Create documentation HTML table with register and field information.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         output_file = output_path / (self.name + "_register_table.html")
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
@@ -352,7 +352,7 @@ class RegisterList:
         Create documentation HTML table with constant information.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         output_file = output_path / (self.name + "_constant_table.html")
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
@@ -363,7 +363,7 @@ class RegisterList:
         Save a python class with all register and constant information.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         register_python_generator = RegisterPythonGenerator(self.name, self.generated_source_info())
         register_python_generator.create_class(register_list=self, output_folder=output_path)
@@ -374,7 +374,7 @@ class RegisterList:
         be copied.
 
         Arguments:
-            output_path (`pathlib.Path`): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed here.
         """
         if self.source_definition_file is not None:
             create_directory(output_path, empty=False)

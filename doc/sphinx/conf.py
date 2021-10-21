@@ -10,7 +10,6 @@
 Configuration file for the Sphinx documentation builder.
 """
 
-import builtins
 from pathlib import Path
 import sys
 
@@ -28,19 +27,16 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.graphviz",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
     "sphinx_sitemap",
 ]
 
-# Remove warning that built-in types cannot be referenced.
-nitpick_ignore = [
-    ("py:class", "abc.ABC"),
-]
-for name in dir(builtins):
-    nitpick_ignore.append(("py:class", name))
-
-# nitpick_ignore_regex = [("py:.*", "tsfpga.*")]
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "tsfpga": ("https://tsfpga.com", None),
+}
 
 # Base URL for generated sitemap XML
 html_baseurl = "https://hdl_registers.com"
