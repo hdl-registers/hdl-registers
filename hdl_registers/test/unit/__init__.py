@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the tsfpga project.
-# https://tsfpga.com
-# https://gitlab.com/tsfpga/tsfpga
+# This file is part of the hdl_registers project.
+# https://hdl-registers.com
+# https://gitlab.com/tsfpga/hdl_registers
 # --------------------------------------------------------------------------------------------------
