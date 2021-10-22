@@ -6,10 +6,6 @@
 # https://gitlab.com/tsfpga/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-from tsfpga.system_utils import create_file, read_file
-
-import hdl_registers
-
 
 def get_slogan():
     return (
@@ -18,27 +14,23 @@ def get_slogan():
     )
 
 
-def get_readme_rst(include_website_link, verify=True):
+def get_readme_rst(include_website_link):
     """
     Get the complete README.rst (to be used on website and in PyPI release).
-
-    Also possible to verify that readme.rst in the project root is identical.
     RST file inclusion in README.rst does not work on gitlab unfortunately, hence this
     cumbersome handling where the README is duplicated in two places.
 
     Arguments:
         include_website_link (bool): Include a link to the website in README.
-        verify (bool): Verify that the readme.rst in repo root (which is shown on gitlab)
-            corresponds to the string produced by this function.
     """
 
-    def get_rst(include_link):
-        extra_rst = (
-            "**See documentation on the website**: https://hdl-registers.com\n"
-            if include_link
-            else ""
-        )
-        readme_rst = f"""\
+    extra_rst = (
+        "**See documentation on the website**: https://hdl-registers.com\n"
+        if include_website_link
+        else ""
+    )
+
+    readme_rst = f"""\
 About ``hdl_registers``
 =======================
 
@@ -66,16 +58,4 @@ About ``hdl_registers``
 TBC...
 """
 
-        return readme_rst
-
-    if verify:
-        readme_rst = get_rst(include_link=True)
-        if read_file(hdl_registers.REPO_ROOT / "readme.rst") != readme_rst:
-            file_path = create_file(
-                hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", readme_rst
-            )
-            raise ValueError(
-                f"readme.rst in repo root not correct. Compare to reference in python: {file_path}"
-            )
-
-    return get_rst(include_link=include_website_link)
+    return readme_rst

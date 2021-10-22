@@ -21,7 +21,7 @@ sys.path.insert(0, str(REPO_ROOT))
 PATH_TO_TSFPGA = REPO_ROOT.parent.resolve() / "tsfpga"
 sys.path.insert(0, str(PATH_TO_TSFPGA))
 
-from tsfpga.system_utils import create_directory, create_file, delete
+from tsfpga.system_utils import create_directory, create_file, delete, read_file
 from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 import hdl_registers
@@ -98,7 +98,16 @@ def generate_sphinx_index():
     Rst file inclusion in readme.rst does not work on gitlab unfortunately, hence this
     cumbersome handling of syncing documentation.
     """
-    rst = get_readme_rst(include_website_link=False, verify=True)
+    rst = get_readme_rst(include_website_link=True)
+
+    if read_file(hdl_registers.REPO_ROOT / "readme.rst") != rst:
+        file_path = create_file(
+            hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", rst
+        )
+        raise ValueError(
+            f"readme.rst in repo root not correct. Compare to reference in python: {file_path}"
+        )
+
     create_file(GENERATED_SPHINX / "index.rst", rst)
 
 

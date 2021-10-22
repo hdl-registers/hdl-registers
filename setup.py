@@ -6,6 +6,7 @@
 # https://gitlab.com/tsfpga/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+from os.path import relpath
 from pathlib import Path
 import sys
 
@@ -13,16 +14,12 @@ from setuptools import setup, find_packages
 
 REPO_ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
-PATH_TO_TSFPGA = REPO_ROOT.parent.resolve() / "tsfpga"
-sys.path.insert(0, str(PATH_TO_TSFPGA))
-
-import tsfpga
-from tsfpga.system_utils import path_relative_to
 
 import hdl_registers
 from hdl_registers.about import get_readme_rst, get_slogan
 
-
+# Duplicated from tsfpga/__init__.py since setup.py may not depend on tsfpga
+DEFAULT_FILE_ENCODING = "utf-8"
 REQUIREMENTS_TXT = hdl_registers.HDL_REGISTERS_PATH / "requirements.txt"
 REQUIREMENTS_DEVELOP_TXT = hdl_registers.HDL_REGISTERS_PATH / "requirements_develop.txt"
 
@@ -55,7 +52,7 @@ def main():
         name="hdl_registers",
         version=hdl_registers.__version__,
         description=get_slogan(),
-        long_description=get_readme_rst(include_website_link=True, verify=False),
+        long_description=get_readme_rst(include_website_link=True),
         long_description_content_type="text/x-rst",
         license="BSD 3-Clause License",
         author="Lukas Vik",
@@ -83,7 +80,7 @@ def main():
 
 def read_requirements_file(path):
     requirements = []
-    with open(path, encoding=tsfpga.DEFAULT_FILE_ENCODING) as file_handle:
+    with open(path, encoding=DEFAULT_FILE_ENCODING) as file_handle:
         # Requirements file contains one package name per line
         for line_data in file_handle.readlines():
             if line_data:
@@ -100,9 +97,21 @@ def get_package_data():
     files = [REQUIREMENTS_TXT, REQUIREMENTS_DEVELOP_TXT]
 
     # Specify path relative to the python package folder
-    package_data = [str(path_relative_to(file_path, tsfpga.TSFPGA_PATH)) for file_path in files]
+    package_data = [
+        str(path_relative_to(file_path, hdl_registers.HDL_REGISTERS_PATH)) for file_path in files
+    ]
 
     return package_data
+
+
+# Duplicated system_utils.py since setup.py can not depend on tsfpga
+def path_relative_to(path, other):
+    """
+    Note Path.relative_to() does not support the use case where e.g. readme.md should get
+    relative path "../readme.md". Hence we have to use os.path.
+    """
+    assert path.exists(), path
+    return Path(relpath(str(path), str(other)))
 
 
 if __name__ == "__main__":
