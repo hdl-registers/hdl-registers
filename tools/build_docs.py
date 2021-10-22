@@ -98,17 +98,17 @@ def generate_sphinx_index():
     Rst file inclusion in readme.rst does not work on gitlab unfortunately, hence this
     cumbersome handling of syncing documentation.
     """
-    rst = get_readme_rst(include_website_link=True)
-
-    if read_file(hdl_registers.REPO_ROOT / "readme.rst") != rst:
+    rst_to_verify = get_readme_rst(include_website_link=True)
+    if read_file(hdl_registers.REPO_ROOT / "readme.rst") != rst_to_verify:
         file_path = create_file(
-            hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", rst
+            hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", rst_to_verify
         )
         raise ValueError(
             f"readme.rst in repo root not correct. Compare to reference in python: {file_path}"
         )
 
-    create_file(GENERATED_SPHINX / "index.rst", rst)
+    result = get_readme_rst(include_website_link=False)
+    create_file(GENERATED_SPHINX / "index.rst", result)
 
 
 def build_information_badges(output_path):
