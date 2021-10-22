@@ -19,7 +19,7 @@ About ``hdl_registers``
   :alt: License
   :target: https://hdl-registers.com/license_information.html
 
-The ``hdl_registers`` project is a HDL register generator fast enough to be run in real time.
+The hdl_registers project is a HDL register generator fast enough to be run in real time.
 
 **See documentation on the website**: https://hdl-registers.com
 

@@ -9,7 +9,7 @@
 
 def get_slogan():
     return (
-        "The ``hdl_registers`` project is a HDL register generator "
+        "The hdl_registers project is a HDL register generator "
         "fast enough to be run in real time."
     )
 
