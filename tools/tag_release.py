@@ -23,6 +23,7 @@ from tsfpga.tools.version_number_handler import (
     commit_and_tag_release,
     make_commit,
     UNRELEASED_EMPTY,
+    verify_new_version_number,
     VersionNumberHandler,
 )
 
@@ -37,7 +38,12 @@ def main():
     release_version = parser.parse_args().release_version[0]
 
     repo = Repo(REPO_ROOT)
-    git_tag = f"v{release_version}"
+    git_tag = verify_new_version_number(
+        repo=repo,
+        pypi_project_name="hdl_registers",
+        new_version=release_version,
+        unreleased_notes_file=HDL_REGISTERS_DOC / "release_notes" / "unreleased.rst",
+    )
 
     version_number_handler = VersionNumberHandler(
         repo=repo, version_file_path=HDL_REGISTERS_PATH / "__init__.py"
