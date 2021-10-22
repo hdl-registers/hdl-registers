@@ -19,6 +19,10 @@ workflow:
     # Pushes to master (a successful merge request is also a "push") should run so
     # that new website is deployed.
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+    # PyPI deploy should be run only when there is a tag. However a $CI_COMMIT_TAG is
+    # set only on the $CI_PIPELINE_SOURCE = "push" event (not on merge_request_event
+    # or schedule). So allow the pipeline to run for this as well.
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG != null'
 
 
 default:
