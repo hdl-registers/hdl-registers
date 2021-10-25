@@ -112,7 +112,7 @@ def generate_sphinx_index():
 
 
 def build_information_badges(output_path):
-    badge_svg = badge(left_text="pip install", right_text="hdl_registers", right_color="blue")
+    badge_svg = badge(left_text="pip install", right_text="hdl-registers", right_color="blue")
     create_file(output_path / "pip_install.svg", badge_svg)
 
     badge_svg = badge(left_text="license", right_text="BSD 3-Clause", right_color="blue")
