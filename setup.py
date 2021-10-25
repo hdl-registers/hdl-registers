@@ -57,7 +57,7 @@ def main():
         license="BSD 3-Clause License",
         author="Lukas Vik",
         author_email="2767848-LukasVik@users.noreply.gitlab.com",
-        url="https://hdl_registers.com",
+        url="https://hdl-registers.com",
         python_requires=">=3.6",
         install_requires=read_requirements_file(REQUIREMENTS_TXT),
         extras_require=dict(dev=read_requirements_file(REQUIREMENTS_DEVELOP_TXT)),
