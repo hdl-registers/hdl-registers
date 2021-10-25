@@ -15,8 +15,6 @@ Install further dependencies with:
 
     python -m pip install --upgrade --requirement hdl_registers/requirements_develop.txt
 
-You also need VUnit installed `somewhere where python can find it <https://vunit.github.io/installing.html>`__.
-
 
 
 .. _maintain_changelog:
