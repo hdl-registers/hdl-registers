@@ -17,6 +17,17 @@ class RegisterField(ABC):
     """
 
     @property
+    def max_binary_value(self) -> int:
+        """
+        Get the maximum value, represented as a positive integer, that this field can hold given
+        its width.
+
+        Returns:
+            int: The maximum value.
+        """
+        return 2 ** self.width - 1
+
+    @property
     @abstractmethod
     def width(self):
         """
@@ -24,6 +35,17 @@ class RegisterField(ABC):
 
         Returns:
             int: The width.
+        """
+        raise NotImplementedError("Must be implemented in child class")
+
+    @property
+    @abstractmethod
+    def base_index(self):
+        """
+        The index within the register for the lowest bit of this Field.
+
+        Returns:
+            int: The index.
         """
         raise NotImplementedError("Must be implemented in child class")
 
@@ -74,3 +96,22 @@ class RegisterField(ABC):
             int: The value.
         """
         raise NotImplementedError("Must be implemented in child class")
+
+    def set_value(self, field_value: int) -> int:
+        """
+        Convert the supplied value into the bit-shifted unsigned integer ready
+        to be written to the register. The bits of the other fields in the
+        register are masked out and will be set to zero.
+
+        Arguments:
+            field_value (int) : Desired value to set the field to.
+
+        Returns:
+            int: the register value
+        """
+        max_ = self.max_binary_value
+        if not 0 <= field_value <= max_:
+            raise ValueError(f"Value: {field_value} is invalid for unsigned of width {max_}")
+        mask = max_ << self.base_index
+        value_shifted = field_value << self.base_index
+        return value_shifted & mask

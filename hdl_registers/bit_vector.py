@@ -27,7 +27,7 @@ class BitVector(RegisterField):
                 only "1" and "0".
         """
         self.name = name
-        self.base_index = base_index
+        self._base_index = base_index
         self.description = description
 
         self._check_width(width)
@@ -53,6 +53,13 @@ class BitVector(RegisterField):
 
         if value < 1 or value > 32:
             raise ValueError(f'Invalid bit vector width for "{self.name}". Got: "{value}".')
+
+    @property
+    def base_index(self):
+        """
+        The index within the register for the lowest bit of this Field.
+        """
+        return self._base_index
 
     @property
     def default_value(self):

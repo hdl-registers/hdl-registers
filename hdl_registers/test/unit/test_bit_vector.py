@@ -24,6 +24,67 @@ def test_get_value():
     assert bit.get_value(register_value) == 5
 
 
+def test_max_binary_value():
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=2, default_value=format(0, "02b")
+    )
+    assert bit_vector.max_binary_value == 0b11
+
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=32, default_value=format(0, "032b")
+    )
+    assert bit_vector.max_binary_value == 0b11111111_11111111_11111111_11111111
+
+    # Test with base_index > 0
+    bit_vector = BitVector(
+        name="", base_index=4, description="", width=4, default_value=format(0, "04b")
+    )
+    assert bit_vector.max_binary_value == 0b1111
+
+
+def test_set_value():
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=2, default_value=format(0, "02b")
+    )
+    assert bit_vector.set_value(0b10) == 0b10
+    assert bit_vector.set_value(0b11) == 0b11
+
+    with pytest.raises(ValueError):
+        bit_vector.set_value(0b111)
+
+    bit_vector = BitVector(
+        name="", base_index=2, description="", width=2, default_value=format(0, "02b")
+    )
+    assert bit_vector.set_value(0b10) == 0b1000
+
+    bit_vector = BitVector(
+        name="", base_index=3, description="", width=4, default_value=format(0, "04b")
+    )
+    assert bit_vector.set_value(0b1111) == 0b1111000
+
+    bit_vector0 = BitVector(name="", base_index=0, description="", width=2, default_value="00")
+    bit_vector1 = BitVector(name="", base_index=2, description="", width=4, default_value="0000")
+    bit_vector2 = BitVector(name="", base_index=6, description="", width=3, default_value="000")
+
+    register_value = int("111000011", base=2)
+    value0 = bit_vector0.set_value(bit_vector0.get_value(register_value))
+    value1 = bit_vector1.set_value(bit_vector1.get_value(register_value))
+    value2 = bit_vector2.set_value(bit_vector2.get_value(register_value))
+    assert value0 | value1 | value2 == register_value
+
+    register_value = int("000111100", base=2)
+    value0 = bit_vector0.set_value(bit_vector0.get_value(register_value))
+    value1 = bit_vector1.set_value(bit_vector1.get_value(register_value))
+    value2 = bit_vector2.set_value(bit_vector2.get_value(register_value))
+    assert value0 | value1 | value2 == register_value
+
+    register_value = int("101010101", base=2)
+    value0 = bit_vector0.set_value(bit_vector0.get_value(register_value))
+    value1 = bit_vector1.set_value(bit_vector1.get_value(register_value))
+    value2 = bit_vector2.set_value(bit_vector2.get_value(register_value))
+    assert value0 | value1 | value2 == register_value
+
+
 def test_repr():
     # Check that repr is an actual representation, not just "X object at 0xABCDEF"
     assert "apa" in repr(

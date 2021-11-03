@@ -26,12 +26,19 @@ class Bit(RegisterField):
             default_value (str): Default value. Either "1" or "0".
         """
         self.name = name
-        self.base_index = index
+        self._base_index = index
         self.description = description
 
         self._default_value = None
         # Assign self._default_value via setter
         self.default_value = default_value
+
+    @property
+    def base_index(self):
+        """
+        The index within the register for the lowest bit of this Field.
+        """
+        return self._base_index
 
     @property
     def default_value(self):
