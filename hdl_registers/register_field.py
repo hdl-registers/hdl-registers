@@ -99,8 +99,7 @@ class RegisterField(ABC):
         """
         raise NotImplementedError("Must be implemented in child class")
 
-    @abstractmethod
-    def get_value(self, register_value):
+    def get_value(self, register_value: int) -> float:
         """
         Get the value of this field, given the supplied register value.
         Child classes might implement sanity checks on the value.
@@ -111,7 +110,15 @@ class RegisterField(ABC):
         Returns:
             float: The value of the field.
         """
-        raise NotImplementedError("Must be implemented in child class")
+        shift = self.base_index
+
+        mask_at_base = (1 << self.width) - 1
+        mask = mask_at_base << shift
+
+        value_unsigned = (register_value & mask) >> shift
+        field_value = self.field_type.convert_from_unsigned_binary(self.width, value_unsigned)
+
+        return field_value
 
     def set_value(self, field_value: float) -> int:
         """
@@ -126,9 +133,13 @@ class RegisterField(ABC):
             int: the register value
         """
         value_unsigned = self.field_type.convert_to_unsigned_binary(self.width, field_value)
-        max_ = self.max_binary_value
-        if not 0 <= value_unsigned <= max_:
-            raise ValueError(f"Value: {value_unsigned} is invalid for unsigned of width {max_}")
-        mask = max_ << self.base_index
+        max_value = self.max_binary_value
+        if not 0 <= value_unsigned <= max_value:
+            raise ValueError(
+                f"Value: {value_unsigned} is invalid for unsigned of width {self.width}"
+            )
+
+        mask = max_value << self.base_index
         value_shifted = value_unsigned << self.base_index
+
         return value_shifted & mask
