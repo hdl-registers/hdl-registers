@@ -67,8 +67,9 @@ class Bit(RegisterField):
     def get_value(self, register_value):
         shift = self.base_index
         mask = 1 << self.base_index
-        value = (register_value & mask) >> shift
-        return value
+        value_unsigned = (register_value & mask) >> shift
+        field_value = self.field_type.convert_from_unsigned_binary(self.width, value_unsigned)
+        return field_value
 
     @property
     def range(self):

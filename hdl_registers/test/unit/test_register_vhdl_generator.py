@@ -21,6 +21,7 @@ from tsfpga.system_utils import read_file
 
 from hdl_registers.parser import from_toml
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_field_type import Unsigned, Signed, SignedFixedPoint, UnsignedFixedPoint
 
 
 class RegisterConfiguration:
@@ -88,3 +89,35 @@ def test_vhdl_package_with_only_one_register(tmp_path):
   );
 """
     assert expected in vhdl, vhdl
+
+
+def test_vhdl_typedef(tmp_path):
+    register_list = RegisterList(name="artyz7", source_definition_file=None)
+    number = register_list.append_register("number", "r_w", "")
+    number.append_bit_vector("udata0", "expected unsigned(1 downto 0)", 2, "11", Unsigned())
+    number.append_bit_vector("sdata0", "expected signed(1 downto 0)", 2, "11", Signed())
+    number.append_bit_vector(
+        "ufixed0", "expected ufixed(1 downto 0)", 2, "11", UnsignedFixedPoint(-1, -2)
+    )
+    number.append_bit_vector(
+        "ufixed1", "expected ufixed(5 downto -2)", 8, "1" * 8, UnsignedFixedPoint(5, -2)
+    )
+    number.append_bit_vector(
+        "ufixed1", "expected ufixed(5 downto -2)", 8, "1" * 8, UnsignedFixedPoint(5, -2)
+    )
+    number.append_bit_vector(
+        "sfixed0", "expected sfixed(-1 downto -2)", 2, "11", SignedFixedPoint(-1, -2)
+    )
+    number.append_bit_vector(
+        "sfixed0", "expected sfixed(5 downto 0)", 6, "1" * 6, SignedFixedPoint(5, 0)
+    )
+
+    register_list.create_vhdl_package(tmp_path)
+    vhdl = read_file(tmp_path / "artyz7_regs_pkg.vhd")
+
+    assert "subtype artyz7_number_udata0_t is unsigned(1 downto 0);" in vhdl, vhdl
+    assert "subtype artyz7_number_sdata0_t is signed(1 downto 0);" in vhdl, vhdl
+    assert "subtype artyz7_number_ufixed0_t is ufixed(-1 downto -2);" in vhdl, vhdl
+    assert "subtype artyz7_number_ufixed1_t is ufixed(5 downto -2);" in vhdl, vhdl
+    assert "subtype artyz7_number_sfixed0_t is sfixed(-1 downto -2);" in vhdl, vhdl
+    assert "subtype artyz7_number_sfixed0_t is sfixed(5 downto 0);" in vhdl, vhdl

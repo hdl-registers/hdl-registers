@@ -8,6 +8,7 @@
 
 from .bit import Bit
 from .bit_vector import BitVector
+from .register_field import FieldType, DEFAULT_FIELD_TYPE
 
 
 class RegisterMode:
@@ -85,7 +86,9 @@ class Register:
 
         return bit
 
-    def append_bit_vector(self, name, description, width, default_value):
+    def append_bit_vector(
+        self, name, description, width, default_value, field_type: FieldType = DEFAULT_FIELD_TYPE
+    ):
         """
         Append a bit vector field to this register.
 
@@ -95,6 +98,7 @@ class Register:
             description (str): Description of the bit vector.
             default_value (str): Default value as a string. Must be of length ``width`` and contain
                 only "1" and "0".
+            field_type (FieldType): The field type used to interpret the bits of the field.
 
         Return:
             :class:`.BitVector`: The bit vector object that was created.
@@ -105,6 +109,7 @@ class Register:
             description=description,
             width=width,
             default_value=default_value,
+            field_type=field_type,
         )
         self.fields.append(bit_vector)
 

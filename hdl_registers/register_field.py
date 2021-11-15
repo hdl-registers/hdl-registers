@@ -8,6 +8,10 @@
 
 from abc import ABC, abstractmethod
 
+from .register_field_type import FieldType, Unsigned
+
+DEFAULT_FIELD_TYPE = Unsigned()
+
 
 class RegisterField(ABC):
 
@@ -19,13 +23,24 @@ class RegisterField(ABC):
     @property
     def max_binary_value(self) -> int:
         """
-        Get the maximum value, represented as a positive integer, that this field can hold given
-        its width.
+        Get the maximum value, represented as a positive integer, that this
+        field can hold given its width.
 
         Returns:
             int: The maximum value.
         """
         return 2 ** self.width - 1
+
+    @property
+    def field_type(self) -> FieldType:
+        """
+        The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint...)
+        used to interpret the bits of the field.
+
+        Returns:
+            FieldType: The instanced FieldType subclass.
+        """
+        return DEFAULT_FIELD_TYPE  # Default for all RegisterFields
 
     @property
     @abstractmethod
@@ -65,7 +80,8 @@ class RegisterField(ABC):
     @abstractmethod
     def default_value_str(self):
         """
-        Return a formatted string of the default value. The way it shall appear in documentation.
+        Return a formatted string of the default value. The way it shall appear
+        in documentation.
 
         Returns:
             str: The default value.
@@ -93,25 +109,26 @@ class RegisterField(ABC):
             register_value (int): Value of the register that this field belongs to.
 
         Returns:
-            int: The value.
+            float: The value of the field.
         """
         raise NotImplementedError("Must be implemented in child class")
 
-    def set_value(self, field_value: int) -> int:
+    def set_value(self, field_value: float) -> int:
         """
         Convert the supplied value into the bit-shifted unsigned integer ready
         to be written to the register. The bits of the other fields in the
         register are masked out and will be set to zero.
 
         Arguments:
-            field_value (int) : Desired value to set the field to.
+            field_value (float) : Desired value to set the field to.
 
         Returns:
             int: the register value
         """
+        value_unsigned = self.field_type.convert_to_unsigned_binary(self.width, field_value)
         max_ = self.max_binary_value
-        if not 0 <= field_value <= max_:
-            raise ValueError(f"Value: {field_value} is invalid for unsigned of width {max_}")
+        if not 0 <= value_unsigned <= max_:
+            raise ValueError(f"Value: {value_unsigned} is invalid for unsigned of width {max_}")
         mask = max_ << self.base_index
-        value_shifted = field_value << self.base_index
+        value_shifted = value_unsigned << self.base_index
         return value_shifted & mask

@@ -9,6 +9,7 @@
 import pytest
 
 from hdl_registers.bit import Bit
+from hdl_registers.register_field_type import Unsigned
 
 
 def test_get_value():
@@ -111,3 +112,8 @@ def test_updating_to_invalid_default_value_should_raise_exception():
     assert str(exception_info.value) == (
         'Bit "hest" invalid binary value for "default_value". Got: "2".'
     )
+
+
+def test_field_type():
+    bit = Bit(name="test", index=0, description="", default_value="1")
+    assert isinstance(bit.field_type, Unsigned)

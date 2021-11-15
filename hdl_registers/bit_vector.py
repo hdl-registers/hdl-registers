@@ -6,7 +6,8 @@
 # https://gitlab.com/tsfpga/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-from .register_field import RegisterField
+from .register_field import RegisterField, DEFAULT_FIELD_TYPE
+from .register_field_type import FieldType
 
 
 class BitVector(RegisterField):
@@ -15,7 +16,16 @@ class BitVector(RegisterField):
     Used to represent a bit vector field in a register.
     """
 
-    def __init__(self, name, base_index, description, width, default_value):
+    # pylint: disable=too-many-arguments
+    def __init__(
+        self,
+        name,
+        base_index,
+        description,
+        width,
+        default_value,
+        field_type: FieldType = DEFAULT_FIELD_TYPE,
+    ):
         """
         Arguments:
             name (str): The name of the bit vector.
@@ -25,6 +35,7 @@ class BitVector(RegisterField):
             width (int) : The width of the bit vector field.
             default_value (str): Default value as a string. Must be of length ``width`` and contain
                 only "1" and "0".
+            field_type (FieldType): The field type used to interpret the bits of the field.
         """
         self.name = name
         self._base_index = base_index
@@ -36,6 +47,11 @@ class BitVector(RegisterField):
         self._default_value = None
         # Assign self._default_value via setter
         self.default_value = default_value
+        self._field_type = field_type
+
+    @property
+    def field_type(self) -> FieldType:
+        return self._field_type
 
     @property
     def width(self):
@@ -101,8 +117,9 @@ class BitVector(RegisterField):
         shift = self.base_index
         mask_at_base = (1 << self.width) - 1
         mask = mask_at_base << shift
-        value = (register_value & mask) >> shift
-        return value
+        value_unsigned = (register_value & mask) >> shift
+        field_value = self.field_type.convert_from_unsigned_binary(self.width, value_unsigned)
+        return field_value
 
     @property
     def range(self):
@@ -123,4 +140,5 @@ base_index={self.base_index},\
 description={self.description},
 width={self.width},\
 default_value={self.default_value},\
+field_type={self.field_type},\
 )"""

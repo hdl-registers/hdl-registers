@@ -157,6 +157,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                     vhdl += f"""\
   subtype {name} is natural range {field.width + field.base_index - 1} downto {field.base_index};
   constant {name}_width : positive := {field.width};
+  subtype {name}_t is {field.field_type.vhdl_typedef(bit_width=field.width)};
 """
 
             if register.fields:
@@ -204,6 +205,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.fixed_pkg.all;
 
 library reg_file;
 use reg_file.reg_file_pkg.all;

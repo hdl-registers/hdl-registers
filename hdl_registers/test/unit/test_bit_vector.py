@@ -9,6 +9,7 @@
 import pytest
 
 from hdl_registers.bit_vector import BitVector
+from hdl_registers.register_field_type import Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint
 
 
 def test_get_value():
@@ -22,6 +23,18 @@ def test_get_value():
 
     register_value = int("101010101", base=2)
     assert bit.get_value(register_value) == 5
+
+    # Test field_type
+    field = BitVector(
+        name="",
+        base_index=2,
+        description="",
+        width=16,
+        default_value="0" * 16,
+        field_type=SignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8),
+    )
+    register_value = 0b11111111_00000011_11111111_11111100
+    assert field.get_value(register_value) == -0.00390625
 
 
 def test_max_binary_value():
@@ -84,6 +97,17 @@ def test_set_value():
     value2 = bit_vector2.set_value(bit_vector2.get_value(register_value))
     assert value0 | value1 | value2 == register_value
 
+    # Test field_type
+    field = BitVector(
+        name="",
+        base_index=2,
+        description="",
+        width=16,
+        default_value="0" * 16,
+        field_type=SignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8),
+    )
+    assert field.set_value(-0.00390625) == 0b11_11111111_11111100
+
 
 def test_repr():
     # Check that repr is an actual representation, not just "X object at 0xABCDEF"
@@ -115,6 +139,33 @@ def test_repr():
     assert repr(
         BitVector(name="apa", base_index=0, description="", width=1, default_value="1")
     ) != repr(BitVector(name="apa", base_index=0, description="", width=1, default_value="0"))
+
+    # Different field_type
+    field0 = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=8,
+        default_value="0" * 8,
+        field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+    )
+    field1 = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=8,
+        default_value="0" * 8,
+        field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+    )
+    field2 = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=8,
+        default_value="0" * 8,
+        field_type=UnsignedFixedPoint(max_bit_index=8, min_bit_index=-1),
+    )
+    assert repr(field0) == repr(field1) != repr(field2)
 
 
 def test_invalid_width():
@@ -183,3 +234,42 @@ def test_default_value_uint():
 
     bit_vector.default_value = "1001"
     assert bit_vector.default_value_uint == 9
+
+
+def test_field_type():
+    bit_vector = BitVector(name="", base_index=0, description="", width=4, default_value="1111")
+    assert isinstance(bit_vector.field_type, Unsigned)
+
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=4, default_value="1111", field_type=Unsigned()
+    )
+    assert isinstance(bit_vector.field_type, Unsigned)
+
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=4, default_value="1111", field_type=Signed()
+    )
+    assert isinstance(bit_vector.field_type, Signed)
+
+    bit_vector = BitVector(
+        name="",
+        base_index=0,
+        description="",
+        width=4,
+        default_value="1111",
+        field_type=SignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+    )
+    assert isinstance(bit_vector.field_type, SignedFixedPoint)
+    assert bit_vector.field_type.max_bit_index == 7
+    assert bit_vector.field_type.min_bit_index == -2
+
+    bit_vector = BitVector(
+        name="",
+        base_index=0,
+        description="",
+        width=4,
+        default_value="1111",
+        field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+    )
+    assert isinstance(bit_vector.field_type, UnsignedFixedPoint)
+    assert bit_vector.field_type.max_bit_index == 7
+    assert bit_vector.field_type.min_bit_index == -2
