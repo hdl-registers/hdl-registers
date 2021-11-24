@@ -85,7 +85,7 @@ def test_vhdl_package_with_only_one_register(tmp_path):
   );
 
   constant apa_regs_init : apa_regs_t := (
-    0 => std_logic_vector(to_signed(0, 32))
+    0 => "00000000000000000000000000000000"
   );
 """
     assert expected in vhdl, vhdl

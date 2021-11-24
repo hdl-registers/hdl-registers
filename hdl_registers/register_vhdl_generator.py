@@ -111,9 +111,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                 register_definitions.append(
                     f"{opening}(idx => {idx}, reg_type => {register_object.mode})"
                 )
-                default_values.append(
-                    f"{opening}std_logic_vector(to_signed({register_object.default_value}, 32))"
-                )
+                default_values.append(f'{opening}"{register_object.default_value:032b}"')
 
                 vhdl_array_index = vhdl_array_index + 1
             else:
@@ -125,9 +123,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                         register_definitions.append(
                             f"{opening}(idx => {idx}, reg_type => {register.mode})"
                         )
-                        default_values.append(
-                            f"{opening}std_logic_vector(to_signed({register.default_value}, 32))"
-                        )
+                        default_values.append(f'{opening}"{register.default_value:032b}"')
 
                         vhdl_array_index = vhdl_array_index + 1
 
