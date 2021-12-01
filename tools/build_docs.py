@@ -38,7 +38,7 @@ def main():
     rst = generate_release_notes(
         repo_root=hdl_registers.REPO_ROOT,
         release_notes_directory=hdl_registers.HDL_REGISTERS_DOC / "release_notes",
-        project_name="tsfpga",
+        project_name="hdl_registers",
     )
     create_file(GENERATED_SPHINX / "release_notes.rst", rst)
 
