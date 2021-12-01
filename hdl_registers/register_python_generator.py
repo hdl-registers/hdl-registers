@@ -40,7 +40,7 @@ class RegisterPythonGenerator(RegisterCodeGenerator):
         pickle_file = output_folder / f"{self.module_name}.pickle"
         py_file = output_folder / f"{self.module_name}.py"
 
-        py_code = f"""\
+        py_code = f'''\
 {self._file_header}
 import pickle
 from pathlib import Path
@@ -50,11 +50,25 @@ THIS_DIR = Path(__file__).parent
 
 class {self._class_name}:
 
+    """
+    Instantiate this class to get the RegisterList object for the {self.module_name} module.
+    """
+
     def __new__(cls):
-        # Recreate the RegisterList object from binary pickle.
+        """
+        Recreate the RegisterList object from binary pickle.
+        """
         with (THIS_DIR / "{pickle_file.name}").open("rb") as file_handle:
             return pickle.load(file_handle)
-"""
+
+
+def get_register_list():
+    """
+    Return a RegisterList object with the registers/constants from the {self.module_name} module.
+    Recreated from a python pickle file.
+    """
+    return {self._class_name}()
+'''
         create_file(py_file, py_code)
 
         with pickle_file.open("wb") as file_handle:
