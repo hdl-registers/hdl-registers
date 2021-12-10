@@ -263,14 +263,17 @@ class RegisterList:
                 register_vhdl_generator.get_package(self.register_objects, self.constants)
             )
 
-    def create_c_header(self, output_path):
+    def create_c_header(self, output_path, file_name=None):
         """
         Create a C header file with register and field definitions.
 
         Arguments:
             output_path (pathlib.Path): Result will be placed here.
+            file_name (str): Optionally specify an explicit file name.
         """
-        output_file = output_path / (self.name + "_regs.h")
+        file_name = f"{self.name}_regs.h" if file_name is None else file_name
+        output_file = output_path / file_name
+
         register_c_generator = RegisterCGenerator(self.name, self.generated_source_info())
         create_file(
             output_file, register_c_generator.get_header(self.register_objects, self.constants)

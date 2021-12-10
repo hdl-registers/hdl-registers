@@ -44,8 +44,10 @@ def test_can_generate_vhdl_package_without_error(tmp_path, register_list):
 @pytest.mark.parametrize("register_list", REGISTER_LISTS)
 def test_can_generate_c_header_without_error(tmp_path, register_list):
     register_list.create_c_header(tmp_path)
-
     assert (tmp_path / f"{register_list.name}_regs.h").exists()
+
+    register_list.create_c_header(tmp_path, file_name="apa.h")
+    assert (tmp_path / "apa.h").exists()
 
 
 @pytest.mark.parametrize("register_list", REGISTER_LISTS)
