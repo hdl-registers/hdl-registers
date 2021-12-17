@@ -16,6 +16,11 @@ class RegisterHtmlGenerator:
     """
 
     def __init__(self, module_name, generated_info):
+        """
+        Arguments:
+            module_name (str): The name of the register map.
+            generated_info (list(str)): Will be placed in the file headers.
+        """
         self.module_name = module_name
         self.generated_info = generated_info
         self._html_translator = HtmlTranslator()
@@ -23,6 +28,9 @@ class RegisterHtmlGenerator:
     def get_register_table(self, register_objects):
         """
         Get a HTML table with register infomation. Can be included in other documents.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
 
         Returns:
             str: HTML code.
@@ -38,6 +46,9 @@ class RegisterHtmlGenerator:
         """
         Get a HTML table with constant infomation. Can be included in other documents.
 
+        Arguments:
+            constants (list(.Constant)): Constants to be included.
+
         Returns:
             str: HTML code.
         """
@@ -51,6 +62,10 @@ class RegisterHtmlGenerator:
     def get_page(self, register_objects, constants):
         """
         Get a complete HTML page with register and constant infomation.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+            constants (list(.Constant)): Constants to be included.
 
         Returns:
             str: HTML code.

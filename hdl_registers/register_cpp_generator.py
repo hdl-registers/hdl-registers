@@ -22,11 +22,27 @@ class RegisterCppGenerator(RegisterCodeGenerator):
     """
 
     def __init__(self, module_name, generated_info):
+        """
+        Arguments:
+            module_name (str): The name of the register map.
+            generated_info (list(str)): Will be placed in the file headers.
+        """
         self.module_name = module_name
         self.generated_info = generated_info
         self._class_name = self._to_pascal_case(module_name)
 
     def get_interface(self, register_objects, constants):
+        """
+        Get a complete C++ interface class header with all constant values and the signatures of
+        all methods.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+            constants (list(.Constant)): Constants to be included.
+
+        Returns:
+            str: C++ code.
+        """
         cpp_code = f"class I{self._class_name}\n"
         cpp_code += "{\n"
         cpp_code += "public:\n"
@@ -104,6 +120,15 @@ class RegisterCppGenerator(RegisterCodeGenerator):
         return cpp_code
 
     def get_header(self, register_objects):
+        """
+        Get a complete C++ class header for the implementation of all methods.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+
+        Returns:
+            str: C++ code.
+        """
         cpp_code = f"class {self._class_name} : public I{self._class_name}\n"
         cpp_code += "{\n"
 
@@ -139,6 +164,15 @@ class RegisterCppGenerator(RegisterCodeGenerator):
         return cpp_code_top + self._with_namespace(cpp_code)
 
     def get_implementation(self, register_objects):
+        """
+        Get a complete C++ class implementation with all methods.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+
+        Returns:
+            str: C++ code.
+        """
         cpp_code = f"{self._class_name}::{self._constructor_signature()}\n"
         cpp_code += "    : m_registers(reinterpret_cast<volatile uint32_t *>(base_address))\n"
         cpp_code += "{\n"

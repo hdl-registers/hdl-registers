@@ -21,10 +21,25 @@ class RegisterCGenerator(RegisterCodeGenerator):
     """
 
     def __init__(self, module_name, generated_info):
+        """
+        Arguments:
+            module_name (str): The name of the register map.
+            generated_info (list(str)): Will be placed in the file headers.
+        """
         self.module_name = module_name
         self.generated_info = generated_info
 
     def get_header(self, register_objects, constants):
+        """
+        Get a complete C header with all constants and all registers.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+            constants (list(.Constant)): Constants to be included.
+
+        Returns:
+            str: C code.
+        """
         define_name = self.module_name.upper() + "_REGS_H"
 
         c_code = f"""\

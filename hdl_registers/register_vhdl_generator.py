@@ -18,6 +18,11 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
     """
 
     def __init__(self, module_name, generated_info):
+        """
+        Arguments:
+            module_name (str): The name of the register map.
+            generated_info (list(str)): Will be placed in the file headers.
+        """
         self.module_name = module_name
         self.generated_info = generated_info
 
@@ -194,6 +199,16 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         return vhdl
 
     def get_package(self, register_objects, constants):
+        """
+        Get a complete VHDL package with register and constant infomation.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+            constants (list(.Constant)): Constants to be included.
+
+        Returns:
+            str: VHDL code.
+        """
         pkg_name = f"{self.module_name}_regs_pkg"
 
         vhdl = f"""\
