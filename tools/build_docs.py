@@ -26,8 +26,9 @@ from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 import hdl_registers
 from hdl_registers.about import get_readme_rst
+from hdl_registers.parser import from_toml
 
-GENERATED_SPHINX = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx"
+GENERATED_SPHINX = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_rst"
 GENERATED_SPHINX_HTML = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_html"
 SPHINX_DOC = hdl_registers.HDL_REGISTERS_DOC / "sphinx"
 
@@ -43,6 +44,8 @@ def main():
     create_file(GENERATED_SPHINX / "release_notes.rst", rst)
 
     generate_apidoc()
+
+    generate_register_code()
 
     generate_sphinx_index()
 
@@ -88,6 +91,26 @@ def generate_apidoc():
         "**/test/**",
     ]
     check_call(cmd, cwd=hdl_registers.REPO_ROOT)
+
+
+def generate_register_code():
+    toml_file = SPHINX_DOC / "files" / "example.toml"
+    register_list = from_toml(module_name="example", toml_file=toml_file, default_registers=None)
+
+    output_path = GENERATED_SPHINX / "register_code"
+
+    create_directory(output_path / "vhdl")
+    register_list.create_vhdl_package(output_path=output_path / "vhdl")
+
+    register_list.create_html_page(output_path=output_path / "html")
+    register_list.create_html_register_table(output_path=output_path / "html")
+    register_list.create_html_constant_table(output_path=output_path / "html")
+
+    register_list.create_c_header(output_path=output_path / "c")
+
+    register_list.create_cpp_interface(output_path=output_path / "cpp")
+    register_list.create_cpp_header(output_path=output_path / "cpp")
+    register_list.create_cpp_implementation(output_path=output_path / "cpp")
 
 
 def generate_sphinx_index():

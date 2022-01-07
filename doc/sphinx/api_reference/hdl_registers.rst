@@ -1,1 +1,1 @@
-.. include:: ../../../generated/sphinx/apidoc/hdl_registers.rst
+.. include:: ../../../generated/sphinx_rst/apidoc/hdl_registers.rst

@@ -28,7 +28,25 @@ About ``hdl_registers``
   :target: https://hdl-registers.com/python_coverage_html
 
 The hdl_registers project is a HDL register generator fast enough to be run in real time.
+It can easily be plugged into your development environment so that register code generation is done
+before each build and simulation run.
+For your FPGA release artifacts it can generate headers and documentation.
 
 **See documentation on the website**: https://hdl-registers.com
 
-TBC...
+The typical use case is to let hdl_registers parse a ``.toml`` file with register definitions that
+make up a register map.
+It is also possible to work directly with the Python abstractions as well, without using a
+data file.
+From the Python abstractions, the following code can be generated:
+
+* VHDL package containing the register constant values, as well as a type with all the registers
+  and their modes.
+  This can then be used with a
+  `general register file <https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd>`_
+  in the VHDL code.
+* HTML website with documentation of the registers and constants.
+* C header with constant values, register addresses, and register field information.
+* C++ header and implementation with constant values, and setters/getters for the
+  different registers.
+  The header has an abstract interface class which can be used for mocking.

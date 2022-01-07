@@ -35,6 +35,7 @@ extensions = [
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "hdl_modules": ("https://hdl-modules.com", None),
     "tsfpga": ("https://tsfpga.com", None),
 }
 

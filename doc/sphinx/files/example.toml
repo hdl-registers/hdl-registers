@@ -1,0 +1,125 @@
+################################################################################
+# This will allocate a register with the name "configuration".
+[register.configuration]
+
+# The "mode" property MUST be present for a register.
+# The value specified must be a valid mode string value.
+mode = "r_w"
+# The "description" property is optional for a register. Will default to "" if not specified.
+# The value specified must be a string.
+description = """This is the description of my register.
+
+Rudimentary RST formatting can be used, such as **boldface** and *italics*."""
+
+
+# This will allocate a bit field named "enable" in the "configuration" register.
+[register.configuration.bit.enable]
+
+# The "description" property is optional for a bit field. Will default to "" if not specified.
+# The value specified must be a string.
+description = "Description of the **enable** bit field."
+# The "default_value" property is optional for a bit field.
+# Must hold either of the strings "1" or "0" if specified.
+# Will default to "0" if not specified.
+default_value = "1"
+
+
+# This will allocate a bit vector field named "data_tag" in the "configuration" register.
+[register.configuration.bit_vector.data_tag]
+
+# The "width" property MUST be present for a bit vector field.
+# The value specified must be a positive integer.
+width = 4
+# The "description" property is optional for a bit vector field. Will default to "" if not specified.
+# The value specified must be a string.
+description = "Description of my **data_tag** bit vector field."
+# The "default_value" property is optional for a bit vector field.
+# The value specified must be a string whose length is the same as the specified **width** property value.
+# May only contain ones and zeros.
+# Will default to all zeros if not specified.
+default_value = "0101"
+
+
+################################################################################
+# Another register added as an example. Will allocate a register with the name "status".
+[register.status]
+
+mode = "r"
+
+[register.status.bit.idle]
+
+description = """'1' when the module is inactive and a new run can be launched.
+
+'0' when the module is working."""
+default_value = "1"
+
+[register.status.bit.stalling]
+
+description = "'1' if the module is currently being stalled."
+
+[register.status.bit_vector.counter]
+
+description = "Number of bursts that have finished."
+width = 8
+
+
+################################################################################
+# This will allocate a register array with the name "base_addresses".
+[register_array.base_addresses]
+
+# The "array_length" property MUST be present for a register array.
+# The value specified must be a positive integer.
+# The registers within the array will be repeated this many times.
+array_length = 3
+# The "description" property is optional for a register array. Will default to "" if not specified.
+# The value specified must be a string.
+description = "One set of base addresses for each feature."
+
+
+# ------------------------------------------------------------------------------
+# This will allocate a register "read_address" in the "base_addresses" array.
+[register_array.base_addresses.register.read_address]
+
+# Registers in a register array follow the exact same rules as "plain" registers.
+# The properties that may and must be set are the same.
+# Fields (bits, bit vectors, ...) can be added to array registers in the same way.
+mode = "w"
+
+# This will allocate a bit vector field named "address" in the "read_address" register within the "base_addresses" array.
+[register_array.base_addresses.register.read_address.bit_vector.address]
+
+width = 28
+description = "Read address for a 256 MiB address space."
+
+
+# ------------------------------------------------------------------------------
+# This will allocate a register "write_address" in the "base_addresses" array.
+[register_array.base_addresses.register.write_address]
+
+mode = "w"
+
+# This will allocate a bit vector field named "address" in the "write_address" register within the "base_addresses" array.
+[register_array.base_addresses.register.write_address.bit_vector.address]
+
+width = 28
+description = "Write address for a 256 MiB address space."
+
+
+################################################################################
+# This will allocate a register constant with the name "axi_data_width".
+[constant.axi_data_width]
+
+# The "value" property MUST be present for a register array.
+# The value specified must be an integer.
+value = 64
+# The "description" property is optional for a constant. Will default to "" if not specified.
+# The value specified must be a string.
+description = "Data width of the AXI port used by this module."
+
+
+################################################################################
+# Another register constant added as an example. Will allocate a constant with the name "address_alignment".
+[constant.address_alignment]
+
+value = 4096
+description = "The required address alignment for memory buffers."

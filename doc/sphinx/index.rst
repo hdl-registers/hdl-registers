@@ -1,4 +1,4 @@
-.. include:: ../../generated/sphinx/index.rst
+.. include:: ../../generated/sphinx_rst/index.rst
 
 .. toctree::
     :caption: About
@@ -8,12 +8,21 @@
     contributing
     release_notes
 
-
 .. toctree::
-    :caption: Technical documentation
+    :caption: User guide
     :hidden:
 
-    registers
+    getting_started
+    toml_format
+
+.. toctree::
+    :caption: Code generators
+    :hidden:
+
+    c_generator
+    cpp_generator
+    html_generator
+    vhdl_generator
 
 .. toctree::
     :caption: API reference
