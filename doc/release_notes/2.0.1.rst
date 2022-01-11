@@ -1,1 +1,2 @@
-Second release to test PyPI deploy. Functionality is identical to `tsfpga <https://tsfpga.com/>`__ version 9.0.0.
+Second release to test PyPI deploy. Functionality is identical to
+`tsfpga <https://tsfpga.com/>`__ version 9.0.0.

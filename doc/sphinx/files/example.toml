@@ -30,11 +30,13 @@ default_value = "1"
 # The "width" property MUST be present for a bit vector field.
 # The value specified must be a positive integer.
 width = 4
-# The "description" property is optional for a bit vector field. Will default to "" if not specified.
+# The "description" property is optional for a bit vector field.
+# Will default to "" if not specified.
 # The value specified must be a string.
 description = "Description of my **data_tag** bit vector field."
 # The "default_value" property is optional for a bit vector field.
-# The value specified must be a string whose length is the same as the specified **width** property value.
+# The value specified must be a string whose length is the same as the
+# specified **width** property value.
 # May only contain ones and zeros.
 # Will default to all zeros if not specified.
 default_value = "0101"
@@ -85,7 +87,8 @@ description = "One set of base addresses for each feature."
 # Fields (bits, bit vectors, ...) can be added to array registers in the same way.
 mode = "w"
 
-# This will allocate a bit vector field named "address" in the "read_address" register within the "base_addresses" array.
+# This will allocate a bit vector field named "address" in the "read_address" register within
+# the "base_addresses" array.
 [register_array.base_addresses.register.read_address.bit_vector.address]
 
 width = 28
@@ -98,7 +101,8 @@ description = "Read address for a 256 MiB address space."
 
 mode = "w"
 
-# This will allocate a bit vector field named "address" in the "write_address" register within the "base_addresses" array.
+# This will allocate a bit vector field named "address" in the "write_address" register within
+# the "base_addresses" array.
 [register_array.base_addresses.register.write_address.bit_vector.address]
 
 width = 28
@@ -118,7 +122,8 @@ description = "Data width of the AXI port used by this module."
 
 
 ################################################################################
-# Another register constant added as an example. Will allocate a constant with the name "address_alignment".
+# Another register constant added as an example. Will allocate a constant with the
+# name "address_alignment".
 [constant.address_alignment]
 
 value = 4096

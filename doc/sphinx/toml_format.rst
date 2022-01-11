@@ -5,7 +5,8 @@
 
 The register TOML parser reads a ``.toml`` file and constructs a :class:`.RegisterList` object.
 It is important the the TOML is formatted correctly and has the necessary fields.
-The register TOML parser will warn if there are any error in the TOML, such as missing fields, unknown fields, wrong data types for fields, etc.
+The register TOML parser will warn if there are any error in the TOML, such as missing fields,
+unknown fields, wrong data types for fields, etc.
 
 The parser is implemented in the :class:`.RegisterParser` class and :func:`.from_toml` function.
 

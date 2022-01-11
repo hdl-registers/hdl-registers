@@ -1,11 +1,13 @@
 HTML code generator
 ===================
 
-A complete HTML page can be generated, with register details as well as textual description of the different register modes.
+A complete HTML page can be generated, with register details as well as textual description of the
+different register modes.
 This is done with a call to :meth:`.RegisterList.create_html_page`.
 
 .. note::
-   Markdown/reStructuredText syntax can be used in register and bit descriptions, which will be converted to appropriate HTML tags.
+   Markdown/reStructuredText syntax can be used in register and bit descriptions, which will be
+   converted to appropriate HTML tags.
    Text can be set bold with double asterisks, and italicised with a single asterisk.
    A paragraph break can be inserted with consecutive newlines.
 
@@ -19,7 +21,8 @@ Tables only
 -----------
 
 Optionally, only the tables with register and constant descriptions can be generated to HTML,
-using :meth:`.RegisterList.create_html_register_table` and :meth:`.RegisterList.create_html_constant_table`.
+using :meth:`.RegisterList.create_html_register_table`
+and :meth:`.RegisterList.create_html_constant_table`.
 These can be included in a separate documentation flow.
 
 Generated HTML file here:
