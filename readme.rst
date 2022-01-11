@@ -1,5 +1,5 @@
-About ``hdl_registers``
-=======================
+About hdl_registers
+===================
 
 |pic_website| |pic_gitlab| |pic_gitter| |pic_pip_install| |pic_license| |pic_python_line_coverage|
 
