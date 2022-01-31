@@ -46,12 +46,12 @@ def _from_unsigned_binary(
     if integer_bit_width + fraction_bit_width != bit_width:
         raise ValueError("Inconsistent bit width")
 
-    value = unsigned_binary * 2 ** -fraction_bit_width
+    value = unsigned_binary * 2**-fraction_bit_width
     if is_signed:
         sign_bit = unsigned_binary & (1 << (bit_width - 1))
         if sign_bit != 0:
             # If sign bit is set, compute negative value.
-            value -= 2 ** integer_bit_width
+            value -= 2**integer_bit_width
 
     return value
 
@@ -94,7 +94,7 @@ def _to_unsigned_binary(
     if integer_bit_width + fraction_bit_width != bit_width:
         raise ValueError("Inconsistent bit width")
 
-    binary_value = round(value * 2 ** fraction_bit_width)
+    binary_value = round(value * 2**fraction_bit_width)
     if value < 0:
         if is_signed:
             binary_value += 1 << bit_width
@@ -181,7 +181,7 @@ class Unsigned(FieldType):
         return 0
 
     def max_value(self, bit_width: int) -> int:
-        return 2 ** bit_width - 1
+        return 2**bit_width - 1
 
     def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> int:
         return unsigned_binary

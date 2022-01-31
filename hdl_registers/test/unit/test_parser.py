@@ -141,7 +141,7 @@ default_value="0000000000000011"
         assert registers[1].mode == "r_w"
         assert registers[1].index == 1
         assert registers[1].description == "Interrupt register"
-        assert registers[1].default_value == 6 * 2 ** 2 + 1 * 2 ** 1
+        assert registers[1].default_value == 6 * 2**2 + 1 * 2**1
         assert registers[1].fields[0].name == "bad"
         assert registers[1].fields[0].description == "Bad things happen"
         assert registers[1].fields[0].default_value == "0"

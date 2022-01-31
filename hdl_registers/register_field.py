@@ -29,7 +29,7 @@ class RegisterField(ABC):
         Returns:
             int: The maximum value.
         """
-        return 2 ** self.width - 1
+        return 2**self.width - 1
 
     @property
     def field_type(self) -> FieldType:

@@ -110,7 +110,7 @@ def test_default_value():
     register.append_bit_vector(name="foo", description="", width=4, default_value="0110")
     register.append_bit_vector(name="foo", description="", width=4, default_value="0101")
 
-    assert register.default_value == 1 * 2 ** 0 + 1 * 2 ** 2 + 6 * 2 ** 3 + 5 * 2 ** 7
+    assert register.default_value == 1 * 2**0 + 1 * 2**2 + 6 * 2**3 + 5 * 2**7
 
 
 def test_default_value_can_be_updated():

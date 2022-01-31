@@ -129,7 +129,7 @@ class Register:
         """
         default_value = 0
         for field in self.fields:
-            default_value += field.default_value_uint * 2 ** field.base_index
+            default_value += field.default_value_uint * 2**field.base_index
         return default_value
 
     def get_field(self, name):
