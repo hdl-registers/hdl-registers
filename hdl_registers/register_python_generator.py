@@ -34,7 +34,7 @@ class RegisterPythonGenerator(RegisterCodeGenerator):
         that recreates it.
 
         Arguments:
-            register_list (.RegisterList): This register list object will be saved.
+            register_list (RegisterList): This register list object will be saved.
             output_folder (pathlib.Path): The pickle and python files will be saved here.
         """
         pickle_file = output_folder / f"{self.module_name}.pickle"

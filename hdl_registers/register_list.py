@@ -64,7 +64,7 @@ class RegisterList:
 
                 Can be set to ``None`` if this information does not make sense in the current
                 use case.
-            default_registers (list(.Register)): These registers will be inserted in the
+            default_registers (list(Register)): These registers will be inserted in the
                register list.
         """
         register_list = cls(name=name, source_definition_file=source_definition_file)
@@ -80,7 +80,7 @@ class RegisterList:
             mode (str): A valid register mode.
             description (str): Textual register description.
         Return:
-            :class:`.Register`: The register object that was created.
+            Register: The register object that was created.
         """
         if self.register_objects:
             index = self.register_objects[-1].index + 1
@@ -100,7 +100,7 @@ class RegisterList:
             name (str): The name of the register array.
             length (int): The number of times the register sequence shall be repeated.
         Return:
-            :class:`.RegisterArray`: The register array object that was created.
+            RegisterArray: The register array object that was created.
         """
         if self.register_objects:
             base_index = self.register_objects[-1].index + 1
@@ -121,7 +121,7 @@ class RegisterList:
         Arguments:
             name (str): The name of the register.
         Return:
-            :class:`.Register`: The register.
+            Register: The register.
         """
         for register_object in self.register_objects:
             if isinstance(register_object, Register) and register_object.name == name:
@@ -136,7 +136,7 @@ class RegisterList:
         Arguments:
             name (str): The name of the register array.
         Return:
-            :class:`.RegisterArray`: The register array.
+            RegisterArray: The register array.
         """
         for register_object in self.register_objects:
             if isinstance(register_object, RegisterArray) and register_object.name == name:
@@ -186,7 +186,7 @@ class RegisterList:
             length (int): The constant value (signed).
             description (str): Textual description for the constant.
         Return:
-            :class:`.Constant`: The constant object that was created.
+            Constant: The constant object that was created.
         """
         constant = Constant(name, value, description)
         self.constants.append(constant)
@@ -199,7 +199,7 @@ class RegisterList:
         Arguments:
             name (str): The name of the constant.
         Return:
-            :class:`.Constant`: The constant.
+            Constant: The constant.
         """
         for constant in self.constants:
             if constant.name == name:

@@ -47,7 +47,7 @@ class RegisterHtmlGenerator:
         Get a HTML table with constant infomation. Can be included in other documents.
 
         Arguments:
-            constants (list(.Constant)): Constants to be included.
+            constants (list(Constant)): Constants to be included.
 
         Returns:
             str: HTML code.
@@ -65,7 +65,7 @@ class RegisterHtmlGenerator:
 
         Arguments:
             register_objects (list): Register arrays and registers to be included.
-            constants (list(.Constant)): Constants to be included.
+            constants (list(Constant)): Constants to be included.
 
         Returns:
             str: HTML code.

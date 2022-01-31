@@ -38,7 +38,7 @@ class RegisterCppGenerator(RegisterCodeGenerator):
 
         Arguments:
             register_objects (list): Register arrays and registers to be included.
-            constants (list(.Constant)): Constants to be included.
+            constants (list(Constant)): Constants to be included.
 
         Returns:
             str: C++ code.
