@@ -28,8 +28,8 @@ About hdl_registers
   :target: https://hdl-registers.com/python_coverage_html
 
 The hdl_registers project is a HDL register generator fast enough to be run in real time.
-It can easily be plugged into your development environment so that register code generation is done
-before each build and simulation run.
+It can easily be plugged into your development environment so that VHDL register code generation is
+done before each build and simulation run.
 For your FPGA release artifacts it can generate headers and documentation.
 
 **See documentation on the website**: https://hdl-registers.com
