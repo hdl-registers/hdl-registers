@@ -34,6 +34,8 @@ For your FPGA release artifacts it can generate headers and documentation.
 
 **See documentation on the website**: https://hdl-registers.com
 
+**See PyPI for installation details**: https://pypi.org/project/hdl-registers/
+
 The typical use case is to let hdl_registers parse a ``.toml`` file with register definitions that
 make up a register map.
 It is also possible to work directly with the Python abstractions as well, without using a

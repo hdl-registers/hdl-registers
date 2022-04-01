@@ -52,7 +52,7 @@ def main():
         name="hdl_registers",
         version=hdl_registers.__version__,
         description=get_slogan(),
-        long_description=get_readme_rst(include_website_link=True),
+        long_description=get_readme_rst(include_extra_for_pypi=True),
         long_description_content_type="text/x-rst",
         license="BSD 3-Clause License",
         author="Lukas Vik",

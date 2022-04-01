@@ -16,21 +16,47 @@ For your FPGA release artifacts it can generate headers and documentation."""
     return rst
 
 
-def get_readme_rst(include_website_link):
+def get_readme_rst(
+    include_extra_for_gitlab=False,
+    include_extra_for_website=False,
+    include_extra_for_pypi=False,
+):
     """
     Get the complete README.rst (to be used on website and in PyPI release).
     RST file inclusion in README.rst does not work on gitlab unfortunately, hence this
     cumbersome handling where the README is duplicated in two places.
 
-    Arguments:
-        include_website_link (bool): Include a link to the website in README.
-    """
+    The generics control some extra text that is included. This is mainly links to the
+    other places where you can find information on the project (website, gitlab, PyPI).
 
-    extra_rst = (
-        "**See documentation on the website**: https://hdl-registers.com\n"
-        if include_website_link
-        else ""
-    )
+    Arguments:
+        include_extra_for_gitlab (bool): Include the extra text that shall be included in the
+            gitlab README.
+        include_extra_for_website (bool): Include the extra text that shall be included in the
+            website main page.
+      include_extra_for_pypi (bool): Include the extra text that shall be included in the
+            PyPI release README.
+    """
+    if include_extra_for_gitlab:
+        extra_rst = """\
+**See documentation on the website**: https://hdl-registers.com
+
+**See PyPI for installation details**: https://pypi.org/project/hdl-registers/
+"""
+    elif include_extra_for_website:
+        extra_rst = """\
+This website contains readable documentation for the project.
+To check out the source code go to the `gitlab page <https://gitlab.com/tsfpga/hdl_registers>`__.
+To install see the `PyPI page <https://pypi.org/project/hdl-registers/>`__.
+"""
+    elif include_extra_for_pypi:
+        extra_rst = """\
+**See documentation on the website**: https://hdl-registers.com
+
+**Check out the source code on gitlab**: https://gitlab.com/tsfpga/hdl_registers
+"""
+    else:
+        extra_rst = ""
 
     readme_rst = f"""\
 About hdl_registers
