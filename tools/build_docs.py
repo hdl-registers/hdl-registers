@@ -112,6 +112,8 @@ def generate_register_code():
     register_list.create_cpp_header(output_path=output_path / "cpp")
     register_list.create_cpp_implementation(output_path=output_path / "cpp")
 
+    register_list.create_python_class(output_path=output_path / "py")
+
 
 def generate_sphinx_index():
     """

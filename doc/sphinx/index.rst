@@ -23,6 +23,7 @@
     cpp_generator
     html_generator
     vhdl_generator
+    python_generator
 
 .. toctree::
     :caption: API reference
