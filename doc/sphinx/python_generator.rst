@@ -1,3 +1,5 @@
+.. _python_generator:
+
 Python code generator
 =====================
 
