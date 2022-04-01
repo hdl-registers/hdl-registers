@@ -26,10 +26,6 @@ REQUIREMENTS_DEVELOP_TXT = hdl_registers.HDL_REGISTERS_PATH / "requirements_deve
 
 def main():
     """
-    Note that this script must be called from a clean repo (since all files in "tsfpga" and
-    "modules" will be included; so if there are stray dirty files the will be included as well).
-    Please use the "tools/build_pypi_release.py" script.
-
     Be extremely careful when making changes to this setup script. It is hard to see what is
     actually included and what is missing. Also the package data, and where it gets placed in the
     release tree, is very messy.
@@ -37,14 +33,13 @@ def main():
     When making changes it is recommended to try the release locally before commiting to master.
     To test in a docker image do, e.g:
 
-    python tools/build_pypi_release.py --clean-and-build
+    python3 setup.py sdist
     docker run --rm --interactive --tty --volume $(pwd)/dist:/dist:ro --workdir /dist \
         python:3.8-slim-buster /bin/bash
     python -m pip install hdl_registers-1.0.2.tar.gz
 
     The install should pass and you should be able to run python and "import hdl_registers".
     You should see all the files in "/usr/local/lib/python3.8/site-packages/hdl_registers".
-    Check that e.g. pylintrc, vivado_settings.tcl, module_fifo.py, etc. are there.
     Test to run "python -m pip uninstall hdl_registers" and see that it passes. Check the output to
     see that there are not package files installed in weird locations (such as /usr/local/lib/).
     """
