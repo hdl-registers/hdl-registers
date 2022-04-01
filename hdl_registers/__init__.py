@@ -18,4 +18,4 @@ HDL_REGISTERS_PATH = REPO_ROOT / "hdl_registers"
 HDL_REGISTERS_DOC = REPO_ROOT / "doc"
 HDL_REGISTERS_GENERATED = REPO_ROOT / "generated"
 
-__version__ = "2.1.0"
+__version__ = "2.1.1-dev"
