@@ -26,7 +26,7 @@ def get_readme_rst(
     RST file inclusion in README.rst does not work on gitlab unfortunately, hence this
     cumbersome handling where the README is duplicated in two places.
 
-    The generics control some extra text that is included. This is mainly links to the
+    The arguments control some extra text that is included. This is mainly links to the
     other places where you can find information on the project (website, gitlab, PyPI).
 
     Arguments:
