@@ -3,7 +3,7 @@ VHDL code generator
 
 A VHDL package can be generated with a call to :meth:`.RegisterList.create_vhdl_package`.
 The VHDL package file is designed to be used with the generic AXI-Lite register file available in
-hdl_modules: :ref:`reg_file.axi_lite_reg_file`.
+the `hdl_modules <https://hdl-modules.com>`__ project: :ref:`reg_file.axi_lite_reg_file`.
 
 Since generation of VHDL packages is usually run in real time (e.g. before running a simulation) the
 speed of the tool is important.
@@ -35,10 +35,12 @@ For the plain register (``configuration``) the register index is simply a natura
 For the register arrays it is instead a function, e.g. ``example_base_addresses_read_address``.
 The function takes an array index argument and will assert if it is out of bounds of the array.
 
-Note that there is a large eco-system of register related components in the hdl_modules project.
+Note that there is a large eco-system of register related components in
+the `hdl_modules <https://hdl-modules.com>`__ project.
 Firstly there are wrappers available for easier working with VUnit verification components.
 See the :ref:`bfm library <module_bfm>` and :ref:`reg_file.reg_operations_pkg`.
 Furthermore there is a large number of synthesizable AXI components available that enable the
 register bus: AXI-to-AXI-Lite converter, AXI/AXI-Lite interconnect, AXI-Lite mux (splitter),
 AXI-Lite clock domain crossing, etc.
-See the :ref:`axi library <module_axi>` for more details.
+See the :ref:`reg_file library <module_reg_file>` and :ref:`axi library <module_axi>` for
+more details.

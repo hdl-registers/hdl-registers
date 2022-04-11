@@ -100,7 +100,7 @@ From the Python abstractions, the following code can be generated:
 * VHDL package containing the register constant values, as well as a type with all the registers
   and their modes.
   This can then be used with a
-  `general register file \
+  `generic register file \
 <https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd>`_
   in the VHDL code.
 * HTML website with documentation of the registers and constants.
