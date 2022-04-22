@@ -25,7 +25,8 @@ def test_running_simulation(tmp_path):
     that (some of) the information is correct.
     """
     register_list = from_toml(
-        module_name="example", toml_file=HDL_REGISTERS_DOC / "sphinx" / "files" / "example.toml"
+        module_name="example",
+        toml_file=HDL_REGISTERS_DOC / "sphinx" / "files" / "regs_example.toml",
     )
     register_list.create_vhdl_package(output_path=tmp_path)
 

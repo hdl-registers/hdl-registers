@@ -16,20 +16,21 @@ import tsfpga
 from tsfpga.examples.example_env import get_default_registers
 from tsfpga.system_utils import read_file
 
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TEST
 from hdl_registers.parser import from_toml
 
 
-# Test with the two example TOML files that we have available
+# Test with all the example TOML files that we have available
 REGISTER_LISTS = [
     from_toml(
         module_name="ddr_buffer",
         toml_file=tsfpga.TSFPGA_EXAMPLE_MODULES / "ddr_buffer" / "regs_ddr_buffer.toml",
         default_registers=get_default_registers(),
     ),
+    from_toml(module_name="test", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
     from_toml(
-        module_name="artyz7",
-        toml_file=tsfpga.TSFPGA_EXAMPLE_MODULES / "artyz7" / "regs_artyz7.toml",
-        default_registers=get_default_registers(),
+        module_name="example",
+        toml_file=HDL_REGISTERS_DOC / "sphinx" / "files" / "regs_example.toml",
     ),
 ]
 

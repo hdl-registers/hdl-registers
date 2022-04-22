@@ -10,9 +10,9 @@ import unittest
 
 import pytest
 
-import tsfpga
 from tsfpga.system_utils import read_file
 
+from hdl_registers import HDL_REGISTERS_TEST
 from hdl_registers.parser import from_toml
 
 
@@ -21,8 +21,8 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
     tmp_path = None
 
     def setUp(self):
-        toml_file = tsfpga.TSFPGA_EXAMPLE_MODULES / "artyz7" / "regs_artyz7.toml"
-        self.registers = from_toml("artyz7", toml_file)
+        toml_file = HDL_REGISTERS_TEST / "regs_test.toml"
+        self.registers = from_toml("test", toml_file)
 
     def test_registers(self):
         """
@@ -157,7 +157,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 
     def _create_html_page(self):
         self.registers.create_html_page(self.tmp_path)
-        html = read_file(self.tmp_path / "artyz7_regs.html")
+        html = read_file(self.tmp_path / "test_regs.html")
         return html
 
     @staticmethod
@@ -214,12 +214,12 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         self.registers.register_objects = []
 
         self.registers.create_html_register_table(self.tmp_path)
-        html = read_file(self.tmp_path / "artyz7_register_table.html")
+        html = read_file(self.tmp_path / "test_register_table.html")
         assert html == "", html
 
     def test_constant_table_is_empty_string_if_no_constants_are_available(self):
         self.registers.constants = []
 
         self.registers.create_html_constant_table(self.tmp_path)
-        html = read_file(self.tmp_path / "artyz7_constant_table.html")
+        html = read_file(self.tmp_path / "test_constant_table.html")
         assert html == "", html

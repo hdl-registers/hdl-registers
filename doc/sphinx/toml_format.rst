@@ -13,7 +13,7 @@ The parser is implemented in the :class:`.RegisterParser` class and :func:`.from
 Below is a compilation of all the TOML properties that are available.
 Comments describe what attributes are optional and which are required.
 
-.. literalinclude:: files/example.toml
+.. literalinclude:: files/regs_example.toml
    :caption: Register TOML format rules.
    :language: toml
 

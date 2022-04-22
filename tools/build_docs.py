@@ -94,7 +94,7 @@ def generate_apidoc():
 
 
 def generate_register_code():
-    toml_file = SPHINX_DOC / "files" / "example.toml"
+    toml_file = SPHINX_DOC / "files" / "regs_example.toml"
     register_list = from_toml(module_name="example", toml_file=toml_file, default_registers=None)
 
     output_path = GENERATED_SPHINX / "register_code"
