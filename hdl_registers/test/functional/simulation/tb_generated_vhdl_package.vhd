@@ -49,12 +49,12 @@ begin
       assert example_reg_map(example_configuration).reg_type = r_w;
       assert example_reg_map(example_status).reg_type = r;
 
-      assert example_reg_map(example_base_addresses_read_address(0)).reg_type = w;
-      assert example_reg_map(example_base_addresses_write_address(0)).reg_type = w;
-      assert example_reg_map(example_base_addresses_read_address(1)).reg_type = w;
-      assert example_reg_map(example_base_addresses_write_address(1)).reg_type = w;
-      assert example_reg_map(example_base_addresses_read_address(2)).reg_type = w;
-      assert example_reg_map(example_base_addresses_write_address(2)).reg_type = w;
+      assert example_reg_map(example_base_addresses_read_address(0)).reg_type = r_w;
+      assert example_reg_map(example_base_addresses_write_address(0)).reg_type = r_w;
+      assert example_reg_map(example_base_addresses_read_address(1)).reg_type = r_w;
+      assert example_reg_map(example_base_addresses_write_address(1)).reg_type = r_w;
+      assert example_reg_map(example_base_addresses_read_address(2)).reg_type = r_w;
+      assert example_reg_map(example_base_addresses_write_address(2)).reg_type = r_w;
 
     elsif run("test_generated_register_field_indexes") then
       -- Generated bit field indexes should match the order and widths in the TOML

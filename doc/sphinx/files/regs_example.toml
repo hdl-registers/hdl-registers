@@ -85,7 +85,7 @@ description = "One set of base addresses for each feature."
 # Registers in a register array follow the exact same rules as "plain" registers.
 # The properties that may and must be set are the same.
 # Fields (bits, bit vectors, ...) can be added to array registers in the same way.
-mode = "w"
+mode = "r_w"
 
 # This will allocate a bit vector field named "address" in the "read_address" register within
 # the "base_addresses" array.
@@ -99,7 +99,7 @@ description = "Read address for a 256 MiB address space."
 # This will allocate a register "write_address" in the "base_addresses" array.
 [register_array.base_addresses.register.write_address]
 
-mode = "w"
+mode = "r_w"
 
 # This will allocate a bit vector field named "address" in the "write_address" register within
 # the "base_addresses" array.

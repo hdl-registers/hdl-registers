@@ -56,7 +56,7 @@ void test_constants()
             main_function += """\
   assert(TEST_NUM_REGS == 8);
   test_addresses();
-  test_bit_indexes();
+  test_field_indexes();
   test_generated_type();
 """
 
@@ -85,9 +85,9 @@ void test_addresses()
   assert(TEST_FURTHER_REGS_DUMMY_REG_ADDR(0) == 4 * (TEST_NUM_REGS - 1));
 }
 
-void test_bit_indexes()
+void test_field_indexes()
 {
-  // Assert bit indexes of plain register
+  // Assert field indexes of plain register
   assert(TEST_PLAIN_DUMMY_REG_PLAIN_BIT_A_SHIFT == 0);
   assert(TEST_PLAIN_DUMMY_REG_PLAIN_BIT_A_MASK == 1);
 
@@ -97,7 +97,7 @@ void test_bit_indexes()
   assert(TEST_PLAIN_DUMMY_REG_PLAIN_BIT_VECTOR_SHIFT == 2);
   assert(TEST_PLAIN_DUMMY_REG_PLAIN_BIT_VECTOR_MASK == 15 << 2);
 
-  // Assert bit indexes of array register
+  // Assert field indexes of array register
   assert(TEST_PLAIN_DUMMY_REG_PLAIN_BIT_A_SHIFT == 0);
   assert(TEST_PLAIN_DUMMY_REG_PLAIN_BIT_A_MASK == 1);
 
@@ -194,7 +194,9 @@ void test_constants()
   fpga_regs::Test test = fpga_regs::Test(base_address);
 
   test_read_write_registers(&test, memory);
-  test_bit_indexes();
+  test_field_indexes();
+  test_field_getters(&test);
+  test_field_getters_from_value(&test);
 """
 
             functions += """\
@@ -237,9 +239,9 @@ void test_read_write_registers(fpga_regs::Test *test, uint32_t *memory)
   assert(memory[7] == 7);
 }
 
-void test_bit_indexes()
+void test_field_indexes()
 {
-  // Assert bit indexes of plain register
+  // Assert field indexes of plain register
   assert(fpga_regs::Test::plain_dummy_reg_plain_bit_a_shift == 0);
   assert(fpga_regs::Test::plain_dummy_reg_plain_bit_a_mask == 1);
   assert(fpga_regs::Test::plain_dummy_reg_plain_bit_b_shift == 1);
@@ -247,13 +249,73 @@ void test_bit_indexes()
   assert(fpga_regs::Test::plain_dummy_reg_plain_bit_vector_shift == 2);
   assert(fpga_regs::Test::plain_dummy_reg_plain_bit_vector_mask == 15 << 2);
 
-  // Assert bit indexes of array register
+  // Assert field indexes of array register
   assert(fpga_regs::Test::dummy_regs_array_dummy_reg_array_bit_a_shift == 0);
   assert(fpga_regs::Test::dummy_regs_array_dummy_reg_array_bit_a_mask == 1);
   assert(fpga_regs::Test::dummy_regs_array_dummy_reg_array_bit_b_shift == 1);
   assert(fpga_regs::Test::dummy_regs_array_dummy_reg_array_bit_b_mask == 2);
   assert(fpga_regs::Test::dummy_regs_array_dummy_reg_array_bit_vector_shift == 2);
   assert(fpga_regs::Test::dummy_regs_array_dummy_reg_array_bit_vector_mask == 31 << 2);
+}
+
+void test_field_getters(fpga_regs::Test *test)
+{
+  // Assert field getters of plain register
+  test->set_plain_dummy_reg((0b1010 << 2) | (0b0  << 1) | (0b1 << 0));
+  assert(test->get_plain_dummy_reg_plain_bit_a() == 1);
+  assert(test->get_plain_dummy_reg_plain_bit_b() == 0);
+  assert(test->get_plain_dummy_reg_plain_bit_vector() == 10);
+
+  test->set_plain_dummy_reg((0b1011 << 2) | (0b1  << 1) | (0b0 << 0));
+  assert(test->get_plain_dummy_reg_plain_bit_a() == 0);
+  assert(test->get_plain_dummy_reg_plain_bit_b() == 1);
+  assert(test->get_plain_dummy_reg_plain_bit_vector() == 11);
+
+  // Assert field getters of array register
+  test->set_dummy_regs_array_dummy_reg(0, (0b1010 << 2) | (0b0  << 1) | (0b1 << 0));
+  test->set_dummy_regs_array_dummy_reg(1, (0b1011 << 2) | (0b1  << 1) | (0b0 << 0));
+
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(0) == 1);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(0) == 0);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(0) == 10);
+
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(1) == 0);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(1) == 1);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(1) == 11);
+}
+
+void test_field_getters_from_value(fpga_regs::Test *test)
+{
+  uint32_t register_value = 0;
+
+  // Assert field getters of plain register
+
+  register_value = (0b1010 << 2) | (0b0  << 1) | (0b1 << 0);
+  assert(test->get_plain_dummy_reg_plain_bit_a_from_value(register_value) == 1);
+  assert(test->get_plain_dummy_reg_plain_bit_b_from_value(register_value) == 0);
+  assert(test->get_plain_dummy_reg_plain_bit_vector_from_value(register_value) == 10);
+
+  register_value = (0b1011 << 2) | (0b1  << 1) | (0b0 << 0);
+  assert(test->get_plain_dummy_reg_plain_bit_a_from_value(register_value) == 0);
+  assert(test->get_plain_dummy_reg_plain_bit_b_from_value(register_value) == 1);
+  assert(test->get_plain_dummy_reg_plain_bit_vector_from_value(register_value) == 11);
+
+
+  // Assert field getters of array register
+
+  register_value = (0b01010 << 2) | (0b0  << 1) | (0b1 << 0);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_a_from_value(register_value) == 1);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_b_from_value(register_value) == 0);
+  assert(
+    test->get_dummy_regs_array_dummy_reg_array_bit_vector_from_value(register_value) == 10
+  );
+
+  register_value = (0b11011 << 2) | (0b1  << 1) | (0b0 << 0);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_a_from_value(register_value) == 0);
+  assert(test->get_dummy_regs_array_dummy_reg_array_bit_b_from_value(register_value) == 1);
+  assert(
+    test->get_dummy_regs_array_dummy_reg_array_bit_vector_from_value(register_value) == 27
+  );
 }
 
 """

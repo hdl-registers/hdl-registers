@@ -1,1 +1,3 @@
-Nothing here yet.
+Added
+
+* Add field getters to :class:`.RegisterCppGenerator`.
