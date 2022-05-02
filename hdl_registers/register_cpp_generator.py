@@ -216,8 +216,11 @@ class InterfaceGenerator(CommonGenerator):
         cpp_code += "public:\n"
 
         for constant in constants:
-            cpp_code += self._comment("Register constant.", indentation=2)
-            cpp_code += self._comment_block(constant.description, indentation=2)
+            cpp_code += self._comment("Register constant. Description:", indentation=2)
+            if constant.description is None or constant.description == "":
+                cpp_code += self._comment("None.", indentation=2)
+            else:
+                cpp_code += self._comment_block(constant.description, indentation=2)
 
             cpp_code += f"  static const int {constant.name} = {constant.value}L;\n"
         if constants:
@@ -248,7 +251,11 @@ class InterfaceGenerator(CommonGenerator):
             )
 
             cpp_code += self._comment(comment=description, indentation=2)
-            cpp_code += self._comment_block(register.description, indentation=2)
+            if register.description is None or register.description == "":
+                cpp_code += self._comment("None.", indentation=2)
+            else:
+                cpp_code += self._comment_block(register.description, indentation=2)
+
             cpp_code += "\n"
 
             if register.is_bus_readable:
@@ -311,7 +318,10 @@ class InterfaceGenerator(CommonGenerator):
             )
 
             cpp_code += self._comment(description, indentation=2)
-            cpp_code += self._comment_block(field.description, indentation=2)
+            if field.description is None or field.description == "":
+                cpp_code += self._comment("None.", indentation=2)
+            else:
+                cpp_code += self._comment_block(field.description, indentation=2)
 
             field_constant_name = self._get_field_constant_name(
                 register=register, register_array=register_array, field=field
