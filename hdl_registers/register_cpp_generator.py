@@ -325,12 +325,13 @@ class InterfaceGenerator(CommonGenerator):
             )
 
             if register.is_bus_readable:
-                cpp_code += self._comment(
-                    f'Getter for the "{field.name}" field {register_description},', indentation=2
+                comment = (
+                    f'Getter for the "{field.name}" field {register_description},\n'
+                    "which will read register value over the register bus."
                 )
-                cpp_code += self._comment(
-                    "which will read register value over the register bus.", indentation=2
-                )
+
+                cpp_code += self._comment_block(text=comment, indentation=2)
+
                 signature = self._field_getter_function_signature(
                     register=register,
                     register_array=register_array,
@@ -339,10 +340,11 @@ class InterfaceGenerator(CommonGenerator):
                 )
                 cpp_code += getter_function(signature=signature)
 
-                cpp_code += self._comment(
-                    f'Getter for the "{field.name}" field {register_description},', indentation=2
+                comment = (
+                    f'Getter for the "{field.name}" field {register_description},\n'
+                    "given the register's current value."
                 )
-                cpp_code += self._comment("given the register's current value.", indentation=2)
+                cpp_code += self._comment_block(text=comment, indentation=2)
 
                 signature = self._field_getter_function_signature(
                     register=register,
