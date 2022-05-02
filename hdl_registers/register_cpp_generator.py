@@ -11,7 +11,7 @@ from .register_array import RegisterArray
 from .register_code_generator import RegisterCodeGenerator
 
 
-class RegisterCppGenerator(RegisterCodeGenerator):
+class RegisterCppGenerator:
     """
     Generate a C++ class with register definitions and methods.
 
@@ -29,7 +29,6 @@ class RegisterCppGenerator(RegisterCodeGenerator):
         """
         self.module_name = module_name
         self.generated_info = generated_info
-        self._class_name = self._to_pascal_case(module_name)
 
     def get_interface(self, register_objects, constants):
         """
@@ -42,6 +41,175 @@ class RegisterCppGenerator(RegisterCodeGenerator):
 
         Returns:
             str: C++ code.
+        """
+        generator = InterfaceGenerator(
+            module_name=self.module_name, generated_info=self.generated_info
+        )
+        return generator.get_interface(register_objects=register_objects, constants=constants)
+
+    def get_header(self, register_objects):
+        """
+        Get a complete C++ class header for the implementation of all methods.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+
+        Returns:
+            str: C++ code.
+        """
+        generator = HeaderGenerator(
+            module_name=self.module_name, generated_info=self.generated_info
+        )
+        return generator.get_header(register_objects=register_objects)
+
+    def get_implementation(self, register_objects):
+        """
+        Get a complete C++ class implementation with all methods.
+
+        Arguments:
+            register_objects (list): Register arrays and registers to be included.
+
+        Returns:
+            str: C++ code.
+        """
+        generator = ImplementationGenerator(
+            module_name=self.module_name, generated_info=self.generated_info
+        )
+        return generator.get_implementation(register_objects=register_objects)
+
+
+class CommonGenerator(RegisterCodeGenerator):
+    """
+    Class with common methods for generating C++ code.
+    Do not use this directly, should use :class:`.RegisterCppGenerator`:
+    """
+
+    def __init__(self, module_name, generated_info):
+        self.module_name = module_name
+
+        self._class_name = self._to_pascal_case(module_name)
+        self._file_header = "".join([self._comment(header_line) for header_line in generated_info])
+
+    @staticmethod
+    def _get_separator_line(indentation):
+        """
+        Get a separator line, e.g. "  // ---------------------------------\n"
+        """
+        result = " " * indentation + "// "
+        num_dash = 80 - len(result)
+        result += "-" * num_dash
+        result += "\n"
+        return result
+
+    @staticmethod
+    def _comment(comment, indentation=0):
+        indent = " " * indentation
+        return f"{indent}// {comment}\n"
+
+    @staticmethod
+    def _with_namespace(cpp_code_body):
+        cpp_code = "namespace fpga_regs\n"
+        cpp_code += "{\n\n"
+        cpp_code += f"{cpp_code_body}"
+        cpp_code += "\n} /* namespace fpga_regs */\n"
+        return cpp_code
+
+    def _constructor_signature(self):
+        return f"{self._class_name}(volatile uint8_t *base_address)"
+
+    @staticmethod
+    def _array_length_constant_name(register_array):
+        return f"{register_array.name}_array_length"
+
+    @staticmethod
+    def _get_methods_description(register, register_array):
+        result = f'Methods for the "{register.name}" register'
+        if register_array:
+            result += f' within the "{register_array.name}" register array'
+        result += "."
+
+        return result
+
+    @staticmethod
+    def _register_getter_function_name(register, register_array):
+        result = "get"
+
+        if register_array:
+            result += f"_{register_array.name}"
+
+        result += f"_{register.name}"
+
+        return result
+
+    def _register_getter_function_signature(self, register, register_array):
+        function_name = self._register_getter_function_name(
+            register=register, register_array=register_array
+        )
+        result = f"{function_name}("
+
+        if register_array:
+            result += "size_t array_index"
+
+        result += ")"
+
+        return result
+
+    @staticmethod
+    def _field_getter_function_name(register, register_array, field, from_value):
+        result = "get"
+
+        if register_array:
+            result += f"_{register_array.name}"
+
+        result += f"_{register.name}_{field.name}"
+
+        if from_value:
+            result += "_from_value"
+
+        return result
+
+    def _field_getter_function_signature(self, register, register_array, field, from_value):
+        function_name = self._field_getter_function_name(
+            register=register, register_array=register_array, field=field, from_value=from_value
+        )
+        result = f"{function_name}("
+
+        if from_value:
+            # Value is supplied by user
+            result += "uint32_t register_value"
+        elif register_array:
+            # Value shall be read from bus, in which case we need to know array index if this
+            # is an array
+            result += "size_t array_index"
+
+        result += ")"
+
+        return result
+
+    @staticmethod
+    def _setter_function_signature(register, register_array):
+        if register_array is None:
+            return f"set_{register.name}(uint32_t value)"
+        return f"set_{register_array.name}_{register.name}(size_t array_index, uint32_t value)"
+
+    @staticmethod
+    def _get_field_constant_name(register, register_array, field):
+        if register_array is None:
+            return f"{register.name}_{field.name}"
+
+        return f"{register_array.name}_{register.name}_{field.name}"
+
+
+class InterfaceGenerator(CommonGenerator):
+    """
+    Class to generate a C++ interface header.
+    Do not use this directly, should use :class:`.RegisterCppGenerator`:
+    """
+
+    def get_interface(self, register_objects, constants):
+        """
+        Get a complete C++ interface class header. See :meth:`.RegisterCppGenerator.get_interface`
+        for more details.
         """
         cpp_code = f"class I{self._class_name}\n"
         cpp_code += "{\n"
@@ -108,7 +276,7 @@ class RegisterCppGenerator(RegisterCodeGenerator):
         cpp_code += "};\n"
 
         cpp_code_top = f"""\
-{self._file_header()}
+{self._file_header}
 #pragma once
 
 #include <cassert>
@@ -127,141 +295,6 @@ class RegisterCppGenerator(RegisterCodeGenerator):
         cpp_code = self._comment("Number of registers within this register map.", indentation=2)
         cpp_code += f"  static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
-
-    @staticmethod
-    def _get_separator_line(indentation):
-        """
-        Get a separator line, e.g. "  // ---------------------------------\n"
-        """
-        result = " " * indentation + "// "
-        num_dash = 80 - len(result)
-        result += "-" * num_dash
-        result += "\n"
-        return result
-
-    @staticmethod
-    def _get_methods_description(register, register_array):
-        result = f'Methods for the "{register.name}" register'
-        if register_array:
-            result += f' within the "{register_array.name}" register array'
-        result += "."
-
-        return result
-
-    def get_header(self, register_objects):
-        """
-        Get a complete C++ class header for the implementation of all methods.
-
-        Arguments:
-            register_objects (list): Register arrays and registers to be included.
-
-        Returns:
-            str: C++ code.
-        """
-        cpp_code = f"class {self._class_name} : public I{self._class_name}\n"
-        cpp_code += "{\n"
-
-        cpp_code += "private:\n"
-        cpp_code += "  volatile uint32_t *m_registers;\n\n"
-
-        cpp_code += "public:\n"
-        cpp_code += f"  {self._constructor_signature()};\n\n"
-        cpp_code += f"  virtual ~{self._class_name}() {{ }}\n"
-
-        def getter_function(signature):
-            return f"  virtual uint32_t {signature} const override;\n"
-
-        for register, register_array in self._iterate_registers(register_objects):
-            cpp_code += f"\n{self._get_separator_line(indentation=2)}"
-
-            description = self._get_methods_description(
-                register=register, register_array=register_array
-            )
-            description += " See interface header for documentation."
-            cpp_code += self._comment(comment=description, indentation=2)
-
-            if register.is_bus_readable:
-                signature = self._register_getter_function_signature(
-                    register=register,
-                    register_array=register_array,
-                )
-                cpp_code += getter_function(signature=signature)
-
-                for field in register.fields:
-                    signature = self._field_getter_function_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                        from_value=False,
-                    )
-                    cpp_code += getter_function(signature=signature)
-
-                    signature = self._field_getter_function_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                        from_value=True,
-                    )
-                    cpp_code += getter_function(signature=signature)
-
-            if register.is_bus_writeable:
-                cpp_code += (
-                    "  virtual void "
-                    f"{self._setter_function_signature(register, register_array)} const override;\n"
-                )
-
-        cpp_code += "};\n"
-
-        cpp_code_top = f"""\
-{self._file_header()}
-#pragma once
-
-#include "i_{self.module_name}.h"
-
-"""
-        return cpp_code_top + self._with_namespace(cpp_code)
-
-    def get_implementation(self, register_objects):
-        """
-        Get a complete C++ class implementation with all methods.
-
-        Arguments:
-            register_objects (list): Register arrays and registers to be included.
-
-        Returns:
-            str: C++ code.
-        """
-        cpp_code = f"{self._class_name}::{self._constructor_signature()}\n"
-        cpp_code += "    : m_registers(reinterpret_cast<volatile uint32_t *>(base_address))\n"
-        cpp_code += "{\n"
-        cpp_code += "  // Empty\n"
-        cpp_code += "}\n\n"
-
-        for register, register_array in self._iterate_registers(register_objects):
-            cpp_code += f"\n{self._get_separator_line(indentation=0)}"
-
-            description = self._get_methods_description(
-                register=register, register_array=register_array
-            )
-            description += " See interface header for documentation.\n"
-            cpp_code += self._comment(comment=description, indentation=0)
-
-            if register.is_bus_readable:
-                cpp_code += self._register_getter_function(register, register_array)
-
-                for field in register.fields:
-                    cpp_code += self._field_getter_function(register, register_array, field=field)
-                    cpp_code += self._field_getter_function_from_value(
-                        register, register_array, field=field
-                    )
-
-            if register.is_bus_writeable:
-                cpp_code += self._setter_function(register, register_array)
-
-        cpp_code_top = f"{self._file_header()}\n"
-        cpp_code_top += f'#include "include/{self.module_name}.h"\n\n'
-
-        return cpp_code_top + self._with_namespace(cpp_code)
 
     def _field_interface(self, register, register_array):
         def getter_function(signature):
@@ -323,35 +356,124 @@ class RegisterCppGenerator(RegisterCodeGenerator):
 
         return cpp_code
 
-    @staticmethod
-    def _get_field_constant_name(register, register_array, field):
-        if register_array is None:
-            return f"{register.name}_{field.name}"
 
-        return f"{register_array.name}_{register.name}_{field.name}"
+class HeaderGenerator(CommonGenerator):
+    """
+    Class to generate a C++ header.
+    Do not use this directly, should use :class:`.RegisterCppGenerator`:
+    """
 
-    @staticmethod
-    def _array_length_constant_name(register_array):
-        return f"{register_array.name}_array_length"
+    def get_header(self, register_objects):
+        """
+        Get a complete C++ class header for the implementation of all methods.
+        See :meth:`.RegisterCppGenerator.get_header` for more details.
+        """
+        cpp_code = f"class {self._class_name} : public I{self._class_name}\n"
+        cpp_code += "{\n"
 
-    @staticmethod
-    def _with_namespace(cpp_code_body):
-        cpp_code = "namespace fpga_regs\n"
-        cpp_code += "{\n\n"
-        cpp_code += f"{cpp_code_body}"
-        cpp_code += "\n} /* namespace fpga_regs */\n"
-        return cpp_code
+        cpp_code += "private:\n"
+        cpp_code += "  volatile uint32_t *m_registers;\n\n"
 
-    @staticmethod
-    def _comment(comment, indentation=0):
-        indent = " " * indentation
-        return f"{indent}// {comment}\n"
+        cpp_code += "public:\n"
+        cpp_code += f"  {self._constructor_signature()};\n\n"
+        cpp_code += f"  virtual ~{self._class_name}() {{ }}\n"
 
-    def _file_header(self):
-        return "".join([self._comment(header_line) for header_line in self.generated_info])
+        def getter_function(signature):
+            return f"  virtual uint32_t {signature} const override;\n"
 
-    def _constructor_signature(self):
-        return f"{self._class_name}(volatile uint8_t *base_address)"
+        for register, register_array in self._iterate_registers(register_objects):
+            cpp_code += f"\n{self._get_separator_line(indentation=2)}"
+
+            description = self._get_methods_description(
+                register=register, register_array=register_array
+            )
+            description += " See interface header for documentation."
+            cpp_code += self._comment(comment=description, indentation=2)
+
+            if register.is_bus_readable:
+                signature = self._register_getter_function_signature(
+                    register=register,
+                    register_array=register_array,
+                )
+                cpp_code += getter_function(signature=signature)
+
+                for field in register.fields:
+                    signature = self._field_getter_function_signature(
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                        from_value=False,
+                    )
+                    cpp_code += getter_function(signature=signature)
+
+                    signature = self._field_getter_function_signature(
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                        from_value=True,
+                    )
+                    cpp_code += getter_function(signature=signature)
+
+            if register.is_bus_writeable:
+                cpp_code += (
+                    "  virtual void "
+                    f"{self._setter_function_signature(register, register_array)} const override;\n"
+                )
+
+        cpp_code += "};\n"
+
+        cpp_code_top = f"""\
+{self._file_header}
+#pragma once
+
+#include "i_{self.module_name}.h"
+
+"""
+        return cpp_code_top + self._with_namespace(cpp_code)
+
+
+class ImplementationGenerator(CommonGenerator):
+    """
+    Class to generate a C++ implementation.
+    Do not use this directly, should use :class:`.RegisterCppGenerator`:
+    """
+
+    def get_implementation(self, register_objects):
+        """
+        Get a complete C++ class implementation with all methods.
+        See :meth:`.RegisterCppGenerator.get_implementation` for more details.
+        """
+        cpp_code = f"{self._class_name}::{self._constructor_signature()}\n"
+        cpp_code += "    : m_registers(reinterpret_cast<volatile uint32_t *>(base_address))\n"
+        cpp_code += "{\n"
+        cpp_code += "  // Empty\n"
+        cpp_code += "}\n\n"
+
+        for register, register_array in self._iterate_registers(register_objects):
+            cpp_code += f"\n{self._get_separator_line(indentation=0)}"
+
+            description = self._get_methods_description(
+                register=register, register_array=register_array
+            )
+            description += " See interface header for documentation.\n"
+            cpp_code += self._comment(comment=description, indentation=0)
+
+            if register.is_bus_readable:
+                cpp_code += self._register_getter_function(register, register_array)
+
+                for field in register.fields:
+                    cpp_code += self._field_getter_function(register, register_array, field=field)
+                    cpp_code += self._field_getter_function_from_value(
+                        register, register_array, field=field
+                    )
+
+            if register.is_bus_writeable:
+                cpp_code += self._setter_function(register, register_array)
+
+        cpp_code_top = f"{self._file_header}\n"
+        cpp_code_top += f'#include "include/{self.module_name}.h"\n\n'
+
+        return cpp_code_top + self._with_namespace(cpp_code)
 
     def _setter_function(self, register, register_array):
         cpp_code = (
@@ -373,12 +495,6 @@ class RegisterCppGenerator(RegisterCodeGenerator):
             cpp_code += "  m_registers[index] = value;\n"
         cpp_code += "}\n\n"
         return cpp_code
-
-    @staticmethod
-    def _setter_function_signature(register, register_array):
-        if register_array is None:
-            return f"set_{register.name}(uint32_t value)"
-        return f"set_{register_array.name}_{register.name}(size_t array_index, uint32_t value)"
 
     def _register_getter_function(self, register, register_array):
         signature = self._register_getter_function_signature(
@@ -451,59 +567,3 @@ class RegisterCppGenerator(RegisterCodeGenerator):
         cpp_code += "}\n\n"
 
         return cpp_code
-
-    @staticmethod
-    def _register_getter_function_name(register, register_array):
-        result = "get"
-
-        if register_array:
-            result += f"_{register_array.name}"
-
-        result += f"_{register.name}"
-
-        return result
-
-    def _register_getter_function_signature(self, register, register_array):
-        function_name = self._register_getter_function_name(
-            register=register, register_array=register_array
-        )
-        result = f"{function_name}("
-
-        if register_array:
-            result += "size_t array_index"
-
-        result += ")"
-
-        return result
-
-    @staticmethod
-    def _field_getter_function_name(register, register_array, field, from_value):
-        result = "get"
-
-        if register_array:
-            result += f"_{register_array.name}"
-
-        result += f"_{register.name}_{field.name}"
-
-        if from_value:
-            result += "_from_value"
-
-        return result
-
-    def _field_getter_function_signature(self, register, register_array, field, from_value):
-        function_name = self._field_getter_function_name(
-            register=register, register_array=register_array, field=field, from_value=from_value
-        )
-        result = f"{function_name}("
-
-        if from_value:
-            # Value is supplied by user
-            result += "uint32_t register_value"
-        elif register_array:
-            # Value shall be read from bus, in which case we need to know array index if this
-            # is an array
-            result += "size_t array_index"
-
-        result += ")"
-
-        return result
