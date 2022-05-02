@@ -67,6 +67,8 @@ build_pages:
   needs: ["pytest"]
   script:
     - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
+    # Without the "git fetch" call, "build_docs.py" can not find all git tags.
+    - git fetch --all --tags
     - python3 tools/build_docs.py
   artifacts:
     paths:

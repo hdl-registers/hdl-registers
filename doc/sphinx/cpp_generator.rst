@@ -13,6 +13,9 @@ Below is the resulting code from the :doc:`TOML format example <toml_format>`:
    :caption: Example interface header
    :language: C++
 
+Getters
+-------
+
 Note that there are three ways to read a register field:
 
 1. The method that reads the whole register, e.g. ``get_configuration()``.
@@ -29,6 +32,31 @@ read the register value more than once over the register bus, which would be the
 (2) multiple times.
 Instead we can call (1) once and then (3) multiple times to get our field values.
 
+
+Setters
+-------
+
+Conversely there are three ways to write a register field:
+
+1. The method that writes the whole register, e.g. ``set_configuration()``.
+
+2. The method that reads the register, updates the value of the field, and then writes the register
+   back, e.g. ``set_configuration_enable()``.
+
+3. The method that updates the value of the field given a previously read register value,
+   and returns an updated register value,
+   e.g. ``set_configuration_enable_from_value(register_value)``.
+
+Method (2) is the most convenient in most cases.
+However if we want to update more than one field of a register it would be very inefficient to
+read and write the register more than once over the register bus, which would be the result of
+calling (2) multiple times.
+Instead we can call a register getter once, e.g. ``get_configuration()``, and then (3) multiple
+times to get our updated register value.
+This value is then written over the register bus using (1).
+
+
+
 .. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.h
    :caption: Example class header
    :language: C++
@@ -37,7 +65,7 @@ Instead we can call (1) once and then (3) multiple times to get our field values
    :caption: Example class implementation
    :language: C++
 
-Note that when the register is part of an array, the setter/getter takes a second
+Note that when the register is part of an array, the register setter/getter takes a second
 argument ``array_index``.
 There is an assert that the user-provided array index is within the bounds of the array.
 

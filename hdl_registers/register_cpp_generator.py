@@ -131,6 +131,13 @@ class CommonGenerator(RegisterCodeGenerator):
         return result
 
     @staticmethod
+    def _field_value_type_name():
+        """
+        We represent all fields as uint32_t. In the future we might support enum types.
+        """
+        return "uint32_t"
+
+    @staticmethod
     def _register_getter_function_name(register, register_array):
         result = "get"
 
@@ -187,17 +194,67 @@ class CommonGenerator(RegisterCodeGenerator):
         return result
 
     @staticmethod
-    def _setter_function_signature(register, register_array):
-        if register_array is None:
-            return f"set_{register.name}(uint32_t value)"
-        return f"set_{register_array.name}_{register.name}(size_t array_index, uint32_t value)"
+    def _get_shift_and_mask(field):
+        cpp_code = f"  const uint32_t shift = {field.base_index}uL;\n"
+        cpp_code += f'  const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
+        cpp_code += "  const uint32_t mask_shifted = mask_at_base << shift;\n"
+        return cpp_code
 
     @staticmethod
-    def _get_field_constant_name(register, register_array, field):
-        if register_array is None:
-            return f"{register.name}_{field.name}"
+    def _register_setter_function_name(register, register_array):
+        result = "set"
 
-        return f"{register_array.name}_{register.name}_{field.name}"
+        if register_array:
+            result += f"_{register_array.name}"
+
+        result += f"_{register.name}"
+
+        return result
+
+    def _register_setter_function_signature(self, register, register_array):
+        function_name = self._register_setter_function_name(
+            register=register, register_array=register_array
+        )
+        result = f"{function_name}("
+
+        if register_array:
+            result += "size_t array_index, "
+
+        result += "uint32_t register_value)"
+
+        return result
+
+    @staticmethod
+    def _field_setter_function_name(register, register_array, field, from_value):
+        result = "set"
+
+        if register_array:
+            result += f"_{register_array.name}"
+
+        result += f"_{register.name}_{field.name}"
+
+        if from_value:
+            result += "_from_value"
+
+        return result
+
+    def _field_setter_function_signature(self, register, register_array, field, from_value):
+        function_name = self._field_setter_function_name(
+            register=register, register_array=register_array, field=field, from_value=from_value
+        )
+        result = f"{function_name}("
+
+        if from_value:
+            # Current register value is supplied by user
+            result += "uint32_t register_value, "
+        elif register_array:
+            # Current register value shall be read from bus, in which case we need to know array
+            # index if this is an array
+            result += "size_t array_index, "
+
+        result += f"{self._field_value_type_name()} field_value)"
+
+        return result
 
 
 class InterfaceGenerator(CommonGenerator):
@@ -216,12 +273,7 @@ class InterfaceGenerator(CommonGenerator):
         cpp_code += "public:\n"
 
         for constant in constants:
-            cpp_code += self._comment("Register constant. Description:", indentation=2)
-            if constant.description is None or constant.description == "":
-                cpp_code += self._comment("None.", indentation=2)
-            else:
-                cpp_code += self._comment_block(constant.description, indentation=2)
-
+            cpp_code += self._comment("Register constant.", indentation=2)
             cpp_code += f"  static const int {constant.name} = {constant.value}L;\n"
         if constants:
             cpp_code += "\n"
@@ -246,16 +298,9 @@ class InterfaceGenerator(CommonGenerator):
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
-            description += (
-                f' Mode "{REGISTER_MODES[register.mode].mode_readable}". Register description:'
-            )
+            description += f' Mode "{REGISTER_MODES[register.mode].mode_readable}".'
 
             cpp_code += self._comment(comment=description, indentation=2)
-            if register.description is None or register.description == "":
-                cpp_code += self._comment("None.", indentation=2)
-            else:
-                cpp_code += self._comment_block(register.description, indentation=2)
-
             cpp_code += "\n"
 
             if register.is_bus_readable:
@@ -273,10 +318,10 @@ class InterfaceGenerator(CommonGenerator):
                     "Setter that will write the whole register's value over the register bus.",
                     indentation=2,
                 )
-                cpp_code += (
-                    "  virtual void "
-                    f"{self._setter_function_signature(register, register_array)} const = 0;\n\n"
+                signature = self._register_setter_function_signature(
+                    register=register, register_array=register_array
                 )
+                cpp_code += f"  virtual void {signature} const = 0;\n\n"
 
             cpp_code += self._field_interface(register, register_array)
 
@@ -304,35 +349,14 @@ class InterfaceGenerator(CommonGenerator):
         return cpp_code
 
     def _field_interface(self, register, register_array):
-        def getter_function(signature):
-            return f"  virtual uint32_t {signature} const = 0;\n"
+        def function(return_type_name, signature):
+            return f"  virtual {return_type_name} {signature} const = 0;\n"
 
         cpp_code = ""
         for field in register.fields:
             register_description = f'in the "{register.name}" register'
             if register_array is not None:
                 register_description += f' within the "{register_array.name}" register array'
-
-            description = (
-                f'Bitmask for the "{field.name}" field {register_description}. Field description:'
-            )
-
-            cpp_code += self._comment(description, indentation=2)
-            if field.description is None or field.description == "":
-                cpp_code += self._comment("None.", indentation=2)
-            else:
-                cpp_code += self._comment_block(field.description, indentation=2)
-
-            field_constant_name = self._get_field_constant_name(
-                register=register, register_array=register_array, field=field
-            )
-            cpp_code += (
-                f"  static const uint32_t {field_constant_name}_shift = {field.base_index}uL;\n"
-            )
-            cpp_code += (
-                f"  static const uint32_t {field_constant_name}_mask = "
-                f'0b{"1" * field.width}uL << {field.base_index}uL;\n'
-            )
 
             if register.is_bus_readable:
                 comment = (
@@ -348,7 +372,9 @@ class InterfaceGenerator(CommonGenerator):
                     field=field,
                     from_value=False,
                 )
-                cpp_code += getter_function(signature=signature)
+                cpp_code += function(
+                    return_type_name=self._field_value_type_name(), signature=signature
+                )
 
                 comment = (
                     f'Getter for the "{field.name}" field {register_description},\n'
@@ -362,7 +388,38 @@ class InterfaceGenerator(CommonGenerator):
                     field=field,
                     from_value=True,
                 )
-                cpp_code += getter_function(signature=signature)
+                cpp_code += function(
+                    return_type_name=self._field_value_type_name(), signature=signature
+                )
+
+            if register.is_bus_writeable:
+                comment = (
+                    f'Setter for the "{field.name}" field {register_description},\n'
+                    "which will read-modify-write over the register bus."
+                )
+                cpp_code += self._comment_block(text=comment, indentation=2)
+
+                signature = self._field_setter_function_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
+                    from_value=False,
+                )
+                cpp_code += function(return_type_name="void", signature=signature)
+
+                comment = (
+                    f'Setter for the "{field.name}" field {register_description},\n'
+                    "given the register's current value, which will return an updated value."
+                )
+                cpp_code += self._comment_block(text=comment, indentation=2)
+
+                signature = self._field_setter_function_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
+                    from_value=True,
+                )
+                cpp_code += function(return_type_name="uint32_t", signature=signature)
 
             cpp_code += "\n"
 
@@ -390,8 +447,8 @@ class HeaderGenerator(CommonGenerator):
         cpp_code += f"  {self._constructor_signature()};\n\n"
         cpp_code += f"  virtual ~{self._class_name}() {{ }}\n"
 
-        def getter_function(signature):
-            return f"  virtual uint32_t {signature} const override;\n"
+        def function(return_type_name, signature):
+            return f"  virtual {return_type_name} {signature} const override;\n"
 
         for register, register_array in self._iterate_registers(register_objects):
             cpp_code += f"\n{self._get_separator_line(indentation=2)}"
@@ -407,7 +464,7 @@ class HeaderGenerator(CommonGenerator):
                     register=register,
                     register_array=register_array,
                 )
-                cpp_code += getter_function(signature=signature)
+                cpp_code += function(return_type_name="uint32_t", signature=signature)
 
                 for field in register.fields:
                     signature = self._field_getter_function_signature(
@@ -416,7 +473,9 @@ class HeaderGenerator(CommonGenerator):
                         field=field,
                         from_value=False,
                     )
-                    cpp_code += getter_function(signature=signature)
+                    cpp_code += function(
+                        return_type_name=self._field_value_type_name(), signature=signature
+                    )
 
                     signature = self._field_getter_function_signature(
                         register=register,
@@ -424,13 +483,33 @@ class HeaderGenerator(CommonGenerator):
                         field=field,
                         from_value=True,
                     )
-                    cpp_code += getter_function(signature=signature)
+                    cpp_code += function(
+                        return_type_name=self._field_value_type_name(), signature=signature
+                    )
 
             if register.is_bus_writeable:
-                cpp_code += (
-                    "  virtual void "
-                    f"{self._setter_function_signature(register, register_array)} const override;\n"
+                signature = self._register_setter_function_signature(
+                    register=register, register_array=register_array
                 )
+
+                cpp_code += function(return_type_name="void", signature=signature)
+
+                for field in register.fields:
+                    signature = self._field_setter_function_signature(
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                        from_value=False,
+                    )
+                    cpp_code += function(return_type_name="void", signature=signature)
+
+                    signature = self._field_setter_function_signature(
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                        from_value=True,
+                    )
+                    cpp_code += function(return_type_name="uint32_t", signature=signature)
 
         cpp_code += "};\n"
 
@@ -480,23 +559,27 @@ class ImplementationGenerator(CommonGenerator):
                     )
 
             if register.is_bus_writeable:
-                cpp_code += self._setter_function(register, register_array)
+                cpp_code += self._register_setter_function(register, register_array)
+
+                for field in register.fields:
+                    cpp_code += self._field_setter_function(register, register_array, field=field)
+                    cpp_code += self._field_setter_function_from_value(
+                        register, register_array, field=field
+                    )
 
         cpp_code_top = f"{self._file_header}\n"
         cpp_code_top += f'#include "include/{self.module_name}.h"\n\n'
 
         return cpp_code_top + self._with_namespace(cpp_code)
 
-    def _setter_function(self, register, register_array):
-        cpp_code = (
-            "void "
-            f"{self._class_name}::{self._setter_function_signature(register, register_array)} "
-            "const\n"
+    def _register_setter_function(self, register, register_array):
+        signature = self._register_setter_function_signature(
+            register=register, register_array=register_array
         )
+        cpp_code = f"void {self._class_name}::{signature} const\n"
         cpp_code += "{\n"
-        if register_array is None:
-            cpp_code += f"  m_registers[{register.index}] = value;\n"
-        else:
+
+        if register_array:
             cpp_code += (
                 f"  assert(array_index < {self._array_length_constant_name(register_array)});\n"
             )
@@ -504,8 +587,76 @@ class ImplementationGenerator(CommonGenerator):
                 f"  const size_t index = {register_array.base_index} "
                 f"+ array_index * {len(register_array.registers)} + {register.index};\n"
             )
-            cpp_code += "  m_registers[index] = value;\n"
+        else:
+            cpp_code += f"  const size_t index = {register.index};\n"
+
+        cpp_code += "  m_registers[index] = register_value;\n"
         cpp_code += "}\n\n"
+        return cpp_code
+
+    def _field_setter_function(self, register, register_array, field):
+        signature = self._field_setter_function_signature(
+            register=register, register_array=register_array, field=field, from_value=False
+        )
+
+        cpp_code = f"void {self._class_name}::{signature} const\n"
+        cpp_code += "{\n"
+
+        register_getter_function_name = self._register_getter_function_name(
+            register=register, register_array=register_array
+        )
+        cpp_code += f"  const uint32_t current_register_value = {register_getter_function_name}("
+        if register_array:
+            cpp_code += "array_index"
+        cpp_code += ");\n"
+
+        signature = self._field_setter_function_name(
+            register=register, register_array=register_array, field=field, from_value=True
+        )
+        cpp_code += (
+            "  const uint32_t result_register_value = "
+            f" {signature}(current_register_value, field_value);\n"
+        )
+
+        register_setter_function_name = self._register_setter_function_name(
+            register=register, register_array=register_array
+        )
+        cpp_code += f"  {register_setter_function_name}("
+        if register_array:
+            cpp_code += "array_index, "
+        cpp_code += "result_register_value);\n"
+
+        cpp_code += "}\n\n"
+
+        return cpp_code
+
+    def _field_setter_function_from_value(self, register, register_array, field):
+        signature = self._field_setter_function_signature(
+            register=register, register_array=register_array, field=field, from_value=True
+        )
+
+        cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
+        cpp_code += "{\n"
+
+        cpp_code += self._get_shift_and_mask(field=field)
+        cpp_code += "\n  const uint32_t field_value_masked = field_value & mask_at_base;\n"
+        cpp_code += (
+            "  const uint32_t field_value_masked_and_shifted = field_value_masked << shift;\n\n"
+        )
+
+        cpp_code += "  const uint32_t mask_shifted_inverse = ~mask_shifted;\n"
+        cpp_code += (
+            "  const uint32_t register_value_masked = register_value & mask_shifted_inverse;\n\n"
+        )
+
+        cpp_code += (
+            "  const uint32_t result_register_value = "
+            "register_value_masked | field_value_masked_and_shifted;\n\n"
+        )
+        cpp_code += "  return result_register_value;"
+
+        cpp_code += "}\n\n"
+
         return cpp_code
 
     def _register_getter_function(self, register, register_array):
@@ -514,9 +665,8 @@ class ImplementationGenerator(CommonGenerator):
         )
         cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
         cpp_code += "{\n"
-        if register_array is None:
-            cpp_code += f"  return m_registers[{register.index}];\n"
-        else:
+
+        if register_array:
             cpp_code += (
                 f"  assert(array_index < {self._array_length_constant_name(register_array)});\n"
             )
@@ -524,7 +674,10 @@ class ImplementationGenerator(CommonGenerator):
                 f"  const size_t index = {register_array.base_index} "
                 f"+ array_index * {len(register_array.registers)} + {register.index};\n"
             )
-            cpp_code += "  return m_registers[index];\n"
+        else:
+            cpp_code += f"  const size_t index = {register.index};\n"
+
+        cpp_code += "  return m_registers[index];\n"
         cpp_code += "}\n\n"
         return cpp_code
 
@@ -533,7 +686,7 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=False
         )
 
-        cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
+        cpp_code = f"{self._field_value_type_name()} {self._class_name}::{signature} const\n"
         cpp_code += "{\n"
 
         register_getter_function_name = self._register_getter_function_name(
@@ -562,19 +715,13 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=True
         )
 
-        cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
+        cpp_code = f"{self._field_value_type_name()} {self._class_name}::{signature} const\n"
         cpp_code += "{\n"
 
-        field_constant_name = self._get_field_constant_name(
-            register=register, register_array=register_array, field=field
-        )
+        cpp_code += self._get_shift_and_mask(field=field)
 
-        cpp_code += (
-            f"  const uint32_t result_masked = register_value & {field_constant_name}_mask;\n"
-        )
-        cpp_code += (
-            f"  const uint32_t result_shifted = result_masked >> {field_constant_name}_shift;\n"
-        )
+        cpp_code += "\n  const uint32_t result_masked = register_value & mask_shifted;\n"
+        cpp_code += "  const uint32_t result_shifted = result_masked >> shift;\n"
         cpp_code += "  return result_shifted;\n"
         cpp_code += "}\n\n"
 
