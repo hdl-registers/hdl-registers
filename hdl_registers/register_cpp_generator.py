@@ -15,9 +15,10 @@ class RegisterCppGenerator:
     """
     Generate a C++ class with register definitions and methods.
 
-    There is no unit test of this class that checks the generated code. It is instead functionally
-    tested in the file test_register_compilation.py. That test generates C++ code from an example
-    register set, compiles it and performs some run-time assertions in a C++ program.
+    There is only a very limited unit test of this class that checks the generated code.
+    It is instead functionally tested in the file test_register_compilation.py.
+    That test generates C++ code from an example register set, compiles it and performs some
+    run-time assertions in a C++ program.
     That test is considered more meaningful and exhaustive than a unit test would be.
     """
 
@@ -393,10 +394,16 @@ class InterfaceGenerator(CommonGenerator):
                 )
 
             if register.is_bus_writeable:
-                comment = (
-                    f'Setter for the "{field.name}" field {register_description},\n'
-                    "which will read-modify-write over the register bus."
-                )
+                comment = f'Setter for the "{field.name}" field {register_description},\n'
+                if register.mode == "r_w":
+                    comment += "which will read-modify-write over the register bus."
+                elif register.mode in ["w", "wpulse", "r_wpulse"]:
+                    comment += (
+                        "which will set the field to the given value, and all other bits to zero."
+                    )
+                else:
+                    raise ValueError(f"Can not handle this register's mode: {register}")
+
                 cpp_code += self._comment_block(text=comment, indentation=2)
 
                 signature = self._field_setter_function_signature(
@@ -602,13 +609,29 @@ class ImplementationGenerator(CommonGenerator):
         cpp_code = f"void {self._class_name}::{signature} const\n"
         cpp_code += "{\n"
 
-        register_getter_function_name = self._register_getter_function_name(
-            register=register, register_array=register_array
-        )
-        cpp_code += f"  const uint32_t current_register_value = {register_getter_function_name}("
-        if register_array:
-            cpp_code += "array_index"
-        cpp_code += ");\n"
+        if register.mode == "r_w":
+            register_getter_function_name = self._register_getter_function_name(
+                register=register, register_array=register_array
+            )
+            cpp_code += self._comment(
+                "Get the current value of any other fields by reading register on the bus.",
+                indentation=2,
+            )
+            current_register_value = f"{register_getter_function_name}("
+            if register_array:
+                current_register_value += "array_index"
+            current_register_value += ")"
+        elif register.mode in ["w", "wpulse", "r_wpulse"]:
+            cpp_code += self._comment_block(
+                "This register type's currently written value can not be read back.\n"
+                "Hence set all other bits to zero when writing the value.",
+                indentation=2,
+            )
+            current_register_value = 0
+        else:
+            raise ValueError(f"Can not handle this register's mode: {register}")
+
+        cpp_code += f"  const uint32_t current_register_value = {current_register_value};\n"
 
         signature = self._field_setter_function_name(
             register=register, register_array=register_array, field=field, from_value=True
@@ -653,7 +676,7 @@ class ImplementationGenerator(CommonGenerator):
             "  const uint32_t result_register_value = "
             "register_value_masked | field_value_masked_and_shifted;\n\n"
         )
-        cpp_code += "  return result_register_value;"
+        cpp_code += "  return result_register_value;\n"
 
         cpp_code += "}\n\n"
 
@@ -677,7 +700,8 @@ class ImplementationGenerator(CommonGenerator):
         else:
             cpp_code += f"  const size_t index = {register.index};\n"
 
-        cpp_code += "  return m_registers[index];\n"
+        cpp_code += "  const uint32_t result = m_registers[index];\n\n"
+        cpp_code += "  return result;\n"
         cpp_code += "}\n\n"
         return cpp_code
 
@@ -705,7 +729,7 @@ class ImplementationGenerator(CommonGenerator):
         cpp_code += (
             f"  const uint32_t result = {field_getter_from_value_function_name}(register_value);\n"
         )
-        cpp_code += "  return result;\n"
+        cpp_code += "\n  return result;\n"
         cpp_code += "}\n\n"
 
         return cpp_code
@@ -722,7 +746,7 @@ class ImplementationGenerator(CommonGenerator):
 
         cpp_code += "\n  const uint32_t result_masked = register_value & mask_shifted;\n"
         cpp_code += "  const uint32_t result_shifted = result_masked >> shift;\n"
-        cpp_code += "  return result_shifted;\n"
+        cpp_code += "\n  return result_shifted;\n"
         cpp_code += "}\n\n"
 
         return cpp_code

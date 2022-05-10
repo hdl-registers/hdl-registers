@@ -36,18 +36,20 @@ begin
     if run("test_generated_register_addresses") then
       check_equal(example_configuration, 0);
       check_equal(example_status, 1);
+      check_equal(example_command, 2);
 
       check_equal(example_base_addresses_array_length, 3);
-      check_equal(example_base_addresses_read_address(0), 2);
-      check_equal(example_base_addresses_write_address(0), 3);
-      check_equal(example_base_addresses_read_address(1), 4);
-      check_equal(example_base_addresses_write_address(1), 5);
-      check_equal(example_base_addresses_read_address(2), 6);
-      check_equal(example_base_addresses_write_address(2), 7);
+      check_equal(example_base_addresses_read_address(0), 3);
+      check_equal(example_base_addresses_write_address(0), 4);
+      check_equal(example_base_addresses_read_address(1), 5);
+      check_equal(example_base_addresses_write_address(1), 6);
+      check_equal(example_base_addresses_read_address(2), 7);
+      check_equal(example_base_addresses_write_address(2), 8);
 
     elsif run("test_generated_register_modes") then
       assert example_reg_map(example_configuration).reg_type = r_w;
       assert example_reg_map(example_status).reg_type = r;
+      assert example_reg_map(example_command).reg_type = wpulse;
 
       assert example_reg_map(example_base_addresses_read_address(0)).reg_type = r_w;
       assert example_reg_map(example_base_addresses_write_address(0)).reg_type = r_w;

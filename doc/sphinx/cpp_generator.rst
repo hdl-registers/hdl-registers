@@ -7,16 +7,49 @@ This is done with a call to :meth:`.RegisterList.create_cpp_interface`,
 The first call will create an abstract interface header that can be used for mocking in a unit
 test environment.
 
-Below is the resulting code from the :doc:`TOML format example <toml_format>`:
+
+.. _interface_header:
+
+Interface header
+----------------
+
+Below is the resulting interface header code, generated from the
+:doc:`TOML format example <toml_format>`:
 
 .. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/i_example.h
    :caption: Example interface header
    :language: C++
 
+
+Class header
+------------
+
+Below is the generated class header:
+
+.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.h
+   :caption: Example class header
+   :language: C++
+
+
+Implementation
+--------------
+
+Below is the generated class implementation:
+
+.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.cpp
+   :caption: Example class implementation
+   :language: C++
+
+Note that when the register is part of an array, the register setter/getter takes a second
+argument ``array_index``.
+There is an assert that the user-provided array index is within the bounds of the array.
+
+
 Getters
 -------
 
-Note that there are three ways to read a register field:
+It can be noted, most clearly in the :ref:`interface_header`, that there are three ways to read a
+register field:
 
 1. The method that reads the whole register, e.g. ``get_configuration()``.
 
@@ -55,17 +88,13 @@ Instead we can call a register getter once, e.g. ``get_configuration()``, and th
 times to get our updated register value.
 This value is then written over the register bus using (1).
 
+Exceptions
+__________
 
-
-.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.h
-   :caption: Example class header
-   :language: C++
-
-.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.cpp
-   :caption: Example class implementation
-   :language: C++
-
-Note that when the register is part of an array, the register setter/getter takes a second
-argument ``array_index``.
-There is an assert that the user-provided array index is within the bounds of the array.
-
+The discussion about setters above is valid for "read write" mode registers, which is arguably the
+most common type.
+However there are three register modes where the previously written register value can not be
+read back over the bus and then modified: "write only", "write pulse", and "read, write pulse".
+The field setters for registers of this mode will write all bits outside of the current field
+as zero.
+This can for example be seen in the setter ``set_command_start()`` in the generated code above.

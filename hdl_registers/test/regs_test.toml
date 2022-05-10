@@ -23,6 +23,42 @@ default_value = "0011"
 
 
 ################################################################################
+[register.status]
+
+mode = "r"
+
+bit.a.description = "Bit A"
+bit.b.description = "Bit B"
+
+
+################################################################################
+[register.command]
+
+mode = "wpulse"
+
+bit.a.description = "Bit A"
+bit.b.description = "Bit B"
+
+
+################################################################################
+[register.irq_status]
+
+mode = "r_wpulse"
+
+bit.a.description = "Bit A"
+bit.b.description = "Bit B"
+
+
+################################################################################
+[register.address]
+
+mode = "w"
+
+bit_vector.a.width = 8
+bit_vector.b.width = 8
+
+
+################################################################################
 [register_array.dummy_regs]
 
 array_length = 3

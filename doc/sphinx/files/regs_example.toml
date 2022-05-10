@@ -66,6 +66,24 @@ width = 8
 
 
 ################################################################################
+# Another register added as an example. Will allocate a register with the name "command".
+[register.command]
+
+mode = "wpulse"
+description = """
+The value written to this register will be asserted for one clock cycle in the FPGA fabric.
+"""
+
+[register.command.bit.start]
+
+description = "Write this bit to start operation."
+
+[register.command.bit.flush]
+
+description = "Write this bit to flush data in progress."
+
+
+################################################################################
 # This will allocate a register array with the name "base_addresses".
 [register_array.base_addresses]
 

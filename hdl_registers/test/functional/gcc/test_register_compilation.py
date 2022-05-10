@@ -54,7 +54,7 @@ void test_constants()
             main_function += "  assert(TEST_NUM_REGS == 0);\n"
         else:
             main_function += """\
-  assert(TEST_NUM_REGS == 8);
+  assert(TEST_NUM_REGS == 12);
   test_addresses();
   test_field_indexes();
   test_generated_type();
@@ -65,22 +65,22 @@ void test_addresses()
 {
   // Assert that indexes are correct
   assert(TEST_PLAIN_DUMMY_REG_INDEX == 0);
-  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_INDEX(0) == 1);
-  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_INDEX(0) == 2);
-  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_INDEX(1) == 3);
-  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_INDEX(1) == 4);
-  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_INDEX(2) == 5);
-  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_INDEX(2) == 6);
+  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_INDEX(0) == 5);
+  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_INDEX(0) == 6);
+  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_INDEX(1) == 7);
+  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_INDEX(1) == 8);
+  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_INDEX(2) == 9);
+  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_INDEX(2) == 10);
 
   // Assert that addresses are correct
   assert(TEST_PLAIN_DUMMY_REG_ADDR == 0);
-  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ADDR(0) == 4);
-  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_ADDR(0) == 8);
-  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ADDR(1) == 12);
-  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_ADDR(1) == 16);
-  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ADDR(2) == 20);
-  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_ADDR(2) == 24);
-  assert(TEST_FURTHER_REGS_DUMMY_REG_ADDR(0) == 28);
+  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ADDR(0) == 20);
+  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_ADDR(0) == 24);
+  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ADDR(1) == 28);
+  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_ADDR(1) == 32);
+  assert(TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ADDR(2) == 36);
+  assert(TEST_DUMMY_REGS_SECOND_ARRAY_DUMMY_REG_ADDR(2) == 40);
+  assert(TEST_FURTHER_REGS_DUMMY_REG_ADDR(0) == 44);
   // Last register
   assert(TEST_FURTHER_REGS_DUMMY_REG_ADDR(0) == 4 * (TEST_NUM_REGS - 1));
 }
@@ -115,13 +115,13 @@ void test_generated_type()
   assert(sizeof(regs) == 4 * TEST_NUM_REGS);
 
   assert((void *)&regs == (void *)&regs.plain_dummy_reg);
-  assert((void *)&regs + 4 == (void *)&regs.dummy_regs[0].array_dummy_reg);
-  assert((void *)&regs + 8 == (void *)&regs.dummy_regs[0].second_array_dummy_reg);
-  assert((void *)&regs + 12 == (void *)&regs.dummy_regs[1].array_dummy_reg);
-  assert((void *)&regs + 16 == (void *)&regs.dummy_regs[1].second_array_dummy_reg);
-  assert((void *)&regs + 20 == (void *)&regs.dummy_regs[2].array_dummy_reg);
-  assert((void *)&regs + 24 == (void *)&regs.dummy_regs[2].second_array_dummy_reg);
-  assert((void *)&regs + 28 == (void *)&regs.further_regs[0].dummy_reg);
+  assert((void *)&regs + 20 == (void *)&regs.dummy_regs[0].array_dummy_reg);
+  assert((void *)&regs + 24 == (void *)&regs.dummy_regs[0].second_array_dummy_reg);
+  assert((void *)&regs + 28 == (void *)&regs.dummy_regs[1].array_dummy_reg);
+  assert((void *)&regs + 32 == (void *)&regs.dummy_regs[1].second_array_dummy_reg);
+  assert((void *)&regs + 36 == (void *)&regs.dummy_regs[2].array_dummy_reg);
+  assert((void *)&regs + 40 == (void *)&regs.dummy_regs[2].second_array_dummy_reg);
+  assert((void *)&regs + 44 == (void *)&regs.further_regs[0].dummy_reg);
 
   // Some dummy code that uses the generated type
   regs.plain_dummy_reg = 0;
@@ -185,7 +185,7 @@ void test_constants()
             main_function += "  assert(fpga_regs::Test::num_registers == 0);\n"
         else:
             main_function += """\
-  assert(fpga_regs::Test::num_registers == 8);
+  assert(fpga_regs::Test::num_registers == 12);
   assert(fpga_regs::Test::dummy_regs_array_length == 3);
 
   // Allocate memory and instantiate the register class
@@ -197,6 +197,9 @@ void test_constants()
   test_field_getters(&test);
   test_field_getters_from_value(&test);
   test_field_setters(&test);
+  test_field_setter_on_write_only_register(&test, memory);
+  test_field_setter_on_write_pulse_register(&test, memory);
+  test_field_setter_on_read_write_pulse_register(&test, memory);
 """
 
             functions += """\
@@ -207,36 +210,36 @@ void test_read_write_registers(fpga_regs::Test *test, uint32_t *memory)
   test->set_plain_dummy_reg(0);
   test->set_dummy_regs_array_dummy_reg(0, 1);
   // second_array_dummy_reg is read only, so set the value in the memory straight away
-  memory[2] = 2;
+  memory[6] = 2;
   test->set_dummy_regs_array_dummy_reg(1, 3);
-  memory[4] = 4;
+  memory[8] = 4;
   test->set_dummy_regs_array_dummy_reg(2, 5);
-  memory[6] = 6;
+  memory[10] = 6;
   test->set_further_regs_dummy_reg(0, 7);
 
   assert(test->get_plain_dummy_reg() == 0);
   assert(memory[0] == 0);
 
   assert(test->get_dummy_regs_array_dummy_reg(0) == 1);
-  assert(memory[1] == 1);
+  assert(memory[5] == 1);
 
   assert(test->get_dummy_regs_second_array_dummy_reg(0) == 2);
-  assert(memory[2] == 2);
+  assert(memory[6] == 2);
 
   assert(test->get_dummy_regs_array_dummy_reg(1) == 3);
-  assert(memory[3] == 3);
+  assert(memory[7] == 3);
 
   assert(test->get_dummy_regs_second_array_dummy_reg(1) == 4);
-  assert(memory[4] == 4);
+  assert(memory[8] == 4);
 
   assert(test->get_dummy_regs_array_dummy_reg(2) == 5);
-  assert(memory[5] == 5);
+  assert(memory[9] == 5);
 
   assert(test->get_dummy_regs_second_array_dummy_reg(2) == 6);
-  assert(memory[6] == 6);
+  assert(memory[10] == 6);
 
   assert(test->get_further_regs_dummy_reg(0) == 7);
-  assert(memory[7] == 7);
+  assert(memory[11] == 7);
 }
 
 void test_field_getters(fpga_regs::Test *test)
@@ -339,12 +342,60 @@ void test_field_setters(fpga_regs::Test *test)
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(0) == 10);
 }
 
+void test_field_setter_on_write_pulse_register(fpga_regs::Test *test, uint32_t *memory)
+{
+  int reg_index = 2;
+
+  test->set_command(1337);
+  assert(memory[reg_index] == 1337);
+
+  // All other bits should be zero when writing a field in a "write pulse" register
+
+  test->set_command_a(1);
+  assert(memory[reg_index] == 1);
+
+  test->set_command_b(1);
+  assert(memory[reg_index] == 1 << 1);
+}
+
+void test_field_setter_on_read_write_pulse_register(fpga_regs::Test *test, uint32_t *memory)
+{
+  int reg_index = 3;
+
+  test->set_irq_status(1337);
+  assert(memory[reg_index] == 1337);
+
+  // All other bits should be zero when writing a field in a "read, write pulse" register
+
+  test->set_irq_status_a(1);
+  assert(memory[reg_index] == 1);
+
+  test->set_irq_status_b(1);
+  assert(memory[reg_index] == 1 << 1);
+}
+
+void test_field_setter_on_write_only_register(fpga_regs::Test *test, uint32_t *memory)
+{
+  int reg_index = 4;
+
+  test->set_address(1337);
+  assert(memory[reg_index] == 1337);
+
+  // All other bits should be zero when writing a field in a "write only" register
+
+  test->set_address_a(244);
+  assert(memory[reg_index] == 244);
+
+  test->set_address_b(213);
+  assert(memory[reg_index] == 213 << 8);
+}
 
 """
 
         main_file = self.working_dir / "main.cpp"
         main = f"""\
 #include <assert.h>
+#include <iostream>
 
 #include "include/test.h"
 

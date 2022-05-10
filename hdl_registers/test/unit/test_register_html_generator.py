@@ -50,8 +50,8 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 
         self._check_register(
             name="array_dummy_reg",
-            index="1 + i &times; 2",
-            address="0x0004 + i &times; 0x0008",
+            index="5 + i &times; 2",
+            address="0x0014 + i &times; 0x0008",
             mode="Read, Write",
             default_value="0x31",
             description="The first register in the array.",
@@ -60,8 +60,8 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 
         self._check_register(
             name="second_array_dummy_reg",
-            index="2 + i &times; 2",
-            address="0x0008 + i &times; 0x0008",
+            index="6 + i &times; 2",
+            address="0x0018 + i &times; 0x0008",
             mode="Read",
             default_value="0x0",
             description="The second register in the array.",
