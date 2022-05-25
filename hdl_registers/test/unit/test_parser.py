@@ -200,7 +200,7 @@ default_value="0000000000000011"
         with pytest.raises(ValueError) as exception_info:
             load_toml_file(self.toml_file)
         assert str(exception_info.value).startswith(
-            f"Error while parsing TOML file {self.toml_file}:\nUnexpected character"
+            f"Error while parsing TOML file {self.toml_file}:\nExpected '=' after a key"
         )
 
     def test_plain_register_with_array_length_attribute_should_raise_exception(self):
@@ -285,10 +285,11 @@ mode = "w"
 
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Error while parsing TOML file {self.toml_file}:\nKey "irq" already exists.'
+        expected = (
+            f"Error while parsing TOML file {self.toml_file}:\n"
+            "Cannot declare ('register', 'irq') twice"
         )
+        assert str(exception_info.value).startswith(expected)
 
     def test_register_with_same_name_as_register_array_should_raise_exception(self):
         self.create_toml_file_with_extras(
@@ -322,10 +323,12 @@ description = "Declaration 2"
 
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Error while parsing TOML file {self.toml_file}:\nKey "test_bit" already exists.'
+
+        expected = (
+            f"Error while parsing TOML file {self.toml_file}:\n"
+            "Cannot declare ('register', 'test_reg', 'bit', 'test_bit') twice"
         )
+        assert str(exception_info.value).startswith(expected)
 
     def test_overriding_default_register(self):
         self.create_toml_file_with_extras(

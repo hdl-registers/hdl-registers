@@ -7,7 +7,7 @@
 # --------------------------------------------------------------------------------------------------
 
 import copy
-import tomlkit
+import tomli
 
 from tsfpga.system_utils import read_file
 
@@ -21,7 +21,7 @@ def load_toml_file(toml_file):
 
     raw_toml = read_file(toml_file)
     try:
-        return tomlkit.loads(raw_toml)
+        return tomli.loads(raw_toml)
     except Exception as exception_info:
         message = f"Error while parsing TOML file {toml_file}:\n{exception_info}"
         raise ValueError(message) from exception_info
