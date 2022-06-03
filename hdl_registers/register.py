@@ -13,6 +13,11 @@ from .register_field import FieldType, DEFAULT_FIELD_TYPE
 
 class RegisterMode:
     def __init__(self, mode_readable, description):
+        """
+        Arguments:
+            mode_readable (str): The readable representation of this mode. E.g. "r" -> "Read-only".
+            description (str): Textual description of mode.
+        """
         self.mode_readable = mode_readable
         self.description = description
 
