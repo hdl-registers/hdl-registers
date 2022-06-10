@@ -66,7 +66,6 @@ def main():
             "Operating System :: Microsoft :: Windows",
             "Operating System :: MacOS :: MacOS X",
             "Operating System :: POSIX :: Linux",
-            "Topic :: Software Development :: Testing",
             "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
         ],
         zip_safe=False,

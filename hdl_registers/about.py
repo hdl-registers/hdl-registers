@@ -106,8 +106,8 @@ From the Python abstractions, the following code can be generated:
   in the VHDL code.
 * HTML website with documentation of the registers and constants.
 * C header with constant values, register addresses, and register field information.
-* C++ header and implementation with constant values, and setters/getters for the
-  different registers.
+* C++ header and implementation with constant values, and setters/getters for
+  registers and fields.
   The header has an abstract interface class which can be used for mocking.
 """  # noqa: E501
 
