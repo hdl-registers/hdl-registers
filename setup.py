@@ -53,6 +53,12 @@ def main():
         author="Lukas Vik",
         author_email="2767848-LukasVik@users.noreply.gitlab.com",
         url="https://hdl-registers.com",
+        project_urls={
+            "Documentation": "https://hdl-registers.com/",
+            "Changelog": "https://hdl-registers.com/release_notes.html",
+            "Source": "https://gitlab.com/tsfpga/hdl_registers",
+            "Issues": "https://gitlab.com/tsfpga/hdl_registers/-/issues",
+        },
         python_requires=">=3.6",
         install_requires=read_requirements_file(REQUIREMENTS_TXT),
         extras_require=dict(dev=read_requirements_file(REQUIREMENTS_DEVELOP_TXT)),
