@@ -3,7 +3,12 @@
 [register.configuration]
 
 # The "mode" property MUST be present for a register.
-# The value specified must be a valid mode string value.
+# The value specified must be a valid mode string value. Either of:
+# * "r" for Read,
+# * "w" for Write,
+# * "r_w" for Read, Write
+# * "wpulse" for Write-pulse
+# * "r_wpulse" for Read, Write-pulse
 mode = "r_w"
 # The "description" property is optional for a register. Will default to "" if not specified.
 # The value specified must be a string.
