@@ -11,14 +11,14 @@ stages:
 
 workflow:
   rules:
-    # Run pipeline for scheduled (nightly master runs), for merge requests, and
+    # Run pipeline for scheduled (nightly main branch runs), for merge requests, and
     # when triggered manually on the web.
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
-    # Pushes to master (a successful merge request is also a "push") should run so
+    # Pushes to main (a successful merge request is also a "push") should run so
     # that new website is deployed.
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
     # PyPI deploy should be run only when there is a tag. However a $CI_COMMIT_TAG is
     # set only on the $CI_PIPELINE_SOURCE = "push" event (not on merge_request_event
     # or schedule). So allow the pipeline to run for this as well.
@@ -40,8 +40,8 @@ pytest:
   stage: test
   image: tsfpga/ci_py_sim
   script:
-    - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
-    - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/hdl_modules.git ../hdl_modules
+    - git clone --depth 1 --single-branch --branch main https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
+    - git clone --depth 1 --single-branch --branch main https://gitlab.com/tsfpga/hdl_modules.git ../hdl_modules
     - python3 -m pytest -v --cov hdl_registers --cov-report xml:generated/python_coverage.xml --cov-report html:generated/python_coverage_html hdl_registers/
   artifacts:
     paths:
@@ -53,7 +53,7 @@ build_pypi:
   stage: test
   image: tsfpga/ci_py_sim
   script:
-    - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
+    - git clone --depth 1 --single-branch --branch main https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
     - python3 setup.py sdist
   artifacts:
     paths:
@@ -66,7 +66,7 @@ build_pages:
   # Start as soon as pytest job is done. Even if build_pypi in previous stage is not.
   needs: ["pytest"]
   script:
-    - git clone --depth 1 --single-branch --branch master https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
+    - git clone --depth 1 --single-branch --branch main https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
     # Without the "git fetch" call, "build_docs.py" can not find all git tags.
     - git fetch --all --tags
     - python3 tools/build_docs.py
@@ -97,7 +97,7 @@ pages:
   # anything special.
   image: alpine
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
   script:
     - mv generated/sphinx_html public
   artifacts:
