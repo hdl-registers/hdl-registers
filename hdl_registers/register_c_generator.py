@@ -162,9 +162,8 @@ class RegisterCGenerator(RegisterCodeGenerator):
 
             field_name = f"{register_name}_{field.name.upper()}"
             c_code += f"#define {field_name}_SHIFT ({field.base_index}u)\n"
-            c_code += (
-                f"#define {field_name}_MASK " f'(0b{"1" * field.width}u << {field.base_index}u)\n'
-            )
+            c_code += f'#define {field_name}_MASK (0b{"1" * field.width}u << {field.base_index}u)\n'
+            c_code += f"#define {field_name}_MASK_INVERSE (~{field_name}_MASK)\n"
 
         return c_code
 
