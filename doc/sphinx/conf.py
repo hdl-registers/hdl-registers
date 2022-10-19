@@ -17,7 +17,7 @@ import sys
 # Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install
 REPO_ROOT = Path(__file__).parent.parent.parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
-PATH_TO_TSFPGA = REPO_ROOT.parent.resolve() / "tsfpga"
+PATH_TO_TSFPGA = REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"
 sys.path.insert(0, str(PATH_TO_TSFPGA))
 
 project = "hdl_registers"

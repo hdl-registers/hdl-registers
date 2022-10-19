@@ -16,7 +16,7 @@ from git import Repo
 
 PATH_TO_REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(PATH_TO_REPO_ROOT))
-PATH_TO_TSFPGA = PATH_TO_REPO_ROOT.parent.resolve() / "tsfpga"
+PATH_TO_TSFPGA = PATH_TO_REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"
 sys.path.insert(0, str(PATH_TO_TSFPGA))
 
 from tsfpga.system_utils import create_file
