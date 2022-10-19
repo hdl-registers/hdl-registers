@@ -18,7 +18,7 @@ Requirements
 The VHDL package depends on :ref:`reg_file.reg_file_pkg` from the :ref:`reg_file <module_reg_file>`
 module of `hdl_modules <https://hdl-modules.com>`__.
 Can be downloaded from gitlab here:
-https://gitlab.com/tsfpga/hdl_modules/-/blob/main/modules/reg_file/src/reg_file_pkg.vhd
+https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
 
 Example
