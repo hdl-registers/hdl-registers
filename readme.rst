@@ -9,7 +9,7 @@ About hdl_registers
 
 .. |pic_gitlab| image:: https://hdl-registers.com/badges/gitlab.svg
   :alt: Gitlab
-  :target: https://gitlab.com/tsfpga/hdl_registers
+  :target: https://gitlab.com/hdl_registers/hdl_registers
 
 .. |pic_gitter| image:: https://badges.gitter.im/owner/repo.png
   :alt: Gitter

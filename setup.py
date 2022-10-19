@@ -4,7 +4,7 @@
 # This file is part of the hdl_registers project, a HDL register generator fast enough to be run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/tsfpga/hdl_registers
+# https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
 from os.path import relpath
@@ -57,8 +57,8 @@ def main():
         project_urls={
             "Documentation": "https://hdl-registers.com/",
             "Changelog": "https://hdl-registers.com/release_notes.html",
-            "Source": "https://gitlab.com/tsfpga/hdl_registers",
-            "Issues": "https://gitlab.com/tsfpga/hdl_registers/-/issues",
+            "Source": "https://gitlab.com/hdl_registers/hdl_registers",
+            "Issues": "https://gitlab.com/hdl_registers/hdl_registers/-/issues",
         },
         python_requires=">=3.6",
         install_requires=read_requirements_file(REQUIREMENTS_TXT),

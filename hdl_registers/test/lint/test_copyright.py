@@ -4,7 +4,7 @@
 # This file is part of the hdl_registers project, a HDL register generator fast enough to be run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/tsfpga/hdl_registers
+# https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
 from tsfpga.git_utils import find_git_files
@@ -18,7 +18,7 @@ COPYRIGHT_TEXT = [
     "be run",
     "in real time.",
     "https://hdl-registers.com",
-    "https://gitlab.com/tsfpga/hdl_registers",
+    "https://gitlab.com/hdl_registers/hdl_registers",
 ]
 
 

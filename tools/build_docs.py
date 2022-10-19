@@ -4,7 +4,7 @@
 # This file is part of the hdl_registers project, a HDL register generator fast enough to be run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/tsfpga/hdl_registers
+# https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
 import argparse
@@ -145,7 +145,7 @@ def build_information_badges(output_path):
 
     badge_svg = badge(
         left_text="",
-        right_text="tsfpga/hdl_registers",
+        right_text="hdl_registers/hdl_registers",
         left_color="grey",
         right_color="grey",
         logo="https://about.gitlab.com/images/press/press-kit-icon.svg",

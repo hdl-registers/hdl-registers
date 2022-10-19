@@ -4,7 +4,7 @@
 # This file is part of the hdl_registers project, a HDL register generator fast enough to be run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/tsfpga/hdl_registers
+# https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
 
@@ -48,14 +48,15 @@ def get_readme_rst(
     elif include_extra_for_website:
         extra_rst = """\
 This website contains readable documentation for the project.
-To check out the source code go to the `gitlab page <https://gitlab.com/tsfpga/hdl_registers>`__.
+To check out the source code go to the `gitlab page
+<https://gitlab.com/hdl_registers/hdl_registers>`__.
 To install see the `PyPI page <https://pypi.org/project/hdl-registers/>`__.
 """
     elif include_extra_for_pypi:
         extra_rst = """\
 **See documentation on the website**: https://hdl-registers.com
 
-**Check out the source code on gitlab**: https://gitlab.com/tsfpga/hdl_registers
+**Check out the source code on gitlab**: https://gitlab.com/hdl_registers/hdl_registers
 """
     else:
         extra_rst = ""
@@ -72,7 +73,7 @@ About hdl_registers
 
 .. |pic_gitlab| image:: https://hdl-registers.com/badges/gitlab.svg
   :alt: Gitlab
-  :target: https://gitlab.com/tsfpga/hdl_registers
+  :target: https://gitlab.com/hdl_registers/hdl_registers
 
 .. |pic_gitter| image:: https://badges.gitter.im/owner/repo.png
   :alt: Gitter
