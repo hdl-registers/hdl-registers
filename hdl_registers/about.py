@@ -48,8 +48,8 @@ def get_readme_rst(
     elif include_extra_for_website:
         extra_rst = """\
 This website contains readable documentation for the project.
-To check out the source code go to the `gitlab page
-<https://gitlab.com/hdl_registers/hdl_registers>`__.
+To check out the source code go to the
+`gitlab page <https://gitlab.com/hdl_registers/hdl_registers>`__.
 To install see the `PyPI page <https://pypi.org/project/hdl-registers/>`__.
 """
     elif include_extra_for_pypi:
