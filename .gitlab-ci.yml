@@ -40,8 +40,10 @@ pytest:
   stage: test
   image: tsfpga/ci_py_sim
   script:
-    - git clone --depth 1 --single-branch --branch main https://gitlab.com/tsfpga/tsfpga.git ../tsfpga
-    - git clone --depth 1 --single-branch --branch main https://gitlab.com/hdl_modules/hdl_modules.git ../hdl_modules
+    - mkdir ../../tsfpga
+    - git clone --depth 1 --single-branch --branch main https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
+    - mkdir ../../hdl_modules
+    - git clone --depth 1 --single-branch --branch main https://gitlab.com/hdl_modules/hdl_modules.git ../../hdl_modules/hdl_modules
     - python3 -m pytest -v --cov hdl_registers --cov-report xml:generated/python_coverage.xml --cov-report html:generated/python_coverage_html hdl_registers/
   artifacts:
     paths:
