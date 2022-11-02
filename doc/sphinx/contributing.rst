@@ -99,7 +99,11 @@ ___________________
 
 .. code-block:: shell
 
-    git push origin --tag vX.Y.Z HEAD:release_branch
+    git push origin HEAD:refs/heads/release_branch
+    git push origin vX.Y.Z
+
+**WARNING:** Avoid the "git push --tags" command, which is dangerous since it pushes all your
+local tags.
 
 Pushing a tag will create a special CI run in gitlab:
 
@@ -109,13 +113,16 @@ The pipeline for the tag will run an additional job ``deploy_pypi``:
 
 .. image:: files/ci_deploy_jobs.png
 
-Wait until that pipeline is finished before proceeding to merge the commits.
-The pipeline for the merge request might finish before the pipeline for the tag
-(which pushes to PyPI).
+From the release branch that was just pushed you must create a merge request to ``main``.
+Wait until the tag pipeline (which pushes to PyPI) is finished before proceeding to merge
+the commits.
+The pipeline for the merge request might finish before the pipeline for the tag.
 So we wait for the tag pipeline to finish before merging, to be sure that the release upload worked
 before adding commits to ``main``.
 
-The package is uploaded to https://pypi.org/project/hdl_registers/.
+Note that the tag is pushed and available in the repo even if you do not merge the merge request.
+
+The Python package is uploaded to https://pypi.org/project/hdl_registers/.
 You can check there to make sure your new release is available.
 
 
