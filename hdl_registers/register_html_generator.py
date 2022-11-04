@@ -7,8 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-from .register import Register, REGISTER_MODES
+# Local folder libraries
 from .html_translator import HtmlTranslator
+from .register import REGISTER_MODES, Register
 
 
 class RegisterHtmlGenerator:

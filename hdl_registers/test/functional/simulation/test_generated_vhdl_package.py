@@ -7,12 +7,14 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 from pathlib import Path
 
+# Third party libraries
+from tsfpga.module import get_hdl_modules
 from vunit import VUnit
 
-from tsfpga.module import get_hdl_modules
-
+# First party libraries
 from hdl_registers import HDL_REGISTERS_DOC
 from hdl_registers.parser import from_toml
 

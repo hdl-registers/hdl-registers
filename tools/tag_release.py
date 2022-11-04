@@ -7,11 +7,13 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import argparse
+import sys
 from pathlib import Path
 from shutil import move
-import sys
 
+# Third party libraries
 from git import Repo
 
 PATH_TO_REPO_ROOT = Path(__file__).parent.parent.resolve()
@@ -19,15 +21,17 @@ sys.path.insert(0, str(PATH_TO_REPO_ROOT))
 PATH_TO_TSFPGA = PATH_TO_REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"
 sys.path.insert(0, str(PATH_TO_TSFPGA))
 
+# Third party libraries
 from tsfpga.system_utils import create_file
 from tsfpga.tools.version_number_handler import (
+    UNRELEASED_EMPTY,
+    VersionNumberHandler,
     commit_and_tag_release,
     make_commit,
-    UNRELEASED_EMPTY,
     verify_new_version_number,
-    VersionNumberHandler,
 )
 
+# First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_PATH, REPO_ROOT
 
 

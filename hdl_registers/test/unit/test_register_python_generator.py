@@ -7,8 +7,10 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
 from tsfpga.system_utils import load_python_module
 
+# First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
 from hdl_registers.parser import from_toml
 

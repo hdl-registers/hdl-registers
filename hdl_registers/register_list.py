@@ -7,19 +7,21 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import copy
-import hashlib
 import datetime
+import hashlib
 import re
+from pathlib import Path
 from shutil import copy2
 
-from pathlib import Path
-
+# Third party libraries
 from tsfpga import DEFAULT_FILE_ENCODING
-from tsfpga.git_utils import git_commands_are_available, get_git_commit
-from tsfpga.svn_utils import svn_commands_are_available, get_svn_revision_information
+from tsfpga.git_utils import get_git_commit, git_commands_are_available
+from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_available
 from tsfpga.system_utils import create_directory, create_file, read_file
 
+# Local folder libraries
 from . import __version__
 from .constant import Constant
 from .register import Register

@@ -12,6 +12,7 @@ A HDL register generator fast enough to be run in real time.
 """
 
 
+# Standard libraries
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()

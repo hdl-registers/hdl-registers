@@ -7,6 +7,7 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 from abc import ABC, abstractmethod
 
 

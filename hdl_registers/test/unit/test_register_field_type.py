@@ -8,12 +8,15 @@
 # --------------------------------------------------------------------------------------------------
 # pylint: disable=protected-access
 
+# Third party libraries
 import pytest
+
+# First party libraries
 from hdl_registers.register_field_type import (
     FieldType,
-    Unsigned,
     Signed,
     SignedFixedPoint,
+    Unsigned,
     UnsignedFixedPoint,
 )
 

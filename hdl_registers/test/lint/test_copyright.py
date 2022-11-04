@@ -7,9 +7,11 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
 from tsfpga.git_utils import find_git_files
 from tsfpga.test.lint.test_copyright import CopyrightHeader
 
+# First party libraries
 from hdl_registers import REPO_ROOT
 
 COPYRIGHT_HOLDER = "Lukas Vik"

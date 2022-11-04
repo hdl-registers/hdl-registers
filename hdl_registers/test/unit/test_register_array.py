@@ -7,8 +7,10 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
 import pytest
 
+# First party libraries
 from hdl_registers.register_array import RegisterArray
 
 

@@ -7,6 +7,7 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Local folder libraries
 from .register import REGISTER_MODES
 from .register_array import RegisterArray
 from .register_code_generator import RegisterCodeGenerator

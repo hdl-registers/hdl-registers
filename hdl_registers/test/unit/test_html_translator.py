@@ -7,8 +7,10 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import unittest
 
+# First party libraries
 from hdl_registers.html_translator import HtmlTranslator
 
 

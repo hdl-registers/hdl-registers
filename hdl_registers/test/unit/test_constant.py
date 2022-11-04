@@ -7,6 +7,7 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# First party libraries
 from hdl_registers.constant import Constant
 
 

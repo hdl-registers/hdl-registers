@@ -7,9 +7,10 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Local folder libraries
 from .bit import Bit
 from .bit_vector import BitVector
-from .register_field import FieldType, DEFAULT_FIELD_TYPE
+from .register_field import DEFAULT_FIELD_TYPE, FieldType
 
 
 class RegisterMode:

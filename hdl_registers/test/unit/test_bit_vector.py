@@ -7,10 +7,12 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
 import pytest
 
+# First party libraries
 from hdl_registers.bit_vector import BitVector
-from hdl_registers.register_field_type import Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint
+from hdl_registers.register_field_type import Signed, SignedFixedPoint, Unsigned, UnsignedFixedPoint
 
 
 def test_get_value():

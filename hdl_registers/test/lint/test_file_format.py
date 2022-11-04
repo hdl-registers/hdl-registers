@@ -7,6 +7,7 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
 from tsfpga.git_utils import find_git_files
 from tsfpga.test.lint.test_file_format import (
     check_file_ends_with_newline,
@@ -17,7 +18,8 @@ from tsfpga.test.lint.test_file_format import (
     open_file_with_encoding,
 )
 
-from hdl_registers import REPO_ROOT, HDL_REGISTERS_DOC
+# First party libraries
+from hdl_registers import HDL_REGISTERS_DOC, REPO_ROOT
 
 
 def test_all_checked_in_files_are_properly_encoded():

@@ -15,14 +15,15 @@ That testbench compiles the VHDL package and performs some run-time assertions o
 generated values. That test is considered more meaningful and exhaustive than a unit test would be.
 """
 
+# Third party libraries
 import pytest
-
 from tsfpga.system_utils import read_file
 
+# First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
 from hdl_registers.parser import from_toml
+from hdl_registers.register_field_type import Signed, SignedFixedPoint, Unsigned, UnsignedFixedPoint
 from hdl_registers.register_list import RegisterList
-from hdl_registers.register_field_type import Unsigned, Signed, SignedFixedPoint, UnsignedFixedPoint
 
 
 class RegisterConfiguration:

@@ -7,15 +7,17 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import copy
-from pathlib import Path
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
+# Third party libraries
 import pytest
-
 from tsfpga.system_utils import create_file
 
+# First party libraries
 from hdl_registers.parser import from_toml
 from hdl_registers.register import Register
 from hdl_registers.register_list import RegisterList

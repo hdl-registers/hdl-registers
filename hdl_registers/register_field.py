@@ -7,8 +7,10 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 from abc import ABC, abstractmethod
 
+# Local folder libraries
 from .register_field_type import FieldType, Unsigned
 
 DEFAULT_FIELD_TYPE = Unsigned()

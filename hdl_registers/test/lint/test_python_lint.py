@@ -7,10 +7,12 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
 from tsfpga.git_utils import find_git_files
 from tsfpga.test.lint.test_python_lint import run_black, run_flake8_lint, run_pylint
 
-from hdl_registers import REPO_ROOT, HDL_REGISTERS_DOC
+# First party libraries
+from hdl_registers import HDL_REGISTERS_DOC, REPO_ROOT
 
 
 def _files_to_test():

@@ -7,7 +7,8 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-from .register_field import RegisterField, DEFAULT_FIELD_TYPE
+# Local folder libraries
+from .register_field import DEFAULT_FIELD_TYPE, RegisterField
 from .register_field_type import FieldType
 
 

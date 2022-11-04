@@ -7,15 +7,18 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+import sys
 from os.path import relpath
 from pathlib import Path
-import sys
 
-from setuptools import setup, find_packages
+# Third party libraries
+from setuptools import find_packages, setup
 
 REPO_ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
 
+# First party libraries
 import hdl_registers
 from hdl_registers.about import get_readme_rst, get_slogan
 

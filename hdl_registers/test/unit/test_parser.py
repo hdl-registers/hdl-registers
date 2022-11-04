@@ -7,11 +7,14 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import unittest
-import pytest
 
+# Third party libraries
+import pytest
 from tsfpga.system_utils import create_file
 
+# First party libraries
 from hdl_registers.parser import from_toml, load_toml_file
 from hdl_registers.register import Register
 

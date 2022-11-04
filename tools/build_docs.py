@@ -7,13 +7,15 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import argparse
-from pathlib import Path
 import shutil
-from subprocess import check_call
 import sys
+from pathlib import Path
+from subprocess import check_call
 from xml.etree import ElementTree
 
+# Third party libraries
 from pybadges import badge
 
 # Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install
@@ -22,9 +24,11 @@ sys.path.insert(0, str(REPO_ROOT))
 PATH_TO_TSFPGA = REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"
 sys.path.insert(0, str(PATH_TO_TSFPGA))
 
+# Third party libraries
 from tsfpga.system_utils import create_directory, create_file, delete, read_file
 from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
+# First party libraries
 import hdl_registers
 from hdl_registers.about import get_readme_rst
 from hdl_registers.parser import from_toml

@@ -7,10 +7,13 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import pickle
 
+# Third party libraries
 from tsfpga.system_utils import create_file
 
+# Local folder libraries
 from .register_code_generator import RegisterCodeGenerator
 
 

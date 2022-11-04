@@ -7,13 +7,16 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
 import copy
-import tomli
 
+# Third party libraries
+import tomli
 from tsfpga.system_utils import read_file
 
-from .register_list import RegisterList
+# Local folder libraries
 from .constant import Constant
+from .register_list import RegisterList
 
 
 def load_toml_file(toml_file):
