@@ -93,7 +93,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
   subtype {self.module_name}_regs_t is reg_vec_t({range_name});
   constant {self.module_name}_regs_init : {self.module_name}_regs_t;
 
-  subtype {self.module_name}_reg_was_accessed_t is std_logic_vector({range_name});
+  subtype {self.module_name}_reg_was_accessed_t is std_ulogic_vector({range_name});
 
 """
 

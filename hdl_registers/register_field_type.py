@@ -193,7 +193,7 @@ class Unsigned(FieldType):
         return round(value)
 
     def vhdl_typedef(self, bit_width: int) -> str:
-        return f"unsigned({bit_width-1} downto 0)"
+        return f"u_unsigned({bit_width-1} downto 0)"
 
     def __repr__(self):
         return self.__class__.__name__
@@ -218,7 +218,7 @@ class Signed(FieldType):
         return _to_unsigned_binary(bit_width, value, is_signed=True)
 
     def vhdl_typedef(self, bit_width: int) -> str:
-        return f"signed({bit_width-1} downto 0)"
+        return f"u_signed({bit_width-1} downto 0)"
 
     def __repr__(self):
         return self.__class__.__name__
