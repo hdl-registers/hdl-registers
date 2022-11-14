@@ -44,3 +44,17 @@ register bus: AXI-to-AXI-Lite converter, AXI/AXI-Lite interconnect, AXI-Lite mux
 AXI-Lite clock domain crossing, etc.
 See the :ref:`reg_file library <module_reg_file>` and :ref:`axi library <module_axi>` for
 more details.
+
+
+Unresolved types
+----------------
+
+The generated VHDL uses unresolved types
+(e.g. ``std_ulogic_vector`` instead of ``std_logic_vector``) consistently.
+This means that accidental multiple drivers of a signal will result in an error when simulating
+or synthesizing the design.
+
+Since e.g. ``std_logic`` is a sub-type of ``std_ulogic`` in VHDL-2008, it is no problem if
+hdl_registers components are integrated in a code base that still uses the resolved types.
+E.g. a ``std_logic`` signal can be assigned to a hdl_registers signal of type ``std_ulogic``,
+and vice versa, without problem.
