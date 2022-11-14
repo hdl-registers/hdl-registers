@@ -11,7 +11,7 @@
 from pathlib import Path
 
 # Third party libraries
-from tsfpga.module import get_hdl_modules
+from tsfpga.examples.example_env import get_hdl_modules
 from vunit import VUnit
 
 # First party libraries
