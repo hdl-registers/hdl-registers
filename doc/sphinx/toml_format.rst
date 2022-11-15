@@ -17,4 +17,4 @@ Comments describe what attributes are optional and which are required.
    :caption: Register TOML format rules.
    :language: toml
 
-See the other articles for an insight into the code that can be from this definition file.
+See the other articles for an insight into the code that can be generated from this definition file.
