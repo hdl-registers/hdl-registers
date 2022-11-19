@@ -22,9 +22,9 @@ class Bit(RegisterField):
     def __init__(self, name, index, description, default_value):
         """
         Arguments:
-            name (str): The name of the bit array.
-            index (int): The zero-based index of this bit array within the register.
-            description (str): Textual bit array description.
+            name (str): The name of the bit.
+            index (int): The zero-based index of this bit within the register.
+            description (str): Textual bit description.
             default_value (str): Default value. Either "1" or "0".
         """
         self.name = name

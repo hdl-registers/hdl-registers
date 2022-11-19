@@ -9,6 +9,9 @@
 
 
 def get_slogan():
+    """
+    One-paragraph description of the project.
+    """
     rst = """\
 The hdl_registers project is an open-source HDL register generator fast enough to be run in
 real time.
@@ -36,7 +39,7 @@ def get_readme_rst(
             gitlab README.
         include_extra_for_website (bool): Include the extra text that shall be included in the
             website main page.
-      include_extra_for_pypi (bool): Include the extra text that shall be included in the
+        include_extra_for_pypi (bool): Include the extra text that shall be included in the
             PyPI release README.
     """
     if include_extra_for_gitlab:

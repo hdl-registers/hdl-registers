@@ -186,7 +186,7 @@ class RegisterList:
 
         Arguments:
             name (str): The name of the constant.
-            length (int): The constant value (signed).
+            value (int): The constant value (signed).
             description (str): Textual description for the constant.
         Return:
             Constant: The constant object that was created.
