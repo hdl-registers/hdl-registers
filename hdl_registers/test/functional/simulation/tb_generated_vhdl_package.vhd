@@ -81,6 +81,10 @@ begin
       check_equal(example_base_addresses_write_address_address'high, 27);
       check_equal(example_base_addresses_write_address_address_width, 28);
 
+    elsif run("test_generated_constants") then
+      check_equal(example_constant_axi_data_width, 64);
+      check_equal(example_constant_clock_rate_hz, 156250000.0);
+
     end if;
 
     test_runner_cleanup(runner);

@@ -137,7 +137,7 @@ description = "Write address for a 256 MiB address space."
 [constant.axi_data_width]
 
 # The "value" property MUST be present for a register array.
-# The value specified must be an integer.
+# The value specified can be of different data types. This constant is an integer value.
 value = 64
 # The "description" property is optional for a constant. Will default to "" if not specified.
 # The value specified must be a string.
@@ -146,8 +146,19 @@ description = "Data width of the AXI port used by this module."
 
 ################################################################################
 # Another register constant added as an example. Will allocate a constant with the
-# name "address_alignment".
-[constant.address_alignment]
+# name "clock_rate_hz".
+[constant.clock_rate_hz]
 
-value = 4096
-description = "The required address alignment for memory buffers."
+# This constant is a floating point value.
+value = 156.25e6
+description = "The clock rate used in the system, given in Hertz."
+
+
+################################################################################
+# Another register constant added as an example. Will allocate a constant with the
+# name "clock_rate_hz".
+[constant.supports_pre_filtering]
+
+# This constant is a boolean value.
+value = true
+description = "Will indicate 'True' if the module supports data pre-filtering."

@@ -477,14 +477,38 @@ height = 4
 
 value = 0xf
 description = "the width"
+
+[constant.apa]
+
+value = 3.14
 """
         )
 
         register_list = from_toml(self.module_name, self.toml_file)
-        assert len(register_list.constants) == 1
+        assert len(register_list.constants) == 2
+
         assert register_list.constants[0].name == "data_width"
         assert register_list.constants[0].value == 15
         assert register_list.constants[0].description == "the width"
+
+        assert register_list.constants[1].name == "apa"
+        assert register_list.constants[1].value == 3.14
+        assert register_list.constants[1].description == ""
+
+    def test_constant_without_value_should_raise_exception(self):
+        self.create_toml_file_with_extras(
+            """
+[constant.data_width]
+
+description = "the width"
+"""
+        )
+        with pytest.raises(ValueError) as exception_info:
+            from_toml(self.module_name, self.toml_file)
+        assert (
+            str(exception_info.value)
+            == f'Constant "data_width" in {self.toml_file} does not have "value" field'
+        )
 
     def test_unknown_constant_field_should_raise_exception(self):
         self.create_toml_file_with_extras(

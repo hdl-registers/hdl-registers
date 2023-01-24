@@ -7,8 +7,47 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Third party libraries
+import pytest
+
 # First party libraries
 from hdl_registers.constant import Constant
+
+
+def test_boolean():
+    for value in [True, False]:
+        constant = Constant(name="apa", value=value)
+
+        assert constant.is_boolean
+        assert not constant.is_integer
+        assert not constant.is_float
+
+
+def test_integer():
+    for value in [123, -9]:
+        constant = Constant(name="apa", value=value)
+
+        assert constant.is_integer
+        assert not constant.is_boolean
+        assert not constant.is_float
+
+
+def test_float():
+    for value in [3.14, -9.9]:
+        constant = Constant(name="apa", value=value)
+
+        assert constant.is_float
+        assert not constant.is_boolean
+        assert not constant.is_integer
+
+
+def test_invalid_data_type():
+    with pytest.raises(ValueError) as exception_info:
+        Constant(name="apa", value="hest")
+    assert (
+        str(exception_info.value)
+        == 'Constant "apa" has invalid data type "<class \'str\'>". Value: "hest"'
+    )
 
 
 def test_repr():

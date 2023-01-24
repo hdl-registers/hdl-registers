@@ -104,3 +104,13 @@ array_length = 1
 
 mode = "r_w"
 description = "A register in a second register array"
+
+
+################################################################################
+[constant]
+
+data_width.value = 24
+decrement.value = -8
+enabled.value = true
+disabled.value = false
+rate.value = 3.5

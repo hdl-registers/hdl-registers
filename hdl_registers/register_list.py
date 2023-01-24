@@ -157,9 +157,9 @@ class RegisterList:
 
         Arguments:
             register_name (str): The name of the register.
-            register_array_name (str): If the register is within a register array the name
+            register_array_name (str): If the register is within a register array, the name
                 of the array must be specified.
-            register_array_name (str): If the register is within a register array the array
+            register_array_name (str): If the register is within a register array, the array
                 iteration index must be specified.
 
         Return:
@@ -186,12 +186,12 @@ class RegisterList:
 
         Arguments:
             name (str): The name of the constant.
-            value (int): The constant value (signed).
+            value (bool, int, str): The constant value.
             description (str): Textual description for the constant.
         Return:
             Constant: The constant object that was created.
         """
-        constant = Constant(name, value, description)
+        constant = Constant(name=name, value=value, description=description)
         self.constants.append(constant)
         return constant
 

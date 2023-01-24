@@ -35,12 +35,10 @@ class TestRegisterCompilation(unittest.TestCase):
         toml_file = HDL_REGISTERS_TEST / "regs_test.toml"
         self.registers = from_toml("test", toml_file)
 
-        self.registers.add_constant("data_width", 24)
-        self.registers.add_constant("decrement", -8)
-
     def _compile_and_test_c_header(self, test_constants, test_registers):
         main_function = ""
         functions = ""
+
         if test_constants:
             main_function += "  test_constants();\n"
 
@@ -49,6 +47,13 @@ void test_constants()
 {
   assert(TEST_DATA_WIDTH == 24);
   assert(TEST_DECREMENT == -8);
+
+  assert(TEST_ENABLED);
+  assert(!TEST_DISABLED);
+  assert(TEST_ENABLED && !TEST_DISABLED);
+
+  assert(TEST_RATE == 3.5);
+  assert(TEST_RATE != 3.6);
 }
 """
 
@@ -150,6 +155,7 @@ void test_generated_type()
         main_file = self.working_dir / "main.c"
         main = f"""\
 #include <assert.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "test_regs.h"
@@ -193,6 +199,13 @@ void test_constants()
 {
   assert(fpga_regs::Test::data_width == 24);
   assert(fpga_regs::Test::decrement == -8);
+
+  assert(fpga_regs::Test::enabled);
+  assert(!fpga_regs::Test::disabled);
+  assert(fpga_regs::Test::enabled && !fpga_regs::Test::disabled);
+
+  assert(fpga_regs::Test::rate == 3.5);
+  assert(fpga_regs::Test::rate != 3.6);
 }
 
 """

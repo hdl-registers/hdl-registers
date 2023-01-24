@@ -178,9 +178,19 @@ class RegisterCGenerator(RegisterCodeGenerator):
     def _constants(self, constants):
         c_code = ""
         for constant in constants:
+            if constant.is_boolean:
+                value = str(constant.value).lower()
+            elif constant.is_integer:
+                # No suffix -> "int", i.e. signed integer of at least 32 bits
+                value = str(constant.value)
+            elif constant.is_float:
+                # "f" suffix -> "float" (as opposed to "double", to match the VHDL type)
+                value = f"{constant.value}f"
+            else:
+                raise ValueError(f"Got unexpected constant type. {constant}")
+
             c_code += self._comment(f'Register constant "{constant.name}".')
             c_code += self._comment_block(constant.description)
-            c_code += (
-                f"#define {self.module_name.upper()}_{constant.name.upper()} ({constant.value})\n"
-            )
+            c_code += f"#define {self.module_name.upper()}_{constant.name.upper()} ({value})\n"
+
         return c_code

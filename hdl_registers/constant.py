@@ -9,16 +9,49 @@
 
 
 class Constant:
+    is_boolean = False
+    is_integer = False
+    is_float = False
+
     def __init__(self, name, value, description=None):
         """
         Arguments:
             name (str): The name of the constant.
-            value (int): The constant value (signed).
+            value (bool, int, str): The constant value.
             description (str): Textual description for the constant.
         """
         self.name = name
-        self.value = value
         self.description = "" if description is None else description
+
+        self._value = None
+        # Assign self._value via setter
+        self.value = value
+
+    @property
+    def value(self):
+        """
+        Getter for value.
+        """
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        """
+        Setter for value that performs sanity checks.
+        """
+        self._value = value
+
+        if isinstance(value, int):
+            self.is_boolean = isinstance(value, bool)
+            self.is_integer = not self.is_boolean
+
+        elif isinstance(value, float):
+            self.is_float = True
+
+        if sum([self.is_boolean, self.is_integer, self.is_float]) != 1:
+            raise ValueError(
+                f'Constant "{self.name}" has invalid data type "{type(value)}". Value: "{value}"'
+            )
 
     def __repr__(self):
         return f"""{self.__class__.__name__}(\

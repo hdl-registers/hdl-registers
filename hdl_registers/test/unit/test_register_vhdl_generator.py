@@ -28,9 +28,11 @@ from hdl_registers.register_list import RegisterList
 
 class RegisterConfiguration:
     def __init__(self, module_name, source_toml_file):
-        self.register_list = from_toml(module_name, source_toml_file)
-        self.register_list.add_constant("dummy_constant", "3")
-        self.register_list.add_constant("flappy_constant", "91")
+        self.register_list = from_toml(module_name=module_name, toml_file=source_toml_file)
+
+        self.register_list.add_constant(name="boolean_constant", value=True)
+        self.register_list.add_constant(name="integer_constant", value=3)
+        self.register_list.add_constant(name="real_constant", value=3.14)
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
         self.register_list.create_vhdl_package(output_path)
@@ -42,9 +44,13 @@ class RegisterConfiguration:
             assert "constant test_reg_map : " not in vhdl, vhdl
 
         if test_constants:
-            assert "constant test_constant_dummy_constant : integer := 3;" in vhdl, vhdl
+            assert "constant test_constant_boolean_constant : boolean := true;" in vhdl, vhdl
+            assert "constant test_constant_integer_constant : integer := 3;" in vhdl, vhdl
+            assert "constant test_constant_real_constant : real := 3.14;" in vhdl, vhdl
         else:
-            assert "constant test_constant_dummy_constant : integer := 3;" not in vhdl, vhdl
+            assert "boolean_constant" not in vhdl, vhdl
+            assert "integer_constant" not in vhdl, vhdl
+            assert "real_constant" not in vhdl, vhdl
 
 
 @pytest.fixture

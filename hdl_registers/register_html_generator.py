@@ -180,8 +180,11 @@ th {
 
     @staticmethod
     def _to_hex_string(value, num_nibbles=4):
+        """
+        Convert an integer value to a hexadecimal string. E.g. "0x1000".
+        """
         if value < 0:
-            return "N/A"
+            return "-"
 
         formatting_string = f"0x{{:0{num_nibbles}X}}"
         return formatting_string.format(value)
@@ -278,13 +281,23 @@ repeated {register_object.length} times.
 
         return html
 
+    def _format_hex_constant(self, constant):
+        if constant.is_integer:
+            return self._to_hex_string(value=constant.value, num_nibbles=8)
+
+        # No hex formatting available for the other types
+        if constant.is_boolean or constant.is_float:
+            return "-"
+
+        raise ValueError(f"Got unexpected constant type. {constant}")
+
     def _get_constant_table(self, constants):
         html = """
 <table>
 <thead>
   <tr>
     <th>Name</th>
-    <th>Value (decimal)</th>
+    <th>Value</th>
     <th>Value (hexadecimal)</th>
     <th>Description</th>
   </tr>
@@ -297,7 +310,7 @@ repeated {register_object.length} times.
   <tr>
     <td><strong>{constant.name}</strong></td>
     <td>{constant.value}</td>
-    <td>{self._to_hex_string(constant.value, num_nibbles=8)}</td>
+    <td>{self._format_hex_constant(constant=constant)}</td>
     <td>{description}</td>
   </tr>"""
 

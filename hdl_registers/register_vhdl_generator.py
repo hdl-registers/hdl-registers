@@ -190,9 +190,21 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
     def _constants(self, constants):
         vhdl = ""
         for constant in constants:
+            if constant.is_boolean:
+                type_name = "boolean"
+                value = str(constant.value).lower()
+            elif constant.is_integer:
+                type_name = "integer"
+                value = constant.value
+            elif constant.is_float:
+                type_name = "real"
+                value = constant.value
+            else:
+                raise ValueError(f"Got unexpected constant type. {constant}")
+
             vhdl += (
                 "  constant "
-                f"{self.module_name}_constant_{constant.name} : integer := {constant.value};\n"
+                f"{self.module_name}_constant_{constant.name} : {type_name} := {value};\n"
             )
         if vhdl:
             vhdl += "\n"

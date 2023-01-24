@@ -128,27 +128,33 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         Test that all constant show up in the HTML with correct attributes.
         Should only appear if there are actually any constants set.
         """
-        html = self._create_html_page()
-        assert "The following constants are part of the register interface" not in html, html
+        constants_text = "The following constants are part of the register interface"
 
-        # Add some constants and assert
-        self.registers.add_constant("data_width", 24)
-        self.registers.add_constant("decrement", -8)
         html = self._create_html_page()
 
+        # Check that registers are there
         assert "Registers" in html, html
         assert "dummy_regs" in html, html
 
-        assert "The following constants are part of the register interface" in html, html
+        # Check that constants are there
+        assert constants_text in html, html
         self._check_constant(name="data_width", value=24, html=html)
         self._check_constant(name="decrement", value=-8, html=html)
+
+        # Test again with no constants
+        self.registers.constants = []
+        html = self._create_html_page()
+
+        # Registers should still be there
+        assert "Registers" in html, html
+        assert "dummy_regs" in html, html
+
+        # But no constants
+        assert constants_text not in html, html
 
     def test_constants_and_no_registers(self):
         self.registers.register_objects = []
 
-        # Add some constants and assert
-        self.registers.add_constant("data_width", 24)
-        self.registers.add_constant("decrement", -8)
         html = self._create_html_page()
 
         assert "This module does not have any registers" in html, html

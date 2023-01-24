@@ -101,9 +101,16 @@ class RegisterParser:
         return self._register_list
 
     def _parse_constant(self, name, items):
-        constant = Constant(name=name, value=items["value"])
+        if "value" not in items:
+            message = (
+                f'Constant "{name}" in {self._source_definition_file} does not have '
+                '"value" field'
+            )
+            raise ValueError(message)
 
-        for item_name, item_value in items.items():
+        description = items.get("description", "")
+
+        for item_name in items.keys():
             if item_name not in self.recognized_constant_items:
                 message = (
                     f'Error while parsing constant "{name}" in {self._source_definition_file}: '
@@ -111,8 +118,7 @@ class RegisterParser:
                 )
                 raise ValueError(message)
 
-            if item_name == "description":
-                constant.description = item_value
+        constant = Constant(name=name, value=items["value"], description=description)
 
         self._register_list.constants.append(constant)
 

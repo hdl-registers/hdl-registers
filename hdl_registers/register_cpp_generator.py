@@ -275,11 +275,7 @@ class InterfaceGenerator(CommonGenerator):
         cpp_code += "{\n"
         cpp_code += "public:\n"
 
-        for constant in constants:
-            cpp_code += self._comment("Register constant.", indentation=2)
-            cpp_code += f"  static const int {constant.name} = {constant.value}L;\n"
-        if constants:
-            cpp_code += "\n"
+        cpp_code += self._constants(constants=constants)
 
         cpp_code += self._num_registers(register_objects)
 
@@ -340,6 +336,33 @@ class InterfaceGenerator(CommonGenerator):
 
 """
         return cpp_code_top + self._with_namespace(cpp_code)
+
+    def _constants(self, constants):
+        cpp_code = ""
+
+        for constant in constants:
+            if constant.is_boolean:
+                type_declaration = " bool"
+                value = str(constant.value).lower()
+            elif constant.is_integer:
+                type_declaration = " int"
+                value = str(constant.value)
+            elif constant.is_float:
+                # Expand "const" to "constexpr", which is needed for static floats. See
+                # https://stackoverflow.com/questions/9141950/
+                # initializing-const-member-within-class-declaration-in-c
+                type_declaration = "expr float"
+                value = str(constant.value)
+            else:
+                raise ValueError(f"Got unexpected constant type. {constant}")
+
+            cpp_code += self._comment("Register constant.", indentation=2)
+            cpp_code += f"  static const{type_declaration} {constant.name} = {value};\n"
+
+        if constants:
+            cpp_code += "\n"
+
+        return cpp_code
 
     def _num_registers(self, register_objects):
         # It is possible that we have constants but no registers
