@@ -9,13 +9,13 @@
 
 # Third party libraries
 from tsfpga.git_utils import find_git_files
-from tsfpga.test.lint.test_python_lint import run_black, run_flake8_lint, run_pylint
+from tsfpga.test.lint.test_python_lint import run_black, run_flake8_lint, run_isort, run_pylint
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, REPO_ROOT
 
 
-def _files_to_test():
+def _files_to_check():
     # Exclude doc folder, since conf.py used by sphinx does not conform
     return [
         str(path)
@@ -28,12 +28,16 @@ def _files_to_test():
 
 
 def test_pylint():
-    run_pylint(_files_to_test())
+    run_pylint(_files_to_check())
 
 
 def test_flake8_lint():
-    run_flake8_lint(_files_to_test())
+    run_flake8_lint(_files_to_check())
 
 
 def test_black_formatting():
-    run_black(_files_to_test())
+    run_black(_files_to_check())
+
+
+def test_isort_formatting():
+    run_isort(files=_files_to_check(), cwd=REPO_ROOT)

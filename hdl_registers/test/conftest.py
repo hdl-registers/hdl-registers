@@ -7,15 +7,8 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-import sys
-from pathlib import Path
-
-# Many tests use helper methods from tsfpga.
-# Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install
-REPO_ROOT = Path(__file__).parent.parent.parent
-PATH_TO_TSFPGA = REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"
-sys.path.insert(0, str(PATH_TO_TSFPGA))
+# Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
+import tools.tools_pythonpath  # noqa: F401
 
 # Third party libraries
 # pylint: disable=unused-import
