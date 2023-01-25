@@ -7,7 +7,6 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-
 # Local folder libraries
 from .register import Register
 from .register_array import RegisterArray
