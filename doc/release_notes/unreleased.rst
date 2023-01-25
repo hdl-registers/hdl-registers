@@ -2,6 +2,7 @@ Added
 
 * Add field setters and getters to :class:`.RegisterCppGenerator`.
 * Add ``*_MASK_INVERSE`` defines for fields to :class:`.RegisterCGenerator`.
+* Add support for register constants of boolean and floating point type.
 
 Breaking changes
 
