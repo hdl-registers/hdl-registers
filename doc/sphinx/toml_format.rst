@@ -27,7 +27,7 @@ Why TOML?
 ---------
 
 The `TOML <https://toml.io/>`__ file format (short for Tom's Obvious Minimal Language) is a
-configuration file format that is both easy to read and write.
+configuration file format that is easy to both read and write.
 Compared to XML, YAML and JSON, which would be the most obvious alternatives, it has the
 following advantages that are relevant when handling FPGA registers:
 
