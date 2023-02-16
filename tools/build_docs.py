@@ -151,7 +151,7 @@ def build_information_badges(output_path):
         right_text="hdl_registers/hdl_registers",
         left_color="grey",
         right_color="grey",
-        logo="https://about.gitlab.com/images/press/press-kit-icon.svg",
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "gitlab.svg"),
         embed_logo=True,
     )
     create_file(output_path / "gitlab.svg", badge_svg)
@@ -161,7 +161,7 @@ def build_information_badges(output_path):
         right_text="hdl-registers.com",
         left_color="grey",
         right_color="grey",
-        logo="https://design.firefox.com/product-identity/firefox/firefox/firefox-logo.svg",
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "firefox.svg"),
         embed_logo=True,
     )
     create_file(output_path / "website.svg", badge_svg)
