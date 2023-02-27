@@ -12,7 +12,6 @@ import re
 
 
 class HtmlTranslator:
-
     r"""
     Translate a raw text with markdown/rst annotations into HTML code.
 

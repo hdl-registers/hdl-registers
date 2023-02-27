@@ -54,7 +54,6 @@ def from_toml(module_name, toml_file, default_registers=None):
 
 
 class RegisterParser:
-
     recognized_constant_items = {"value", "description"}
     recognized_register_items = {"mode", "description", "bit", "bit_vector"}
     recognized_register_array_items = {"array_length", "description", "register"}

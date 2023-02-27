@@ -51,7 +51,6 @@ default_value = "0"
 # pylint: disable=too-many-public-methods
 @pytest.mark.usefixtures("fixture_tmp_path")
 class TestRegisterParser(unittest.TestCase):
-
     tmp_path = None
 
     module_name = "sensor"

@@ -308,7 +308,6 @@ def test_deep_copy_of_register_list_actually_copies_everything():
 # pylint: disable=too-many-public-methods
 @pytest.mark.usefixtures("fixture_tmp_path")
 class TestRegisterList(unittest.TestCase):
-
     tmp_path = None
 
     module_name = "sensor"
