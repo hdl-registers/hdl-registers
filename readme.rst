@@ -11,9 +11,9 @@ About hdl_registers
   :alt: Gitlab
   :target: https://gitlab.com/hdl_registers/hdl_registers
 
-.. |pic_gitter| image:: https://badges.gitter.im/owner/repo.png
+.. |pic_gitter| image:: https://tsfpga.com/badges/gitter.svg
   :alt: Gitter
-  :target: https://gitter.im/tsfpga/tsfpga
+  :target: https://app.gitter.im/#/room/#60a276916da03739847cca54:gitter.im
 
 .. |pic_pip_install| image:: https://hdl-registers.com/badges/pip_install.svg
   :alt: pypi
