@@ -30,6 +30,6 @@ If you want to cite this open-source software project, the following BibTeX can 
 
   @misc{hdl_registers,
     author = {Vik, Lukas},
-    title  = {hdl\_registers: An open-source HDL register generator fast enough to run in real time},
+    title  = {{hdl\_registers: An open-source HDL register generator fast enough to run in real time}},
     url    = {https://hdl-registers.com},
   }
