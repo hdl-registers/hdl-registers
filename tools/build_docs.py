@@ -151,7 +151,7 @@ def build_information_badges(output_path):
         right_text="hdl_registers/hdl_registers",
         left_color="grey",
         right_color="grey",
-        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "gitlab.svg"),
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "gitlab.svg"),
         embed_logo=True,
     )
     create_file(output_path / "gitlab.svg", badge_svg)
@@ -161,10 +161,18 @@ def build_information_badges(output_path):
         right_text="hdl-registers.com",
         left_color="grey",
         right_color="grey",
-        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "firefox.svg"),
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "firefox.svg"),
         embed_logo=True,
     )
     create_file(output_path / "website.svg", badge_svg)
+
+    badge_svg = badge(
+        left_text="chat",
+        right_text="on gitter",
+        left_color="#5a5a5a",
+        right_color="#41ab8b",
+    )
+    create_file(output_path / "gitter.svg", badge_svg)
 
 
 def build_python_coverage_badge(output_path):
@@ -180,10 +188,10 @@ def build_python_coverage_badge(output_path):
         left_text="line coverage",
         right_text=f"{line_coverage}%",
         right_color=color,
-        logo=str(SPHINX_DOC / "Python-logo-notext.svg"),
+        logo=str(
+            hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "Python-logo-notext.svg"
+        ),
         embed_logo=True,
-        left_link="https://hdl-registers.com/python_coverage_html",
-        right_link="https://hdl-registers.com/python_coverage_html",
     )
     create_file(output_path / "python_coverage.svg", badge_svg)
 

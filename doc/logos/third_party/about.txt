@@ -19,3 +19,15 @@ gitlab.svg:
 Original file name: press-kit-icon.svg
 Downloaded from: https://about.gitlab.com/images/press/press-kit-icon.svg
 License: (C) 2023 GitLab B.V.
+
+
+
+
+Python-logo-notext.svg:
+Downloaded from: https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg
+License: This work is free software; you can redistribute it and/or modify it under the terms of
+the GNU General Public License as published by the Free Software Foundation; either version 2 of
+the License, or any later version. This work is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of merchantability or fitness for
+a particular purpose.
+See version 2 and version 3 of the GNU General Public License for more details.
