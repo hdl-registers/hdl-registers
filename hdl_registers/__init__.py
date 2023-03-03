@@ -1,19 +1,17 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the hdl_registers project, a HDL register generator fast enough to be run
+# This file is part of the hdl_registers project, a HDL register generator fast enough to run
 # in real time.
 # https://hdl-registers.com
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-"""
-A HDL register generator fast enough to be run in real time.
-"""
-
-
 # Standard libraries
 from pathlib import Path
+
+# Local folder libraries
+from .about import get_pypi_slogan
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 
@@ -23,3 +21,4 @@ HDL_REGISTERS_DOC = REPO_ROOT / "doc"
 HDL_REGISTERS_GENERATED = REPO_ROOT / "generated"
 
 __version__ = "3.0.1-dev"
+__doc__ = get_pypi_slogan()  # pylint: disable=redefined-builtin

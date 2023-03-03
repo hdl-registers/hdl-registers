@@ -1,7 +1,7 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the hdl_registers project, a HDL register generator fast enough to be run
+# This file is part of the hdl_registers project, a HDL register generator fast enough to run
 # in real time.
 # https://hdl-registers.com
 # https://gitlab.com/hdl_registers/hdl_registers
@@ -21,7 +21,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 # First party libraries
 import hdl_registers
-from hdl_registers.about import get_readme_rst, get_slogan
+from hdl_registers.about import get_pypi_slogan, get_readme_rst
 
 # Duplicated from tsfpga/__init__.py since setup.py may not depend on tsfpga
 DEFAULT_FILE_ENCODING = "utf-8"
@@ -51,7 +51,7 @@ def main():
     setup(
         name="hdl_registers",
         version=hdl_registers.__version__,
-        description=get_slogan(),
+        description=get_pypi_slogan(),
         long_description=get_readme_rst(include_extra_for_pypi=True),
         long_description_content_type="text/x-rst",
         license="BSD 3-Clause License",

@@ -1,23 +1,24 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the hdl_registers project, a HDL register generator fast enough to be run
+# This file is part of the hdl_registers project, a HDL register generator fast enough to run
 # in real time.
 # https://hdl-registers.com
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
 
-def get_slogan():
+def get_pypi_slogan():
     """
-    One-paragraph description of the project.
+    Short slogan used on pypi.org and in Python package.
+    Note that there seems to be an upper limit of 98 characters, so it can't be the same as the one
+    on the website.
+
+    Note that this slogan is also listed (manually duplicated) in license.rst for
+    academic citations.
+    If you change in one place you should change in both.
     """
-    rst = """\
-The hdl_registers project is an open-source HDL register generator fast enough to be run in
-real time.
-It can easily be plugged into your development environment so that VHDL register code generation is
-done before each build and simulation run.
-For your FPGA release artifacts it can generate headers and documentation."""
+    rst = "An open-source HDL register generator fast enough to run in real time."
     return rst
 
 
@@ -94,7 +95,11 @@ About hdl_registers
   :alt: Python line coverage
   :target: https://hdl-registers.com/python_coverage_html
 
-{get_slogan()}
+The hdl_registers project is an open-source HDL register generator fast enough to run in
+real time.
+It can easily be plugged into your development environment so that VHDL register code generation is
+done before each build and simulation run.
+For your FPGA release artifacts it can generate headers and documentation.
 
 {extra_rst}
 The typical use case is to let hdl_registers parse a ``.toml`` file with register definitions that
