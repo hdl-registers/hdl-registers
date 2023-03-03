@@ -22,4 +22,4 @@ HDL_REGISTERS_TEST = HDL_REGISTERS_PATH / "test"
 HDL_REGISTERS_DOC = REPO_ROOT / "doc"
 HDL_REGISTERS_GENERATED = REPO_ROOT / "generated"
 
-__version__ = "2.1.1-dev2"
+__version__ = "3.0.0"
