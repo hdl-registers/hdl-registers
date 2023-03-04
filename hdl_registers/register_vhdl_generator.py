@@ -226,7 +226,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
 
     def get_package(self, register_objects, constants):
         """
-        Get a complete VHDL package with register and constant infomation.
+        Get a complete VHDL package with register and constant information.
 
         Arguments:
             register_objects (list): Register arrays and registers to be included.
