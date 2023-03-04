@@ -14,7 +14,8 @@ Interface header
 ----------------
 
 Below is the resulting interface header code, generated from the
-:doc:`TOML format example <toml_format>`:
+:doc:`TOML format example <toml_format>`.
+Note that the register constants are also included here.
 
 .. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/i_example.h
    :caption: Example interface header

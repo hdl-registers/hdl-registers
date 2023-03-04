@@ -55,7 +55,7 @@ THIS_DIR = Path(__file__).parent
 class {self._class_name}:
 
     """
-    Instantiate this class to get the RegisterList object for the {self.module_name} module.
+    Instantiate this class to get the RegisterList object for the '{self.module_name}' module.
     """
 
     def __new__(cls):
@@ -68,7 +68,7 @@ class {self._class_name}:
 
 def get_register_list():
     """
-    Return a RegisterList object with the registers/constants from the {self.module_name} module.
+    Return a RegisterList object with the registers/constants from the '{self.module_name}' module.
     Recreated from a python pickle file.
     """
     return {self._class_name}()

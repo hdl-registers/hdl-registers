@@ -1,6 +1,46 @@
 Getting started
 ===============
 
+Installation
+------------
+
+The latest release version of hdl_registers can be installed from
+`PyPI <https://pypi.org/project/hdl-registers/>`__ with the command
+
+.. code-block:: shell
+
+  python3 -m pip install hdl-registers
+
+Alternatively, you can clone the `git repository <https://gitlab.com/hdl_registers/hdl_registers>`__
+if you want to use a development version.
+From the repo checkout you can install the Python package by running
+
+.. code-block:: shell
+
+  python3 setup.py install
+
+in the repo root.
+You can also access it in your scripts by adding the repo path to the ``PYTHONPATH`` environment
+variable, or by modifying ``sys.path`` in your script.
+
+
+Usage
+-----
+
+A minimal usage example:
+
+.. code-block:: python
+
+  from pathlib import Path
+
+  from hdl_registers.parser import from_toml
+
+
+  this_dir = Path(__file__).parent
+
+  register_list = from_toml(module_name="caesar", toml_file=this_dir / "caesar_registers.toml")
+  register_list.create_vhdl_package(output_path=this_dir)
+
 The basis of all register operations is the :class:`.RegisterList` class.
 An object of this type is returned when calling :func:`.from_toml` on a TOML file with the
 :doc:`correct format <toml_format>`.
@@ -9,8 +49,9 @@ If you have more than one module with registers in your project then these are r
 :class:`.RegisterList` object each.
 
 Register code generation is then done using the class methods on this object.
-For example :meth:`.create_vhdl_package`.
-See the sidebar for information on how to use the different generators.
+For example :meth:`.create_vhdl_package` as seen above.
+See the sidebar under "Code Generators" for information on what can be generated and how to
+invoke it.
 
 
 Default registers

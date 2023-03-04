@@ -212,7 +212,7 @@ class RegisterList:
 
     def create_vhdl_package(self, output_path):
         """
-        Create a VHDL package file with register and field definitions.
+        Create a VHDL package file with register, field and constant definitions.
 
         This function assumes that the ``output_path`` folder already exists. This assumption makes
         it slightly faster than the other functions that use ``create_file()``. Necessary since this
@@ -225,7 +225,7 @@ class RegisterList:
         generated again if something has changed.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         vhd_file = output_path / (self.name + "_regs_pkg.vhd")
 
@@ -268,11 +268,12 @@ class RegisterList:
 
     def create_c_header(self, output_path, file_name=None):
         """
-        Create a C header file with register and field definitions.
+        Create a C header file with register, field and constant definitions.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
             file_name (str): Optionally specify an explicit file name.
+                If not specified, the name will be derived from the name of this register list.
         """
         file_name = f"{self.name}_regs.h" if file_name is None else file_name
         output_file = output_path / file_name
@@ -284,11 +285,11 @@ class RegisterList:
 
     def create_cpp_interface(self, output_path):
         """
-        Create a C++ class interface header file, with register and field definitions. The
-        interface header contains only virtual methods.
+        Create a C++ class interface header file, with register, field and constant definitions.
+        The interface header contains only virtual methods.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         output_file = output_path / ("i_" + self.name + ".h")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -298,10 +299,10 @@ class RegisterList:
 
     def create_cpp_header(self, output_path):
         """
-        Create a C++ class header file.
+        Create a C++ class header file with register, field and constant definitions.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         output_file = output_path / (self.name + ".h")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -312,7 +313,7 @@ class RegisterList:
         Create a C++ class implementation file.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         output_file = output_path / (self.name + ".cpp")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -320,12 +321,12 @@ class RegisterList:
 
     def create_html_page(self, output_path):
         """
-        Create a documentation HTML page with register and field information. Will include the
-        tables created by :meth:`.create_html_register_table` and
+        Create a documentation HTML page with register, field and constant information.
+        Will include the tables created by :meth:`.create_html_register_table` and
         :meth:`.create_html_constant_table`.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
 
@@ -347,7 +348,7 @@ class RegisterList:
         Create documentation HTML table with register and field information.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         output_file = output_path / (self.name + "_register_table.html")
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
@@ -358,7 +359,7 @@ class RegisterList:
         Create documentation HTML table with constant information.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         output_file = output_path / (self.name + "_constant_table.html")
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
@@ -366,10 +367,10 @@ class RegisterList:
 
     def create_python_class(self, output_path):
         """
-        Save a python class with all register and constant information.
+        Save a python class with all register, field and constant definitions.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         register_python_generator = RegisterPythonGenerator(self.name, self.generated_source_info())
         register_python_generator.create_class(register_list=self, output_folder=output_path)
@@ -380,7 +381,7 @@ class RegisterList:
         be copied.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed here.
+            output_path (pathlib.Path): Result will be placed in this folder.
         """
         if self.source_definition_file is not None:
             create_directory(output_path, empty=False)
