@@ -1,1 +1,3 @@
-Nothing here yet.
+Added
+
+* Add more comments to generated VHDL.
