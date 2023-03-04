@@ -55,8 +55,9 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                 )
             else:
                 vhdl += f"  {self._register_function_signature(register, register_array)};\n"
+
         if vhdl:
-            vhdl += "\n"
+            vhdl = f"  -- Register indexes, within the list of registers.\n{vhdl}\n"
 
         return vhdl
 
@@ -69,8 +70,9 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
             if isinstance(register_object, RegisterArray):
                 constant = self._array_length_constant_name(register_object)
                 vhdl += f"  constant {constant} : natural := {register_object.length};\n"
+
         if vhdl:
-            vhdl += "\n"
+            vhdl = f"  -- Number of times the register array is repeated.\n{vhdl}\n"
 
         return vhdl
 
@@ -87,11 +89,15 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
   -- Declare register map constants here, but define them in body.
   -- This is done so that functions have been elaborated when they are called.
   subtype {range_name} is natural range 0 to {last_index};
+  -- To be used as the 'regs' generic of 'axi_lite_reg_file.vhd'.
   constant {map_name} : reg_definition_vec_t({range_name});
 
+  -- To be used for the 'regs_up' and 'regs_down' ports of 'axi_lite_reg_file.vhd'.
   subtype {self.module_name}_regs_t is reg_vec_t({range_name});
+  -- To be used as the 'default_values' generic of 'axi_lite_reg_file.vhd'.
   constant {self.module_name}_regs_init : {self.module_name}_regs_t;
 
+  -- To be used for the 'reg_was_read' and 'reg_was_written' ports of 'axi_lite_reg_file.vhd'.
   subtype {self.module_name}_reg_was_accessed_t is std_ulogic_vector({range_name});
 
 """
@@ -150,6 +156,14 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
     def _register_fields(self, register_objects):
         vhdl = ""
         for register, register_array in self._iterate_registers(register_objects):
+            if not register.fields:
+                continue
+
+            vhdl += f"  -- Bit indexes of fields within the '{register.name}' register"
+            if register_array is not None:
+                vhdl += f" within the '{register_array.name}' register array"
+            vhdl += ".\n"
+
             for field in register.fields:
                 name = f"{self._register_name(register, register_array)}_{field.name}"
 
@@ -161,9 +175,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
   constant {name}_width : positive := {field.width};
   subtype {name}_t is {field.field_type.vhdl_typedef(bit_width=field.width)};
 """
-
-            if register.fields:
-                vhdl += "\n"
+            vhdl += "\n"
 
         return vhdl
 
@@ -206,8 +218,9 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                 "  constant "
                 f"{self.module_name}_constant_{constant.name} : {type_name} := {value};\n"
             )
+
         if vhdl:
-            vhdl += "\n"
+            vhdl = f"  -- Register constants.\n{vhdl}\n"
 
         return vhdl
 
