@@ -17,8 +17,8 @@ def get_short_slogan():
     Note that this slogan should be the same as the one used in the readme and on the website below.
     The difference is capitalization and whether the project name is included.
     """
-    rst = "An open-source HDL register generator fast enough to run in real time"
-    return rst
+    result = "An open-source HDL register generator fast enough to run in real time"
+    return result
 
 
 def get_readme_rst(

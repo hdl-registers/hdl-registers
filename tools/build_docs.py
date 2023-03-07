@@ -29,7 +29,7 @@ from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 # First party libraries
 import hdl_registers
-from hdl_registers.about import get_readme_rst
+from hdl_registers.about import get_readme_rst, get_short_slogan
 from hdl_registers.parser import from_toml
 
 GENERATED_SPHINX = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_rst"
@@ -140,7 +140,7 @@ def generate_bibtex():
   }
 """
 
-    rst = f"{rst_before}{hdl_registers.get_short_slogan()}{rst_after}"
+    rst = f"{rst_before}{get_short_slogan()}{rst_after}"
 
     create_file(GENERATED_SPHINX / "bibtex.rst", rst)
 
