@@ -52,7 +52,7 @@ def get_readme_rst(
     elif include_extra_for_website:
         # The website needs the initial heading, in order for the landing page to get
         # the correct title.
-        # The others do not need this initial heading, it justs makes the gitlab/pypi page
+        # The others do not need this initial heading, it just makes the gitlab/pypi page
         # more clunky.
         readme_rst = """\
 About hdl_registers
