@@ -85,7 +85,6 @@ def test_no_checked_in_files_have_too_long_lines():
         # Impossible to break RST syntax
         REPO_ROOT / "readme.rst",
         HDL_REGISTERS_DOC / "sphinx" / "html_generator.rst",
-        HDL_REGISTERS_DOC / "sphinx" / "license_information.rst",
     ]
     for file_path in files_to_test(excludes=excludes):
         test_ok &= check_file_for_line_length(file_path=file_path)
