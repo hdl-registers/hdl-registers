@@ -14,7 +14,7 @@ def get_pypi_slogan():
     Note that there seems to be an upper limit of 98 characters, so it can't be the same as the one
     on the website.
 
-    Note that this slogan is also listed (manually duplicated) in license.rst for
+    Note that this slogan is also listed (manually duplicated) in license_information.rst for
     academic citations.
     If you change in one place you should change in both.
     """
