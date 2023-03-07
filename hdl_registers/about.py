@@ -8,17 +8,16 @@
 # --------------------------------------------------------------------------------------------------
 
 
-def get_pypi_slogan():
+def get_short_slogan():
     """
-    Short slogan used on pypi.org and in Python package.
-    Note that there seems to be an upper limit of 98 characters, so it can't be the same as the one
-    on the website.
+    Short slogan used e.g. on pypi.org.
+    Note that there seems to be an upper limit of 98 characters when rendering the slogan
+    on pypi.org.
 
-    Note that this slogan is also listed (manually duplicated) in license_information.rst for
-    academic citations.
-    If you change in one place you should change in both.
+    Note that this slogan should be the same as the one used in the readme and on the website below.
+    The difference is capitalization and whether the project name is included.
     """
-    rst = "An open-source HDL register generator fast enough to run in real time."
+    rst = "An open-source HDL register generator fast enough to run in real time"
     return rst
 
 

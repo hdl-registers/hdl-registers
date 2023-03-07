@@ -51,6 +51,8 @@ def main():
 
     generate_register_code()
 
+    generate_bibtex()
+
     generate_sphinx_index()
 
     build_sphinx(build_path=SPHINX_DOC, output_path=GENERATED_SPHINX_HTML)
@@ -117,6 +119,30 @@ def generate_register_code():
     register_list.create_cpp_implementation(output_path=output_path / "cpp")
 
     register_list.create_python_class(output_path=output_path / "py")
+
+
+def generate_bibtex():
+    """
+    Generate a BibTeX snippet for citing this project.
+
+    Since BibTeX also uses curly braces, f-string formatting is hard here.
+    Hence the string is split up.
+    """
+    rst_before = """\
+.. code-block:: tex
+
+  @misc{hdl_registers,
+    author = {Vik, Lukas},
+    title  = {{hdl\\_registers: """
+
+    rst_after = """}},
+    url    = {https://hdl-registers.com},
+  }
+"""
+
+    rst = f"{rst_before}{hdl_registers.get_short_slogan()}{rst_after}"
+
+    create_file(GENERATED_SPHINX / "bibtex.rst", rst)
 
 
 def generate_sphinx_index():

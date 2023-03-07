@@ -16,14 +16,4 @@ Citation
 
 If you want to cite this open-source software project, the following BibTeX can be used.
 
-..
-  Note that this slogan is also listed (manually duplicated) in about.py.
-  If you change in one place you should change in both.
-
-.. code-block:: tex
-
-  @misc{hdl_registers,
-    author = {Vik, Lukas},
-    title  = {{hdl\_registers: An open-source HDL register generator fast enough to run in real time}},
-    url    = {https://hdl-registers.com},
-  }
+.. include:: ../../generated/sphinx_rst/bibtex.rst

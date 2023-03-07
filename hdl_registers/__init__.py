@@ -11,7 +11,7 @@
 from pathlib import Path
 
 # Local folder libraries
-from .about import get_pypi_slogan
+from .about import get_short_slogan
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 
@@ -21,4 +21,4 @@ HDL_REGISTERS_DOC = REPO_ROOT / "doc"
 HDL_REGISTERS_GENERATED = REPO_ROOT / "generated"
 
 __version__ = "3.0.3-dev"
-__doc__ = get_pypi_slogan()  # pylint: disable=redefined-builtin
+__doc__ = get_short_slogan()  # pylint: disable=redefined-builtin
