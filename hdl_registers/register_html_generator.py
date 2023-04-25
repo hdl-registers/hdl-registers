@@ -281,12 +281,22 @@ repeated {register_object.length} times.
 
         return html
 
-    def _format_hex_constant(self, constant):
+    def _format_constant_value(self, constant):
+        if constant.is_string:
+            return f'"{constant.value}"'
+
+        # For others, just cast to string
+        if constant.is_boolean or constant.is_integer or constant.is_float:
+            return str(constant.value)
+
+        raise ValueError(f"Got unexpected constant type. {constant}")
+
+    def _format_hex_constant_value(self, constant):
         if constant.is_integer:
             return self._to_hex_string(value=constant.value, num_nibbles=8)
 
         # No hex formatting available for the other types
-        if constant.is_boolean or constant.is_float:
+        if constant.is_boolean or constant.is_float or constant.is_string:
             return "-"
 
         raise ValueError(f"Got unexpected constant type. {constant}")
@@ -309,8 +319,8 @@ repeated {register_object.length} times.
             html += f"""
   <tr>
     <td><strong>{constant.name}</strong></td>
-    <td>{constant.value}</td>
-    <td>{self._format_hex_constant(constant=constant)}</td>
+    <td>{self._format_constant_value(constant=constant)}</td>
+    <td>{self._format_hex_constant_value(constant=constant)}</td>
     <td>{description}</td>
   </tr>"""
 

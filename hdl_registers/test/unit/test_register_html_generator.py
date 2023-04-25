@@ -140,6 +140,10 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert constants_text in html, html
         self._check_constant(name="data_width", value=24, html=html)
         self._check_constant(name="decrement", value=-8, html=html)
+        self._check_constant(name="enabled", value="True", html=html)
+        self._check_constant(name="disabled", value="False", html=html)
+        self._check_constant(name="rate", value="3.5", html=html)
+        self._check_constant(name="paragraph", value='"hello there :)"', html=html)
 
         # Test again with no constants
         self.registers.constants = []

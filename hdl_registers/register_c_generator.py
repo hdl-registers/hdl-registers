@@ -178,19 +178,33 @@ class RegisterCGenerator(RegisterCodeGenerator):
     def _constants(self, constants):
         c_code = ""
         for constant in constants:
+            constant_name = f"{self.module_name.upper()}_{constant.name.upper()}"
+
+            # Most of the types are a simple "#define". But some are special, where we explicitly
+            # set the declaration.
+            declaration = ""
+
             if constant.is_boolean:
                 value = str(constant.value).lower()
             elif constant.is_integer:
-                # No suffix -> "int", i.e. signed integer of at least 32 bits
+                # No suffix -> "int", i.e. signed integer of at least 32 bits.
                 value = str(constant.value)
             elif constant.is_float:
-                # "f" suffix -> "float" (as opposed to "double", to match the VHDL type)
+                # "f" suffix -> "float" (as opposed to "double", to match the VHDL type).
                 value = f"{constant.value}f"
+            elif constant.is_string:
+                # C string literal: Raw value enclosed in double quotation marks.
+                declaration = f'char *{constant_name} = "{constant.value}";'
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
             c_code += self._comment(f'Register constant "{constant.name}".')
             c_code += self._comment_block(constant.description)
-            c_code += f"#define {self.module_name.upper()}_{constant.name.upper()} ({value})\n"
+
+            if declaration:
+                c_code += f"{declaration}\n"
+            else:
+                # Default: simple "#define"
+                c_code += f"#define {constant_name} ({value})\n"
 
         return c_code

@@ -114,3 +114,4 @@ decrement.value = -8
 enabled.value = true
 disabled.value = false
 rate.value = 3.5
+paragraph.value = "hello there :)"

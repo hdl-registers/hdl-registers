@@ -84,6 +84,8 @@ begin
     elsif run("test_generated_constants") then
       check_equal(example_constant_axi_data_width, 64);
       check_equal(example_constant_clock_rate_hz, 156250000.0);
+      check_equal(example_constant_supports_pre_filtering, true);
+      check_equal(example_constant_name, "example module");
 
     end if;
 

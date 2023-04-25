@@ -470,6 +470,7 @@ height = 4
         )
 
     def test_constants_in_toml(self):
+        # Test all supported data types
         self.create_toml_file_with_extras(
             """
 [constant.data_width]
@@ -480,11 +481,19 @@ description = "the width"
 [constant.apa]
 
 value = 3.14
+
+[constant.hest]
+
+value = true
+
+[constant.zebra]
+
+value = "foo"
 """
         )
 
         register_list = from_toml(self.module_name, self.toml_file)
-        assert len(register_list.constants) == 2
+        assert len(register_list.constants) == 4
 
         assert register_list.constants[0].name == "data_width"
         assert register_list.constants[0].value == 15
@@ -493,6 +502,12 @@ value = 3.14
         assert register_list.constants[1].name == "apa"
         assert register_list.constants[1].value == 3.14
         assert register_list.constants[1].description == ""
+
+        assert register_list.constants[2].name == "hest"
+        assert register_list.constants[2].value is True
+
+        assert register_list.constants[3].name == "zebra"
+        assert register_list.constants[3].value == "foo"
 
     def test_constant_without_value_should_raise_exception(self):
         self.create_toml_file_with_extras(

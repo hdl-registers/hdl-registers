@@ -8,10 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 
-class Constant:
+class Constant:  # pylint: disable=too-many-instance-attributes
     is_boolean = False
     is_integer = False
     is_float = False
+    is_string = False
 
     def __init__(self, name, value, description=None):
         """
@@ -48,7 +49,10 @@ class Constant:
         elif isinstance(value, float):
             self.is_float = True
 
-        if sum([self.is_boolean, self.is_integer, self.is_float]) != 1:
+        elif isinstance(value, str):
+            self.is_string = True
+
+        if sum([self.is_boolean, self.is_integer, self.is_float, self.is_string]) != 1:
             raise ValueError(
                 f'Constant "{self.name}" has invalid data type "{type(value)}". Value: "{value}"'
             )

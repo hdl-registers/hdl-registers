@@ -33,6 +33,7 @@ class RegisterConfiguration:
         self.register_list.add_constant(name="boolean_constant", value=True)
         self.register_list.add_constant(name="integer_constant", value=3)
         self.register_list.add_constant(name="real_constant", value=3.14)
+        self.register_list.add_constant(name="string_constant", value="apa")
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
         self.register_list.create_vhdl_package(output_path)
@@ -47,10 +48,12 @@ class RegisterConfiguration:
             assert "constant test_constant_boolean_constant : boolean := true;" in vhdl, vhdl
             assert "constant test_constant_integer_constant : integer := 3;" in vhdl, vhdl
             assert "constant test_constant_real_constant : real := 3.14;" in vhdl, vhdl
+            assert 'constant test_constant_string_constant : string := "apa";' in vhdl, vhdl
         else:
             assert "boolean_constant" not in vhdl, vhdl
             assert "integer_constant" not in vhdl, vhdl
             assert "real_constant" not in vhdl, vhdl
+            assert "string_constant" not in vhdl, vhdl
 
 
 @pytest.fixture

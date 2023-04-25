@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # Third party libraries
 import pytest
 
@@ -21,32 +24,45 @@ def test_boolean():
         assert constant.is_boolean
         assert not constant.is_integer
         assert not constant.is_float
+        assert not constant.is_string
 
 
 def test_integer():
     for value in [123, -9]:
         constant = Constant(name="apa", value=value)
 
-        assert constant.is_integer
         assert not constant.is_boolean
+        assert constant.is_integer
         assert not constant.is_float
+        assert not constant.is_string
 
 
 def test_float():
     for value in [3.14, -9.9]:
         constant = Constant(name="apa", value=value)
 
-        assert constant.is_float
         assert not constant.is_boolean
         assert not constant.is_integer
+        assert constant.is_float
+        assert not constant.is_string
+
+
+def test_string():
+    for value in ["", "hello"]:
+        constant = Constant(name="apa", value=value)
+
+        assert not constant.is_boolean
+        assert not constant.is_integer
+        assert not constant.is_float
+        assert constant.is_string
 
 
 def test_invalid_data_type():
     with pytest.raises(ValueError) as exception_info:
-        Constant(name="apa", value="hest")
+        Constant(name="apa", value=Path())
     assert (
         str(exception_info.value)
-        == 'Constant "apa" has invalid data type "<class \'str\'>". Value: "hest"'
+        == 'Constant "apa" has invalid data type "<class \'pathlib.PosixPath\'>". Value: "."'
     )
 
 

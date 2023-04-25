@@ -353,6 +353,10 @@ class InterfaceGenerator(CommonGenerator):
                 # initializing-const-member-within-class-declaration-in-c
                 type_declaration = "expr float"
                 value = str(constant.value)
+            elif constant.is_string:
+                # Expand "const" to "constexpr", which is needed for static string literals.
+                type_declaration = "expr auto"
+                value = f'"{constant.value}"'
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 

@@ -211,6 +211,9 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
             elif constant.is_float:
                 type_name = "real"
                 value = constant.value
+            elif constant.is_string:
+                type_name = "string"
+                value = f'"{constant.value}"'
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 

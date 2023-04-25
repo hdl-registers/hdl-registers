@@ -162,3 +162,13 @@ description = "The clock rate used in the system, given in Hertz."
 # This constant is a boolean value.
 value = true
 description = "Will indicate 'True' if the module supports data pre-filtering."
+
+
+################################################################################
+# Another register constant added as an example. Will allocate a constant with the
+# name "name".
+[constant.name]
+
+# This constant is a string value.
+value = "example module"
+description = "Textual description."

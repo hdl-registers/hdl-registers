@@ -54,6 +54,9 @@ void test_constants()
 
   assert(TEST_RATE == 3.5);
   assert(TEST_RATE != 3.6);
+
+  assert(TEST_PARAGRAPH == "hello there :)");
+  assert(TEST_PARAGRAPH != "-");
 }
 """
 
@@ -206,6 +209,9 @@ void test_constants()
 
   assert(fpga_regs::Test::rate == 3.5);
   assert(fpga_regs::Test::rate != 3.6);
+
+  assert(fpga_regs::Test::paragraph == "hello there :)");
+  assert(fpga_regs::Test::paragraph != "");
 }
 
 """
