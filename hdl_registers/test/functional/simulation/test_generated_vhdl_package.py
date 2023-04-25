@@ -36,6 +36,7 @@ def test_running_simulation(tmp_path):
     vunit_proj = VUnit.from_argv(
         argv=["--minimal", "--num-threads", "4", "--output-path", str(tmp_path)]
     )
+    vunit_proj.add_vhdl_builtins()
 
     library = vunit_proj.add_library(library_name="example")
     library.add_source_file(THIS_FOLDER / "tb_generated_vhdl_package.vhd")
