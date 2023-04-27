@@ -20,6 +20,7 @@ Note that the register constants are also included here.
 .. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/i_example.h
    :caption: Example interface header
    :language: C++
+   :linenos:
 
 
 Class header
@@ -30,6 +31,7 @@ Below is the generated class header:
 .. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.h
    :caption: Example class header
    :language: C++
+   :linenos:
 
 
 Implementation
@@ -40,6 +42,7 @@ Below is the generated class implementation:
 .. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.cpp
    :caption: Example class implementation
    :language: C++
+   :linenos:
 
 Note that when the register is part of an array, the register setter/getter takes a second
 argument ``array_index``.

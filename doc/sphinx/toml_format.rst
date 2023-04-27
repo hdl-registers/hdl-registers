@@ -19,6 +19,7 @@ Comments describe what attributes are optional and which are required.
 .. literalinclude:: files/regs_example.toml
    :caption: Register TOML format rules.
    :language: toml
+   :linenos:
 
 See the other articles for an insight into the code that can be generated from this definition file.
 

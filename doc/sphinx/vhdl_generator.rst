@@ -29,6 +29,7 @@ Below is the resulting code from the :doc:`TOML format example <toml_format>`.
 .. literalinclude:: ../../generated/sphinx_rst/register_code/vhdl/example_regs_pkg.vhd
    :caption: example_regs_pkg.vhd
    :language: vhdl
+   :linenos:
 
 For the plain register (``configuration``) the register index is simply a natural
 (``example_configuration``, where "example" is the name of the module).
