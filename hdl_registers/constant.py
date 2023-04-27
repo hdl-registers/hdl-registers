@@ -18,7 +18,7 @@ class Constant:  # pylint: disable=too-many-instance-attributes
         """
         Arguments:
             name (str): The name of the constant.
-            value (bool, int, str): The constant value.
+            value (bool, int, float, str): The constant value.
             description (str): Textual description for the constant.
         """
         self.name = name
