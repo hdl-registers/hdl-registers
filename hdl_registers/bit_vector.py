@@ -74,9 +74,6 @@ class BitVector(RegisterField):
 
     @property
     def base_index(self):
-        """
-        The index within the register for the lowest bit of this Field.
-        """
         return self._base_index
 
     @property

@@ -28,9 +28,6 @@ class RegisterField(ABC):
         """
         Get the maximum value, represented as a positive integer, that this
         field can hold given its width.
-
-        Returns:
-            int: The maximum value.
         """
         return 2**self.width - 1
 
@@ -39,67 +36,49 @@ class RegisterField(ABC):
         """
         The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint, ...)
         used to interpret the bits of the field.
-
-        Returns:
-            FieldType: The instanced FieldType subclass.
         """
         # Default for all RegisterFields
         return DEFAULT_FIELD_TYPE
 
     @property
     @abstractmethod
-    def width(self):
+    def width(self) -> int:
         """
         Return the width, in number of bits, that this field occupies.
-
-        Returns:
-            int: The width.
         """
         raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
-    def base_index(self):
+    def base_index(self) -> int:
         """
         The index within the register for the lowest bit of this Field.
-
-        Returns:
-            int: The index.
         """
         raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
-    def range(self):
+    def range(self) -> str:
         """
         Return the bits that this field occupies in a readable format.
         The way it shall appear in documentation.
-
-        Returns:
-            str: The bit range.
         """
         raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
-    def default_value_str(self):
+    def default_value_str(self) -> str:
         """
         Return a formatted string of the default value. The way it shall appear
         in documentation.
-
-        Returns:
-            str: The default value.
         """
         raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
-    def default_value_uint(self):
+    def default_value_uint(self) -> int:
         """
         Return a the default value as an unsigned int.
-
-        Returns:
-            int: The default value.
         """
         raise NotImplementedError("Must be implemented in child class")
 
