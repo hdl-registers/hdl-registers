@@ -61,5 +61,5 @@ class Constant:  # pylint: disable=too-many-instance-attributes
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 value={self.value},\
-description={self.description},
+description={self.description},\
 )"""

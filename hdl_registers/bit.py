@@ -74,7 +74,7 @@ class Bit(RegisterField):
     def __repr__(self):
         return f"""{self.__class__.__name__}(\
 name={self.name},\
-base_index={self.base_index},
-description={self.description},
-default_value={self.default_value},
+base_index={self.base_index},\
+description={self.description},\
+default_value={self.default_value},\
 )"""
