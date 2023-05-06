@@ -64,10 +64,6 @@ class Bit(RegisterField):
         self._default_value = value
 
     @property
-    def range(self):
-        return str(self.base_index)
-
-    @property
     def default_value_str(self):
         return f"0b{self.default_value}"
 

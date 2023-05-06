@@ -32,6 +32,17 @@ class RegisterField(ABC):
         return 2**self.width - 1
 
     @property
+    def range(self) -> str:
+        """
+        Return the bits that this field occupies in a readable format.
+        The way it shall appear in documentation.
+        """
+        if self.width == 1:
+            return f"{self.base_index}"
+
+        return f"{self.base_index + self.width - 1}:{self.base_index}"
+
+    @property
     def field_type(self) -> FieldType:
         """
         The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint, ...)
@@ -53,15 +64,6 @@ class RegisterField(ABC):
     def base_index(self) -> int:
         """
         The index within the register for the lowest bit of this Field.
-        """
-        raise NotImplementedError("Must be implemented in child class")
-
-    @property
-    @abstractmethod
-    def range(self) -> str:
-        """
-        Return the bits that this field occupies in a readable format.
-        The way it shall appear in documentation.
         """
         raise NotImplementedError("Must be implemented in child class")
 
