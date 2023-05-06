@@ -37,13 +37,14 @@ class RegisterField(ABC):
     @property
     def field_type(self) -> FieldType:
         """
-        The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint...)
+        The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint, ...)
         used to interpret the bits of the field.
 
         Returns:
             FieldType: The instanced FieldType subclass.
         """
-        return DEFAULT_FIELD_TYPE  # Default for all RegisterFields
+        # Default for all RegisterFields
+        return DEFAULT_FIELD_TYPE
 
     @property
     @abstractmethod
