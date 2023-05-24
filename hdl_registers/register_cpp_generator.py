@@ -8,7 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant.constant import ConstantType, get_constant_type
+from .constant.bit_vector_constant import UnsignedVectorConstant
+from .constant.boolean_constant import BooleanConstant
+from .constant.float_constant import FloatConstant
+from .constant.integer_constant import IntegerConstant
+from .constant.string_constant import StringConstant
 from .register import REGISTER_MODES
 from .register_array import RegisterArray
 from .register_code_generator import RegisterCodeGenerator
@@ -342,24 +346,25 @@ class InterfaceGenerator(CommonGenerator):
         cpp_code = ""
 
         for constant in constants:
-            constant_type = get_constant_type(constant=constant)
-
-            if constant_type == ConstantType.BOOLEAN:
+            if isinstance(constant, BooleanConstant):
                 type_declaration = " bool"
                 value = str(constant.value).lower()
-            elif constant_type == ConstantType.INTEGER:
+            elif isinstance(constant, IntegerConstant):
                 type_declaration = " int"
                 value = str(constant.value)
-            elif constant_type == ConstantType.FLOAT:
+            elif isinstance(constant, FloatConstant):
                 # Expand "const" to "constexpr", which is needed for static floats. See
                 # https://stackoverflow.com/questions/9141950/
                 # initializing-const-member-within-class-declaration-in-c
                 type_declaration = "expr float"
                 value = str(constant.value)
-            elif constant_type == ConstantType.STRING:
+            elif isinstance(constant, StringConstant):
                 # Expand "const" to "constexpr", which is needed for static string literals.
                 type_declaration = "expr auto"
                 value = f'"{constant.value}"'
+            elif isinstance(constant, UnsignedVectorConstant):
+                type_declaration = " auto"
+                value = f"{constant.prefix}{constant.value_without_separator}"
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 

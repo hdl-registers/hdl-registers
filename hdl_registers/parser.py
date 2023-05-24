@@ -15,6 +15,7 @@ import tomli
 from tsfpga.system_utils import read_file
 
 # Local folder libraries
+from .constant.constant import StringConstantDataType
 from .register_list import RegisterList
 
 
@@ -53,7 +54,7 @@ def from_toml(module_name, toml_file, default_registers=None):
 
 
 class RegisterParser:
-    recognized_constant_items = {"value", "description"}
+    recognized_constant_items = {"value", "description", "data_type"}
     recognized_register_items = {"mode", "description", "bit", "bit_vector"}
     recognized_register_array_items = {"array_length", "description", "register"}
     recognized_bit_items = {"description", "default_value"}
@@ -86,8 +87,7 @@ class RegisterParser:
         """
         if "constant" in register_data:
             for name, items in register_data["constant"].items():
-                value, description = self._parse_constant(name=name, items=items)
-                self._register_list.add_constant(name=name, value=value, description=description)
+                self._parse_constant(name=name, items=items)
 
         if "register" in register_data:
             for name, items in register_data["register"].items():
@@ -117,8 +117,30 @@ class RegisterParser:
 
         value = items["value"]
         description = items.get("description", "")
+        data_type_str = items.get("data_type")
 
-        return value, description
+        if data_type_str is None:
+            data_type = None
+        else:
+            if not isinstance(value, str):
+                raise ValueError(
+                    f'Error while parsing constant "{name}" in '
+                    f"{self._source_definition_file}: "
+                    'May not set "data_type" for non-string constant.'
+                )
+
+            try:
+                data_type = StringConstantDataType[data_type_str]
+            except KeyError as exception_info:
+                raise ValueError(
+                    f'Error while parsing constant "{name}" in '
+                    f"{self._source_definition_file}: "
+                    f'Invalid data type "{data_type_str}".'
+                ) from exception_info
+
+        self._register_list.add_constant(
+            name=name, value=value, description=description, data_type=data_type
+        )
 
     def _parse_plain_register(self, name, items):
         for item_name in items.keys():

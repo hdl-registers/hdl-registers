@@ -57,6 +57,9 @@ void test_constants()
 
   assert(TEST_PARAGRAPH == "hello there :)");
   assert(TEST_PARAGRAPH != "-");
+
+  assert(TEST_BASE_ADDRESS_BIN == TEST_BASE_ADDRESS_HEX);
+  assert(TEST_BASE_ADDRESS_BIN == 34359738368);
 }
 """
 
@@ -212,6 +215,10 @@ void test_constants()
 
   assert(fpga_regs::Test::paragraph == "hello there :)");
   assert(fpga_regs::Test::paragraph != "");
+
+  assert(fpga_regs::Test::base_address_bin == fpga_regs::Test::base_address_hex);
+  // This assertions shows that values greater than unsigned 32-bit integer work.
+  assert(fpga_regs::Test::base_address_bin == 34359738368);
 }
 
 """

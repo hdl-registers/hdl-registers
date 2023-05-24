@@ -8,7 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant.constant import ConstantType, get_constant_type
+from .constant.bit_vector_constant import UnsignedVectorConstant
+from .constant.boolean_constant import BooleanConstant
+from .constant.float_constant import FloatConstant
+from .constant.integer_constant import IntegerConstant
+from .constant.string_constant import StringConstant
 from .register import Register
 from .register_array import RegisterArray
 from .register_code_generator import RegisterCodeGenerator
@@ -203,26 +207,28 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
     def _constants(self, constants):
         vhdl = ""
         for constant in constants:
-            constant_type = get_constant_type(constant=constant)
-
-            if constant_type == ConstantType.BOOLEAN:
-                type_name = "boolean"
+            if isinstance(constant, BooleanConstant):
+                type_declaration = "boolean"
                 value = str(constant.value).lower()
-            elif constant_type == ConstantType.INTEGER:
-                type_name = "integer"
+            elif isinstance(constant, IntegerConstant):
+                type_declaration = "integer"
                 value = constant.value
-            elif constant_type == ConstantType.FLOAT:
-                type_name = "real"
+            elif isinstance(constant, FloatConstant):
+                type_declaration = "real"
                 value = constant.value
-            elif constant_type == ConstantType.STRING:
-                type_name = "string"
+            elif isinstance(constant, StringConstant):
+                type_declaration = "string"
                 value = f'"{constant.value}"'
+            elif isinstance(constant, UnsignedVectorConstant):
+                type_declaration = f"unsigned({constant.width} - 1 downto 0)"
+                prefix = "x" if constant.is_hexadecimal_not_binary else ""
+                value = f'{prefix}"{constant.value}"'
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
             vhdl += (
                 "  constant "
-                f"{self.module_name}_constant_{constant.name} : {type_name} := {value};\n"
+                f"{self.module_name}_constant_{constant.name} : {type_declaration} := {value};\n"
             )
 
         if vhdl:

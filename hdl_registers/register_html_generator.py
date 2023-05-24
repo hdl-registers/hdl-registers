@@ -8,7 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant.constant import ConstantType, get_constant_type
+from .constant.bit_vector_constant import UnsignedVectorConstant
+from .constant.boolean_constant import BooleanConstant
+from .constant.float_constant import FloatConstant
+from .constant.integer_constant import IntegerConstant
+from .constant.string_constant import StringConstant
 from .html_translator import HtmlTranslator
 from .register import REGISTER_MODES, Register
 
@@ -282,25 +286,41 @@ repeated {register_object.length} times.
 
         return html
 
-    def _format_constant_value(self, constant_type, value):
-        if constant_type == ConstantType.STRING:
-            return f'"{value}"'
+    def _format_constant_value(self, constant):
+        if isinstance(constant, StringConstant):
+            return f'"{constant.value}"'
 
-        # For others, just cast to string
-        if constant_type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.INTEGER]:
-            return str(value)
+        # For most, just cast to string.
+        if isinstance(constant, (BooleanConstant, IntegerConstant, FloatConstant)):
+            return str(constant.value)
 
-        raise ValueError(f'Got unexpected constant type. "{constant_type}" "{value}".')
+        if isinstance(constant, UnsignedVectorConstant):
+            if constant.is_hexadecimal_not_binary:
+                # The hex value will be printed in the "Value (Hexadecimal)" column.
+                return "-"
 
-    def _format_hex_constant_value(self, constant_type, value):
-        if constant_type == ConstantType.INTEGER:
-            return self._to_hex_string(value=value, num_nibbles=8)
+            # But if it is binary, we present it here.
+            return f"{constant.prefix}{constant.value}"
 
-        # No hex formatting available for the other types
-        if constant_type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.STRING]:
+        raise ValueError(f'Got unexpected constant type. "{constant}".')
+
+    def _format_hex_constant_value(self, constant):
+        if isinstance(constant, IntegerConstant):
+            return self._to_hex_string(value=constant.value, num_nibbles=8)
+
+        # No hex formatting available for most types
+        if isinstance(constant, (BooleanConstant, FloatConstant, StringConstant)):
             return "-"
 
-        raise ValueError(f'Got unexpected constant type. "{constant_type}" "{value}".')
+        if isinstance(constant, UnsignedVectorConstant):
+            if constant.is_hexadecimal_not_binary:
+                # If this is a hex constant, we present it here.
+                return f"{constant.prefix}{constant.value}"
+
+            # The binary value will be printed in the regular "Value" column.
+            return "-"
+
+        raise ValueError(f'Got unexpected constant type. "{constant}".')
 
     def _get_constant_table(self, constants):
         html = """
@@ -316,14 +336,13 @@ repeated {register_object.length} times.
 <tbody>"""
 
         for constant in constants:
-            constant_type = get_constant_type(constant=constant)
             description = self._html_translator.translate(constant.description)
 
             html += f"""
   <tr>
     <td><strong>{constant.name}</strong></td>
-    <td>{self._format_constant_value(constant_type=constant_type, value=constant.value)}</td>
-    <td>{self._format_hex_constant_value(constant_type=constant_type, value=constant.value)}</td>
+    <td>{self._format_constant_value(constant=constant)}</td>
+    <td>{self._format_hex_constant_value(constant=constant)}</td>
     <td>{description}</td>
   </tr>"""
 

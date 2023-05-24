@@ -166,9 +166,23 @@ description = "Will indicate 'True' if the module supports data pre-filtering."
 
 ################################################################################
 # Another register constant added as an example. Will allocate a constant with the
+# name "base_address".
+[constant.base_address]
+
+# This constant is an unsigned bit vector value.
+# The "data_type" property is only available when the "value" is of type string.
+# It is still optional even for strings, and will default to "string" if not specified.
+value = "0x8000_0000"
+description = "Base address on the register bus."
+data_type = "unsigned"
+
+
+################################################################################
+# Another register constant added as an example. Will allocate a constant with the
 # name "name".
 [constant.name]
 
 # This constant is a string value.
+# Note that "data_type" is not specified and will use the default value "string".
 value = "example module"
-description = "Textual description."
+description = "Name of the module."

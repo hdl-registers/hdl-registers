@@ -14,7 +14,7 @@ import hashlib
 import re
 from pathlib import Path
 from shutil import copy2
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 # Third party libraries
 from tsfpga import DEFAULT_FILE_ENCODING
@@ -24,8 +24,9 @@ from tsfpga.system_utils import create_directory, create_file, read_file
 
 # Local folder libraries
 from . import __version__
+from .constant.bit_vector_constant import UnsignedVectorConstant
 from .constant.boolean_constant import BooleanConstant
-from .constant.constant import ConstantType, get_constant_type_from_value
+from .constant.constant import StringConstantDataType
 from .constant.float_constant import FloatConstant
 from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
@@ -196,31 +197,50 @@ class RegisterList:
 
         return register_array_start_index + register_index
 
-    def add_constant(self, name, value, description=None) -> "Constant":
+    def add_constant(
+        self,
+        name: str,
+        value: Union[bool, float, int, str],
+        description: str = None,
+        data_type: StringConstantDataType = None,
+    ) -> "Constant":
         """
         Add a constant. Will be available in the generated packages and headers.
         Will automatically determine the type of the constant based on the type of the
         ``value`` argument.
 
         Arguments:
-            name (str): The name of the constant.
-            value (bool, int, str): The constant value.
-            description (str): Textual description for the constant.
+            name: The name of the constant.
+            value: The constant value.
+            description: Textual description for the constant.
+            data_type: The data type of the constant, shall only be set if a string ``value``
+                is supplied.
+                If ``value`` is a string and ``data_type`` is ``None``, the data type will default
+                to ``string``.
         Return:
             The constant object that was created.
         """
-        constant_type = get_constant_type_from_value(value=value)
+        if isinstance(value, int):
+            if isinstance(value, bool):
+                constant = BooleanConstant(name=name, value=value, description=description)
+            else:
+                constant = IntegerConstant(name=name, value=value, description=description)
 
-        if constant_type == ConstantType.BOOLEAN:
-            constant = BooleanConstant(name=name, value=value, description=description)
-        elif constant_type == ConstantType.INTEGER:
-            constant = IntegerConstant(name=name, value=value, description=description)
-        elif constant_type == ConstantType.FLOAT:
+        elif isinstance(value, float):
             constant = FloatConstant(name=name, value=value, description=description)
-        elif constant_type == ConstantType.STRING:
-            constant = StringConstant(name=name, value=value, description=description)
+
+        elif isinstance(value, str):
+            if data_type is None or data_type == StringConstantDataType.string:
+                constant = StringConstant(name=name, value=value, description=description)
+            elif data_type == StringConstantDataType.unsigned:
+                constant = UnsignedVectorConstant(name=name, value=value, description=description)
+            else:
+                assert (
+                    False
+                ), f"Unknown data type for string constant {name}. Data type: {data_type}"
+
         else:
-            message = f'Error while parsing constant "{name}": Unknown data type "{type(value)}".'
+            message = f'Error while parsing constant "{name}": Unknown type "{type(value)}".'
             raise ValueError(message)
 
         self.constants.append(constant)

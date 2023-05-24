@@ -9,6 +9,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library vunit_lib;
 context vunit_lib.vunit_context;
@@ -31,6 +32,7 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
+    constant expected_base_address : unsigned(31 downto 0) := x"8000_0000";
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -86,6 +88,7 @@ begin
       check_equal(example_constant_clock_rate_hz, 156250000.0);
       check_equal(example_constant_supports_pre_filtering, true);
       check_equal(example_constant_name, "example module");
+      check_equal(example_constant_base_address, expected_base_address);
 
     end if;
 

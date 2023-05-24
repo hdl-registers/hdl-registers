@@ -111,7 +111,17 @@ description = "A register in a second register array"
 
 data_width.value = 24
 decrement.value = -8
+
 enabled.value = true
+
 disabled.value = false
+
 rate.value = 3.5
+
 paragraph.value = "hello there :)"
+
+base_address_bin.value = "0b1000_0000_0000_0000_0000_0000_0000_0000_0000"
+base_address_bin.data_type = "unsigned"
+
+base_address_hex.value = "0x8_0000_0000"
+base_address_hex.data_type = "unsigned"

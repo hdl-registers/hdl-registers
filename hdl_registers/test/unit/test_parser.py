@@ -15,6 +15,7 @@ import pytest
 from tsfpga.system_utils import create_file
 
 # First party libraries
+from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.parser import from_toml, load_toml_file
 from hdl_registers.register import Register
@@ -490,11 +491,21 @@ value = true
 [constant.zebra]
 
 value = "foo"
+
+[constant.base_address_hex]
+
+value = "0xFF01_2345"
+data_type = "unsigned"
+
+[constant.base_address_bin]
+
+value = "0b1000_0011"
+data_type = "unsigned"
 """
         )
 
         register_list = from_toml(self.module_name, self.toml_file)
-        assert len(register_list.constants) == 4
+        assert len(register_list.constants) == 6
 
         assert register_list.constants[0].name == "data_width"
         assert register_list.constants[0].value == 15
@@ -510,6 +521,14 @@ value = "foo"
         assert isinstance(register_list.constants[3], StringConstant)
         assert register_list.constants[3].name == "zebra"
         assert register_list.constants[3].value == "foo"
+
+        assert isinstance(register_list.constants[4], UnsignedVectorConstant)
+        assert register_list.constants[4].name == "base_address_hex"
+        assert register_list.constants[4].value == "FF01_2345"
+
+        assert isinstance(register_list.constants[5], UnsignedVectorConstant)
+        assert register_list.constants[5].name == "base_address_bin"
+        assert register_list.constants[5].value == "1000_0011"
 
     def test_constant_without_value_should_raise_exception(self):
         self.create_toml_file_with_extras(
@@ -542,4 +561,40 @@ default_value = 0xf
             str(exception_info.value)
             == f'Error while parsing constant "data_width" in {self.toml_file}: '
             'Unknown key "default_value"'
+        )
+
+    def test_data_type_on_non_string_constant_should_raise_exception(self):
+        self.create_toml_file_with_extras(
+            """
+[constant.data_width]
+
+value = 0xf
+data_type = "unsigned"
+"""
+        )
+
+        with pytest.raises(ValueError) as exception_info:
+            from_toml(self.module_name, self.toml_file)
+        assert (
+            str(exception_info.value)
+            == f'Error while parsing constant "data_width" in {self.toml_file}: '
+            'May not set "data_type" for non-string constant.'
+        )
+
+    def test_invalid_string_constant_data_type_should_raise_exception(self):
+        self.create_toml_file_with_extras(
+            """
+[constant.data_width]
+
+value = "0xff"
+data_type = "signed"
+"""
+        )
+
+        with pytest.raises(ValueError) as exception_info:
+            from_toml(self.module_name, self.toml_file)
+        assert (
+            str(exception_info.value)
+            == f'Error while parsing constant "data_width" in {self.toml_file}: '
+            'Invalid data type "signed".'
         )

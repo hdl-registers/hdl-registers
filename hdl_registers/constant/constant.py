@@ -30,35 +30,14 @@ class Constant(ABC):
         """
 
 
-class ConstantType(IntEnum):
-    BOOLEAN = auto()
-    FLOAT = auto()
-    INTEGER = auto()
-    STRING = auto()
-    ERROR_NO_TYPE_AVAILABLE = auto()
-
-
-def get_constant_type_from_value(value):
+class StringConstantDataType(IntEnum):
     """
-    TODO
+    The data types that are supported for constants where the value is of type string.
+
+    We use pylint disable since Python constants shall usually be upper case.
+    In this case we want the enum key to exactly match the data type name, which we want as
+    lower case for readability in TOML.
     """
-    if isinstance(value, int):
-        if isinstance(value, bool):
-            return ConstantType.BOOLEAN
 
-        return ConstantType.INTEGER
-
-    if isinstance(value, float):
-        return ConstantType.FLOAT
-
-    if isinstance(value, str):
-        return ConstantType.STRING
-
-    return ConstantType.ERROR_NO_TYPE_AVAILABLE
-
-
-def get_constant_type(constant):
-    """
-    TODO
-    """
-    return get_constant_type_from_value(value=constant.value)
+    string = auto()  # pylint: disable=invalid-name
+    unsigned = auto()  # pylint: disable=invalid-name
