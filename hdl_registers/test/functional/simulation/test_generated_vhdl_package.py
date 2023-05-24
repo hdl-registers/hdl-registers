@@ -12,10 +12,11 @@ from pathlib import Path
 
 # Third party libraries
 from tsfpga.examples.example_env import get_hdl_modules
+from tsfpga.system_utils import create_directory
 from vunit import VUnit
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_DOC
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED
 from hdl_registers.parser import from_toml
 
 THIS_FOLDER = Path(__file__).parent.resolve()
@@ -51,3 +52,8 @@ def test_running_simulation(tmp_path):
         vunit_proj.main()
     except SystemExit as exception:
         assert exception.code == 0
+
+
+if __name__ == "__main__":
+    output_path = create_directory(HDL_REGISTERS_GENERATED / "vunit_out", empty=True)
+    test_running_simulation(tmp_path=HDL_REGISTERS_GENERATED / "vunit_out")
