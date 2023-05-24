@@ -14,6 +14,7 @@ import hashlib
 import re
 from pathlib import Path
 from shutil import copy2
+from typing import TYPE_CHECKING
 
 # Third party libraries
 from tsfpga import DEFAULT_FILE_ENCODING
@@ -23,7 +24,11 @@ from tsfpga.system_utils import create_directory, create_file, read_file
 
 # Local folder libraries
 from . import __version__
-from .constant import Constant
+from .constant.boolean_constant import BooleanConstant
+from .constant.constant import ConstantType, get_constant_type
+from .constant.float_constant import FloatConstant
+from .constant.integer_constant import IntegerConstant
+from .constant.string_constant import StringConstant
 from .register import Register
 from .register_array import RegisterArray
 from .register_c_generator import RegisterCGenerator
@@ -31,6 +36,11 @@ from .register_cpp_generator import RegisterCppGenerator
 from .register_html_generator import RegisterHtmlGenerator
 from .register_python_generator import RegisterPythonGenerator
 from .register_vhdl_generator import RegisterVhdlGenerator
+
+if TYPE_CHECKING:
+    # Local folder libraries
+    from .constant.constant import Constant
+
 
 # Pre-compile regular expressions only once.
 VHDL_PACKAGE_VERSION_REGEXP = re.compile(
@@ -186,18 +196,33 @@ class RegisterList:
 
         return register_array_start_index + register_index
 
-    def add_constant(self, name, value, description=None):
+    def add_constant(self, name, value, description=None) -> "Constant":
         """
         Add a constant. Will be available in the generated packages and headers.
+        Will automatically determine the type of the constant based on the type of the
+        ``value`` argument.
 
         Arguments:
             name (str): The name of the constant.
             value (bool, int, str): The constant value.
             description (str): Textual description for the constant.
         Return:
-            Constant: The constant object that was created.
+            The constant object that was created.
         """
-        constant = Constant(name=name, value=value, description=description)
+        constant_type = get_constant_type(value=value)
+
+        if constant_type == ConstantType.BOOLEAN:
+            constant = BooleanConstant(name=name, value=value, description=description)
+        elif constant_type == ConstantType.INTEGER:
+            constant = IntegerConstant(name=name, value=value, description=description)
+        elif constant_type == ConstantType.FLOAT:
+            constant = FloatConstant(name=name, value=value, description=description)
+        elif constant_type == ConstantType.STRING:
+            constant = StringConstant(name=name, value=value, description=description)
+        else:
+            message = f'Error while parsing constant "{name}": Unknown data type "{type(value)}".'
+            raise ValueError(message)
+
         self.constants.append(constant)
         return constant
 

@@ -15,7 +15,6 @@ import tomli
 from tsfpga.system_utils import read_file
 
 # Local folder libraries
-from .constant import Constant
 from .register_list import RegisterList
 
 
@@ -87,7 +86,8 @@ class RegisterParser:
         """
         if "constant" in register_data:
             for name, items in register_data["constant"].items():
-                self._parse_constant(name, items)
+                value, description = self._parse_constant(name=name, items=items)
+                self._register_list.add_constant(name=name, value=value, description=description)
 
         if "register" in register_data:
             for name, items in register_data["register"].items():
@@ -107,8 +107,6 @@ class RegisterParser:
             )
             raise ValueError(message)
 
-        description = items.get("description", "")
-
         for item_name in items.keys():
             if item_name not in self.recognized_constant_items:
                 message = (
@@ -117,9 +115,10 @@ class RegisterParser:
                 )
                 raise ValueError(message)
 
-        constant = Constant(name=name, value=items["value"], description=description)
+        value = items["value"]
+        description = items.get("description", "")
 
-        self._register_list.constants.append(constant)
+        return value, description
 
     def _parse_plain_register(self, name, items):
         for item_name in items.keys():

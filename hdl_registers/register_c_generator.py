@@ -8,6 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
+from .constant.constant import ConstantType
 from .register import REGISTER_MODES, Register
 from .register_code_generator import RegisterCodeGenerator
 
@@ -184,15 +185,15 @@ class RegisterCGenerator(RegisterCodeGenerator):
             # set the declaration.
             declaration = ""
 
-            if constant.is_boolean:
+            if constant.type == ConstantType.BOOLEAN:
                 value = str(constant.value).lower()
-            elif constant.is_integer:
+            elif constant.type == ConstantType.INTEGER:
                 # No suffix -> "int", i.e. signed integer of at least 32 bits.
                 value = str(constant.value)
-            elif constant.is_float:
+            elif constant.type == ConstantType.FLOAT:
                 # "f" suffix -> "float" (as opposed to "double", to match the VHDL type).
                 value = f"{constant.value}f"
-            elif constant.is_string:
+            elif constant.type == ConstantType.STRING:
                 # C string literal: Raw value enclosed in double quotation marks.
                 declaration = f'char *{constant_name} = "{constant.value}";'
             else:

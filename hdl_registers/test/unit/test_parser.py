@@ -15,6 +15,7 @@ import pytest
 from tsfpga.system_utils import create_file
 
 # First party libraries
+from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.parser import from_toml, load_toml_file
 from hdl_registers.register import Register
 
@@ -506,6 +507,7 @@ value = "foo"
         assert register_list.constants[2].name == "hest"
         assert register_list.constants[2].value is True
 
+        assert isinstance(register_list.constants[3], StringConstant)
         assert register_list.constants[3].name == "zebra"
         assert register_list.constants[3].value == "foo"
 

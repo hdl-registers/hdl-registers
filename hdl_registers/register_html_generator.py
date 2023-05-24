@@ -8,6 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
+from .constant.constant import ConstantType
 from .html_translator import HtmlTranslator
 from .register import REGISTER_MODES, Register
 
@@ -29,7 +30,7 @@ class RegisterHtmlGenerator:
 
     def get_register_table(self, register_objects):
         """
-        Get a HTML table with register infomation. Can be included in other documents.
+        Get a HTML table with register information. Can be included in other documents.
 
         Arguments:
             register_objects (list): Register arrays and registers to be included.
@@ -46,7 +47,7 @@ class RegisterHtmlGenerator:
 
     def get_constant_table(self, constants):
         """
-        Get a HTML table with constant infomation. Can be included in other documents.
+        Get a HTML table with constant information. Can be included in other documents.
 
         Arguments:
             constants (list(Constant)): Constants to be included.
@@ -63,7 +64,7 @@ class RegisterHtmlGenerator:
 
     def get_page(self, register_objects, constants):
         """
-        Get a complete HTML page with register and constant infomation.
+        Get a complete HTML page with register and constant information.
 
         Arguments:
             register_objects (list): Register arrays and registers to be included.
@@ -282,24 +283,24 @@ repeated {register_object.length} times.
         return html
 
     def _format_constant_value(self, constant):
-        if constant.is_string:
+        if constant.type == ConstantType.STRING:
             return f'"{constant.value}"'
 
         # For others, just cast to string
-        if constant.is_boolean or constant.is_integer or constant.is_float:
+        if constant.type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.INTEGER]:
             return str(constant.value)
 
-        raise ValueError(f"Got unexpected constant type. {constant}")
+        raise ValueError(f'Got unexpected constant type. "{constant}".')
 
     def _format_hex_constant_value(self, constant):
-        if constant.is_integer:
+        if constant.type == ConstantType.INTEGER:
             return self._to_hex_string(value=constant.value, num_nibbles=8)
 
         # No hex formatting available for the other types
-        if constant.is_boolean or constant.is_float or constant.is_string:
+        if constant.type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.STRING]:
             return "-"
 
-        raise ValueError(f"Got unexpected constant type. {constant}")
+        raise ValueError(f'Got unexpected constant type. "{constant}".')
 
     def _get_constant_table(self, constants):
         html = """
@@ -316,6 +317,7 @@ repeated {register_object.length} times.
 
         for constant in constants:
             description = self._html_translator.translate(constant.description)
+
             html += f"""
   <tr>
     <td><strong>{constant.name}</strong></td>

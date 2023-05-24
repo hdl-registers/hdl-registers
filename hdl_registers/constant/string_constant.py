@@ -7,19 +7,19 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Local folder libraries
+from .constant import Constant, ConstantType
 
-class Constant:  # pylint: disable=too-many-instance-attributes
-    is_boolean = False
-    is_integer = False
-    is_float = False
-    is_string = False
 
-    def __init__(self, name, value, description=None):
+class StringConstant(Constant):
+    type = ConstantType.STRING
+
+    def __init__(self, name: str, value: str, description: str = None):
         """
         Arguments:
-            name (str): The name of the constant.
-            value (bool, int, float, str): The constant value.
-            description (str): Textual description for the constant.
+            name: The name of the constant.
+            value: The constant value.
+            description: Textual description for the constant.
         """
         self.name = name
         self.description = "" if description is None else description
@@ -29,33 +29,23 @@ class Constant:  # pylint: disable=too-many-instance-attributes
         self.value = value
 
     @property
-    def value(self):
+    def value(self) -> str:
         """
         Getter for value.
         """
         return self._value
 
     @value.setter
-    def value(self, value):
+    def value(self, value: str):
         """
         Setter for value that performs sanity checks.
         """
-        self._value = value
-
-        if isinstance(value, int):
-            self.is_boolean = isinstance(value, bool)
-            self.is_integer = not self.is_boolean
-
-        elif isinstance(value, float):
-            self.is_float = True
-
-        elif isinstance(value, str):
-            self.is_string = True
-
-        if sum([self.is_boolean, self.is_integer, self.is_float, self.is_string]) != 1:
+        if not isinstance(value, str):
             raise ValueError(
-                f'Constant "{self.name}" has invalid data type "{type(value)}". Value: "{value}"'
+                f'Constant "{self.name}" has invalid data type "{type(value)}". Value: "{value}".'
             )
+
+        self._value = value
 
     def __repr__(self):
         return f"""{self.__class__.__name__}(\

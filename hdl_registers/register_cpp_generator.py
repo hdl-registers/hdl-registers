@@ -8,6 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
+from .constant.constant import ConstantType
 from .register import REGISTER_MODES
 from .register_array import RegisterArray
 from .register_code_generator import RegisterCodeGenerator
@@ -341,19 +342,19 @@ class InterfaceGenerator(CommonGenerator):
         cpp_code = ""
 
         for constant in constants:
-            if constant.is_boolean:
+            if constant.type == ConstantType.BOOLEAN:
                 type_declaration = " bool"
                 value = str(constant.value).lower()
-            elif constant.is_integer:
+            elif constant.type == ConstantType.INTEGER:
                 type_declaration = " int"
                 value = str(constant.value)
-            elif constant.is_float:
+            elif constant.type == ConstantType.FLOAT:
                 # Expand "const" to "constexpr", which is needed for static floats. See
                 # https://stackoverflow.com/questions/9141950/
                 # initializing-const-member-within-class-declaration-in-c
                 type_declaration = "expr float"
                 value = str(constant.value)
-            elif constant.is_string:
+            elif constant.type == ConstantType.STRING:
                 # Expand "const" to "constexpr", which is needed for static string literals.
                 type_declaration = "expr auto"
                 value = f'"{constant.value}"'
