@@ -287,38 +287,15 @@ repeated {register_object.length} times.
         return html
 
     def _format_constant_value(self, constant):
+        if isinstance(constant, UnsignedVectorConstant):
+            return f"{constant.prefix}{constant.value}"
+
         if isinstance(constant, StringConstant):
             return f'"{constant.value}"'
 
-        # For most, just cast to string.
+        # For others, just cast to string.
         if isinstance(constant, (BooleanConstant, IntegerConstant, FloatConstant)):
             return str(constant.value)
-
-        if isinstance(constant, UnsignedVectorConstant):
-            if constant.is_hexadecimal_not_binary:
-                # The hex value will be printed in the "Value (Hexadecimal)" column.
-                return "-"
-
-            # But if it is binary, we present it here.
-            return f"{constant.prefix}{constant.value}"
-
-        raise ValueError(f'Got unexpected constant type. "{constant}".')
-
-    def _format_hex_constant_value(self, constant):
-        if isinstance(constant, IntegerConstant):
-            return self._to_hex_string(value=constant.value, num_nibbles=8)
-
-        # No hex formatting available for most types
-        if isinstance(constant, (BooleanConstant, FloatConstant, StringConstant)):
-            return "-"
-
-        if isinstance(constant, UnsignedVectorConstant):
-            if constant.is_hexadecimal_not_binary:
-                # If this is a hex constant, we present it here.
-                return f"{constant.prefix}{constant.value}"
-
-            # The binary value will be printed in the regular "Value" column.
-            return "-"
 
         raise ValueError(f'Got unexpected constant type. "{constant}".')
 
@@ -329,7 +306,6 @@ repeated {register_object.length} times.
   <tr>
     <th>Name</th>
     <th>Value</th>
-    <th>Value (hexadecimal)</th>
     <th>Description</th>
   </tr>
 </thead>
@@ -337,12 +313,10 @@ repeated {register_object.length} times.
 
         for constant in constants:
             description = self._html_translator.translate(constant.description)
-
             html += f"""
   <tr>
     <td><strong>{constant.name}</strong></td>
     <td>{self._format_constant_value(constant=constant)}</td>
-    <td>{self._format_hex_constant_value(constant=constant)}</td>
     <td>{description}</td>
   </tr>"""
 
