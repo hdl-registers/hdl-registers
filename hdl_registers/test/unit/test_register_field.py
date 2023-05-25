@@ -18,7 +18,7 @@ def test_register_field():
         default_value_str = None
         default_value_uint = None
 
-    assert MyField().range == "3"
+    assert MyField().range_str == "3"
 
     class MyOtherField(RegisterField):
         base_index = 4
@@ -26,4 +26,4 @@ def test_register_field():
         default_value_str = None
         default_value_uint = None
 
-    assert MyOtherField().range == "11:4"
+    assert MyOtherField().range_str == "11:4"

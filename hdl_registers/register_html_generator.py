@@ -250,7 +250,7 @@ repeated {register_object.length} times.
         html = f"""
   <tr>
     <td>&nbsp;&nbsp;<em>{field.name}</em></td>
-    <td>&nbsp;&nbsp;{field.range}</td>
+    <td>&nbsp;&nbsp;{field.range_str}</td>
     <td></td>
     <td></td>
     <td>{field.default_value_str}</td>

@@ -32,7 +32,7 @@ class RegisterField(ABC):
         return 2**self.width - 1
 
     @property
-    def range(self) -> str:
+    def range_str(self) -> str:
         """
         Return the bits that this field occupies in a readable format.
         The way it shall appear in documentation.

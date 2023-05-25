@@ -5,6 +5,8 @@ Breaking changes
 
 * Remove the largely unused "Value (hexadecimal)" constant information column from HTML generator.
 
+* Rename ``RegisterField.range`` to :meth:`.RegisterField.range_str`.
+
 Added
 
 * Add support for unsigned bit vector constants via the :class:`.UnsignedVectorConstant` class.
