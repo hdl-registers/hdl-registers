@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant.constant import ConstantType
+from .constant.constant import ConstantType, get_constant_type
 from .register import Register
 from .register_array import RegisterArray
 from .register_code_generator import RegisterCodeGenerator
@@ -203,16 +203,18 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
     def _constants(self, constants):
         vhdl = ""
         for constant in constants:
-            if constant.type == ConstantType.BOOLEAN:
+            constant_type = get_constant_type(constant=constant)
+
+            if constant_type == ConstantType.BOOLEAN:
                 type_name = "boolean"
                 value = str(constant.value).lower()
-            elif constant.type == ConstantType.INTEGER:
+            elif constant_type == ConstantType.INTEGER:
                 type_name = "integer"
                 value = constant.value
-            elif constant.type == ConstantType.FLOAT:
+            elif constant_type == ConstantType.FLOAT:
                 type_name = "real"
                 value = constant.value
-            elif constant.type == ConstantType.STRING:
+            elif constant_type == ConstantType.STRING:
                 type_name = "string"
                 value = f'"{constant.value}"'
             else:

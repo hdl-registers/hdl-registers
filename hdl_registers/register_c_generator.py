@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant.constant import ConstantType
+from .constant.constant import ConstantType, get_constant_type
 from .register import REGISTER_MODES, Register
 from .register_code_generator import RegisterCodeGenerator
 
@@ -179,21 +179,23 @@ class RegisterCGenerator(RegisterCodeGenerator):
     def _constants(self, constants):
         c_code = ""
         for constant in constants:
+            constant_type = get_constant_type(constant=constant)
+
             constant_name = f"{self.module_name.upper()}_{constant.name.upper()}"
 
             # Most of the types are a simple "#define". But some are special, where we explicitly
             # set the declaration.
             declaration = ""
 
-            if constant.type == ConstantType.BOOLEAN:
+            if constant_type == ConstantType.BOOLEAN:
                 value = str(constant.value).lower()
-            elif constant.type == ConstantType.INTEGER:
+            elif constant_type == ConstantType.INTEGER:
                 # No suffix -> "int", i.e. signed integer of at least 32 bits.
                 value = str(constant.value)
-            elif constant.type == ConstantType.FLOAT:
+            elif constant_type == ConstantType.FLOAT:
                 # "f" suffix -> "float" (as opposed to "double", to match the VHDL type).
                 value = f"{constant.value}f"
-            elif constant.type == ConstantType.STRING:
+            elif constant_type == ConstantType.STRING:
                 # C string literal: Raw value enclosed in double quotation marks.
                 declaration = f'char *{constant_name} = "{constant.value}";'
             else:

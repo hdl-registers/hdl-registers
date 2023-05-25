@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant.constant import ConstantType
+from .constant.constant import ConstantType, get_constant_type
 from .html_translator import HtmlTranslator
 from .register import REGISTER_MODES, Register
 
@@ -282,25 +282,25 @@ repeated {register_object.length} times.
 
         return html
 
-    def _format_constant_value(self, constant):
-        if constant.type == ConstantType.STRING:
-            return f'"{constant.value}"'
+    def _format_constant_value(self, constant_type, value):
+        if constant_type == ConstantType.STRING:
+            return f'"{value}"'
 
         # For others, just cast to string
-        if constant.type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.INTEGER]:
-            return str(constant.value)
+        if constant_type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.INTEGER]:
+            return str(value)
 
-        raise ValueError(f'Got unexpected constant type. "{constant}".')
+        raise ValueError(f'Got unexpected constant type. "{constant_type}" "{value}".')
 
-    def _format_hex_constant_value(self, constant):
-        if constant.type == ConstantType.INTEGER:
-            return self._to_hex_string(value=constant.value, num_nibbles=8)
+    def _format_hex_constant_value(self, constant_type, value):
+        if constant_type == ConstantType.INTEGER:
+            return self._to_hex_string(value=value, num_nibbles=8)
 
         # No hex formatting available for the other types
-        if constant.type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.STRING]:
+        if constant_type in [ConstantType.BOOLEAN, ConstantType.FLOAT, ConstantType.STRING]:
             return "-"
 
-        raise ValueError(f'Got unexpected constant type. "{constant}".')
+        raise ValueError(f'Got unexpected constant type. "{constant_type}" "{value}".')
 
     def _get_constant_table(self, constants):
         html = """
@@ -316,13 +316,14 @@ repeated {register_object.length} times.
 <tbody>"""
 
         for constant in constants:
+            constant_type = get_constant_type(constant=constant)
             description = self._html_translator.translate(constant.description)
 
             html += f"""
   <tr>
     <td><strong>{constant.name}</strong></td>
-    <td>{self._format_constant_value(constant=constant)}</td>
-    <td>{self._format_hex_constant_value(constant=constant)}</td>
+    <td>{self._format_constant_value(constant_type=constant_type, value=constant.value)}</td>
+    <td>{self._format_hex_constant_value(constant_type=constant_type, value=constant.value)}</td>
     <td>{description}</td>
   </tr>"""
 

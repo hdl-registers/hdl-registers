@@ -25,7 +25,7 @@ from tsfpga.system_utils import create_directory, create_file, read_file
 # Local folder libraries
 from . import __version__
 from .constant.boolean_constant import BooleanConstant
-from .constant.constant import ConstantType, get_constant_type
+from .constant.constant import ConstantType, get_constant_type_from_value
 from .constant.float_constant import FloatConstant
 from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
@@ -209,7 +209,7 @@ class RegisterList:
         Return:
             The constant object that was created.
         """
-        constant_type = get_constant_type(value=value)
+        constant_type = get_constant_type_from_value(value=value)
 
         if constant_type == ConstantType.BOOLEAN:
             constant = BooleanConstant(name=name, value=value, description=description)

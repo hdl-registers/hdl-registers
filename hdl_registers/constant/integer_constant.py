@@ -8,12 +8,10 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant import Constant, ConstantType
+from .constant import Constant
 
 
 class IntegerConstant(Constant):
-    type = ConstantType.INTEGER
-
     def __init__(self, name: str, value: int, description: str = None):
         """
         Arguments:

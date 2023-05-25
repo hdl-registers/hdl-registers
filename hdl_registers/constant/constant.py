@@ -19,7 +19,6 @@ class Constant(ABC):
     Lists a few properties that must be available.
     """
 
-    type: "ConstantType"
     name: str
     description: str
 
@@ -39,7 +38,7 @@ class ConstantType(IntEnum):
     ERROR_NO_TYPE_AVAILABLE = auto()
 
 
-def get_constant_type(value):
+def get_constant_type_from_value(value):
     """
     TODO
     """
@@ -56,3 +55,10 @@ def get_constant_type(value):
         return ConstantType.STRING
 
     return ConstantType.ERROR_NO_TYPE_AVAILABLE
+
+
+def get_constant_type(constant):
+    """
+    TODO
+    """
+    return get_constant_type_from_value(value=constant.value)

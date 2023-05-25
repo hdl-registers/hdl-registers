@@ -8,12 +8,10 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant import Constant, ConstantType
+from .constant import Constant
 
 
 class BooleanConstant(Constant):
-    type = ConstantType.BOOLEAN
-
     def __init__(self, name: str, value: bool, description: str = None):
         """
         Arguments:

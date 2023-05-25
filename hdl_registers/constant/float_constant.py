@@ -8,12 +8,10 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant import Constant, ConstantType
+from .constant import Constant
 
 
 class FloatConstant(Constant):
-    type = ConstantType.FLOAT
-
     def __init__(self, name: str, value: float, description: str = None):
         """
         Arguments:

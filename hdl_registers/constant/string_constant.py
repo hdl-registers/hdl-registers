@@ -8,12 +8,10 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .constant import Constant, ConstantType
+from .constant import Constant
 
 
 class StringConstant(Constant):
-    type = ConstantType.STRING
-
     def __init__(self, name: str, value: str, description: str = None):
         """
         Arguments:
