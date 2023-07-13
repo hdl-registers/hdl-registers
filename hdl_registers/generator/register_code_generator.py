@@ -7,8 +7,8 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-# Local folder libraries
-from .register import Register
+# First party libraries
+from hdl_registers.register import Register
 
 
 class RegisterCodeGenerator:

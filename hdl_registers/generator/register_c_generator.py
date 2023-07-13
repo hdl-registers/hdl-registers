@@ -7,13 +7,15 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# First party libraries
+from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
+from hdl_registers.constant.boolean_constant import BooleanConstant
+from hdl_registers.constant.float_constant import FloatConstant
+from hdl_registers.constant.integer_constant import IntegerConstant
+from hdl_registers.constant.string_constant import StringConstant
+from hdl_registers.register import REGISTER_MODES, Register
+
 # Local folder libraries
-from .constant.bit_vector_constant import UnsignedVectorConstant
-from .constant.boolean_constant import BooleanConstant
-from .constant.float_constant import FloatConstant
-from .constant.integer_constant import IntegerConstant
-from .constant.string_constant import StringConstant
-from .register import REGISTER_MODES, Register
 from .register_code_generator import RegisterCodeGenerator
 
 

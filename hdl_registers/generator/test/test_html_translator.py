@@ -11,7 +11,7 @@
 import unittest
 
 # First party libraries
-from hdl_registers.html_translator import HtmlTranslator
+from hdl_registers.generator.html_translator import HtmlTranslator
 
 
 class TestTranslator(unittest.TestCase):

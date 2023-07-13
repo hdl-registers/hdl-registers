@@ -1,7 +1,12 @@
 Breaking changes
 
-* Break ``hdl_registers.constant.Constant`` class into :class:`.BooleanConstant`,
-  :class:`.FloatConstant`, :class:`.IntegerConstant` and :class:`.StringConstant`.
+* Break up ``hdl_registers.Constant`` class into :class:`.BooleanConstant`,
+  :class:`.FloatConstant`, :class:`.IntegerConstant` and :class:`.StringConstant`
+  that are placed in new ``constant`` sub-package.
+
+* Move :class:`.HtmlTranslator`, :class:`.RegisterCGenerator`, :class:`.RegisterCodeGenerator`,
+  :class:`.RegisterCppGenerator`, :class:`.RegisterHtmlGenerator`, :class:`.RegisterPythonGenerator`
+  and :class:`.RegisterVhdlGenerator` classes from top-level to ``generator`` sub-package.
 
 * Remove the largely unused "Value (hexadecimal)" constant information column from HTML generator.
 

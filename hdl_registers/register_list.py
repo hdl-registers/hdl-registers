@@ -30,13 +30,13 @@ from .constant.constant import StringConstantDataType
 from .constant.float_constant import FloatConstant
 from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
+from .generator.register_c_generator import RegisterCGenerator
+from .generator.register_cpp_generator import RegisterCppGenerator
+from .generator.register_html_generator import RegisterHtmlGenerator
+from .generator.register_python_generator import RegisterPythonGenerator
+from .generator.register_vhdl_generator import RegisterVhdlGenerator
 from .register import Register
 from .register_array import RegisterArray
-from .register_c_generator import RegisterCGenerator
-from .register_cpp_generator import RegisterCppGenerator
-from .register_html_generator import RegisterHtmlGenerator
-from .register_python_generator import RegisterPythonGenerator
-from .register_vhdl_generator import RegisterVhdlGenerator
 
 if TYPE_CHECKING:
     # Local folder libraries
@@ -235,13 +235,13 @@ class RegisterList:
             elif data_type == StringConstantDataType.unsigned:
                 constant = UnsignedVectorConstant(name=name, value=value, description=description)
             else:
-                assert (
-                    False
-                ), f"Unknown data type for string constant {name}. Data type: {data_type}"
+                raise TypeError(
+                    f"Unknown data type for string constant {name}. Data type: {data_type}"
+                )
 
         else:
             message = f'Error while parsing constant "{name}": Unknown type "{type(value)}".'
-            raise ValueError(message)
+            raise TypeError(message)
 
         self.constants.append(constant)
         return constant
