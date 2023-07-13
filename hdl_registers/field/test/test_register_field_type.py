@@ -12,7 +12,7 @@
 import pytest
 
 # First party libraries
-from hdl_registers.register_field_type import (
+from hdl_registers.field.register_field_type import (
     FieldType,
     Signed,
     SignedFixedPoint,

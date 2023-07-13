@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # First party libraries
-from hdl_registers.register_field import RegisterField
+from hdl_registers.field.register_field import RegisterField
 
 
 def test_register_field():

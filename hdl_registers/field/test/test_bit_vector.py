@@ -11,8 +11,13 @@
 import pytest
 
 # First party libraries
-from hdl_registers.bit_vector import BitVector
-from hdl_registers.register_field_type import Signed, SignedFixedPoint, Unsigned, UnsignedFixedPoint
+from hdl_registers.field.bit_vector import BitVector
+from hdl_registers.field.register_field_type import (
+    Signed,
+    SignedFixedPoint,
+    Unsigned,
+    UnsignedFixedPoint,
+)
 
 
 def test_get_value():

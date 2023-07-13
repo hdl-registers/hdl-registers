@@ -31,4 +31,5 @@
 
     api_reference/hdl_registers
     api_reference/hdl_registers.constant
+    api_reference/hdl_registers.field
     api_reference/hdl_registers.generator

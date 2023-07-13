@@ -11,8 +11,8 @@
 import pytest
 
 # First party libraries
-from hdl_registers.bit import Bit
-from hdl_registers.register_field_type import Unsigned
+from hdl_registers.field.bit import Bit
+from hdl_registers.field.register_field_type import Unsigned
 
 
 def test_get_value():

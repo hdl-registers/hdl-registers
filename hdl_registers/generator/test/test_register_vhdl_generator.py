@@ -21,8 +21,13 @@ from tsfpga.system_utils import read_file
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers.field.register_field_type import (
+    Signed,
+    SignedFixedPoint,
+    Unsigned,
+    UnsignedFixedPoint,
+)
 from hdl_registers.parser import from_toml
-from hdl_registers.register_field_type import Signed, SignedFixedPoint, Unsigned, UnsignedFixedPoint
 from hdl_registers.register_list import RegisterList
 
 

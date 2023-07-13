@@ -8,9 +8,9 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
-from .bit import Bit
-from .bit_vector import BitVector
-from .register_field import DEFAULT_FIELD_TYPE, FieldType
+from .field.bit import Bit
+from .field.bit_vector import BitVector
+from .field.register_field import DEFAULT_FIELD_TYPE, FieldType
 
 
 class RegisterMode:
