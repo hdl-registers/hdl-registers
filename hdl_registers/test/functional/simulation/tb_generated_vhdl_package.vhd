@@ -22,6 +22,8 @@ use work.example_regs_pkg.all;
 
 entity tb_generated_vhdl_package is
   generic (
+    test_integer_lower_range : boolean := false;
+    test_integer_upper_range : boolean := false;
     runner_cfg : string
   );
 end entity;
@@ -36,7 +38,7 @@ begin
   begin
     test_runner_setup(runner, runner_cfg);
 
-    if run("test_generated_register_addresses") then
+    if run("test_register_addresses") then
       check_equal(example_configuration, 0);
       check_equal(example_status, 1);
       check_equal(example_command, 2);
@@ -49,7 +51,7 @@ begin
       check_equal(example_base_addresses_read_address(2), 7);
       check_equal(example_base_addresses_write_address(2), 8);
 
-    elsif run("test_generated_register_modes") then
+    elsif run("test_register_modes") then
       assert example_reg_map(example_configuration).reg_type = r_w;
       assert example_reg_map(example_status).reg_type = r;
       assert example_reg_map(example_command).reg_type = wpulse;
@@ -61,7 +63,7 @@ begin
       assert example_reg_map(example_base_addresses_read_address(2)).reg_type = r_w;
       assert example_reg_map(example_base_addresses_write_address(2)).reg_type = r_w;
 
-    elsif run("test_generated_register_field_indexes") then
+    elsif run("test_register_field_indexes") then
       -- Generated bit field indexes should match the order and widths in the TOML
 
       -- Status register
@@ -83,12 +85,27 @@ begin
       check_equal(example_base_addresses_write_address_address'high, 27);
       check_equal(example_base_addresses_write_address_address_width, 28);
 
-    elsif run("test_generated_constants") then
+    elsif run("test_constants") then
       check_equal(example_constant_axi_data_width, 64);
       check_equal(example_constant_clock_rate_hz, 156250000.0);
       check_equal(example_constant_supports_pre_filtering, true);
       check_equal(example_constant_name, "example module");
       check_equal(example_constant_base_address, expected_base_address);
+
+    elsif run("test_bit_vector_field_types") then
+      check_equal(example_field_test_u0_t'high, 1);
+      check_equal(example_field_test_u0_t'low, 0);
+
+      check_equal(example_field_test_s0_t'high, 1);
+      check_equal(example_field_test_s0_t'low, 0);
+
+      check_equal(example_field_test_ufixed0_t'high, 5);
+      check_equal(example_field_test_ufixed0_t'low, -2);
+
+      check_equal(example_field_test_sfixed0_t'high, 2);
+      check_equal(example_field_test_sfixed0_t'low, -3);
+
+      check_equal(example_constant_clock_rate_hz, 156250000.0);
 
     end if;
 

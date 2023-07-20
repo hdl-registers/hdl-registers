@@ -21,11 +21,11 @@ from hdl_registers.parser import from_toml, load_toml_file
 from hdl_registers.register import Register
 
 
-def get_test_default_registers():
-    registers = [
-        Register("config", 0, "r_w", "Configuration register."),
-    ]
-    return registers
+def test_load_nonexistent_toml_file_should_raise_exception(tmp_path):
+    toml_path = tmp_path / "apa.toml"
+    with pytest.raises(FileNotFoundError) as exception_info:
+        load_toml_file(toml_file=toml_path)
+    assert str(exception_info.value) == f"Requested TOML file does not exist: {toml_path}"
 
 
 def test_bit_vector_without_width_should_raise_exception(tmp_path):
@@ -33,21 +33,44 @@ def test_bit_vector_without_width_should_raise_exception(tmp_path):
         tmp_path / "regs.toml",
         """
 [register.test_reg]
-
 mode = "w"
 
-[register.test_reg.bit_vector.test_bit_vector]
-
-default_value = "0"
+bit_vector.test_bit_vector.default_value = "0"
 """,
     )
 
     with pytest.raises(ValueError) as exception_info:
         from_toml(module_name="", toml_file=toml_file)
     assert str(exception_info.value) == (
-        f'Bit vector "test_bit_vector" in register "test_reg" in file {toml_file} does not have '
-        'a "width" property'
+        f'Field "test_bit_vector" in register "test_reg" in file {toml_file} does not have '
+        'the required "width" property.'
     )
+
+
+def test_integer_without_max_value_should_raise_exception(tmp_path):
+    toml_file = create_file(
+        tmp_path / "regs.toml",
+        """
+[register.test_reg]
+mode = "w"
+
+integer.test_integer.min_value = 3
+""",
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(module_name="", toml_file=toml_file)
+    assert str(exception_info.value) == (
+        f'Field "test_integer" in register "test_reg" in file {toml_file} does not have '
+        'the required "max_value" property.'
+    )
+
+
+def get_test_default_registers():
+    registers = [
+        Register("config", 0, "r_w", "Configuration register."),
+    ]
+    return registers
 
 
 # pylint: disable=too-many-public-methods
@@ -85,6 +108,12 @@ width = 4
 description = "Many interrupts"
 default_value = "0110"
 
+[register.irq.integer.count]
+
+description = "The number of things"
+min_value = 10
+max_value = 15
+
 
 
 ################################################################################
@@ -103,6 +132,12 @@ mode = "r_w"
 
 description = "Enable things"
 default_value = "1"
+
+[register_array.configuration.register.input_settings.integer.number]
+
+description = "Configure number"
+max_value = 3
+default_value = 1
 
 [register_array.configuration.register.input_settings.bit.disable]
 
@@ -132,7 +167,7 @@ default_value="0000000000000011"
         data = self.toml_data + toml_extras
         create_file(self.toml_file, data)
 
-    def test_order_of_registers_and_bits(self):
+    def test_order_of_registers_and_bits(self):  # pylint: disable=too-many-statements
         registers = from_toml(self.module_name, self.toml_file).register_objects
 
         assert registers[0].name == "data"
@@ -146,7 +181,6 @@ default_value="0000000000000011"
         assert registers[1].mode == "r_w"
         assert registers[1].index == 1
         assert registers[1].description == "Interrupt register"
-        assert registers[1].default_value == 6 * 2**2 + 1 * 2**1
         assert registers[1].fields[0].name == "bad"
         assert registers[1].fields[0].description == "Bad things happen"
         assert registers[1].fields[0].default_value == "0"
@@ -157,23 +191,33 @@ default_value="0000000000000011"
         assert registers[1].fields[2].description == "Many interrupts"
         assert registers[1].fields[2].width == 4
         assert registers[1].fields[2].default_value == "0110"
+        assert registers[1].fields[3].name == "count"
+        assert registers[1].fields[3].description == "The number of things"
+        assert registers[1].fields[3].width == 4
+        assert registers[1].fields[3].default_value == 10
+        assert registers[1].default_value == 10 * 2**6 + 6 * 2**2 + 1 * 2**1 + 0 * 2**0
 
         assert registers[2].name == "configuration"
         assert registers[2].length == 3
         assert registers[2].description == "A register array"
         assert registers[2].index == 2 + 2 * 3 - 1
         assert len(registers[2].registers) == 2
+
         assert registers[2].registers[0].name == "input_settings"
         assert registers[2].registers[0].mode == "r_w"
         assert registers[2].registers[0].index == 0
         assert registers[2].registers[0].description == "Input configuration"
-        assert registers[2].registers[0].default_value == 1
+        assert registers[2].registers[0].default_value == 1 * 2**2 + 1 * 2**0
         assert registers[2].registers[0].fields[0].name == "enable"
         assert registers[2].registers[0].fields[0].description == "Enable things"
         assert registers[2].registers[0].fields[0].default_value == "1"
         assert registers[2].registers[0].fields[1].name == "disable"
         assert registers[2].registers[0].fields[1].description == ""
         assert registers[2].registers[0].fields[1].default_value == "0"
+        assert registers[2].registers[0].fields[2].name == "number"
+        assert registers[2].registers[0].fields[2].description == "Configure number"
+        assert registers[2].registers[0].fields[2].default_value == 1
+
         assert registers[2].registers[1].name == "output_settings"
         assert registers[2].registers[1].mode == "w"
         assert registers[2].registers[1].index == 1
@@ -192,12 +236,6 @@ default_value="0000000000000011"
         # The registers from this test are appended at the end
         assert toml_registers.get_register("data").index == num_default_registers
         assert toml_registers.get_register("irq").index == num_default_registers + 1
-
-    def test_load_nonexistent_toml_file_should_raise_exception(self):
-        file = self.toml_file.with_name("apa.toml")
-        with pytest.raises(FileNotFoundError) as exception_info:
-            load_toml_file(file)
-        assert str(exception_info.value) == f"Requested TOML file does not exist: {file}"
 
     def test_load_dirty_toml_file_should_raise_exception(self):
         self.create_toml_file_with_extras("apa")
@@ -220,9 +258,9 @@ array_length = 4
 
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Error while parsing register "apa" in {self.toml_file}: Unknown key "array_length"'
+        assert str(exception_info.value) == (
+            f'Error while parsing register "apa" in {self.toml_file}: '
+            'Unknown key "array_length".'
         )
 
     def test_register_array_but_no_array_length_attribute_should_raise_exception(self):
@@ -378,7 +416,7 @@ dummy = 3
             from_toml(self.module_name, self.toml_file)
         assert (
             str(exception_info.value)
-            == f'Error while parsing register "test_reg" in {self.toml_file}: Unknown key "dummy"'
+            == f'Error while parsing register "test_reg" in {self.toml_file}: Unknown key "dummy".'
         )
 
     def test_unknown_register_array_field_should_raise_exception(self):
@@ -400,7 +438,7 @@ mode = "r"
         assert (
             str(exception_info.value)
             == f'Error while parsing register array "test_array" in {self.toml_file}: '
-            'Unknown key "dummy"'
+            'Unknown key "dummy".'
         )
 
     def test_unknown_register_field_in_register_array_should_raise_exception(self):
@@ -422,7 +460,7 @@ dummy = 3
         assert (
             str(exception_info.value)
             == f'Error while parsing register "hest" in array "test_array" in {self.toml_file}: '
-            'Unknown key "dummy"'
+            'Unknown key "dummy".'
         )
 
     def test_unknown_bit_field_should_raise_exception(self):
@@ -441,10 +479,9 @@ height = 3
 
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Error while parsing bit "dummy_bit" in register "dummy_reg" in {self.toml_file}: '
-            'Unknown key "height"'
+        assert str(exception_info.value) == (
+            f'Error while parsing field "dummy_bit" in register "dummy_reg" in {self.toml_file}: '
+            'Unknown key "height".'
         )
 
     def test_unknown_bit_vector_field_should_raise_exception(self):
@@ -467,8 +504,8 @@ height = 4
             from_toml(self.module_name, self.toml_file)
         assert (
             str(exception_info.value)
-            == f'Error while parsing bit vector "dummy_bit_vector" in register "dummy_reg" in '
-            f'{self.toml_file}: Unknown key "height"'
+            == f'Error while parsing field "dummy_bit_vector" in register "dummy_reg" in '
+            f'{self.toml_file}: Unknown key "height".'
         )
 
     def test_constants_in_toml(self):
@@ -560,7 +597,7 @@ default_value = 0xf
         assert (
             str(exception_info.value)
             == f'Error while parsing constant "data_width" in {self.toml_file}: '
-            'Unknown key "default_value"'
+            'Unknown key "default_value".'
         )
 
     def test_data_type_on_non_string_constant_should_raise_exception(self):

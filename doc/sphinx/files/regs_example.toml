@@ -47,6 +47,27 @@ description = "Description of my **data_tag** bit vector field."
 default_value = "0101"
 
 
+# This will allocate an integer field named "count" in the "configuration" register.
+[register.configuration.integer.count]
+
+# The "min_value" property is optional for an integer field.
+# Will default to 0 if not specified.
+# The value specified must be a non-negative integer.
+min_value = 2
+# The "max_value" property MUST be present for an integer field.
+# The value specified must be a non-negative integer, and greater than or equal to the
+# "min_value" parameter value.
+max_value = 7
+# The "description" property is optional for an integer field.
+# Will default to "" if not specified.
+# The value specified must be a string.
+description = "Description of my **count** integer field."
+# The "default_value" property is optional for a integer field.
+# The value specified must be an integer within the specified min/max range.
+# Will default to the "min_value" parameter value if not specified.
+default_value = 4
+
+
 ################################################################################
 # Another register added as an example. Will allocate a register with the name "status".
 [register.status]

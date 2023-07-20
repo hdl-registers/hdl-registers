@@ -111,31 +111,61 @@ def test_vhdl_package_with_only_one_register(tmp_path):
 
 def test_vhdl_typedef(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
-    number = register_list.append_register("number", "r_w", "")
-    number.append_bit_vector("udata0", "expected u_unsigned(1 downto 0)", 2, "11", Unsigned())
-    number.append_bit_vector("sdata0", "expected u_signed(1 downto 0)", 2, "11", Signed())
-    number.append_bit_vector(
-        "ufixed0", "expected ufixed(1 downto 0)", 2, "11", UnsignedFixedPoint(-1, -2)
+    register = register_list.append_register("number", "r_w", "")
+
+    register.append_bit_vector(
+        name="u0", description="", width=2, default_value="11", field_type=Unsigned()
     )
-    number.append_bit_vector(
-        "ufixed1", "expected ufixed(5 downto -2)", 8, "1" * 8, UnsignedFixedPoint(5, -2)
+
+    register.append_bit_vector(
+        name="s0", description="", width=2, default_value="11", field_type=Signed()
     )
-    number.append_bit_vector(
-        "ufixed1", "expected ufixed(5 downto -2)", 8, "1" * 8, UnsignedFixedPoint(5, -2)
+
+    register.append_bit_vector(
+        name="ufixed0",
+        description="",
+        width=2,
+        default_value="11",
+        field_type=UnsignedFixedPoint(-1, -2),
     )
-    number.append_bit_vector(
-        "sfixed0", "expected sfixed(-1 downto -2)", 2, "11", SignedFixedPoint(-1, -2)
+    register.append_bit_vector(
+        name="ufixed1",
+        description="",
+        width=8,
+        default_value="1" * 8,
+        field_type=UnsignedFixedPoint(5, -2),
     )
-    number.append_bit_vector(
-        "sfixed0", "expected sfixed(5 downto 0)", 6, "1" * 6, SignedFixedPoint(5, 0)
+
+    register.append_bit_vector(
+        name="sfixed0",
+        description="",
+        width=2,
+        default_value="11",
+        field_type=SignedFixedPoint(-1, -2),
+    )
+    register.append_bit_vector(
+        name="sfixed1",
+        description="",
+        width=6,
+        default_value="1" * 6,
+        field_type=SignedFixedPoint(5, 0),
+    )
+
+    register.append_integer(
+        name="integer0", description="", min_value=1, max_value=3, default_value=2
     )
 
     register_list.create_vhdl_package(tmp_path)
     vhdl = read_file(tmp_path / "test_regs_pkg.vhd")
 
-    assert "subtype test_number_udata0_t is u_unsigned(1 downto 0);" in vhdl, vhdl
-    assert "subtype test_number_sdata0_t is u_signed(1 downto 0);" in vhdl, vhdl
+    assert "subtype test_number_u0_t is u_unsigned(1 downto 0);" in vhdl, vhdl
+
+    assert "subtype test_number_s0_t is u_signed(1 downto 0);" in vhdl, vhdl
+
     assert "subtype test_number_ufixed0_t is ufixed(-1 downto -2);" in vhdl, vhdl
     assert "subtype test_number_ufixed1_t is ufixed(5 downto -2);" in vhdl, vhdl
+
     assert "subtype test_number_sfixed0_t is sfixed(-1 downto -2);" in vhdl, vhdl
-    assert "subtype test_number_sfixed0_t is sfixed(5 downto 0);" in vhdl, vhdl
+    assert "subtype test_number_sfixed1_t is sfixed(5 downto 0);" in vhdl, vhdl
+
+    assert "subtype test_number_integer0_t is integer range 1 to 3;" in vhdl, vhdl

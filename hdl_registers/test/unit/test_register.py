@@ -87,13 +87,38 @@ def test_bit_vectors_are_appended_properly_and_can_be_edited_in_place():
     assert register.fields[0].description == "new desc"
 
 
+def test_integers_are_appended_properly_and_can_be_edited_in_place():
+    register = Register(name="apa", index=0, mode="r", description="")
+
+    integer_hest = register.append_integer(
+        name="hest",
+        description="",
+        min_value=0,
+        max_value=10,
+        default_value=0,
+    )
+    assert integer_hest.base_index == 0
+
+    integer_zebra = register.append_integer(
+        name="zebra",
+        description="",
+        min_value=0,
+        max_value=20,
+        default_value=0,
+    )
+    assert integer_zebra.base_index == 4
+
+    integer_hest.description = "new desc"
+    assert register.fields[0].description == "new desc"
+
+
 def test_appending_bit_to_full_register():
     register = Register(name="apa", index=0, mode="r", description="")
     register.append_bit_vector(name="foo", width=32, description="", default_value="0" * 32)
 
     with pytest.raises(ValueError) as exception_info:
         register.append_bit(name="bar", description="", default_value="0")
-    assert str(exception_info.value).startswith('Maximum width exceeded for register "apa"')
+    assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
 
 
 def test_appending_bit_vector_to_full_register():
@@ -102,7 +127,22 @@ def test_appending_bit_vector_to_full_register():
 
     with pytest.raises(ValueError) as exception_info:
         register.append_bit_vector(name="bar", description="", width=3, default_value="000")
-    assert str(exception_info.value).startswith('Maximum width exceeded for register "apa"')
+    assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
+
+
+def test_appending_integer_to_full_register():
+    register = Register(name="apa", index=0, mode="r", description="")
+    register.append_bit_vector(name="foo", width=30, description="", default_value="0" * 30)
+
+    with pytest.raises(ValueError) as exception_info:
+        register.append_integer(
+            name="zebra",
+            description="",
+            min_value=0,
+            max_value=4,
+            default_value=0,
+        )
+    assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
 
 
 def test_default_value():

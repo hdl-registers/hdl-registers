@@ -7,10 +7,18 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import TYPE_CHECKING
+
 # Local folder libraries
 from .field.bit import Bit
 from .field.bit_vector import BitVector
+from .field.integer import Integer
 from .field.register_field import DEFAULT_FIELD_TYPE, FieldType
+
+if TYPE_CHECKING:
+    # Local folder libraries
+    from .field.register_field import RegisterField
 
 
 class RegisterMode:
@@ -85,11 +93,7 @@ class Register:
         bit = Bit(
             name=name, index=self.bit_index, description=description, default_value=default_value
         )
-        self.fields.append(bit)
-
-        self.bit_index += bit.width
-        if self.bit_index > 32:
-            raise ValueError(f'Maximum width exceeded for register "{self.name}"')
+        self._append_field(field=bit)
 
         return bit
 
@@ -101,8 +105,8 @@ class Register:
 
         Arguments:
             name (str): The name of the bit vector.
-            width (int) : The width of the bit vector.
             description (str): Description of the bit vector.
+            width (int) : The width of the bit vector.
             default_value (str): Default value as a string. Must be of length ``width`` and contain
                 only "1" and "0".
             field_type (FieldType): The field type used to interpret the bits of the field.
@@ -118,13 +122,44 @@ class Register:
             default_value=default_value,
             field_type=field_type,
         )
-        self.fields.append(bit_vector)
-
-        self.bit_index += bit_vector.width
-        if self.bit_index > 32:
-            raise ValueError(f'Maximum width exceeded for register "{self.name}"')
+        self._append_field(field=bit_vector)
 
         return bit_vector
+
+    def append_integer(
+        self, name: str, description: str, min_value: int, max_value: int, default_value: int
+    ) -> Integer:
+        """
+        Append an integer field to this register.
+
+        Arguments:
+            name: The name of the field.
+            description: Textual description of the field.
+            min_value: The minimum value that this field shall be able to represent.
+            min_value: The maximum value that this field shall be able to represent.
+            default_value: Default value. Must be within the specified range.
+
+        Return:
+            The integer field object that was created.
+        """
+        integer = Integer(
+            name=name,
+            base_index=self.bit_index,
+            description=description,
+            min_value=min_value,
+            max_value=max_value,
+            default_value=default_value,
+        )
+        self._append_field(field=integer)
+
+        return integer
+
+    def _append_field(self, field: "RegisterField"):
+        self.fields.append(field)
+
+        self.bit_index += field.width
+        if self.bit_index > 32:
+            raise ValueError(f'Maximum width exceeded for register "{self.name}".')
 
     @property
     def default_value(self) -> int:

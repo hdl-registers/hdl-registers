@@ -31,7 +31,7 @@ def load_toml_file(toml_file):
         raise ValueError(message) from exception_info
 
 
-def from_toml(module_name, toml_file, default_registers=None):
+def from_toml(module_name, toml_file, default_registers=None) -> RegisterList:
     """
     Parse a register TOML file.
 
@@ -41,7 +41,7 @@ def from_toml(module_name, toml_file, default_registers=None):
         default_registers (list(Register)): List of default registers.
 
     Returns:
-        :class:`.RegisterList`: The resulting register list.
+        The resulting register list.
     """
     parser = RegisterParser(
         module_name=module_name,
@@ -55,10 +55,14 @@ def from_toml(module_name, toml_file, default_registers=None):
 
 class RegisterParser:
     recognized_constant_items = {"value", "description", "data_type"}
-    recognized_register_items = {"mode", "description", "bit", "bit_vector"}
+
+    recognized_register_items = {"mode", "description", "bit", "bit_vector", "integer"}
+
     recognized_register_array_items = {"array_length", "description", "register"}
+
     recognized_bit_items = {"description", "default_value"}
     recognized_bit_vector_items = {"description", "width", "default_value"}
+    recognized_integer_items = {"description", "min_value", "max_value", "default_value"}
 
     def __init__(self, module_name, source_definition_file, default_registers):
         self._register_list = RegisterList(
@@ -111,7 +115,7 @@ class RegisterParser:
             if item_name not in self.recognized_constant_items:
                 message = (
                     f'Error while parsing constant "{name}" in {self._source_definition_file}: '
-                    f'Unknown key "{item_name}"'
+                    f'Unknown key "{item_name}".'
                 )
                 raise ValueError(message)
 
@@ -147,7 +151,7 @@ class RegisterParser:
             if item_name not in self.recognized_register_items:
                 message = (
                     f'Error while parsing register "{name}" in {self._source_definition_file}: '
-                    f'Unknown key "{item_name}"'
+                    f'Unknown key "{item_name}".'
                 )
                 raise ValueError(message)
 
@@ -182,10 +186,13 @@ class RegisterParser:
         self._names_taken.add(name)
 
         if "bit" in items:
-            self._parse_bits(register, items["bit"])
+            self._parse_bits(register=register, field_configurations=items["bit"])
 
         if "bit_vector" in items:
-            self._parse_bit_vectors(register, items["bit_vector"])
+            self._parse_bit_vectors(register=register, field_configurations=items["bit_vector"])
+
+        if "integer" in items:
+            self._parse_integers(register=register, field_configurations=items["integer"])
 
     def _parse_register_array(self, name, items):
         if name in self._names_taken:
@@ -202,7 +209,7 @@ class RegisterParser:
             if item_name not in self.recognized_register_array_items:
                 message = (
                     f'Error while parsing register array "{name}" in '
-                    f'{self._source_definition_file}: Unknown key "{item_name}"'
+                    f'{self._source_definition_file}: Unknown key "{item_name}".'
                 )
                 raise ValueError(message)
 
@@ -225,7 +232,7 @@ class RegisterParser:
                 if register_item_name not in self.recognized_register_items:
                     message = (
                         f'Error while parsing register "{register_name}" in array "{name}" in '
-                        f'{self._source_definition_file}: Unknown key "{register_item_name}"'
+                        f'{self._source_definition_file}: Unknown key "{register_item_name}".'
                     )
                     raise ValueError(message)
 
@@ -237,48 +244,100 @@ class RegisterParser:
             )
 
             if "bit" in register_items:
-                self._parse_bits(register, register_items["bit"])
+                self._parse_bits(register=register, field_configurations=register_items["bit"])
 
             if "bit_vector" in register_items:
-                self._parse_bit_vectors(register, register_items["bit_vector"])
+                self._parse_bit_vectors(
+                    register=register, field_configurations=register_items["bit_vector"]
+                )
 
-    def _parse_bits(self, register, bit_configurations):
-        for bit_name, bit_configuration in bit_configurations.items():
-            for item_name in bit_configuration.keys():
-                if item_name not in self.recognized_bit_items:
-                    message = (
-                        f'Error while parsing bit "{bit_name}" in register "{register.name}" in '
-                        f'{self._source_definition_file}: Unknown key "{item_name}"'
-                    )
-                    raise ValueError(message)
+            if "integer" in register_items:
+                self._parse_integers(
+                    register=register, field_configurations=register_items["integer"]
+                )
 
-            description = bit_configuration.get("description", "")
-            default_value = bit_configuration.get("default_value", "0")
-
-            register.append_bit(name=bit_name, description=description, default_value=default_value)
-
-    def _parse_bit_vectors(self, register, bit_vector_configurations):
-        for vector_name, vector_configuration in bit_vector_configurations.items():
-            # The only required field
-            if "width" not in vector_configuration:
+    def _check_field_items(
+        self,
+        register_name: str,
+        field_name: str,
+        field_items: dict,
+        recognized_items: set,
+        required_items: list,
+    ):
+        for item_name in required_items:
+            if item_name not in field_items:
                 message = (
-                    f'Bit vector "{vector_name}" in register "{register.name}" in file '
-                    f'{self._source_definition_file} does not have a "width" property'
+                    f'Field "{field_name}" in register "{register_name}" in file '
+                    f"{self._source_definition_file} does not have the "
+                    f'required "{item_name}" property.'
                 )
                 raise ValueError(message)
 
-            for item_name in vector_configuration.keys():
-                if item_name not in self.recognized_bit_vector_items:
-                    message = (
-                        f'Error while parsing bit vector "{vector_name}" in register '
-                        f'"{register.name}" in {self._source_definition_file}: '
-                        f'Unknown key "{item_name}"'
-                    )
-                    raise ValueError(message)
+        for item_name in field_items.keys():
+            if item_name not in recognized_items:
+                message = (
+                    f'Error while parsing field "{field_name}" in register '
+                    f'"{register_name}" in {self._source_definition_file}: '
+                    f'Unknown key "{item_name}".'
+                )
+                raise ValueError(message)
 
-            width = vector_configuration["width"]
+    def _parse_bits(self, register, field_configurations):
+        for field_name, field_items in field_configurations.items():
+            self._check_field_items(
+                register_name=register.name,
+                field_name=field_name,
+                field_items=field_items,
+                recognized_items=self.recognized_bit_items,
+                required_items=[],
+            )
 
-            description = vector_configuration.get("description", "")
-            default_value = vector_configuration.get("default_value", "0" * width)
+            description = field_items.get("description", "")
+            default_value = field_items.get("default_value", "0")
 
-            register.append_bit_vector(vector_name, description, width, default_value)
+            register.append_bit(
+                name=field_name, description=description, default_value=default_value
+            )
+
+    def _parse_bit_vectors(self, register, field_configurations):
+        for field_name, field_items in field_configurations.items():
+            self._check_field_items(
+                register_name=register.name,
+                field_name=field_name,
+                field_items=field_items,
+                recognized_items=self.recognized_bit_vector_items,
+                required_items=["width"],
+            )
+
+            width = field_items["width"]
+
+            description = field_items.get("description", "")
+            default_value = field_items.get("default_value", "0" * width)
+
+            register.append_bit_vector(
+                name=field_name, description=description, width=width, default_value=default_value
+            )
+
+    def _parse_integers(self, register, field_configurations):
+        for field_name, field_items in field_configurations.items():
+            self._check_field_items(
+                register_name=register.name,
+                field_name=field_name,
+                field_items=field_items,
+                recognized_items=self.recognized_integer_items,
+                required_items=["max_value"],
+            )
+
+            max_value = field_items["max_value"]
+
+            description = field_items.get("description", "")
+            min_value = field_items.get("min_value", 0)
+            default_value = field_items.get("default_value", min_value)
+
+            register.append_integer(
+                name=field_name,
+                description=description,
+                min_value=min_value,
+                max_value=max_value,
+                default_value=default_value,
+            )

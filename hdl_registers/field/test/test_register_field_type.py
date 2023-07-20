@@ -203,28 +203,6 @@ def test_via_bit_widths(field_type_class, integer_bit_width, fraction_bit_width)
     assert field_type.fraction_bit_width == fraction_bit_width
 
 
-@pytest.mark.parametrize(
-    "field_type, bit_width, raise_valueerror",
-    [
-        (Unsigned(), 8, False),
-        (Unsigned(), 16, False),
-        (Signed(), 8, False),
-        (Signed(), 16, False),
-        (UnsignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8), 16, False),
-        (SignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8), 16, False),
-        (UnsignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8), 32, True),
-        (SignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8), 32, True),
-    ],
-)
-def test_vhdl_typedef(field_type, bit_width, raise_valueerror):
-    if raise_valueerror:
-        with pytest.raises(ValueError):
-            field_type.vhdl_typedef(bit_width=bit_width)
-    else:
-        vhdl_str = field_type.vhdl_typedef(bit_width=bit_width)
-        assert "downto" in vhdl_str
-
-
 def test_repr():
     unsigned0 = Unsigned()
     unsigned1 = Unsigned()

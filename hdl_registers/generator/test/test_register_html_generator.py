@@ -38,7 +38,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             index=0,
             address="0x0000",
             mode="Read, Write",
-            default_value="0xE",
+            default_value="0x108E",
             description="A plain <strong>dummy</strong> register.",
             html=html,
         )
@@ -97,6 +97,13 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             index="5:2",
             default_value="0b0011",
             description="Bit <strong>vector</strong>",
+            html=html,
+        )
+        self._check_field(
+            name="plain_integer",
+            index="12:6",
+            default_value="66",
+            description="Integer",
             html=html,
         )
 

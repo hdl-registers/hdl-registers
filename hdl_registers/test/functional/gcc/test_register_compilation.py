@@ -288,27 +288,35 @@ void test_read_write_registers(fpga_regs::Test *test, uint32_t *memory)
 void test_field_getters(fpga_regs::Test *test)
 {
   // Assert field getters of plain register
-  test->set_plain_dummy_reg((0b1010 << 2) | (0b0  << 1) | (0b1 << 0));
+  test->set_plain_dummy_reg((0b1010011 << 6) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0));
   assert(test->get_plain_dummy_reg_plain_bit_a() == 1);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 0);
   assert(test->get_plain_dummy_reg_plain_bit_vector() == 10);
+  assert(test->get_plain_dummy_reg_plain_integer() == 83);
 
-  test->set_plain_dummy_reg((0b1011 << 2) | (0b1  << 1) | (0b0 << 0));
+  test->set_plain_dummy_reg((0b0011100 << 6) | (0b1011 << 2) | (0b1  << 1) | (0b0 << 0));
   assert(test->get_plain_dummy_reg_plain_bit_a() == 0);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 1);
   assert(test->get_plain_dummy_reg_plain_bit_vector() == 11);
+  assert(test->get_plain_dummy_reg_plain_integer() == 28);
 
   // Assert field getters of array register
-  test->set_dummy_regs_array_dummy_reg(0, (0b1010 << 2) | (0b0  << 1) | (0b1 << 0));
-  test->set_dummy_regs_array_dummy_reg(1, (0b1011 << 2) | (0b1  << 1) | (0b0 << 0));
+  test->set_dummy_regs_array_dummy_reg(
+    0, (0b1010011 << 7) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0)
+  );
+  test->set_dummy_regs_array_dummy_reg(
+    1, (0b0011100 << 7) | (0b1011 << 2) | (0b1  << 1) | (0b0 << 0)
+  );
 
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(0) == 1);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(0) == 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(0) == 10);
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer(0) == 83);
 
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(1) == 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(1) == 1);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(1) == 11);
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer(1) == 28);
 }
 
 void test_field_getters_from_value(fpga_regs::Test *test)
@@ -317,32 +325,36 @@ void test_field_getters_from_value(fpga_regs::Test *test)
 
   // Assert field getters of plain register
 
-  register_value = (0b1010 << 2) | (0b0  << 1) | (0b1 << 0);
+  register_value = (0b1010011 << 6) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0);
   assert(test->get_plain_dummy_reg_plain_bit_a_from_value(register_value) == 1);
   assert(test->get_plain_dummy_reg_plain_bit_b_from_value(register_value) == 0);
   assert(test->get_plain_dummy_reg_plain_bit_vector_from_value(register_value) == 10);
+  assert(test->get_plain_dummy_reg_plain_integer_from_value(register_value) == 83);
 
-  register_value = (0b1011 << 2) | (0b1  << 1) | (0b0 << 0);
+  register_value = (0b0011100 << 6) | (0b1011 << 2) | (0b1  << 1) | (0b0 << 0);
   assert(test->get_plain_dummy_reg_plain_bit_a_from_value(register_value) == 0);
   assert(test->get_plain_dummy_reg_plain_bit_b_from_value(register_value) == 1);
   assert(test->get_plain_dummy_reg_plain_bit_vector_from_value(register_value) == 11);
+  assert(test->get_plain_dummy_reg_plain_integer_from_value(register_value) == 28);
 
 
   // Assert field getters of array register
 
-  register_value = (0b01010 << 2) | (0b0  << 1) | (0b1 << 0);
+  register_value = (0b1010011 << 7) | (0b01010 << 2) | (0b0  << 1) | (0b1 << 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a_from_value(register_value) == 1);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b_from_value(register_value) == 0);
   assert(
     test->get_dummy_regs_array_dummy_reg_array_bit_vector_from_value(register_value) == 10
   );
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer_from_value(register_value) == 83);
 
-  register_value = (0b11011 << 2) | (0b1  << 1) | (0b0 << 0);
+  register_value = (0b0011100 << 7) | (0b11011 << 2) | (0b1  << 1) | (0b0 << 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a_from_value(register_value) == 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b_from_value(register_value) == 1);
   assert(
     test->get_dummy_regs_array_dummy_reg_array_bit_vector_from_value(register_value) == 27
   );
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer_from_value(register_value) == 28);
 }
 
 void test_field_setters(fpga_regs::Test *test)
@@ -352,37 +364,46 @@ void test_field_setters(fpga_regs::Test *test)
   test->set_plain_dummy_reg_plain_bit_a(1);
   test->set_plain_dummy_reg_plain_bit_b(0);
   test->set_plain_dummy_reg_plain_bit_vector(0b1010);
+  test->set_plain_dummy_reg_plain_integer(77);
   assert(test->get_plain_dummy_reg_plain_bit_a() == 1);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 0);
   assert(test->get_plain_dummy_reg_plain_bit_vector() == 10);
+  assert(test->get_plain_dummy_reg_plain_integer() == 77);
 
   test->set_plain_dummy_reg_plain_bit_a(0);
   test->set_plain_dummy_reg_plain_bit_b(1);
   test->set_plain_dummy_reg_plain_bit_vector(0b1011);
+  test->set_plain_dummy_reg_plain_integer(99);
   assert(test->get_plain_dummy_reg_plain_bit_a() == 0);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 1);
   assert(test->get_plain_dummy_reg_plain_bit_vector() == 11);
+  assert(test->get_plain_dummy_reg_plain_integer() == 99);
 
   // Assert field setters of array register
 
   test->set_dummy_regs_array_dummy_reg_array_bit_a(0, 1);
   test->set_dummy_regs_array_dummy_reg_array_bit_b(0, 0);
   test->set_dummy_regs_array_dummy_reg_array_bit_vector(0, 0b1010);
+  test->set_dummy_regs_array_dummy_reg_array_integer(0, 58);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(0) == 1);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(0) == 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(0) == 10);
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer(0) == 58);
 
   test->set_dummy_regs_array_dummy_reg_array_bit_a(1, 0);
   test->set_dummy_regs_array_dummy_reg_array_bit_b(1, 1);
   test->set_dummy_regs_array_dummy_reg_array_bit_vector(1, 0b1011);
+  test->set_dummy_regs_array_dummy_reg_array_integer(1, 80);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(1) == 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(1) == 1);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(1) == 11);
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer(1) == 80);
 
   // Index 0 should not have been affected
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_a(0) == 1);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_b(0) == 0);
   assert(test->get_dummy_regs_array_dummy_reg_array_bit_vector(0) == 10);
+  assert(test->get_dummy_regs_array_dummy_reg_array_integer(0) == 58);
 }
 
 void test_field_setter_on_write_pulse_register(fpga_regs::Test *test, uint32_t *memory)
@@ -471,24 +492,23 @@ int main()
         self.registers.register_objects = []
         self._compile_and_test_cpp(test_registers=False, test_constants=True)
 
-    def test_setting_cpp_register_array_out_of_bounds_should_crash(self):
+    def _test_basic(self, test_code: str):
         main_file = self.working_dir / "main.cpp"
-        main = """\
+        main = f"""\
 #include <assert.h>
 
 #include "include/test.h"
 
 int main()
-{
+{{
   uint32_t data[fpga_regs::Test::num_registers];
   volatile uint8_t *base_address = reinterpret_cast<volatile uint8_t *>(data);
   fpga_regs::Test test = fpga_regs::Test(base_address);
 
-  // Index 3 is out of bounds (should be less than 3)
-  test.set_dummy_regs_array_dummy_reg(3, 1337);
+{test_code}
 
   return 0;
-}
+}}
 """
         create_file(main_file, main)
         self.registers.create_cpp_interface(self.include_dir)
@@ -500,6 +520,34 @@ int main()
         cmd = ["g++", main_file, cpp_class_file, f"-o{executable}", f"-I{self.include_dir}"]
         run_command(cmd)
 
+        return executable
+
+    def test_setting_cpp_register_array_out_of_bounds_should_crash(self):
+        test_code = """\
+  // Index 3 is out of bounds (should be less than 3)
+  test.set_dummy_regs_array_dummy_reg(3, 1337);
+"""
+        executable = self._test_basic(test_code=test_code)
+
         with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
             stderr = process.communicate()
         assert "Assertion `array_index < dummy_regs_array_length' failed" in str(stderr), stderr
+
+    def test_setting_cpp_integer_field_out_of_range_should_crash(self):
+        test_code = """\
+  test.set_plain_dummy_reg_plain_integer(20);
+"""
+        executable = self._test_basic(test_code=test_code)
+
+        with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
+            stderr = process.communicate()
+        assert "Assertion `field_value >= 50' failed." in str(stderr), stderr
+
+        test_code = """\
+  test.set_plain_dummy_reg_plain_integer(110);
+"""
+        executable = self._test_basic(test_code=test_code)
+
+        with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
+            stderr = process.communicate()
+        assert "Assertion `field_value <= 100' failed." in str(stderr), stderr

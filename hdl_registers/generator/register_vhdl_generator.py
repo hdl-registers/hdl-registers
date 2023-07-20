@@ -13,6 +13,16 @@ from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
+from hdl_registers.field.bit import Bit
+from hdl_registers.field.bit_vector import BitVector
+from hdl_registers.field.integer import Integer
+from hdl_registers.field.register_field import RegisterField
+from hdl_registers.field.register_field_type import (
+    Signed,
+    SignedFixedPoint,
+    Unsigned,
+    UnsignedFixedPoint,
+)
 from hdl_registers.register import Register
 from hdl_registers.register_array import RegisterArray
 
@@ -166,7 +176,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
             if not register.fields:
                 continue
 
-            vhdl += f"  -- Bit indexes of fields within the '{register.name}' register"
+            vhdl += f"  -- Fields within the '{register.name}' register"
             if register_array is not None:
                 vhdl += f" within the '{register_array.name}' register array"
             vhdl += ".\n"
@@ -180,11 +190,41 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                     vhdl += f"""\
   subtype {name} is natural range {field.width + field.base_index - 1} downto {field.base_index};
   constant {name}_width : positive := {field.width};
-  subtype {name}_t is {field.field_type.vhdl_typedef(bit_width=field.width)};
+  subtype {name}_t is {self._field_typedef(field=field)};
 """
             vhdl += "\n"
 
         return vhdl
+
+    def _field_typedef(self, field: "RegisterField"):
+        if isinstance(field, Bit):
+            return "std_ulogic"
+
+        if isinstance(field, Integer):
+            return f"integer range {field.min_value} to {field.max_value}"
+
+        if isinstance(field, BitVector):
+            if isinstance(field.field_type, Unsigned):
+                return f"u_unsigned({field.width - 1} downto 0)"
+
+            if isinstance(field.field_type, Signed):
+                return f"u_signed({field.width - 1} downto 0)"
+
+            if isinstance(field.field_type, UnsignedFixedPoint):
+                return (
+                    "ufixed("
+                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index})"
+                )
+
+            if isinstance(field.field_type, SignedFixedPoint):
+                return (
+                    "sfixed("
+                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index})"
+                )
+
+            raise TypeError(f'Got unexpected type for field: "{field}".')
+
+        raise TypeError(f'Got unexpected type for field: "{field}".')
 
     def _array_index_functions(self, register_objects):
         vhdl = ""

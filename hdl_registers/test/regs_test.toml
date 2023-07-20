@@ -21,6 +21,13 @@ description = "Bit **vector**"
 width = 4
 default_value = "0011"
 
+[register.plain_dummy_reg.integer.plain_integer]
+
+description = "Integer"
+min_value = 50
+max_value = 100
+default_value = 66
+
 
 ################################################################################
 [register.status]
@@ -85,6 +92,11 @@ default_value = "0"
 description = "Array register bit vector"
 width = 5
 default_value = "01100"
+
+[register_array.dummy_regs.register.array_dummy_reg.integer.array_integer]
+
+description = "Array register integer"
+max_value = 100
 
 
 # ------------------------------------------------------------------------------

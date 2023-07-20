@@ -20,10 +20,10 @@ def _from_unsigned_binary(
 ) -> float:
     """
     Convert from an unsigned binary to one of:
-        - unsigned integer
-        - signed integer
-        - unsigned fixed point
-        - signed fixed point
+    - unsigned integer
+    - signed integer
+    - unsigned fixed point
+    - signed fixed point
 
     Signed uses two's complement representation.
 
@@ -145,18 +145,6 @@ class FieldType(ABC):
         """
 
     @abstractmethod
-    def vhdl_typedef(self, bit_width: int) -> str:
-        """
-        VHDL representation of the field type for the VHDL generation.
-
-        Arguments:
-            bit_width (int) : Width of the field.
-
-        Returns:
-            str
-        """
-
-    @abstractmethod
     def __repr__(self):
         pass
 
@@ -192,9 +180,6 @@ class Unsigned(FieldType):
         self._check_value_in_range(bit_width, value)
         return round(value)
 
-    def vhdl_typedef(self, bit_width: int) -> str:
-        return f"u_unsigned({bit_width-1} downto 0)"
-
     def __repr__(self):
         return self.__class__.__name__
 
@@ -216,9 +201,6 @@ class Signed(FieldType):
     def convert_to_unsigned_binary(self, bit_width: int, value: float) -> int:
         self._check_value_in_range(bit_width, value)
         return _to_unsigned_binary(bit_width, value, is_signed=True)
-
-    def vhdl_typedef(self, bit_width: int) -> str:
-        return f"u_signed({bit_width-1} downto 0)"
 
     def __repr__(self):
         return self.__class__.__name__
@@ -280,10 +262,6 @@ class Fixed(FieldType, ABC):
             is_signed=self.is_signed,
         )
 
-    @abstractmethod
-    def vhdl_typedef(self, bit_width: int) -> str:
-        pass
-
     def __repr__(self):
         return f"""{self.__class__.__name__}(\
 max_bit_index={self.max_bit_index},\
@@ -310,11 +288,6 @@ class UnsignedFixedPoint(Fixed):
             min_bit_index (int): Position of the lower bit relative to the decimal point.
         """
         super().__init__(is_signed=False, max_bit_index=max_bit_index, min_bit_index=min_bit_index)
-
-    def vhdl_typedef(self, bit_width: int) -> str:
-        if bit_width != self.expected_bit_width:
-            raise ValueError("Inconsistent bit width")
-        return f"ufixed({self.max_bit_index} downto {self.min_bit_index})"
 
     @classmethod
     def from_bit_widths(
@@ -352,11 +325,6 @@ class SignedFixedPoint(Fixed):
             min_bit_index (int): Position of the lower bit relative to the decimal point.
         """
         super().__init__(is_signed=True, max_bit_index=max_bit_index, min_bit_index=min_bit_index)
-
-    def vhdl_typedef(self, bit_width: int) -> str:
-        if bit_width != self.expected_bit_width:
-            raise ValueError("Inconsistent bit width")
-        return f"sfixed({self.max_bit_index} downto {self.min_bit_index})"
 
     @classmethod
     def from_bit_widths(cls, integer_bit_width: int, fraction_bit_width: int) -> "SignedFixedPoint":

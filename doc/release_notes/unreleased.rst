@@ -15,6 +15,12 @@ Breaking changes
 
 * Rename ``RegisterField.range`` to :meth:`.RegisterField.range_str`.
 
+* Remove public function ``vhdl_typedef`` from :class:`.FieldType` class, which is available as the
+  :meth:`.BitVector.field_type` member.
+  This logic is instead moved to :class:`.RegisterVhdlGenerator`.
+
 Added
 
 * Add support for unsigned bit vector constants via the :class:`.UnsignedVectorConstant` class.
+
+* Add support for ranged integer register fields via the :class:`.Integer` class.

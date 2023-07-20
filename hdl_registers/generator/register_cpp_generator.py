@@ -13,6 +13,7 @@ from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
+from hdl_registers.field.integer import Integer
 from hdl_registers.register import REGISTER_MODES
 from hdl_registers.register_array import RegisterArray
 
@@ -208,7 +209,19 @@ class CommonGenerator(RegisterCodeGenerator):
         cpp_code = f"  const uint32_t shift = {field.base_index}uL;\n"
         cpp_code += f'  const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
         cpp_code += "  const uint32_t mask_shifted = mask_at_base << shift;\n"
+        cpp_code += "\n"
         return cpp_code
+
+    @staticmethod
+    def _get_checker(field):
+        if isinstance(field, Integer):
+            cpp_code = "  // Check that provided value is within the legal range of this field.\n"
+            cpp_code += f"  assert(field_value >= {field.min_value});\n"
+            cpp_code += f"  assert(field_value <= {field.max_value});\n"
+            cpp_code += "\n"
+            return cpp_code
+
+        return ""
 
     @staticmethod
     def _register_setter_function_name(register, register_array):
@@ -699,9 +712,10 @@ class ImplementationGenerator(CommonGenerator):
 
         cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
         cpp_code += "{\n"
-
         cpp_code += self._get_shift_and_mask(field=field)
-        cpp_code += "\n  const uint32_t field_value_masked = field_value & mask_at_base;\n"
+        cpp_code += self._get_checker(field=field)
+
+        cpp_code += "  const uint32_t field_value_masked = field_value & mask_at_base;\n"
         cpp_code += (
             "  const uint32_t field_value_masked_and_shifted = field_value_masked << shift;\n\n"
         )
