@@ -63,7 +63,7 @@ class RegisterField(ABC):
     @abstractmethod
     def base_index(self) -> int:
         """
-        The index within the register for the lowest bit of this Field.
+        The index within the register for the lowest bit of this field.
         """
         raise NotImplementedError("Must be implemented in child class")
 

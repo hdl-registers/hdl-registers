@@ -18,7 +18,6 @@ class BitVector(RegisterField):
     Used to represent a bit vector field in a register.
     """
 
-    # pylint: disable=too-many-arguments
     def __init__(
         self,
         name,
@@ -27,7 +26,7 @@ class BitVector(RegisterField):
         width,
         default_value,
         field_type: FieldType = DEFAULT_FIELD_TYPE,
-    ):
+    ):  # pylint: disable=too-many-arguments
         """
         Arguments:
             name (str): The name of the bit vector.
@@ -43,6 +42,9 @@ class BitVector(RegisterField):
         self._base_index = base_index
         self.description = description
 
+        # The width of the field affects the base index of the next fields.
+        # Hence the user is not allowed to change it, nor the base index of this field,
+        # after initialization.
         self._check_width(width)
         self._width = width
 
@@ -79,14 +81,14 @@ class BitVector(RegisterField):
     @property
     def default_value(self):
         """
-        Getter for default_value.
+        Getter for private member.
         """
         return self._default_value
 
     @default_value.setter
     def default_value(self, value):
         """
-        Setter for default_value that performs sanity checks.
+        Setter for ``default_value`` that performs sanity checks.
         """
         if not isinstance(value, str):
             message = (

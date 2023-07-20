@@ -42,14 +42,14 @@ class Bit(RegisterField):
     @property
     def default_value(self):
         """
-        Getter for default_value.
+        Getter for private member.
         """
         return self._default_value
 
     @default_value.setter
     def default_value(self, value):
         """
-        Setter for default_value that performs sanity checks.
+        Setter for ``default_value`` that performs sanity checks.
         """
         if not isinstance(value, str):
             message = (

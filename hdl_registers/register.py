@@ -127,16 +127,15 @@ class Register:
         return bit_vector
 
     @property
-    def default_value(self):
+    def default_value(self) -> int:
         """
-        The default value of the register. Depends on the default values of it's fields.
-
-        Returns:
-            int: The default value.
+        The default value of this register as an unsigned integer.
+        Depends on the default values of the fields in this register.
         """
         default_value = 0
         for field in self.fields:
             default_value += field.default_value_uint * 2**field.base_index
+
         return default_value
 
     def get_field(self, name):
