@@ -26,6 +26,8 @@ You can also access it in your scripts by adding the repo path to the ``PYTHONPA
 variable, or by modifying ``sys.path`` in your script.
 
 
+.. _usage:
+
 Usage
 -----
 

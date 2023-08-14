@@ -31,12 +31,12 @@ Below is the resulting code from the :doc:`TOML format example <toml_format>`.
    :language: vhdl
    :linenos:
 
-For the plain register (``configuration``) the register index is simply a natural
+For a plain register (e.g. ``configuration``) the register index is simply a natural
 (``example_configuration``, where "example" is the name of the module).
-For the register arrays it is instead a function, e.g. ``example_base_addresses_read_address``.
+For register arrays it is instead a function, e.g. ``example_base_addresses_read_address``.
 The function takes an array index argument and will assert if it is out of bounds of the array.
 
-Note that there is a large eco-system of register related components in
+Note that there is a large eco-system of register-related components in
 the `hdl_modules <https://hdl-modules.com>`__ project.
 Firstly there are wrappers available for easier working with VUnit verification components.
 See the :ref:`bfm library <module_bfm>` and :ref:`reg_file.reg_operations_pkg`.
