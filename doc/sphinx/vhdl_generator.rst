@@ -34,7 +34,6 @@ Below is the resulting code from the :doc:`TOML format example <toml_format>`.
 For a plain register (e.g. ``configuration``) the register index is simply a natural
 (``example_configuration``, where "example" is the name of the module).
 For register arrays it is instead a function, e.g. ``example_base_addresses_read_address``.
-The function takes an array index argument and will assert if it is out of bounds of the array.
 
 Note that there is a large eco-system of register-related components in
 the `hdl_modules <https://hdl-modules.com>`__ project.
@@ -57,5 +56,5 @@ or synthesizing the design.
 
 Since e.g. ``std_logic`` is a sub-type of ``std_ulogic`` in VHDL-2008, it is no problem if
 hdl_registers components are integrated in a code base that still uses the resolved types.
-E.g. a ``std_logic`` signal can be assigned to a hdl_registers signal of type ``std_ulogic``,
+I.e. a ``std_logic`` signal can be assigned to a hdl_registers signal of type ``std_ulogic``,
 and vice versa, without problem.

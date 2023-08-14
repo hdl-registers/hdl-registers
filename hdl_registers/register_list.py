@@ -317,10 +317,15 @@ class RegisterList:
         print(f"Creating VHDL register package {vhd_file}")
         # Add a header line with the hash
         generated_info = self.generated_source_info() + [f"Register hash {self_hash}."]
-        register_vhdl_generator = RegisterVhdlGenerator(self.name, generated_info)
+        register_vhdl_generator = RegisterVhdlGenerator(
+            module_name=self.name, generated_info=generated_info
+        )
+
         with open(vhd_file, "w", encoding=DEFAULT_FILE_ENCODING) as file_handle:
             file_handle.write(
-                register_vhdl_generator.get_package(self.register_objects, self.constants)
+                register_vhdl_generator.get_package(
+                    register_objects=self.register_objects, constants=self.constants
+                )
             )
 
     def create_c_header(self, output_path, file_name=None):

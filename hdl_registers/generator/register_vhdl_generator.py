@@ -57,29 +57,46 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
             return f"{self.module_name}_{register.name}"
         return f"{self.module_name}_{register_array.name}_{register.name}"
 
+    @property
+    def _register_range_type_name(self):
+        """
+        Name of the type which is the legal index of registers.
+        """
+        return f"{self.module_name}_reg_range"
+
     def _register_function_signature(self, register, register_array):
-        return (
-            "function "
-            f"{self._register_name(register, register_array)}(array_index : natural) return natural"
-        )
+        vhdl = f"""\
+  function {self._register_name(register, register_array)}(
+    array_index : natural range 0 to {self._array_length_constant_name(register_array)} - 1
+  ) return {self._register_range_type_name}"""
+        return vhdl
 
     def _register_indexes(self, register_objects):
-        vhdl = ""
+        vhdl = "  -- Register indexes, within the list of registers.\n"
+
         for register, register_array in self._iterate_registers(register_objects):
             if register_array is None:
                 vhdl += (
                     f"  constant {self._register_name(register)} : natural := {register.index};\n"
                 )
             else:
-                vhdl += f"  {self._register_function_signature(register, register_array)};\n"
+                vhdl += f"{self._register_function_signature(register, register_array)};\n"
 
-        if vhdl:
-            vhdl = f"  -- Register indexes, within the list of registers.\n{vhdl}\n"
+        vhdl += "\n"
 
         return vhdl
 
     def _array_length_constant_name(self, register_array):
         return f"{self.module_name}_{register_array.name}_array_length"
+
+    def _register_range(self, register_objects):
+        last_index = register_objects[-1].index
+        vhdl = f"""\
+  -- The valid range of register indexes.
+  subtype {self._register_range_type_name} is natural range 0 to {last_index};
+
+"""
+        return vhdl
 
     def _array_constants(self, register_objects):
         vhdl = ""
@@ -93,43 +110,34 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                 vhdl += f"  constant {constant} : natural := {register_object.length};\n"
 
         if vhdl:
-            vhdl = f"{vhdl}\n"
+            vhdl += "\n"
 
         return vhdl
 
-    def _register_map(self, register_objects):
-        if not register_objects:
-            # It is possible that we have constants but no registers
-            return ""
-
+    def _register_map_head(self):
         map_name = f"{self.module_name}_reg_map"
-        range_name = f"{self.module_name}_reg_range"
 
-        last_index = register_objects[-1].index
         vhdl = f"""\
-  -- Declare register map constants here, but define them in body.
+  -- Declare 'reg_map' and 'regs_init' constants here, but define them in body.
   -- This is done so that functions have been elaborated when they are called.
-  subtype {range_name} is natural range 0 to {last_index};
+
   -- To be used as the 'regs' generic of 'axi_lite_reg_file.vhd'.
-  constant {map_name} : reg_definition_vec_t({range_name});
+  constant {map_name} : reg_definition_vec_t({self._register_range_type_name});
 
   -- To be used for the 'regs_up' and 'regs_down' ports of 'axi_lite_reg_file.vhd'.
-  subtype {self.module_name}_regs_t is reg_vec_t({range_name});
+  subtype {self.module_name}_regs_t is reg_vec_t({self._register_range_type_name});
   -- To be used as the 'default_values' generic of 'axi_lite_reg_file.vhd'.
   constant {self.module_name}_regs_init : {self.module_name}_regs_t;
 
   -- To be used for the 'reg_was_read' and 'reg_was_written' ports of 'axi_lite_reg_file.vhd'.
-  subtype {self.module_name}_reg_was_accessed_t is std_ulogic_vector({range_name});
+  subtype {self.module_name}_reg_was_accessed_t is \
+std_ulogic_vector({self._register_range_type_name});
 
 """
 
         return vhdl
 
     def _register_map_body(self, register_objects):
-        if not register_objects:
-            # It is possible that we have constants but no registers
-            return ""
-
         map_name = f"{self.module_name}_reg_map"
         range_name = f"{self.module_name}_reg_range"
 
@@ -235,14 +243,10 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         for register_object in register_objects:
             if isinstance(register_object, RegisterArray):
                 num_registers = len(register_object.registers)
-                array_length = self._array_length_constant_name(register_object)
                 for register in register_object.registers:
                     vhdl += f"""\
-  {self._register_function_signature(register, register_object)} is
+{self._register_function_signature(register, register_object)} is
   begin
-    assert array_index < {array_length}
-      report "Array index out of bounds: " & natural'image(array_index)
-      severity failure;
     return {register_object.base_index} + array_index * {num_registers} + {register.index};
   end function;
 
@@ -251,7 +255,8 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         return vhdl
 
     def _constants(self, constants):
-        vhdl = ""
+        vhdl = "  -- Register constant values.\n"
+
         for constant in constants:
             if isinstance(constant, BooleanConstant):
                 type_declaration = "boolean"
@@ -277,8 +282,7 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
                 f"{self.module_name}_constant_{constant.name} : {type_declaration} := {value};\n"
             )
 
-        if vhdl:
-            vhdl = f"  -- Register constants.\n{vhdl}\n"
+        vhdl += "\n"
 
         return vhdl
 
@@ -308,13 +312,23 @@ use reg_file.reg_file_pkg.all;
 
 package {pkg_name} is
 
-{self._register_indexes(register_objects)}\
-{self._array_constants(register_objects)}\
-{self._register_map(register_objects)}\
-{self._register_fields(register_objects)}\
-{self._constants(constants)}\
-end package;
+"""
 
+        if register_objects:
+            vhdl += f"""\
+{self._register_range(register_objects)}\
+{self._array_constants(register_objects)}\
+{self._register_indexes(register_objects)}\
+{self._register_map_head()}\
+{self._register_fields(register_objects)}"""
+
+        if constants:
+            vhdl += self._constants(constants)
+
+        vhdl += "end package;\n"
+
+        if register_objects:
+            vhdl += f"""
 package body {pkg_name} is
 
 {self._array_index_functions(register_objects)}\
