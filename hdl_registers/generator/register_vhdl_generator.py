@@ -86,10 +86,14 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         for register_object in register_objects:
             if isinstance(register_object, RegisterArray):
                 constant = self._array_length_constant_name(register_object)
+                vhdl += (
+                    f"  -- Number of times the '{register_object.name}' "
+                    "register array is repeated.\n"
+                )
                 vhdl += f"  constant {constant} : natural := {register_object.length};\n"
 
         if vhdl:
-            vhdl = f"  -- Number of times the register array is repeated.\n{vhdl}\n"
+            vhdl = f"{vhdl}\n"
 
         return vhdl
 
