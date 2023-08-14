@@ -8,7 +8,17 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
+import sys
 from pathlib import Path
+
+# Add path for default location of tsfpga to PYTHONPATH.
+sys.path.append(
+    str(
+        (
+            Path(__file__).parent.parent.parent.parent.parent.parent.parent / "tsfpga" / "tsfpga"
+        ).resolve()
+    ),
+)
 
 # Third party libraries
 from tsfpga.examples.example_env import get_hdl_modules
