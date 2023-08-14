@@ -118,8 +118,9 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         map_name = f"{self.module_name}_reg_map"
 
         vhdl = f"""\
-  -- Declare 'reg_map' and 'regs_init' constants here, but define them in body.
-  -- This is done so that functions have been elaborated when they are called.
+  -- Declare 'reg_map' and 'regs_init' constants here but define them in body (deferred constants).
+  -- So that functions have been elaborated when they are called.
+  -- Needed for ModelSim compilation to pass.
 
   -- To be used as the 'regs' generic of 'axi_lite_reg_file.vhd'.
   constant {map_name} : reg_definition_vec_t({self._register_range_type_name});
