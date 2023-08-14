@@ -33,7 +33,9 @@ Below is the resulting code from the :doc:`TOML format example <toml_format>`.
 
 For a plain register (e.g. ``configuration``) the register index is simply a natural
 (``example_configuration``, where "example" is the name of the module).
-For register arrays it is instead a function, e.g. ``example_base_addresses_read_address``.
+For register arrays it is instead a function, e.g. ``example_base_addresses_read_address``
+(where ``base_addresses`` is the name of the array and ``read_address`` is the name of
+the register).
 
 Note that there is a large eco-system of register-related components in
 the `hdl_modules <https://hdl-modules.com>`__ project.
