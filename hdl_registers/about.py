@@ -76,18 +76,22 @@ To check out the source code go to the
         extra_rst = ""
 
     readme_rst += f"""\
-|pic_website| |pic_gitlab| |pic_gitter| |pic_pip_install| |pic_license| |pic_python_line_coverage|
+.. image:: https://hdl-registers.com/logos/banner.png
+  :alt: Project banner
+  :align: center
+
+|
 
 .. |pic_website| image:: https://hdl-registers.com/badges/website.svg
   :alt: Website
   :target: https://hdl-registers.com
 
-.. |pic_gitlab| image:: https://hdl-registers.com/badges/gitlab.svg
-  :alt: Gitlab
+.. |pic_repository| image:: https://hdl-registers.com/badges/gitlab.svg
+  :alt: Repository
   :target: https://gitlab.com/hdl_registers/hdl_registers
 
-.. |pic_gitter| image:: https://tsfpga.com/badges/gitter.svg
-  :alt: Gitter
+.. |pic_chat| image:: https://tsfpga.com/badges/gitter.svg
+  :alt: Chat
   :target: https://app.gitter.im/#/room/#60a276916da03739847cca54:gitter.im
 
 .. |pic_pip_install| image:: https://hdl-registers.com/badges/pip_install.svg
@@ -101,6 +105,16 @@ To check out the source code go to the
 .. |pic_python_line_coverage| image:: https://hdl-registers.com/badges/python_coverage.svg
   :alt: Python line coverage
   :target: https://hdl-registers.com/python_coverage_html
+
+.. raw:: html
+
+    <center>
+
+|pic_website| |pic_repository| |pic_chat| |pic_pip_install| |pic_license| |pic_python_line_coverage|
+
+.. raw:: html
+
+    </center>
 
 The hdl_registers project is an open-source HDL register generator fast enough to run in
 real time.
