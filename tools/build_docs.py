@@ -55,6 +55,9 @@ def main():
 
     generate_sphinx_index()
 
+    logos_path = create_directory(GENERATED_SPHINX_HTML / "logos")
+    shutil.copy2(hdl_registers.HDL_REGISTERS_DOC / "logos" / "banner.png", logos_path)
+
     build_sphinx(build_path=SPHINX_DOC, output_path=GENERATED_SPHINX_HTML)
 
     badges_path = create_directory(GENERATED_SPHINX_HTML / "badges")
