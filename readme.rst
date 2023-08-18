@@ -28,15 +28,7 @@
   :alt: Python line coverage
   :target: https://hdl-registers.com/python_coverage_html
 
-.. raw:: html
-
-    <center>
-
 |pic_website| |pic_repository| |pic_chat| |pic_pip_install| |pic_license| |pic_python_line_coverage|
-
-.. raw:: html
-
-    </center>
 
 The hdl_registers project is an open-source HDL register generator fast enough to run in
 real time.
