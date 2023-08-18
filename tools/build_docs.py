@@ -183,6 +183,9 @@ def build_information_badges(output_path):
         logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "gitlab.svg"),
         embed_logo=True,
     )
+    create_file(output_path / "repository.svg", badge_svg)
+    # Legacy file name, but PyPI readme still uses it.
+    # This can be removed once a new release is made.
     create_file(output_path / "gitlab.svg", badge_svg)
 
     badge_svg = badge(
@@ -201,6 +204,9 @@ def build_information_badges(output_path):
         left_color="#5a5a5a",
         right_color="#41ab8b",
     )
+    create_file(output_path / "chat.svg", badge_svg)
+    # Legacy file name, but PyPI readme still uses it.
+    # This can be removed once a new release is made.
     create_file(output_path / "gitter.svg", badge_svg)
 
 
