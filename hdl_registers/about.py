@@ -86,11 +86,11 @@ To check out the source code go to the
   :alt: Website
   :target: https://hdl-registers.com
 
-.. |pic_repository| image:: https://hdl-registers.com/badges/gitlab.svg
+.. |pic_repository| image:: https://hdl-registers.com/badges/repository.svg
   :alt: Repository
   :target: https://gitlab.com/hdl_registers/hdl_registers
 
-.. |pic_chat| image:: https://tsfpga.com/badges/gitter.svg
+.. |pic_chat| image:: https://hdl-registers.com/badges/chat.svg
   :alt: Chat
   :target: https://app.gitter.im/#/room/#60a276916da03739847cca54:gitter.im
 
