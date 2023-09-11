@@ -407,13 +407,13 @@ class InterfaceGenerator(CommonGenerator):
 
         cpp_code = ""
         for field in register.fields:
-            register_description = f'in the "{register.name}" register'
+            field_description = f'the "{field.name}" field in the "{register.name}" register'
             if register_array is not None:
-                register_description += f' within the "{register_array.name}" register array'
+                field_description += f' within the "{register_array.name}" register array'
 
             if register.is_bus_readable:
                 comment = (
-                    f'Getter for the "{field.name}" field {register_description},\n'
+                    f"Getter for {field_description},\n"
                     "which will read register value over the register bus."
                 )
 
@@ -429,10 +429,7 @@ class InterfaceGenerator(CommonGenerator):
                     return_type_name=self._field_value_type_name(), signature=signature
                 )
 
-                comment = (
-                    f'Getter for the "{field.name}" field {register_description},\n'
-                    "given the register's current value."
-                )
+                comment = f"Getter for {field_description},\ngiven the register's current value."
                 cpp_code += self._comment_block(text=comment, indentation=2)
 
                 signature = self._field_getter_function_signature(
@@ -446,7 +443,7 @@ class InterfaceGenerator(CommonGenerator):
                 )
 
             if register.is_bus_writeable:
-                comment = f'Setter for the "{field.name}" field {register_description},\n'
+                comment = f"Setter for {field_description},\n"
                 if register.mode == "r_w":
                     comment += "which will read-modify-write over the register bus."
                 elif register.mode in ["w", "wpulse", "r_wpulse"]:
@@ -467,7 +464,7 @@ class InterfaceGenerator(CommonGenerator):
                 cpp_code += function(return_type_name="void", signature=signature)
 
                 comment = (
-                    f'Setter for the "{field.name}" field {register_description},\n'
+                    f"Setter for {field_description},\n"
                     "given the register's current value, which will return an updated value."
                 )
                 cpp_code += self._comment_block(text=comment, indentation=2)
