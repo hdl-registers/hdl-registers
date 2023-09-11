@@ -45,12 +45,12 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         self.generated_info = generated_info
 
     @staticmethod
-    def _comment(comment, indentation=0):
-        indent = " " * indentation
-        return f"{indent}-- {comment}\n"
+    def _comment(comment, indent=0):
+        indentation = " " * indent
+        return f"{indentation}-- {comment}\n"
 
     def _header(self):
-        return "".join([self._comment(header_line) for header_line in self.generated_info])
+        return self._comment_block(text="\n".join(self.generated_info), indent=0)
 
     def _register_name(self, register, register_array=None):
         if register_array is None:

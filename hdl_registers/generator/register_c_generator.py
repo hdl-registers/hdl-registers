@@ -29,6 +29,10 @@ class RegisterCGenerator(RegisterCodeGenerator):
     That test is considered more meaningful and exhaustive than a unit test would be.
     """
 
+    # The most commonly used indentation.
+    # For code at the top level.
+    default_indent = 0
+
     def __init__(self, module_name, generated_info):
         """
         Arguments:
@@ -65,9 +69,18 @@ class RegisterCGenerator(RegisterCodeGenerator):
         return c_code
 
     @staticmethod
-    def _comment(comment, indentation=0):
-        indent = " " * indentation
-        return f"{indent}// {comment}\n"
+    def _comment(comment, indent=default_indent):
+        """
+        Defaults to the most commonly used indentation.
+        """
+        indentation = " " * indent
+        return f"{indentation}// {comment}\n"
+
+    def _comment_block(self, text, indent=default_indent):
+        """
+        Defaults to the most commonly used indentation.
+        """
+        return super()._comment_block(text=text, indent=indent)
 
     def _file_header(self):
         return "".join([self._comment(header_line) for header_line in self.generated_info])
@@ -81,9 +94,9 @@ class RegisterCGenerator(RegisterCodeGenerator):
         register_struct += "{\n"
         for register_object in register_objects:
             if isinstance(register_object, Register):
-                register_struct += self._comment_block(register_object.description, indentation=2)
+                register_struct += self._comment_block(register_object.description, indent=2)
                 register_struct += self._comment(
-                    f'Mode "{REGISTER_MODES[register_object.mode].mode_readable}".', indentation=2
+                    f'Mode "{REGISTER_MODES[register_object.mode].mode_readable}".', indent=2
                 )
                 register_struct += f"  uint32_t {register_object.name};\n"
 
@@ -96,9 +109,9 @@ class RegisterCGenerator(RegisterCodeGenerator):
                 array_structs += f"typedef struct {array_struct_type}\n"
                 array_structs += "{\n"
                 for register in register_object.registers:
-                    array_structs += self._comment_block(register.description, indentation=2)
+                    array_structs += self._comment_block(register.description, indent=2)
                     array_structs += self._comment(
-                        f'Mode "{REGISTER_MODES[register.mode].mode_readable}".', indentation=2
+                        f'Mode "{REGISTER_MODES[register.mode].mode_readable}".', indent=2
                     )
                     array_structs += f"  uint32_t {register.name};\n"
                 array_structs += f"}} {array_struct_type};\n\n"

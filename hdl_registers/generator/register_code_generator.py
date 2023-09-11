@@ -7,11 +7,14 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from abc import ABC, abstractmethod
+
 # First party libraries
 from hdl_registers.register import Register
 
 
-class RegisterCodeGenerator:
+class RegisterCodeGenerator(ABC):
 
     """
     Common functions for generating register code.
@@ -27,10 +30,11 @@ class RegisterCodeGenerator:
                     yield (register, register_object)
 
     @staticmethod
-    def _comment(comment, indentation=0):
+    @abstractmethod
+    def _comment(comment, indent):
         raise NotImplementedError("Should be overloaded in child class")
 
-    def _comment_block(self, text, indentation=0):
+    def _comment_block(self, text, indent):
         """
         Create a comment block from a string with newlines.
         """
@@ -41,7 +45,7 @@ class RegisterCodeGenerator:
         if text_lines[-1] == "":
             text_lines.pop()
 
-        return "".join(self._comment(line, indentation=indentation) for line in text_lines)
+        return "".join(self._comment(comment=line, indent=indent) for line in text_lines)
 
     @staticmethod
     def _to_pascal_case(snake_string):

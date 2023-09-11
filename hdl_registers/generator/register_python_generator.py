@@ -83,6 +83,6 @@ def get_register_list():
         return "".join([self._comment(header_line) for header_line in self.generated_info])
 
     @staticmethod
-    def _comment(comment, indentation=0):
-        indent = " " * indentation
-        return f"{indent}# {comment}\n"
+    def _comment(comment, indent=0):
+        indentation = " " * indent
+        return f"{indentation}# {comment}\n"

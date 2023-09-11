@@ -223,10 +223,10 @@ void test_constants()
 
 """
 
-        if not test_registers:
-            # If no registers, the constant shall be zero
-            main_function += "  assert(fpga_regs::Test::num_registers == 0);\n"
-        else:
+        num_registers = 12 * test_registers
+        main_function += f"  assert(fpga_regs::Test::num_registers == {num_registers});\n"
+
+        if test_registers:
             main_function += """\
   assert(fpga_regs::Test::num_registers == 12);
   assert(fpga_regs::Test::dummy_regs_array_length == 3);
@@ -452,6 +452,27 @@ void test_field_setter_on_write_only_register(fpga_regs::Test *test, uint32_t *m
 
   test->set_address_b(213);
   assert(memory[reg_index] == 213 << 8);
+}
+
+"""
+
+        # Test also the register attributes.
+        # Keep this test code separate for the sake of readability.
+        if test_registers:
+            main_function += "  test_register_attributes();\n"
+
+            functions += """\
+void test_register_attributes()
+{
+  assert(fpga_regs::test::plain_dummy_reg::plain_bit_a::width == 1);
+  assert(fpga_regs::test::plain_dummy_reg::plain_bit_a::default_value == 0);
+  assert(fpga_regs::test::plain_dummy_reg::plain_bit_b::default_value == 1);
+
+  assert(fpga_regs::test::plain_dummy_reg::plain_bit_vector::width == 4);
+  assert(fpga_regs::test::plain_dummy_reg::plain_bit_vector::default_value == 3);
+
+  assert(fpga_regs::test::dummy_regs::array_dummy_reg::array_bit_vector::width == 5);
+  assert(fpga_regs::test::dummy_regs::array_dummy_reg::array_bit_vector::default_value == 12);
 }
 
 """

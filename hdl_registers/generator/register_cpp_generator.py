@@ -13,6 +13,8 @@ from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
+from hdl_registers.field.bit import Bit
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.integer import Integer
 from hdl_registers.register import REGISTER_MODES
 from hdl_registers.register_array import RegisterArray
@@ -95,34 +97,51 @@ class CommonGenerator(RegisterCodeGenerator):
     Do not use this directly, should use :class:`.RegisterCppGenerator`:
     """
 
+    # The most commonly used indentation.
+    # The one used inside e.g. a class inside a namespace.
+    default_indent = 4
+
     def __init__(self, module_name, generated_info):
         self.module_name = module_name
 
         self._class_name = self._to_pascal_case(module_name)
-        self._file_header = "".join([self._comment(header_line) for header_line in generated_info])
+        self._file_header = "".join(
+            [self._comment(header_line, indent=0) for header_line in generated_info]
+        )
 
     @staticmethod
-    def _get_separator_line(indentation):
+    def _get_separator_line(indent=default_indent):
         """
         Get a separator line, e.g. "  // ---------------------------------\n"
         """
-        result = " " * indentation + "// "
+        indentation = " " * indent
+        result = f"{indentation}// "
+
         num_dash = 80 - len(result)
         result += "-" * num_dash
         result += "\n"
         return result
 
     @staticmethod
-    def _comment(comment, indentation=0):
-        indent = " " * indentation
-        return f"{indent}// {comment}\n"
+    def _comment(comment, indent=default_indent):
+        """
+        Defaults to the most commonly used indentation.
+        """
+        indentation = " " * indent
+        return f"{indentation}// {comment}\n"
+
+    def _comment_block(self, text, indent=default_indent):
+        """
+        Defaults to the most commonly used indentation.
+        """
+        return super()._comment_block(text=text, indent=indent)
 
     @staticmethod
     def _with_namespace(cpp_code_body):
         cpp_code = "namespace fpga_regs\n"
         cpp_code += "{\n\n"
         cpp_code += f"{cpp_code_body}"
-        cpp_code += "\n} /* namespace fpga_regs */\n"
+        cpp_code += "} /* namespace fpga_regs */\n"
         return cpp_code
 
     def _constructor_signature(self):
@@ -206,18 +225,18 @@ class CommonGenerator(RegisterCodeGenerator):
 
     @staticmethod
     def _get_shift_and_mask(field):
-        cpp_code = f"  const uint32_t shift = {field.base_index}uL;\n"
-        cpp_code += f'  const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
-        cpp_code += "  const uint32_t mask_shifted = mask_at_base << shift;\n"
+        cpp_code = f"    const uint32_t shift = {field.base_index}uL;\n"
+        cpp_code += f'    const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
+        cpp_code += "    const uint32_t mask_shifted = mask_at_base << shift;\n"
         cpp_code += "\n"
         return cpp_code
 
     @staticmethod
     def _get_checker(field):
         if isinstance(field, Integer):
-            cpp_code = "  // Check that provided value is within the legal range of this field.\n"
-            cpp_code += f"  assert(field_value >= {field.min_value});\n"
-            cpp_code += f"  assert(field_value <= {field.max_value});\n"
+            cpp_code = "    // Check that provided value is within the legal range of this field.\n"
+            cpp_code += f"    assert(field_value >= {field.min_value});\n"
+            cpp_code += f"    assert(field_value <= {field.max_value});\n"
             cpp_code += "\n"
             return cpp_code
 
@@ -291,9 +310,9 @@ class InterfaceGenerator(CommonGenerator):
         Get a complete C++ interface class header. See :meth:`.RegisterCppGenerator.get_interface`
         for more details.
         """
-        cpp_code = f"class I{self._class_name}\n"
-        cpp_code += "{\n"
-        cpp_code += "public:\n"
+        cpp_code = f"  class I{self._class_name}\n"
+        cpp_code += "  {\n"
+        cpp_code += "  public:\n"
 
         cpp_code += self._constants(constants=constants)
 
@@ -301,50 +320,58 @@ class InterfaceGenerator(CommonGenerator):
 
         for register_object in register_objects:
             if isinstance(register_object, RegisterArray):
-                cpp_code += self._comment(
-                    f'Length of the "{register_object.name}" register array', indentation=2
-                )
+                cpp_code += self._comment(f'Length of the "{register_object.name}" register array')
                 constant_name = self._array_length_constant_name(register_object)
                 cpp_code += (
-                    f"  static const size_t {constant_name} = {register_object.length}uL;\n\n"
+                    f"    static const size_t {constant_name} = {register_object.length}uL;\n\n"
                 )
 
-        cpp_code += f"  virtual ~I{self._class_name}() {{ }}\n"
+        cpp_code += f"    virtual ~I{self._class_name}() {{}}\n\n"
 
         for register, register_array in self._iterate_registers(register_objects):
-            cpp_code += f"\n{self._get_separator_line(indentation=2)}"
+            cpp_code += f"{self._get_separator_line()}"
 
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
             description += f' Mode "{REGISTER_MODES[register.mode].mode_readable}".'
 
-            cpp_code += self._comment(comment=description, indentation=2)
+            cpp_code += self._comment(comment=description)
             cpp_code += "\n"
 
             if register.is_bus_readable:
                 cpp_code += self._comment(
-                    "Getter that will read the whole register's value over the register bus.",
-                    indentation=2,
+                    "Getter that will read the whole register's value over the register bus."
                 )
                 signature = self._register_getter_function_signature(
                     register=register, register_array=register_array
                 )
-                cpp_code += f"  virtual uint32_t {signature} const = 0;\n\n"
+                cpp_code += f"    virtual uint32_t {signature} const = 0;\n\n"
 
             if register.is_bus_writeable:
                 cpp_code += self._comment(
-                    "Setter that will write the whole register's value over the register bus.",
-                    indentation=2,
+                    "Setter that will write the whole register's value over the register bus."
                 )
                 signature = self._register_setter_function_signature(
                     register=register, register_array=register_array
                 )
-                cpp_code += f"  virtual void {signature} const = 0;\n\n"
+                cpp_code += f"    virtual void {signature} const = 0;\n\n"
 
             cpp_code += self._field_interface(register, register_array)
 
-        cpp_code += "};\n"
+        cpp_code += "  };\n\n"
+
+        for register, register_array in self._iterate_registers(register_objects):
+            field_cpp_code = ""
+
+            for field in register.fields:
+                field_cpp_code += self._field_attributes(
+                    register=register, register_array=register_array, field=field
+                )
+
+            cpp_code += field_cpp_code
+            if field_cpp_code:
+                cpp_code += "\n"
 
         cpp_code_top = f"""\
 {self._file_header}
@@ -383,8 +410,8 @@ class InterfaceGenerator(CommonGenerator):
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
-            cpp_code += self._comment("Register constant.", indentation=2)
-            cpp_code += f"  static const{type_declaration} {constant.name} = {value};\n"
+            cpp_code += self._comment("Register constant.")
+            cpp_code += f"    static const{type_declaration} {constant.name} = {value};\n"
 
         if constants:
             cpp_code += "\n"
@@ -397,19 +424,27 @@ class InterfaceGenerator(CommonGenerator):
         if register_objects:
             num_registers = register_objects[-1].index + 1
 
-        cpp_code = self._comment("Number of registers within this register map.", indentation=2)
-        cpp_code += f"  static const size_t num_registers = {num_registers}uL;\n\n"
+        cpp_code = self._comment("Number of registers within this register map.")
+        cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
+
+    @staticmethod
+    def _field_description(register, register_array, field):
+        result = f'the "{field.name}" field in the "{register.name}" register'
+        if register_array is not None:
+            result += f' within the "{register_array.name}" register array'
+
+        return result
 
     def _field_interface(self, register, register_array):
         def function(return_type_name, signature):
-            return f"  virtual {return_type_name} {signature} const = 0;\n"
+            return f"    virtual {return_type_name} {signature} const = 0;\n"
 
         cpp_code = ""
         for field in register.fields:
-            field_description = f'the "{field.name}" field in the "{register.name}" register'
-            if register_array is not None:
-                field_description += f' within the "{register_array.name}" register array'
+            field_description = self._field_description(
+                register=register, register_array=register_array, field=field
+            )
 
             if register.is_bus_readable:
                 comment = (
@@ -417,7 +452,7 @@ class InterfaceGenerator(CommonGenerator):
                     "which will read register value over the register bus."
                 )
 
-                cpp_code += self._comment_block(text=comment, indentation=2)
+                cpp_code += self._comment_block(text=comment)
 
                 signature = self._field_getter_function_signature(
                     register=register,
@@ -430,7 +465,7 @@ class InterfaceGenerator(CommonGenerator):
                 )
 
                 comment = f"Getter for {field_description},\ngiven the register's current value."
-                cpp_code += self._comment_block(text=comment, indentation=2)
+                cpp_code += self._comment_block(text=comment)
 
                 signature = self._field_getter_function_signature(
                     register=register,
@@ -453,7 +488,7 @@ class InterfaceGenerator(CommonGenerator):
                 else:
                     raise ValueError(f"Can not handle this register's mode: {register}")
 
-                cpp_code += self._comment_block(text=comment, indentation=2)
+                cpp_code += self._comment_block(text=comment)
 
                 signature = self._field_setter_function_signature(
                     register=register,
@@ -467,7 +502,7 @@ class InterfaceGenerator(CommonGenerator):
                     f"Setter for {field_description},\n"
                     "given the register's current value, which will return an updated value."
                 )
-                cpp_code += self._comment_block(text=comment, indentation=2)
+                cpp_code += self._comment_block(text=comment)
 
                 signature = self._field_setter_function_signature(
                     register=register,
@@ -478,6 +513,38 @@ class InterfaceGenerator(CommonGenerator):
                 cpp_code += function(return_type_name="uint32_t", signature=signature)
 
             cpp_code += "\n"
+
+        return cpp_code
+
+    @staticmethod
+    def _get_default_value(field):
+        """
+        Get the field's default value formatted in a way suitable for C++ code.
+        """
+        if isinstance(field, Integer):
+            return field.default_value
+
+        if isinstance(field, (Bit, BitVector)):
+            return f"0b{field.default_value}"
+
+        raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
+
+    def _field_attributes(self, register, register_array, field):
+        field_description = self._field_description(
+            register=register, register_array=register_array, field=field
+        )
+        cpp_code = self._comment_block(text=f"Attributes for {field_description}.", indent=2)
+
+        array_namespace = f"::{register_array.name}" if register_array else ""
+        namespace = f"{self.module_name}{array_namespace}::{register.name}::{field.name}"
+
+        cpp_code += f"  namespace {namespace}\n"
+        cpp_code += "  {\n"
+        cpp_code += f"    static const auto width = {field.width};\n"
+        cpp_code += (
+            f"    static const auto default_value = {self._get_default_value(field=field)};\n"
+        )
+        cpp_code += "  }\n"
 
         return cpp_code
 
@@ -493,27 +560,27 @@ class HeaderGenerator(CommonGenerator):
         Get a complete C++ class header for the implementation of all methods.
         See :meth:`.RegisterCppGenerator.get_header` for more details.
         """
-        cpp_code = f"class {self._class_name} : public I{self._class_name}\n"
-        cpp_code += "{\n"
+        cpp_code = f"  class {self._class_name} : public I{self._class_name}\n"
+        cpp_code += "  {\n"
 
-        cpp_code += "private:\n"
-        cpp_code += "  volatile uint32_t *m_registers;\n\n"
+        cpp_code += "  private:\n"
+        cpp_code += "    volatile uint32_t *m_registers;\n\n"
 
-        cpp_code += "public:\n"
-        cpp_code += f"  {self._constructor_signature()};\n\n"
-        cpp_code += f"  virtual ~{self._class_name}() {{ }}\n"
+        cpp_code += "  public:\n"
+        cpp_code += f"    {self._constructor_signature()};\n\n"
+        cpp_code += f"    virtual ~{self._class_name}() {{}}\n"
 
         def function(return_type_name, signature):
-            return f"  virtual {return_type_name} {signature} const override;\n"
+            return f"    virtual {return_type_name} {signature} const override;\n"
 
         for register, register_array in self._iterate_registers(register_objects):
-            cpp_code += f"\n{self._get_separator_line(indentation=2)}"
+            cpp_code += f"\n{self._get_separator_line()}"
 
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
             description += " See interface header for documentation."
-            cpp_code += self._comment(comment=description, indentation=2)
+            cpp_code += self._comment(comment=description)
 
             if register.is_bus_readable:
                 signature = self._register_getter_function_signature(
@@ -567,7 +634,7 @@ class HeaderGenerator(CommonGenerator):
                     )
                     cpp_code += function(return_type_name="uint32_t", signature=signature)
 
-        cpp_code += "};\n"
+        cpp_code += "  };\n"
 
         cpp_code_top = f"""\
 {self._file_header}
@@ -590,20 +657,20 @@ class ImplementationGenerator(CommonGenerator):
         Get a complete C++ class implementation with all methods.
         See :meth:`.RegisterCppGenerator.get_implementation` for more details.
         """
-        cpp_code = f"{self._class_name}::{self._constructor_signature()}\n"
-        cpp_code += "    : m_registers(reinterpret_cast<volatile uint32_t *>(base_address))\n"
-        cpp_code += "{\n"
-        cpp_code += "  // Empty\n"
-        cpp_code += "}\n\n"
+        cpp_code = f"  {self._class_name}::{self._constructor_signature()}\n"
+        cpp_code += "      : m_registers(reinterpret_cast<volatile uint32_t *>(base_address))\n"
+        cpp_code += "  {\n"
+        cpp_code += "    // Empty\n"
+        cpp_code += "  }\n\n"
 
         for register, register_array in self._iterate_registers(register_objects):
-            cpp_code += f"\n{self._get_separator_line(indentation=0)}"
+            cpp_code += f"{self._get_separator_line(indent=2)}"
 
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
             description += " See interface header for documentation.\n"
-            cpp_code += self._comment(comment=description, indentation=0)
+            cpp_code += self._comment(comment=description, indent=2)
 
             if register.is_bus_readable:
                 cpp_code += self._register_getter_function(register, register_array)
@@ -632,22 +699,22 @@ class ImplementationGenerator(CommonGenerator):
         signature = self._register_setter_function_signature(
             register=register, register_array=register_array
         )
-        cpp_code = f"void {self._class_name}::{signature} const\n"
-        cpp_code += "{\n"
+        cpp_code = f"  void {self._class_name}::{signature} const\n"
+        cpp_code += "  {\n"
 
         if register_array:
             cpp_code += (
-                f"  assert(array_index < {self._array_length_constant_name(register_array)});\n"
+                f"    assert(array_index < {self._array_length_constant_name(register_array)});\n"
             )
             cpp_code += (
-                f"  const size_t index = {register_array.base_index} "
+                f"    const size_t index = {register_array.base_index} "
                 f"+ array_index * {len(register_array.registers)} + {register.index};\n"
             )
         else:
-            cpp_code += f"  const size_t index = {register.index};\n"
+            cpp_code += f"    const size_t index = {register.index};\n"
 
-        cpp_code += "  m_registers[index] = register_value;\n"
-        cpp_code += "}\n\n"
+        cpp_code += "    m_registers[index] = register_value;\n"
+        cpp_code += "  }\n\n"
         return cpp_code
 
     def _field_setter_function(self, register, register_array, field):
@@ -655,16 +722,15 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=False
         )
 
-        cpp_code = f"void {self._class_name}::{signature} const\n"
-        cpp_code += "{\n"
+        cpp_code = f"  void {self._class_name}::{signature} const\n"
+        cpp_code += "  {\n"
 
         if register.mode == "r_w":
             register_getter_function_name = self._register_getter_function_name(
                 register=register, register_array=register_array
             )
             cpp_code += self._comment(
-                "Get the current value of any other fields by reading register on the bus.",
-                indentation=2,
+                comment="Get the current value of any other fields by reading register on the bus."
             )
             current_register_value = f"{register_getter_function_name}("
             if register_array:
@@ -673,32 +739,31 @@ class ImplementationGenerator(CommonGenerator):
         elif register.mode in ["w", "wpulse", "r_wpulse"]:
             cpp_code += self._comment_block(
                 "This register type's currently written value can not be read back.\n"
-                "Hence set all other bits to zero when writing the value.",
-                indentation=2,
+                "Hence set all other bits to zero when writing the value."
             )
             current_register_value = 0
         else:
             raise ValueError(f"Can not handle this register's mode: {register}")
 
-        cpp_code += f"  const uint32_t current_register_value = {current_register_value};\n"
+        cpp_code += f"    const uint32_t current_register_value = {current_register_value};\n"
 
         signature = self._field_setter_function_name(
             register=register, register_array=register_array, field=field, from_value=True
         )
         cpp_code += (
-            "  const uint32_t result_register_value = "
-            f" {signature}(current_register_value, field_value);\n"
+            "    const uint32_t result_register_value = "
+            f"{signature}(current_register_value, field_value);\n"
         )
 
         register_setter_function_name = self._register_setter_function_name(
             register=register, register_array=register_array
         )
-        cpp_code += f"  {register_setter_function_name}("
+        cpp_code += f"    {register_setter_function_name}("
         if register_array:
             cpp_code += "array_index, "
         cpp_code += "result_register_value);\n"
 
-        cpp_code += "}\n\n"
+        cpp_code += "  }\n\n"
 
         return cpp_code
 
@@ -707,28 +772,28 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=True
         )
 
-        cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
-        cpp_code += "{\n"
+        cpp_code = f"  uint32_t {self._class_name}::{signature} const\n"
+        cpp_code += "  {\n"
         cpp_code += self._get_shift_and_mask(field=field)
         cpp_code += self._get_checker(field=field)
 
-        cpp_code += "  const uint32_t field_value_masked = field_value & mask_at_base;\n"
+        cpp_code += "    const uint32_t field_value_masked = field_value & mask_at_base;\n"
         cpp_code += (
-            "  const uint32_t field_value_masked_and_shifted = field_value_masked << shift;\n\n"
+            "    const uint32_t field_value_masked_and_shifted = field_value_masked << shift;\n\n"
         )
 
-        cpp_code += "  const uint32_t mask_shifted_inverse = ~mask_shifted;\n"
+        cpp_code += "    const uint32_t mask_shifted_inverse = ~mask_shifted;\n"
         cpp_code += (
-            "  const uint32_t register_value_masked = register_value & mask_shifted_inverse;\n\n"
+            "    const uint32_t register_value_masked = register_value & mask_shifted_inverse;\n\n"
         )
 
         cpp_code += (
-            "  const uint32_t result_register_value = "
+            "    const uint32_t result_register_value = "
             "register_value_masked | field_value_masked_and_shifted;\n\n"
         )
-        cpp_code += "  return result_register_value;\n"
+        cpp_code += "    return result_register_value;\n"
 
-        cpp_code += "}\n\n"
+        cpp_code += "  }\n\n"
 
         return cpp_code
 
@@ -736,23 +801,23 @@ class ImplementationGenerator(CommonGenerator):
         signature = self._register_getter_function_signature(
             register=register, register_array=register_array
         )
-        cpp_code = f"uint32_t {self._class_name}::{signature} const\n"
-        cpp_code += "{\n"
+        cpp_code = f"  uint32_t {self._class_name}::{signature} const\n"
+        cpp_code += "  {\n"
 
         if register_array:
             cpp_code += (
-                f"  assert(array_index < {self._array_length_constant_name(register_array)});\n"
+                f"    assert(array_index < {self._array_length_constant_name(register_array)});\n"
             )
             cpp_code += (
-                f"  const size_t index = {register_array.base_index} "
+                f"    const size_t index = {register_array.base_index} "
                 f"+ array_index * {len(register_array.registers)} + {register.index};\n"
             )
         else:
-            cpp_code += f"  const size_t index = {register.index};\n"
+            cpp_code += f"    const size_t index = {register.index};\n"
 
-        cpp_code += "  const uint32_t result = m_registers[index];\n\n"
-        cpp_code += "  return result;\n"
-        cpp_code += "}\n\n"
+        cpp_code += "    const uint32_t result = m_registers[index];\n\n"
+        cpp_code += "    return result;\n"
+        cpp_code += "  }\n\n"
         return cpp_code
 
     def _field_getter_function(self, register, register_array, field):
@@ -760,8 +825,8 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=False
         )
 
-        cpp_code = f"{self._field_value_type_name()} {self._class_name}::{signature} const\n"
-        cpp_code += "{\n"
+        cpp_code = f"  {self._field_value_type_name()} {self._class_name}::{signature} const\n"
+        cpp_code += "  {\n"
 
         register_getter_function_name = self._register_getter_function_name(
             register=register, register_array=register_array
@@ -771,16 +836,17 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=True
         )
 
-        cpp_code += f"  const uint32_t register_value = {register_getter_function_name}("
+        cpp_code += f"    const uint32_t register_value = {register_getter_function_name}("
         if register_array:
             cpp_code += "array_index"
         cpp_code += ");\n"
 
         cpp_code += (
-            f"  const uint32_t result = {field_getter_from_value_function_name}(register_value);\n"
+            "    const uint32_t result = "
+            f"{field_getter_from_value_function_name}(register_value);\n"
         )
-        cpp_code += "\n  return result;\n"
-        cpp_code += "}\n\n"
+        cpp_code += "\n    return result;\n"
+        cpp_code += "  }\n\n"
 
         return cpp_code
 
@@ -789,14 +855,14 @@ class ImplementationGenerator(CommonGenerator):
             register=register, register_array=register_array, field=field, from_value=True
         )
 
-        cpp_code = f"{self._field_value_type_name()} {self._class_name}::{signature} const\n"
-        cpp_code += "{\n"
+        cpp_code = f"  {self._field_value_type_name()} {self._class_name}::{signature} const\n"
+        cpp_code += "  {\n"
 
         cpp_code += self._get_shift_and_mask(field=field)
 
-        cpp_code += "\n  const uint32_t result_masked = register_value & mask_shifted;\n"
-        cpp_code += "  const uint32_t result_shifted = result_masked >> shift;\n"
-        cpp_code += "\n  return result_shifted;\n"
-        cpp_code += "}\n\n"
+        cpp_code += "    const uint32_t result_masked = register_value & mask_shifted;\n"
+        cpp_code += "    const uint32_t result_shifted = result_masked >> shift;\n"
+        cpp_code += "\n    return result_shifted;\n"
+        cpp_code += "  }\n\n"
 
         return cpp_code
