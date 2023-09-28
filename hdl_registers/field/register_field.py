@@ -90,10 +90,10 @@ class RegisterField(ABC):
         Child classes might implement sanity checks on the value.
 
         Arguments:
-            register_value (int): Value of the register that this field belongs to.
+            register_value: Value of the register that this field belongs to.
 
         Returns:
-            float: The value of the field.
+            The value of the field.
         """
         shift = self.base_index
 
@@ -112,10 +112,10 @@ class RegisterField(ABC):
         register are masked out and will be set to zero.
 
         Arguments:
-            field_value (float) : Desired value to set the field to.
+            field_value: Desired value to set the field to.
 
         Returns:
-            int: the register value
+            The register value
         """
         value_unsigned = self.field_type.convert_to_unsigned_binary(self.width, field_value)
         max_value = self.max_binary_value
