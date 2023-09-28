@@ -78,17 +78,14 @@ class Register:
         self.fields = []
         self.bit_index = 0
 
-    def append_bit(self, name, description, default_value):
+    def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """
         Append a bit field to this register.
 
-        Arguments:
-            name (str): The name of the bit.
-            description (str): Description of the bit.
-            default_value (str): Default value. Either "1" or "0".
+        See :class:`.Bit` for documentation of the arguments.
 
         Return:
-            :class:`.Bit`: The bit object that was created.
+            The bit field object that was created.
         """
         bit = Bit(
             name=name, index=self.bit_index, description=description, default_value=default_value
@@ -98,21 +95,20 @@ class Register:
         return bit
 
     def append_bit_vector(
-        self, name, description, width, default_value, field_type: FieldType = DEFAULT_FIELD_TYPE
-    ):
+        self,
+        name: str,
+        description: str,
+        width: int,
+        default_value: str,
+        field_type: FieldType = DEFAULT_FIELD_TYPE,
+    ) -> BitVector:
         """
         Append a bit vector field to this register.
 
-        Arguments:
-            name (str): The name of the bit vector.
-            description (str): Description of the bit vector.
-            width (int) : The width of the bit vector.
-            default_value (str): Default value as a string. Must be of length ``width`` and contain
-                only "1" and "0".
-            field_type (FieldType): The field type used to interpret the bits of the field.
+        See :class:`.BitVector` for documentation of the arguments.
 
         Return:
-            :class:`.BitVector`: The bit vector object that was created.
+            The bit vector field object that was created.
         """
         bit_vector = BitVector(
             name=name,
@@ -132,12 +128,7 @@ class Register:
         """
         Append an integer field to this register.
 
-        Arguments:
-            name: The name of the field.
-            description: Textual description of the field.
-            min_value: The minimum value that this field shall be able to represent.
-            min_value: The maximum value that this field shall be able to represent.
-            default_value: Default value. Must be within the specified range.
+        See :class:`.Integer` for documentation of the arguments.
 
         Return:
             The integer field object that was created.

@@ -20,23 +20,23 @@ class BitVector(RegisterField):
 
     def __init__(
         self,
-        name,
-        base_index,
-        description,
-        width,
-        default_value,
+        name: str,
+        base_index: int,
+        description: str,
+        width: int,
+        default_value: str,
         field_type: FieldType = DEFAULT_FIELD_TYPE,
     ):  # pylint: disable=too-many-arguments
         """
         Arguments:
-            name (str): The name of the bit vector.
-            base_index (int): The zero-based index within the register for the lowest bit of this
+            name: The name of the bit vector.
+            base_index: The zero-based index within the register for the lowest bit of this
                 bit vector.
-            description (str): Textual bit vector description.
-            width (int) : The width of the bit vector field.
-            default_value (str): Default value as a string. Must be of length ``width`` and contain
+            description: Textual bit vector description.
+            width: The width of the bit vector field.
+            default_value: Default value as a string. Must be of length ``width`` and contain
                 only "1" and "0".
-            field_type (FieldType): The field type used to interpret the bits of the field.
+            field_type: The field type used to interpret the bits of the field.
         """
         self.name = name
         self._base_index = base_index

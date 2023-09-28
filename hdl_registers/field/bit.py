@@ -19,13 +19,13 @@ class Bit(RegisterField):
 
     width = 1
 
-    def __init__(self, name, index, description, default_value):
+    def __init__(self, name: str, index: int, description: str, default_value: str):
         """
         Arguments:
-            name (str): The name of the bit.
-            index (int): The zero-based index of this bit within the register.
-            description (str): Textual bit description.
-            default_value (str): Default value. Either "1" or "0".
+            name: The name of the bit.
+            index: The zero-based index of this bit within the register.
+            description: Textual bit description.
+            default_value: Default value. Either "1" or "0".
         """
         self.name = name
         self._base_index = index
