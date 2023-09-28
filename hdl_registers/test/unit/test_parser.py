@@ -88,27 +88,27 @@ mode = "w"
 
 
 ################################################################################
-[register.irq]
+[register.status]
 
 mode = "r_w"
-description = "Interrupt register"
+description = "Status register"
 
-[register.irq.bit.bad]
+[register.status.bit.bad]
 
 description = "Bad things happen"
 
-[register.irq.bit.not_good]
+[register.status.bit.not_good]
 
 description = ""
 default_value = "1"
 
-[register.irq.bit_vector.interrupts]
+[register.status.bit_vector.interrupts]
 
 width = 4
 description = "Many interrupts"
 default_value = "0110"
 
-[register.irq.integer.count]
+[register.status.integer.count]
 
 description = "The number of things"
 min_value = 10
@@ -177,10 +177,10 @@ default_value="0000000000000011"
         assert registers[0].default_value == 0
         assert registers[0].fields == []
 
-        assert registers[1].name == "irq"
+        assert registers[1].name == "status"
         assert registers[1].mode == "r_w"
         assert registers[1].index == 1
-        assert registers[1].description == "Interrupt register"
+        assert registers[1].description == "Status register"
         assert registers[1].fields[0].name == "bad"
         assert registers[1].fields[0].description == "Bad things happen"
         assert registers[1].fields[0].default_value == "0"
@@ -235,7 +235,7 @@ default_value="0000000000000011"
 
         # The registers from this test are appended at the end
         assert toml_registers.get_register("data").index == num_default_registers
-        assert toml_registers.get_register("irq").index == num_default_registers + 1
+        assert toml_registers.get_register("status").index == num_default_registers + 1
 
     def test_load_dirty_toml_file_should_raise_exception(self):
         self.create_toml_file_with_extras("apa")
@@ -320,7 +320,7 @@ description = "w"
     def test_two_registers_with_same_name_should_raise_exception(self):
         self.create_toml_file_with_extras(
             """
-[register.irq]
+[register.status]
 
 mode = "w"
 """
@@ -330,7 +330,7 @@ mode = "w"
             from_toml(self.module_name, self.toml_file)
         expected = (
             f"Error while parsing TOML file {self.toml_file}:\n"
-            "Cannot declare ('register', 'irq') twice"
+            "Cannot declare ('register', 'status') twice"
         )
         assert str(exception_info.value).startswith(expected)
 
