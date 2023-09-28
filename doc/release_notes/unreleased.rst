@@ -25,3 +25,5 @@ Added
 * Add support for unsigned bit vector constants via the :class:`.UnsignedVectorConstant` class.
 
 * Add support for ranged integer register fields via the :class:`.Integer` class.
+
+* Add support for enumeration register fields via the :class:`.Enumeration` class.

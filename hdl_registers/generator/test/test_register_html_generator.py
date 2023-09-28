@@ -38,7 +38,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             index=0,
             address="0x0000",
             mode="Read, Write",
-            default_value="0x108E",
+            default_value="0x848E",
             description="A plain <strong>dummy</strong> register.",
             html=html,
         )
@@ -56,7 +56,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             index="5 + i &times; 2",
             address="0x0014 + i &times; 0x0008",
             mode="Read, Write",
-            default_value="0x31",
+            default_value="0xB1",
             description="The first register in the array.",
             html=html,
         )
@@ -100,8 +100,14 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             html=html,
         )
         self._check_field(
+            name="plain_enumeration",
+            index="8:6",
+            default_value="third",
+            html=html,
+        )
+        self._check_field(
             name="plain_integer",
-            index="12:6",
+            index="15:9",
             default_value="66",
             description="Integer",
             html=html,
@@ -196,7 +202,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert expected in html, f"{expected}\n\n{html}"
 
     @staticmethod
-    def _check_field(name, index, default_value, description, html):
+    def _check_field(name, index, default_value, html, description=None):
         expected = f"""
   <tr>
     <td>&nbsp;&nbsp;<em>{name}</em></td>
@@ -204,8 +210,14 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
     <td></td>
     <td></td>
     <td>{default_value}</td>
-    <td>{description}</td>
 """
+        if description:
+            expected += f"""\
+    <td>
+      {description}
+    </td>
+"""
+
         assert expected in html, f"{expected}\n\n{html}"
 
     @staticmethod

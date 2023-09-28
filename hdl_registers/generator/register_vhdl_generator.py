@@ -15,6 +15,7 @@ from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
+from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.field.register_field import RegisterField
 from hdl_registers.field.register_field_type import (
@@ -56,6 +57,11 @@ class RegisterVhdlGenerator(RegisterCodeGenerator):
         if register_array is None:
             return f"{self.module_name}_{register.name}"
         return f"{self.module_name}_{register_array.name}_{register.name}"
+
+    def _field_name(self, register, register_array, field):
+        return (
+            f"{self._register_name(register=register, register_array=register_array)}_{field.name}"
+        )
 
     @property
     def _register_range_type_name(self):
@@ -183,59 +189,95 @@ std_ulogic_vector({self._register_range_type_name});
 
         return vhdl
 
-    def _register_fields(self, register_objects):
+    def _register_field_declarations(self, register_objects):
         vhdl = ""
         for register, register_array in self._iterate_registers(register_objects):
             if not register.fields:
                 continue
 
-            vhdl += f"  -- Fields within the '{register.name}' register"
+            register_comment = f"'{register.name}' register"
             if register_array is not None:
-                vhdl += f" within the '{register_array.name}' register array"
-            vhdl += ".\n"
+                register_comment += f" within the '{register_array.name}' register array"
+
+            vhdl += f"""\
+  -- -----------------------------------------------------------------------------
+  -- Fields in the {register_comment}.
+"""
 
             for field in register.fields:
-                name = f"{self._register_name(register, register_array)}_{field.name}"
+                vhdl += f"  -- Range of the '{field.name}' field.\n"
 
-                if field.width == 1:
+                name = self._field_name(
+                    register=register, register_array=register_array, field=field
+                )
+
+                if isinstance(field, Bit):
                     vhdl += f"  constant {name} : natural := {field.base_index};\n"
                 else:
                     vhdl += f"""\
   subtype {name} is natural range {field.width + field.base_index - 1} downto {field.base_index};
+  -- Width of the '{field.name}' field.
   constant {name}_width : positive := {field.width};
-  subtype {name}_t is {self._field_typedef(field=field)};
+  -- Type for the '{field.name}' field.
+{self._field_type_declaration(field=field, name=name)}
 """
-            vhdl += "\n"
+                vhdl += "\n"
 
         return vhdl
 
-    def _field_typedef(self, field: "RegisterField"):
+    def _field_type_declaration(self, field: RegisterField, name: str):
         if isinstance(field, Bit):
-            return "std_ulogic"
-
-        if isinstance(field, Integer):
-            return f"integer range {field.min_value} to {field.max_value}"
+            return f"  subtype {name}_t is std_ulogic;"
 
         if isinstance(field, BitVector):
             if isinstance(field.field_type, Unsigned):
-                return f"u_unsigned({field.width - 1} downto 0)"
+                return f"  subtype {name}_t is u_unsigned({field.width - 1} downto 0);"
 
             if isinstance(field.field_type, Signed):
-                return f"u_signed({field.width - 1} downto 0)"
+                return f"  subtype {name}_t is u_signed({field.width - 1} downto 0);"
 
             if isinstance(field.field_type, UnsignedFixedPoint):
                 return (
-                    "ufixed("
-                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index})"
+                    f"  subtype {name}_t is ufixed("
+                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index});"
                 )
 
             if isinstance(field.field_type, SignedFixedPoint):
                 return (
-                    "sfixed("
-                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index})"
+                    f"  subtype {name}_t is sfixed("
+                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index});"
                 )
 
-            raise TypeError(f'Got unexpected type for field: "{field}".')
+            raise TypeError(f'Got unexpected bit vector type for field: "{field}".')
+
+        if isinstance(field, (Enumeration, Integer)):
+            if isinstance(field, Enumeration):
+                # Enum element names in VHDL are exported to the surrounding scope, causing huge
+                # risk of name clashes.
+                # At the same time, we want the elements to have somewhat concise names so they are
+                # easy to work with.
+                # Compromise by prefixing the element names with the field name.
+                element_names = [f"{field.name}_{element.name}" for element in field.elements]
+                elements = ",\n    ".join(element_names)
+                type_declaration = f"""\
+  type {name}_t is (
+    {elements}
+  );
+"""
+            elif isinstance(field, Integer):
+                type_declaration = f"""\
+   subtype {name}_t is integer range {field.min_value} to {field.max_value};
+"""
+
+            return f"""\
+{type_declaration}\
+  -- Type for the '{field.name}' field as an SLV.
+  subtype {name}_slv_t is std_ulogic_vector({field.width - 1} downto 0);
+  -- Cast a '{field.name}' field value to SLV.
+  function to_{name}_slv(data : {name}_t) return {name}_slv_t;
+  -- Get a '{field.name}' field value from a register value.
+  function to_{name}(data : reg_t) return {name}_t;\
+  """
 
         raise TypeError(f'Got unexpected type for field: "{field}".')
 
@@ -256,7 +298,10 @@ std_ulogic_vector({self._register_range_type_name});
         return vhdl
 
     def _constants(self, constants):
-        vhdl = "  -- Register constant values.\n"
+        vhdl = """\
+  -- ---------------------------------------------------------------------------
+  -- Values of register constants.
+"""
 
         for constant in constants:
             if isinstance(constant, BooleanConstant):
@@ -284,6 +329,59 @@ std_ulogic_vector({self._register_range_type_name});
             )
 
         vhdl += "\n"
+
+        return vhdl
+
+    def _register_field_implementations(self, register_objects):
+        vhdl = ""
+
+        for register, register_array in self._iterate_registers(register_objects):
+            for field in register.fields:
+                if isinstance(field, (Bit, BitVector)):
+                    # Skip all field types that do not have any functions that need to
+                    # be implemented.
+                    continue
+
+                name = self._field_name(
+                    register=register, register_array=register_array, field=field
+                )
+
+                if isinstance(field, Enumeration):
+                    to_slv = f"""\
+    constant data_int : natural := {name}_t'pos(data);
+    constant result : {name}_slv_t := std_ulogic_vector(
+      to_unsigned(data_int, {name}_width)
+    );
+"""
+                    from_slv = f"""\
+    constant field_slv : {name}_slv_t := data({name});
+    constant field_int : natural := to_integer(unsigned(field_slv));
+    constant result : {name}_t := {name}_t'val(field_int);
+"""
+                elif isinstance(field, Integer):
+                    to_slv = f"""\
+    constant result : {name}_slv_t := std_ulogic_vector(to_unsigned(data, {name}_width));
+"""
+                    from_slv = f"""\
+    constant result : natural := to_integer(unsigned(data({name})));
+"""
+                else:
+                    raise TypeError(f'Got unexpected field type: "{field}".')
+
+                vhdl += f"""\
+  function to_{name}_slv(data : {name}_t) return {name}_slv_t is
+{to_slv}\
+  begin
+    return result;
+  end function;
+
+  function to_{name}(data : reg_t) return {name}_t is
+{from_slv}\
+  begin
+    return result;
+  end function;
+
+"""
 
         return vhdl
 
@@ -321,7 +419,8 @@ package {pkg_name} is
 {self._array_constants(register_objects)}\
 {self._register_indexes(register_objects)}\
 {self._register_map_head()}\
-{self._register_fields(register_objects)}"""
+{self._register_field_declarations(register_objects)}\
+"""
 
         if constants:
             vhdl += self._constants(constants)
@@ -334,6 +433,7 @@ package body {pkg_name} is
 
 {self._array_index_functions(register_objects)}\
 {self._register_map_body(register_objects)}\
+{self._register_field_implementations(register_objects)}\
 end package body;
 """
 

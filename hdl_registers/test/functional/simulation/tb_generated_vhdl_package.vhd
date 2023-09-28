@@ -35,6 +35,8 @@ begin
   ------------------------------------------------------------------------------
   main : process
     constant expected_base_address : unsigned(31 downto 0) := x"8000_0000";
+
+    variable reg : reg_t := (others => '0');
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -105,8 +107,62 @@ begin
       check_equal(example_field_test_sfixed0_t'high, 2);
       check_equal(example_field_test_sfixed0_t'low, -3);
 
-      check_equal(example_constant_clock_rate_hz, 156250000.0);
+    elsif run("test_enumeration_to_slv") then
+      check_equal(
+        to_example_configuration_direction_slv(direction_data_in), std_logic_vector'("00")
+      );
+      check_equal(
+        to_example_configuration_direction_slv(direction_high_z), std_logic_vector'("01")
+      );
+      check_equal(
+        to_example_configuration_direction_slv(direction_data_out), std_logic_vector'("10")
+      );
 
+    elsif run("test_enumeration_from_slv") then
+      reg := (others => '1');
+
+      reg(example_configuration_direction) := "00";
+      assert to_example_configuration_direction(reg) = direction_data_in;
+
+      reg(example_configuration_direction) := "01";
+      assert to_example_configuration_direction(reg) = direction_high_z;
+
+      reg(example_configuration_direction) := "10";
+      assert to_example_configuration_direction(reg) = direction_data_out;
+
+    elsif run("test_enumeration_out_of_range") then
+      -- vunit: .expected_failure
+      -- Element does not exist in enum.
+      reg(example_configuration_direction) := "11";
+      assert to_example_configuration_direction(reg) = direction_data_out;
+
+    elsif run("test_integer_to_slv") then
+      check_equal(to_example_configuration_count_slv(2), std_logic_vector'("010"));
+      check_equal(to_example_configuration_count_slv(5), std_logic_vector'("101"));
+      check_equal(to_example_configuration_count_slv(7), std_logic_vector'("111"));
+
+    elsif run("test_integer_to_slv_out_of_range") then
+      -- vunit: .expected_failure
+      -- Is outside of the numeric range of the field.
+      check_equal(to_example_configuration_count_slv(1), std_logic_vector'("001"));
+
+    elsif run("test_integer_from_slv") then
+      reg := (others => '1');
+
+      reg(example_configuration_count) := "011";
+      assert to_example_configuration_count(reg) = 3;
+
+      reg(example_configuration_count) := "100";
+      assert to_example_configuration_count(reg) = 4;
+
+      reg(example_configuration_count) := "101";
+      assert to_example_configuration_count(reg) = 5;
+
+    elsif run("test_integer_from_slv_out_of_range") then
+      -- vunit: .expected_failure
+      -- Is outside of the numeric range of the field.
+      reg(example_configuration_count) := "001";
+      assert to_example_configuration_count(reg) = 1;
     end if;
 
     test_runner_cleanup(runner);

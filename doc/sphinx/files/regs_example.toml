@@ -47,6 +47,30 @@ description = "Description of my **data_tag** bit vector field."
 default_value = "0101"
 
 
+# This will allocate an enumeration field named "direction" in the "configuration" register.
+[register.configuration.enumeration.direction]
+
+# The "description" property is optional for an enumeration field.
+# Will default to "" if not specified.
+# The value specified must be a string.
+description = "Description of my **direction** enumeration field."
+# The "default_value" property is optional for an enumeration field.
+# The value specified must be a string that matches one of the enumeration element names
+# specified below.
+# Will default to the first enumeration element declared below, if not specified.
+default_value = "high_z"
+
+# For an enumeration field there must be at least one enumeration element declared.
+# The name of each element is mapped below to the description of that element.
+element.data_in = "Receive data from outside the FPGA."
+element.high_z = """
+Set pins to high impedance.
+
+Will not process any incoming data, nor send anything out.
+"""
+element.data_out = "Send data from FPGA."
+
+
 # This will allocate an integer field named "count" in the "configuration" register.
 [register.configuration.integer.count]
 

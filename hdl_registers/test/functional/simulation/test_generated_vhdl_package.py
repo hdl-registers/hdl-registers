@@ -46,24 +46,34 @@ def test_running_simulation(tmp_path):
     """
     regs_pkg_path = _generate_registers(output_path=tmp_path)
 
-    vunit_proj = VUnit.from_argv(
-        argv=["--minimal", "--num-threads", "4", "--output-path", str(tmp_path)]
-    )
-    vunit_proj.add_vhdl_builtins()
+    def run(args, exit_code):
+        argv = ["--minimal", "--num-threads", "4", "--output-path", str(tmp_path)] + args
+        vunit_proj = VUnit.from_argv(argv=argv)
+        vunit_proj.add_vhdl_builtins()
 
-    library = vunit_proj.add_library(library_name="example")
-    library.add_source_file(THIS_FOLDER / "tb_generated_vhdl_package.vhd")
-    library.add_source_file(regs_pkg_path)
+        library = vunit_proj.add_library(library_name="example")
+        library.add_source_file(THIS_FOLDER / "tb_generated_vhdl_package.vhd")
+        library.add_source_file(regs_pkg_path)
 
-    for module in get_hdl_modules():
-        vunit_library = vunit_proj.add_library(library_name=module.library_name)
-        for hdl_file in module.get_simulation_files(include_tests=False):
-            vunit_library.add_source_file(hdl_file.path)
+        for module in get_hdl_modules():
+            vunit_library = vunit_proj.add_library(library_name=module.library_name)
+            for hdl_file in module.get_simulation_files(include_tests=False):
+                vunit_library.add_source_file(hdl_file.path)
 
-    try:
-        vunit_proj.main()
-    except SystemExit as exception:
-        assert exception.code == 0
+        try:
+            vunit_proj.main()
+        except SystemExit as exception:
+            assert exception.code == exit_code
+
+    run(args=["--compile"], exit_code=0)
+    # All these tests should pass.
+    run(args=["--without-attribute", ".expected_failure"], exit_code=0)
+    # All these should fail.
+    # The only error checking here is that the return code is non-zero.
+    # That will trigger as long as at least one test case fails, but others could technically pass.
+    # A more robust method would be to parse the VUnit test report and check that each test case
+    # has failed.
+    run(args=["--with-attribute", ".expected_failure"], exit_code=1)
 
 
 def _generate_registers(output_path):

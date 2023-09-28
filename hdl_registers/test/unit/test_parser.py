@@ -47,6 +47,25 @@ bit_vector.test_bit_vector.default_value = "0"
     )
 
 
+def test_enumeration_without_elements_should_raise_exception(tmp_path):
+    toml_file = create_file(
+        tmp_path / "regs.toml",
+        """
+[register.test_reg]
+mode = "w"
+
+enumeration.test.description = ""
+""",
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(module_name="", toml_file=toml_file)
+    assert str(exception_info.value) == (
+        f'Field "test" in register "test_reg" in file {toml_file} does not have the required '
+        '"element" property.'
+    )
+
+
 def test_integer_without_max_value_should_raise_exception(tmp_path):
     toml_file = create_file(
         tmp_path / "regs.toml",
@@ -102,6 +121,15 @@ description = "Bad things happen"
 description = ""
 default_value = "1"
 
+[register.status.enumeration.direction]
+
+description = "The direction mode"
+default_value = "input"
+
+element.passthrough = ""
+element.input = ""
+element.output = "use in output mode"
+
 [register.status.bit_vector.interrupts]
 
 width = 4
@@ -144,6 +172,11 @@ default_value = 1
 description = ""
 default_value = "0"
 
+[register_array.configuration.register.input_settings.enumeration.size]
+
+element.small = ""
+element.large = ""
+
 
 # ------------------------------------------------------------------------------
 [register_array.configuration.register.output_settings]
@@ -167,7 +200,7 @@ default_value="0000000000000011"
         data = self.toml_data + toml_extras
         create_file(self.toml_file, data)
 
-    def test_order_of_registers_and_bits(self):  # pylint: disable=too-many-statements
+    def test_order_of_registers_and_fields(self):  # pylint: disable=too-many-statements
         registers = from_toml(self.module_name, self.toml_file).register_objects
 
         assert registers[0].name == "data"
@@ -181,21 +214,47 @@ default_value="0000000000000011"
         assert registers[1].mode == "r_w"
         assert registers[1].index == 1
         assert registers[1].description == "Status register"
+
+        # Bit fields
         assert registers[1].fields[0].name == "bad"
         assert registers[1].fields[0].description == "Bad things happen"
         assert registers[1].fields[0].default_value == "0"
+
         assert registers[1].fields[1].name == "not_good"
         assert registers[1].fields[1].description == ""
         assert registers[1].fields[1].default_value == "1"
+        # Bit vector fields
         assert registers[1].fields[2].name == "interrupts"
         assert registers[1].fields[2].description == "Many interrupts"
         assert registers[1].fields[2].width == 4
         assert registers[1].fields[2].default_value == "0110"
-        assert registers[1].fields[3].name == "count"
-        assert registers[1].fields[3].description == "The number of things"
-        assert registers[1].fields[3].width == 4
-        assert registers[1].fields[3].default_value == 10
-        assert registers[1].default_value == 10 * 2**6 + 6 * 2**2 + 1 * 2**1 + 0 * 2**0
+
+        # Enumeration fields
+        assert registers[1].fields[3].name == "direction"
+        assert registers[1].fields[3].description == "The direction mode"
+        assert registers[1].fields[3].width == 2
+        assert registers[1].fields[3].default_value.name == "input"
+        assert registers[1].fields[3].elements[0].name == "passthrough"
+        assert registers[1].fields[3].elements[2].name == "output"
+        assert registers[1].fields[3].elements[2].description == "use in output mode"
+
+        # Integer fields
+        assert registers[1].fields[4].name == "count"
+        assert registers[1].fields[4].description == "The number of things"
+        assert registers[1].fields[4].width == 4
+        assert registers[1].fields[4].default_value == 10
+
+        assert registers[1].default_value == (
+            # Bits
+            0 * 2**0
+            + 1 * 2**1
+            # Bit vector
+            + 6 * 2**2
+            # Enum
+            + 1 * 2**6
+            # Integer
+            + 10 * 2**8
+        )
 
         assert registers[2].name == "configuration"
         assert registers[2].length == 3
@@ -207,16 +266,23 @@ default_value="0000000000000011"
         assert registers[2].registers[0].mode == "r_w"
         assert registers[2].registers[0].index == 0
         assert registers[2].registers[0].description == "Input configuration"
-        assert registers[2].registers[0].default_value == 1 * 2**2 + 1 * 2**0
         assert registers[2].registers[0].fields[0].name == "enable"
         assert registers[2].registers[0].fields[0].description == "Enable things"
         assert registers[2].registers[0].fields[0].default_value == "1"
         assert registers[2].registers[0].fields[1].name == "disable"
         assert registers[2].registers[0].fields[1].description == ""
         assert registers[2].registers[0].fields[1].default_value == "0"
-        assert registers[2].registers[0].fields[2].name == "number"
-        assert registers[2].registers[0].fields[2].description == "Configure number"
-        assert registers[2].registers[0].fields[2].default_value == 1
+        assert registers[2].registers[0].fields[2].name == "size"
+        assert registers[2].registers[0].fields[2].default_value.name == "small"
+        assert registers[2].registers[0].fields[3].name == "number"
+        assert registers[2].registers[0].fields[3].description == "Configure number"
+        assert registers[2].registers[0].fields[3].default_value == 1
+        assert registers[2].registers[0].default_value == (
+            # First bit
+            1 * 2**0
+            # Integer
+            + 1 * 2**3
+        )
 
         assert registers[2].registers[1].name == "output_settings"
         assert registers[2].registers[1].mode == "w"

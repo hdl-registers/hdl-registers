@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 # Local folder libraries
 from .field.bit import Bit
 from .field.bit_vector import BitVector
+from .field.enumeration import Enumeration
 from .field.integer import Integer
 from .field.register_field import DEFAULT_FIELD_TYPE, FieldType
 
@@ -121,6 +122,28 @@ class Register:
         self._append_field(field=bit_vector)
 
         return bit_vector
+
+    def append_enumeration(
+        self, name: str, description: str, elements: dict[str, str], default_value: str
+    ) -> Enumeration:
+        """
+        Append an enumeration field to this register.
+
+        See :class:`.Enumeration` for documentation of the arguments.
+
+        Return:
+            The enumeration field object that was created.
+        """
+        field = Enumeration(
+            name=name,
+            base_index=self.bit_index,
+            description=description,
+            elements=elements,
+            default_value=default_value,
+        )
+        self._append_field(field=field)
+
+        return field
 
     def append_integer(
         self, name: str, description: str, min_value: int, max_value: int, default_value: int

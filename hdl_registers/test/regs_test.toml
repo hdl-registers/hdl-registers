@@ -28,6 +28,17 @@ min_value = 50
 max_value = 100
 default_value = 66
 
+[register.plain_dummy_reg.enumeration.plain_enumeration]
+
+description = "Enumeration"
+default_value = "third"
+
+element.first = "element 0"
+element.second = "element 1"
+element.third = "element 2"
+element.fourth = "element 3"
+element.fifth = "element 4"
+
 
 ################################################################################
 [register.status]
@@ -92,6 +103,14 @@ default_value = "0"
 description = "Array register bit vector"
 width = 5
 default_value = "01100"
+
+[register_array.dummy_regs.register.array_dummy_reg.enumeration.array_enumeration]
+
+description = "Array register enumeration"
+default_value = "element1"
+
+element.element0 = "element index 0"
+element.element1 = "element index 1"
 
 [register_array.dummy_regs.register.array_dummy_reg.integer.array_integer]
 

@@ -13,6 +13,7 @@ from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
+from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.register import REGISTER_MODES, Register
 
 # Local folder libraries
@@ -249,6 +250,28 @@ repeated {register_object.length} times.
 
     def _annotate_field(self, field):
         description = self._html_translator.translate(field.description)
+
+        if isinstance(field, Enumeration):
+            description += """\
+      <br />
+      <br />
+      Can be set to the following values:
+
+      <dl>
+"""
+
+            for element in field.elements:
+                description += f"""\
+        <dt style="display: list-item; margin-left:1em">
+          <em>{element.name} ({element.value})</em>:
+        </dt>
+"""
+
+                element_html = self._html_translator.translate(element.description)
+                description += f"        <dd>{element_html}</dd>\n"
+
+            description += "      </dl>\n"
+
         html = f"""
   <tr>
     <td>&nbsp;&nbsp;<em>{field.name}</em></td>
@@ -256,7 +279,9 @@ repeated {register_object.length} times.
     <td></td>
     <td></td>
     <td>{field.default_value_str}</td>
-    <td>{description}</td>
+    <td>
+      {description}
+    </td>
   </tr>"""
 
         return html

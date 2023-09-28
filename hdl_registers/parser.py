@@ -9,6 +9,7 @@
 
 # Standard libraries
 import copy
+from typing import TYPE_CHECKING
 
 # Third party libraries
 import tomli
@@ -17,6 +18,10 @@ from tsfpga.system_utils import read_file
 # Local folder libraries
 from .constant.constant import StringConstantDataType
 from .register_list import RegisterList
+
+if TYPE_CHECKING:
+    # Local folder libraries
+    from .register import Register
 
 
 def load_toml_file(toml_file):
@@ -56,12 +61,22 @@ def from_toml(module_name, toml_file, default_registers=None) -> RegisterList:
 class RegisterParser:
     recognized_constant_items = {"value", "description", "data_type"}
 
-    recognized_register_items = {"mode", "description", "bit", "bit_vector", "integer"}
+    recognized_register_items = {
+        # Attributes of the register.
+        "description",
+        "mode",
+        # Fields.
+        "bit",
+        "bit_vector",
+        "enumeration",
+        "integer",
+    }
 
     recognized_register_array_items = {"array_length", "description", "register"}
 
     recognized_bit_items = {"description", "default_value"}
     recognized_bit_vector_items = {"description", "width", "default_value"}
+    recognized_enumeration_items = {"description", "default_value", "element"}
     recognized_integer_items = {"description", "min_value", "max_value", "default_value"}
 
     def __init__(self, module_name, source_definition_file, default_registers):
@@ -191,6 +206,9 @@ class RegisterParser:
         if "bit_vector" in items:
             self._parse_bit_vectors(register=register, field_configurations=items["bit_vector"])
 
+        if "enumeration" in items:
+            self._parse_enumerations(register=register, field_configurations=items["enumeration"])
+
         if "integer" in items:
             self._parse_integers(register=register, field_configurations=items["integer"])
 
@@ -251,6 +269,11 @@ class RegisterParser:
                     register=register, field_configurations=register_items["bit_vector"]
                 )
 
+            if "enumeration" in register_items:
+                self._parse_enumerations(
+                    register=register, field_configurations=register_items["enumeration"]
+                )
+
             if "integer" in register_items:
                 self._parse_integers(
                     register=register, field_configurations=register_items["integer"]
@@ -282,7 +305,7 @@ class RegisterParser:
                 )
                 raise ValueError(message)
 
-    def _parse_bits(self, register, field_configurations):
+    def _parse_bits(self, register: "Register", field_configurations: dict):
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,
@@ -299,7 +322,7 @@ class RegisterParser:
                 name=field_name, description=description, default_value=default_value
             )
 
-    def _parse_bit_vectors(self, register, field_configurations):
+    def _parse_bit_vectors(self, register: "Register", field_configurations: dict):
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,
@@ -318,7 +341,37 @@ class RegisterParser:
                 name=field_name, description=description, width=width, default_value=default_value
             )
 
-    def _parse_integers(self, register, field_configurations):
+    def _parse_enumerations(self, register: "Register", field_configurations: dict):
+        for field_name, field_items in field_configurations.items():
+            self._check_field_items(
+                register_name=register.name,
+                field_name=field_name,
+                field_items=field_items,
+                recognized_items=self.recognized_enumeration_items,
+                # This is checked also in the Enumeration class, which is needed if the user
+                # is working directly with the Python API.
+                # That is where we usually sanity check, to avoid duplication.
+                # However, this particular check is needed here also since the logic for default
+                # value below does not work if there are no elements.
+                required_items=["element"],
+            )
+
+            description = field_items.get("description", "")
+            elements = field_items.get("element")
+
+            # The default "default value" is the first declared enumeration element.
+            # Note that this works because dictionaries in Python are guaranteed ordered since
+            # Python 3.7.
+            default_value = field_items.get("default_value", list(elements)[0])
+
+            register.append_enumeration(
+                name=field_name,
+                description=description,
+                elements=elements,
+                default_value=default_value,
+            )
+
+    def _parse_integers(self, register: "Register", field_configurations: dict):
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,

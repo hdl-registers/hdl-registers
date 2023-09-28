@@ -13,6 +13,7 @@ from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
+from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.register import REGISTER_MODES, Register
 
 # Local folder libraries
@@ -174,13 +175,30 @@ class RegisterCGenerator(RegisterCodeGenerator):
         c_code = ""
         for field in register.fields:
             c_code += self._comment(
-                f'Mask and shift for the "{field.name}" field in the {register_string}.'
+                f'Attributes for the "{field.name}" field in the {register_string}.'
             )
 
             field_name = f"{register_name}_{field.name.upper()}"
             c_code += f"#define {field_name}_SHIFT ({field.base_index}u)\n"
             c_code += f'#define {field_name}_MASK (0b{"1" * field.width}u << {field.base_index}u)\n'
             c_code += f"#define {field_name}_MASK_INVERSE (~{field_name}_MASK)\n"
+
+            if isinstance(field, Enumeration):
+                # Enums in C export their enumerators to the surrounding scope, causing huge risk of
+                # name clashes.
+                # Hence we give the enumerators long names qualified with the register name, etc.
+                name_value_pairs = [
+                    f"{field_name}_{element.name.upper()} = {element.value},"
+                    for element in field.elements
+                ]
+                separator = "\n  "
+
+                c_code += f"""\
+enum {self._to_pascal_case(field_name)}
+{{
+  {separator.join(name_value_pairs)}
+}};
+"""
 
         return c_code
 
