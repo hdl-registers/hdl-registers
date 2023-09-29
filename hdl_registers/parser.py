@@ -122,7 +122,7 @@ class RegisterParser:
         if "value" not in items:
             message = (
                 f'Constant "{name}" in {self._source_definition_file} does not have '
-                '"value" field'
+                'the required "value" property.'
             )
             raise ValueError(message)
 
@@ -191,7 +191,7 @@ class RegisterParser:
             if "mode" not in items:
                 raise ValueError(
                     f'Register "{name}" in {self._source_definition_file} does not have '
-                    '"mode" field'
+                    'the required "mode" property.'
                 )
             mode = items["mode"]
             register = self._register_list.append_register(
@@ -216,12 +216,13 @@ class RegisterParser:
         if name in self._names_taken:
             message = f'Duplicate name "{name}" in {self._source_definition_file}'
             raise ValueError(message)
-        if "array_length" not in items:
-            message = (
-                f'Register array "{name}" in {self._source_definition_file} does not have '
-                '"array_length" attribute'
-            )
-            raise ValueError(message)
+        for required_attribute in ["array_length", "register"]:
+            if required_attribute not in items:
+                message = (
+                    f'Register array "{name}" in {self._source_definition_file} does not have '
+                    f'the required "{required_attribute}" property.'
+                )
+                raise ValueError(message)
 
         for item_name in items:
             if item_name not in self.recognized_register_array_items:
@@ -242,7 +243,7 @@ class RegisterParser:
             if "mode" not in register_items:
                 message = (
                     f'Register "{register_name}" within array "{name}" in '
-                    f'{self._source_definition_file} does not have "mode" field'
+                    f'{self._source_definition_file} does not have the required "mode" property.'
                 )
                 raise ValueError(message)
 
@@ -290,7 +291,7 @@ class RegisterParser:
         for item_name in required_items:
             if item_name not in field_items:
                 message = (
-                    f'Field "{field_name}" in register "{register_name}" in file '
+                    f'Field "{field_name}" in register "{register_name}" in '
                     f"{self._source_definition_file} does not have the "
                     f'required "{item_name}" property.'
                 )

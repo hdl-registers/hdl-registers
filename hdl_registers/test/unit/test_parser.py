@@ -28,6 +28,24 @@ def test_load_nonexistent_toml_file_should_raise_exception(tmp_path):
     assert str(exception_info.value) == f"Requested TOML file does not exist: {toml_path}"
 
 
+def test_register_array_without_register_should_raise_exception(tmp_path):
+    toml_file = create_file(
+        tmp_path / "regs.toml",
+        """
+[register_array.dummy_array]
+
+array_length = 2
+""",
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(module_name="", toml_file=toml_file)
+    assert str(exception_info.value) == (
+        f'Register array "dummy_array" in {toml_file} does not have '
+        'the required "register" property.'
+    )
+
+
 def test_bit_vector_without_width_should_raise_exception(tmp_path):
     toml_file = create_file(
         tmp_path / "regs.toml",
@@ -42,7 +60,7 @@ bit_vector.test_bit_vector.default_value = "0"
     with pytest.raises(ValueError) as exception_info:
         from_toml(module_name="", toml_file=toml_file)
     assert str(exception_info.value) == (
-        f'Field "test_bit_vector" in register "test_reg" in file {toml_file} does not have '
+        f'Field "test_bit_vector" in register "test_reg" in {toml_file} does not have '
         'the required "width" property.'
     )
 
@@ -61,7 +79,7 @@ enumeration.test.description = ""
     with pytest.raises(ValueError) as exception_info:
         from_toml(module_name="", toml_file=toml_file)
     assert str(exception_info.value) == (
-        f'Field "test" in register "test_reg" in file {toml_file} does not have the required '
+        f'Field "test" in register "test_reg" in {toml_file} does not have the required '
         '"element" property.'
     )
 
@@ -80,7 +98,7 @@ integer.test_integer.min_value = 3
     with pytest.raises(ValueError) as exception_info:
         from_toml(module_name="", toml_file=toml_file)
     assert str(exception_info.value) == (
-        f'Field "test_integer" in register "test_reg" in file {toml_file} does not have '
+        f'Field "test_integer" in register "test_reg" in {toml_file} does not have '
         'the required "max_value" property.'
     )
 
@@ -342,9 +360,9 @@ mode = "r_w"
 
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Register array "apa" in {self.toml_file} does not have "array_length" attribute'
+        assert str(exception_info.value) == (
+            f'Register array "apa" in {self.toml_file} does not have '
+            'the required "array_length" property.'
         )
 
     def test_register_in_array_with_no_mode_attribute_should_raise_exception(self):
@@ -362,9 +380,9 @@ description = "nothing"
 
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Register "hest" within array "apa" in {self.toml_file} does not have "mode" field'
+        assert str(exception_info.value) == (
+            f'Register "hest" within array "apa" in {self.toml_file} does not have '
+            'the required "mode" property.'
         )
 
     def test_register_with_no_mode_field_should_raise_exception(self):
@@ -380,7 +398,7 @@ description = "w"
             from_toml(self.module_name, self.toml_file)
         assert (
             str(exception_info.value)
-            == f'Register "apa" in {self.toml_file} does not have "mode" field'
+            == f'Register "apa" in {self.toml_file} does not have the required "mode" property.'
         )
 
     def test_two_registers_with_same_name_should_raise_exception(self):
@@ -493,7 +511,7 @@ dummy = 3
 array_length = 2
 dummy = 3
 
-[register_array.test_array.hest]
+[register_array.test_array.register.hest]
 
 mode = "r"
 """
@@ -643,9 +661,9 @@ description = "the width"
         )
         with pytest.raises(ValueError) as exception_info:
             from_toml(self.module_name, self.toml_file)
-        assert (
-            str(exception_info.value)
-            == f'Constant "data_width" in {self.toml_file} does not have "value" field'
+        assert str(exception_info.value) == (
+            f'Constant "data_width" in {self.toml_file} does not have '
+            'the required "value" property.'
         )
 
     def test_unknown_constant_field_should_raise_exception(self):
