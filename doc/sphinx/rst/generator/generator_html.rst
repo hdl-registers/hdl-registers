@@ -1,3 +1,5 @@
+.. _html_generator:
+
 HTML code generator
 ===================
 

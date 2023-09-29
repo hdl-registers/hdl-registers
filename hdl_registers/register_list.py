@@ -56,14 +56,14 @@ class RegisterList:
     Used to handle the registers of a module. Also known as a register map.
     """
 
-    def __init__(self, name, source_definition_file):
+    def __init__(self, name: str, source_definition_file: Path = None):
         """
         Arguments:
-            name (str): The name of this register list. Typically the name of the module that uses
-                it.
-            source_definition_file (pathlib.Path): The TOML source file that defined this
-                register list. Will be displayed in generated source code and documentation
+            name: The name of this register list. Typically the name of the module that uses it.
+            source_definition_file: The TOML source file that defined this register list.
+                Will be displayed in generated source code and documentation
                 for traceability.
+                Can be left out when working directly with the Python API.
         """
         self.name = name
         self.source_definition_file = source_definition_file

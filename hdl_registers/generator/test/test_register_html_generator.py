@@ -109,7 +109,6 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             name="plain_integer",
             index="15:9",
             default_value="66",
-            description="Integer",
             html=html,
         )
 

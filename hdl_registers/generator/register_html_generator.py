@@ -14,6 +14,7 @@ from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.enumeration import Enumeration
+from hdl_registers.field.integer import Integer
 from hdl_registers.register import REGISTER_MODES, Register
 
 # Local folder libraries
@@ -271,6 +272,13 @@ repeated {register_object.length} times.
                 description += f"        <dd>{element_html}</dd>\n"
 
             description += "      </dl>\n"
+
+        if isinstance(field, Integer):
+            description += f"""\
+      <br />
+      <br />
+      Valid numeric range: [{field.min_value} &ndash; {field.max_value}].
+"""
 
         html = f"""
   <tr>

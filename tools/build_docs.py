@@ -24,7 +24,7 @@ import tools.tools_pythonpath  # noqa: F401
 
 # Third party libraries
 from pybadges import badge
-from tsfpga.system_utils import create_directory, create_file, delete, read_file
+from tsfpga.system_utils import create_directory, create_file, delete, load_python_module, read_file
 from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 # First party libraries
@@ -122,6 +122,11 @@ def generate_register_code():
     register_list.create_cpp_implementation(output_path=output_path / "cpp")
 
     register_list.create_python_class(output_path=output_path / "py")
+
+    for py_file in (SPHINX_DOC / "rst" / "field" / "py").glob("generate_*.py"):
+        load_python_module(py_file).main(
+            output_path=GENERATED_SPHINX / "register_code" / "field" / py_file.stem
+        )
 
 
 def generate_bibtex():

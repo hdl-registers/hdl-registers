@@ -1,3 +1,5 @@
+.. _vhdl_generator:
+
 VHDL code generator
 ===================
 

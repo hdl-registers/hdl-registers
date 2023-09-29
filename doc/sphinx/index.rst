@@ -16,6 +16,15 @@
     rst/user_guide/toml_format
 
 .. toctree::
+    :caption: Register fields
+    :hidden:
+
+    rst/field/field_bit
+    rst/field/field_bit_vector
+    rst/field/field_enumeration
+    rst/field/field_integer
+
+.. toctree::
     :caption: Code generators
     :hidden:
 
