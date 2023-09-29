@@ -418,19 +418,6 @@ mode = "w"
         )
         assert str(exception_info.value).startswith(expected)
 
-    def test_register_with_same_name_as_register_array_should_raise_exception(self):
-        self.create_toml_file_with_extras(
-            """
-[register.configuration]
-
-mode = "w"
-"""
-        )
-
-        with pytest.raises(ValueError) as exception_info:
-            from_toml(self.module_name, self.toml_file)
-        assert str(exception_info.value) == f'Duplicate name "configuration" in {self.toml_file}'
-
     def test_two_bits_with_same_name_should_raise_exception(self):
         self.create_toml_file_with_extras(
             """

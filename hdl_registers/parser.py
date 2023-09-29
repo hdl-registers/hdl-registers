@@ -92,8 +92,6 @@ class RegisterParser:
             for register in default_registers:
                 self._default_register_names.append(register.name)
 
-        self._names_taken = set()
-
     def parse(self, register_data):
         """
         Parse the TOML data.
@@ -198,8 +196,6 @@ class RegisterParser:
                 name=name, mode=mode, description=description
             )
 
-        self._names_taken.add(name)
-
         if "bit" in items:
             self._parse_bits(register=register, field_configurations=items["bit"])
 
@@ -213,9 +209,6 @@ class RegisterParser:
             self._parse_integers(register=register, field_configurations=items["integer"])
 
     def _parse_register_array(self, name, items):
-        if name in self._names_taken:
-            message = f'Duplicate name "{name}" in {self._source_definition_file}'
-            raise ValueError(message)
         for required_attribute in ["array_length", "register"]:
             if required_attribute not in items:
                 message = (
