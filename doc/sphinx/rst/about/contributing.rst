@@ -107,11 +107,11 @@ local tags.
 
 Pushing a tag will create a special CI run in gitlab:
 
-.. image:: files/ci_deploy_pipelines.png
+.. image:: images/ci_deploy_pipelines.png
 
 The pipeline for the tag will run an additional job ``deploy_pypi``:
 
-.. image:: files/ci_deploy_jobs.png
+.. image:: images/ci_deploy_jobs.png
 
 From the release branch that was just pushed you must create a merge request to ``main``.
 Wait until the tag pipeline (which pushes to PyPI) is finished before proceeding to merge

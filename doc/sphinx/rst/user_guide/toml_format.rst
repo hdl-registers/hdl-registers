@@ -16,7 +16,7 @@ Format
 Below is a compilation of all the TOML properties that are available.
 Comments describe what attributes are optional and which are required.
 
-.. literalinclude:: files/regs_example.toml
+.. literalinclude:: ../../files/regs_example.toml
    :caption: Register TOML format rules.
    :language: toml
    :linenos:

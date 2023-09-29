@@ -12,7 +12,7 @@ Running the :meth:`.RegisterList.create_python_class` method will create a binar
 represents the object precisely, as well as a convenient Python file to re-create the pickle,
 shown below:
 
-.. literalinclude:: ../../generated/sphinx_rst/register_code/py/example.py
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/py/example.py
    :caption: Example Python class
    :language: Python
 

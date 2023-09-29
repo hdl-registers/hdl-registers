@@ -3,9 +3,9 @@ C code generator
 
 A C header can be generated with a call to :meth:`.RegisterList.create_c_header`.
 It contains all information about registers, fields and constants.
-Below is the resulting code from the :doc:`TOML format example <toml_format>`:
+Below is the resulting code from the :ref:`TOML format example <toml_format>`:
 
-.. literalinclude:: ../../generated/sphinx_rst/register_code/c/example_regs.h
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/c/example_regs.h
    :caption: example_regs.h
    :language: C
    :linenos:

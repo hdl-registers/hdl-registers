@@ -4,32 +4,32 @@
     :caption: About
     :hidden:
 
-    license_information
-    contributing
-    release_notes
+    rst/about/license_information
+    rst/about/contributing
+    rst/about/release_notes
 
 .. toctree::
     :caption: User guide
     :hidden:
 
-    getting_started
-    toml_format
+    rst/user_guide/getting_started
+    rst/user_guide/toml_format
 
 .. toctree::
     :caption: Code generators
     :hidden:
 
-    c_generator
-    cpp_generator
-    html_generator
-    vhdl_generator
-    python_generator
+    rst/generator/generator_c
+    rst/generator/generator_cpp
+    rst/generator/generator_html
+    rst/generator/generator_vhdl
+    rst/generator/generator_python
 
 .. toctree::
     :caption: API reference
     :hidden:
 
-    api_reference/hdl_registers
-    api_reference/hdl_registers.constant
-    api_reference/hdl_registers.field
-    api_reference/hdl_registers.generator
+    rst/api_reference/hdl_registers
+    rst/api_reference/hdl_registers.field
+    rst/api_reference/hdl_registers.constant
+    rst/api_reference/hdl_registers.generator

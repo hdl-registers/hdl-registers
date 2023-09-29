@@ -47,7 +47,7 @@ A minimal usage example:
 
 The basis of all register operations is the :class:`.RegisterList` class.
 An object of this type is returned when calling :func:`.from_toml` on a TOML file with the
-:doc:`correct format <toml_format>`.
+:ref:`correct format <toml_format>`.
 The :class:`.RegisterList` object makes up the register map, i.e. the registers of one module.
 If you have more than one module with registers in your project then these are represented with a
 :class:`.RegisterList` object each.

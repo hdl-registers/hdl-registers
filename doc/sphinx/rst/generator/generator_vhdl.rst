@@ -24,9 +24,9 @@ https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/src/reg_
 Example
 -------
 
-Below is the resulting code from the :doc:`TOML format example <toml_format>`.
+Below is the resulting code from the :ref:`TOML format example <toml_format>`.
 
-.. literalinclude:: ../../generated/sphinx_rst/register_code/vhdl/example_regs_pkg.vhd
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/vhdl/example_regs_pkg.vhd
    :caption: example_regs_pkg.vhd
    :language: vhdl
    :linenos:

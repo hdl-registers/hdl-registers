@@ -12,8 +12,8 @@ This is done with a call to :meth:`.RegisterList.create_html_page`.
    A paragraph break can be inserted with consecutive newlines.
 
 
-A HTML page generated from the :doc:`TOML format example <toml_format>` can be viewed here:
-:download:`example_regs.html <../../generated/sphinx_rst/register_code/html/example_regs.html>`
+A HTML page generated from the :ref:`TOML format example <toml_format>` can be viewed here:
+:download:`example_regs.html <../../../../generated/sphinx_rst/register_code/html/example_regs.html>`
 
 
 
@@ -26,7 +26,7 @@ and :meth:`.RegisterList.create_html_constant_table`.
 These can be included in a separate documentation flow.
 
 Generated HTML file here:
-:download:`example_register_table.html <../../generated/sphinx_rst/register_code/html/example_register_table.html>`
+:download:`example_register_table.html <../../../../generated/sphinx_rst/register_code/html/example_register_table.html>`
 
 Generated HTML file here:
-:download:`example_constant_table.html <../../generated/sphinx_rst/register_code/html/example_constant_table.html>`
+:download:`example_constant_table.html <../../../../generated/sphinx_rst/register_code/html/example_constant_table.html>`

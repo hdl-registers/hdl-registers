@@ -6,7 +6,7 @@ This is a very permissive license, which means that ``hdl_registers`` components
 in commercial products.
 See the license text below for details:
 
-.. literalinclude:: ../../license.txt
+.. literalinclude:: ../../../../license.txt
    :language: REST
 
 
@@ -16,4 +16,4 @@ Citation
 
 If you want to cite this open-source software project, the following BibTeX can be used.
 
-.. include:: ../../generated/sphinx_rst/bibtex.rst
+.. include:: ../../../../generated/sphinx_rst/bibtex.rst

@@ -14,10 +14,10 @@ Interface header
 ----------------
 
 Below is the resulting interface header code, generated from the
-:doc:`TOML format example <toml_format>`.
+:ref:`TOML format example <toml_format>`.
 Note that the register constants are also included here.
 
-.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/i_example.h
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/cpp/i_example.h
    :caption: Example interface header
    :language: C++
    :linenos:
@@ -28,7 +28,7 @@ Class header
 
 Below is the generated class header:
 
-.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.h
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/cpp/example.h
    :caption: Example class header
    :language: C++
    :linenos:
@@ -39,7 +39,7 @@ Implementation
 
 Below is the generated class implementation:
 
-.. literalinclude:: ../../generated/sphinx_rst/register_code/cpp/example.cpp
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/cpp/example.cpp
    :caption: Example class implementation
    :language: C++
    :linenos:
