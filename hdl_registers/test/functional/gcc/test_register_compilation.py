@@ -70,8 +70,8 @@ void test_constants()
             main_function += """\
   assert(TEST_NUM_REGS == 12);
   test_addresses();
-  test_field_indexes();
   test_generated_type();
+  test_field_indexes();
 """
 
             functions += """
@@ -97,6 +97,28 @@ void test_addresses()
   assert(TEST_FURTHER_REGS_DUMMY_REG_ADDR(0) == 44);
   // Last register
   assert(TEST_FURTHER_REGS_DUMMY_REG_ADDR(0) == 4 * (TEST_NUM_REGS - 1));
+}
+
+void test_generated_type()
+{
+  // Assert positions within the generated type
+  test_regs_t regs;
+  assert(sizeof(regs) == 4 * TEST_NUM_REGS);
+
+  assert((void *)&regs == (void *)&regs.plain_dummy_reg);
+  assert((void *)&regs + 20 == (void *)&regs.dummy_regs[0].array_dummy_reg);
+  assert((void *)&regs + 24 == (void *)&regs.dummy_regs[0].second_array_dummy_reg);
+  assert((void *)&regs + 28 == (void *)&regs.dummy_regs[1].array_dummy_reg);
+  assert((void *)&regs + 32 == (void *)&regs.dummy_regs[1].second_array_dummy_reg);
+  assert((void *)&regs + 36 == (void *)&regs.dummy_regs[2].array_dummy_reg);
+  assert((void *)&regs + 40 == (void *)&regs.dummy_regs[2].second_array_dummy_reg);
+  assert((void *)&regs + 44 == (void *)&regs.further_regs[0].dummy_reg);
+
+  // Some dummy code that uses the generated type
+  regs.plain_dummy_reg = 0;
+  regs.dummy_regs[0].array_dummy_reg = TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ARRAY_BIT_VECTOR_MASK;
+  regs.dummy_regs[2].second_array_dummy_reg =
+    (1 << TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ARRAY_BIT_B_SHIFT);
 }
 
 void test_field_indexes()
@@ -133,28 +155,6 @@ void test_field_indexes()
     TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ARRAY_BIT_VECTOR_MASK_INVERSE
     == 0b11111111111111111111111110000011
   );
-}
-
-void test_generated_type()
-{
-  // Assert positions within the generated type
-  test_regs_t regs;
-  assert(sizeof(regs) == 4 * TEST_NUM_REGS);
-
-  assert((void *)&regs == (void *)&regs.plain_dummy_reg);
-  assert((void *)&regs + 20 == (void *)&regs.dummy_regs[0].array_dummy_reg);
-  assert((void *)&regs + 24 == (void *)&regs.dummy_regs[0].second_array_dummy_reg);
-  assert((void *)&regs + 28 == (void *)&regs.dummy_regs[1].array_dummy_reg);
-  assert((void *)&regs + 32 == (void *)&regs.dummy_regs[1].second_array_dummy_reg);
-  assert((void *)&regs + 36 == (void *)&regs.dummy_regs[2].array_dummy_reg);
-  assert((void *)&regs + 40 == (void *)&regs.dummy_regs[2].second_array_dummy_reg);
-  assert((void *)&regs + 44 == (void *)&regs.further_regs[0].dummy_reg);
-
-  // Some dummy code that uses the generated type
-  regs.plain_dummy_reg = 0;
-  regs.dummy_regs[0].array_dummy_reg = TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ARRAY_BIT_VECTOR_MASK;
-  regs.dummy_regs[2].second_array_dummy_reg =
-    (1 << TEST_DUMMY_REGS_ARRAY_DUMMY_REG_ARRAY_BIT_B_SHIFT);
 }
 """
 
