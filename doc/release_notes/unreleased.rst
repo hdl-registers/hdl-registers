@@ -11,13 +11,14 @@ Breaking changes
   :class:`.RegisterCppGenerator`, :class:`.RegisterHtmlGenerator`, :class:`.RegisterPythonGenerator`
   and :class:`.RegisterVhdlGenerator` classes from top-level to ``generator`` sub-package.
 
-* Remove the largely unused "Value (hexadecimal)" constant information column from HTML generator.
-
 * Rename ``RegisterField.range`` to :meth:`.RegisterField.range_str`.
 
-* Remove public function ``vhdl_typedef`` from :class:`.FieldType` class, which is available as the
-  :meth:`.BitVector.field_type` member.
+* Remove public method ``vhdl_typedef`` from :class:`.FieldType` class.
   This logic is instead moved to :class:`.RegisterVhdlGenerator`.
+
+* Remove the largely unused "Value (hexadecimal)" constant information column from HTML generator.
+
+* Remove textual descriptions of registers/arrays/fields/constants from generated C header.
 
 Added
 

@@ -94,7 +94,6 @@ class RegisterCGenerator(RegisterCodeGenerator):
         register_struct += "{\n"
         for register_object in register_objects:
             if isinstance(register_object, Register):
-                register_struct += self._comment_block(register_object.description, indent=2)
                 register_struct += self._comment(
                     f'Mode "{REGISTER_MODES[register_object.mode].mode_readable}".', indent=2
                 )
@@ -109,7 +108,6 @@ class RegisterCGenerator(RegisterCodeGenerator):
                 array_structs += f"typedef struct {array_struct_type}\n"
                 array_structs += "{\n"
                 for register in register_object.registers:
-                    array_structs += self._comment_block(register.description, indent=2)
                     array_structs += self._comment(
                         f'Mode "{REGISTER_MODES[register.mode].mode_readable}".', indent=2
                     )
@@ -144,27 +142,26 @@ class RegisterCGenerator(RegisterCodeGenerator):
 
     def _addr_define(self, register, register_array):
         name = self._register_define_name(register, register_array)
-        mode_string = f'Mode "{REGISTER_MODES[register.mode].mode_readable}".'
 
-        if register_array is None:
-            c_code = self._comment(f'Address of the "{register.name}" register. {mode_string}')
-            c_code += self._comment_block(register.description)
-
-            c_code += f"#define {name}_INDEX ({register.index}u)\n"
-            c_code += f"#define {name}_ADDR (4u * {name}_INDEX)\n"
-        else:
-            title = (
-                f'Address of the "{register.name}" register within the "{register_array.name}"'
-                f" register array (array_index < {register_array.length}). {mode_string}"
+        comment = f'Address of the "{register.name}" register'
+        if register_array:
+            comment += (
+                f' within the "{register_array.name}" register array '
+                f"(array_index < {register_array.length})"
             )
-            c_code = self._comment(title)
-            c_code += self._comment_block(register.description)
+        comment += f'.\nMode "{REGISTER_MODES[register.mode].mode_readable}".'
 
+        c_code = self._comment_block(comment)
+
+        if register_array:
             c_code += (
                 f"#define {name}_INDEX(array_index) ({register_array.base_index}u + "
                 f"(array_index) * {len(register_array.registers)}u + {register.index}u)\n"
             )
             c_code += f"#define {name}_ADDR(array_index) (4u * {name}_INDEX(array_index))\n"
+        else:
+            c_code += f"#define {name}_INDEX ({register.index}u)\n"
+            c_code += f"#define {name}_ADDR (4u * {name}_INDEX)\n"
 
         return c_code
 
@@ -179,7 +176,6 @@ class RegisterCGenerator(RegisterCodeGenerator):
             c_code += self._comment(
                 f'Mask and shift for the "{field.name}" field in the {register_string}.'
             )
-            c_code += self._comment_block(field.description)
 
             field_name = f"{register_name}_{field.name.upper()}"
             c_code += f"#define {field_name}_SHIFT ({field.base_index}u)\n"
@@ -222,8 +218,7 @@ class RegisterCGenerator(RegisterCodeGenerator):
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
-            c_code += self._comment(f'Register constant "{constant.name}".')
-            c_code += self._comment_block(constant.description)
+            c_code += self._comment(f'Value of register constant "{constant.name}".')
 
             if declaration:
                 c_code += f"{declaration}\n"
