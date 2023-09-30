@@ -27,13 +27,13 @@ copyright = "Lukas Vik"
 author = "Lukas Vik"
 
 extensions = [
+    "sphinx_rtd_theme",
+    "sphinx_sitemap",
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
     "sphinx.ext.graphviz",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
-    "sphinx_rtd_theme",
-    "sphinx_sitemap",
 ]
 
 intersphinx_mapping = {

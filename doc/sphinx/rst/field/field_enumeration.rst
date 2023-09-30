@@ -57,7 +57,7 @@ HTML page
 _________
 
 See HTML file below for the human-readable documentation that is produced by the
-``generate`` call in the Python example above.
+``generate()`` call in the Python example above.
 Each enumeration field is documented and the description of each element is included.
 
 See :ref:`html_generator` for more details about the HTML generator and its capabilities.
@@ -68,7 +68,7 @@ See :ref:`html_generator` for more details about the HTML generator and its capa
 VHDL package
 ____________
 
-The VHDL code below is produced by the ``generate`` call in the Python example above.
+The VHDL code below is produced by the ``generate()`` call in the Python example above.
 See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
 
 Some interesting things to notice:
@@ -94,10 +94,10 @@ Some interesting things to notice:
 C++ interface
 _____________
 
-The C++ interface header code below is produced by the ``generate`` call in the Python
+The C++ interface header code below is produced by the ``generate()`` call in the Python
 example above.
 
-The class header and implementation are skipped here, since their inclusion would make the page
+The class header and implementation are skipped here, since their inclusion would make this page
 very long.
 See :ref:`cpp_generator` for more details and an example of how the excluded files might look.
 
@@ -105,7 +105,7 @@ Some interesting things to notice in the interface header:
 
 1. The valid enumeration values are defined using a C++ ``enum`` declaration in the namespace of
    each field.
-2. The setters and getters for the field values use the enumeration type as argument or return
+2. The setters and getters for each field value uses the enumeration type as argument or return
    value.
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/i_caesar.h
@@ -117,7 +117,7 @@ Some interesting things to notice in the interface header:
 C header
 ________
 
-The C code below is produced by the ``generate`` call in the Python example above.
+The C code below is produced by the ``generate()`` call in the Python example above.
 Note how the valid enumeration values are defined using a C ``enum`` declaration.
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/caesar_regs.h

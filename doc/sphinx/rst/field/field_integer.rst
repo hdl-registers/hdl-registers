@@ -56,7 +56,7 @@ HTML page
 _________
 
 See HTML file below for the human-readable documentation that is produced by the
-``generate`` call in the Python example above.
+``generate()`` call in the Python example above.
 Each integer field is documented with its valid range.
 
 See :ref:`html_generator` for more details about the HTML generator and its capabilities.
@@ -67,7 +67,7 @@ See :ref:`html_generator` for more details about the HTML generator and its capa
 VHDL package
 ____________
 
-The VHDL code below is produced by the ``generate`` call in the Python example above.
+The VHDL code below is produced by the ``generate()`` call in the Python example above.
 See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
 
 Some interesting things to notice:
@@ -76,7 +76,7 @@ Some interesting things to notice:
 2. The first field is nine bits wide, occupying bits 8 down to 0, while the second one is three
    bits wide, occupying but 11 down to 9.
 3. VHDL supports integer types natively.
-   For each field there is a sub-type that is properly ranged.
+   For each field there is a sub-type that is properly ranged ``integer``.
 4. For each integer field, there are conversion functions for
 
    a. Converting from the integer type to ``std_logic_vector``.
@@ -89,18 +89,37 @@ Some interesting things to notice:
    :linenos:
 
 
-C++ interface
-_____________
+C++
+___
 
-The C++ interface header code below is produced by the ``generate`` call in the Python
-example above.
+The C++ interface header and implementation code below is produced by the ``generate()`` call in
+the Python example above.
 
-The class header and implementation are skipped here, since their inclusion would make the page
-very long.
-See :ref:`cpp_generator` for more details and an example of how the excluded files might look.
+The class header is skipped here, since its inclusion would make this page very long.
+See :ref:`cpp_generator` for more details and an example of how the excluded file might look.
+
+
+C++ interface header
+~~~~~~~~~~~~~~~~~~~~
+
+Note that the setters and getters for each field value uses an integer type as argument or
+return value.
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/i_caesar.h
-   :caption: Generated C++ interface class code.
+   :caption: Generated C++ class interface code.
+   :language: C++
+   :linenos:
+
+
+C++ implementation
+~~~~~~~~~~~~~~~~~~
+
+Note that each setter performs assertions that the supplied argument is withing the legal range of
+the field.
+This will catch calculation errors during testing and at run-time.
+
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar.cpp
+   :caption: Generated C++ class implementation code.
    :language: C++
    :linenos:
 
@@ -108,7 +127,7 @@ See :ref:`cpp_generator` for more details and an example of how the excluded fil
 C header
 ________
 
-The C code below is produced by the ``generate`` call in the Python example above.
+The C code below is produced by the ``generate()`` call in the Python example above.
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs.h
    :caption: Generated C code.
