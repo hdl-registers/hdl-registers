@@ -68,6 +68,7 @@ VHDL package
 ____________
 
 The VHDL code below is produced by the ``generate()`` call in the Python example above.
+Click the button to expand and view the code.
 See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
 
 Some interesting things to notice:
@@ -76,17 +77,22 @@ Some interesting things to notice:
 2. The first field is nine bits wide, occupying bits 8 down to 0, while the second one is three
    bits wide, occupying but 11 down to 9.
 3. VHDL supports integer types natively.
-   For each field there is a sub-type that is properly ranged ``integer``.
+   For each field there is a sub-type that is a properly ranged ``integer``.
 4. For each integer field, there are conversion functions for
 
    a. Converting from the integer type to ``std_logic_vector``.
    b. Slicing a register value at the correct range and converting from ``std_logic_vector``
       to integer.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs_pkg.vhd
-   :caption: Generated VHDL code.
-   :language: VHDL
-   :linenos:
+
+.. collapse:: Click to expand/collapse code.
+
+ .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs_pkg.vhd
+    :caption: Generated VHDL code.
+    :language: VHDL
+    :linenos:
+
+|
 
 
 C++
@@ -94,6 +100,7 @@ ___
 
 The C++ interface header and implementation code below is produced by the ``generate()`` call in
 the Python example above.
+Click the button to expand and view each code block.
 
 The class header is skipped here, since its inclusion would make this page very long.
 See :ref:`cpp_generator` for more details and an example of how the excluded file might look.
@@ -102,13 +109,17 @@ See :ref:`cpp_generator` for more details and an example of how the excluded fil
 C++ interface header
 ~~~~~~~~~~~~~~~~~~~~
 
-Note that the setters and getters for each field value uses an integer type as argument or
+Note that the setters and getters for each field value use an integer type as argument or
 return value.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/i_caesar.h
-   :caption: Generated C++ class interface code.
-   :language: C++
-   :linenos:
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/i_caesar.h
+     :caption: Generated C++ class interface code.
+     :language: C++
+     :linenos:
+
+|
 
 
 C++ implementation
@@ -118,10 +129,14 @@ Note that each setter performs assertions that the supplied argument is withing 
 the field.
 This will catch calculation errors during testing and at run-time.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar.cpp
-   :caption: Generated C++ class implementation code.
-   :language: C++
-   :linenos:
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar.cpp
+     :caption: Generated C++ class implementation code.
+     :language: C++
+     :linenos:
+
+|
 
 
 C header
@@ -129,7 +144,11 @@ ________
 
 The C code below is produced by the ``generate()`` call in the Python example above.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs.h
-   :caption: Generated C code.
-   :language: C
-   :linenos:
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs.h
+     :caption: Generated C code.
+     :language: C
+     :linenos:
+
+|

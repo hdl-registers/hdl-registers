@@ -69,6 +69,7 @@ VHDL package
 ____________
 
 The VHDL code below is produced by the ``generate()`` call in the Python example above.
+Click the button to expand and view the code.
 See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
 
 Some interesting things to notice:
@@ -85,10 +86,14 @@ Some interesting things to notice:
    b. Slicing a register value at the correct range and converting from ``std_logic_vector``
       to enumeration.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/caesar_regs_pkg.vhd
-   :caption: Generated VHDL code.
-   :language: VHDL
-   :linenos:
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/caesar_regs_pkg.vhd
+     :caption: Generated VHDL code.
+     :language: VHDL
+     :linenos:
+
+|
 
 
 C++ interface
@@ -96,6 +101,7 @@ _____________
 
 The C++ interface header code below is produced by the ``generate()`` call in the Python
 example above.
+Click the button to expand and view the code.
 
 The class header and implementation are skipped here, since their inclusion would make this page
 very long.
@@ -108,10 +114,15 @@ Some interesting things to notice in the interface header:
 2. The setters and getters for each field value uses the enumeration type as argument or return
    value.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/i_caesar.h
-   :caption: Generated C++ interface class code.
-   :language: C++
-   :linenos:
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/i_caesar.h
+     :caption: Generated C++ interface class code.
+     :language: C++
+     :linenos:
+
+|
 
 
 C header
@@ -120,7 +131,11 @@ ________
 The C code below is produced by the ``generate()`` call in the Python example above.
 Note how the valid enumeration values are defined using a C ``enum`` declaration.
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/caesar_regs.h
-   :caption: Generated C code.
-   :language: C
-   :linenos:
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/caesar_regs.h
+     :caption: Generated C code.
+     :language: C
+     :linenos:
+
+|
