@@ -224,8 +224,11 @@ enum {self._to_pascal_case(field_name)}
                 # No suffix -> "int", i.e. signed integer of at least 32 bits.
                 value = str(constant.value)
             elif isinstance(constant, FloatConstant):
-                # "f" suffix -> "float" (as opposed to "double", to match the VHDL type).
-                value = f"{constant.value}f"
+                # No suffix -> "double" (https://stackoverflow.com/questions/13276862).
+                # Matches the VHDL type which is at least 64 bits (IEEE 1076-2008, 5.2.5.1).
+                # Note that casting a Python float to string guarantees full precision in the
+                # resulting string: https://stackoverflow.com/a/60026172
+                value = str(constant.value)
             elif isinstance(constant, StringConstant):
                 # C string literal: Raw value enclosed in double quotation marks.
                 declaration = f'char *{constant_name} = "{constant.value}";'

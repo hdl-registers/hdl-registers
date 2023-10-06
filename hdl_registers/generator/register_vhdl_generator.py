@@ -309,10 +309,13 @@ std_ulogic_vector({self._register_range_type_name});
                 value = str(constant.value).lower()
             elif isinstance(constant, IntegerConstant):
                 type_declaration = "integer"
-                value = constant.value
+                value = str(constant.value)
             elif isinstance(constant, FloatConstant):
+                # At least 64 bits (IEEE 1076-2008, 5.2.5.1).
                 type_declaration = "real"
-                value = constant.value
+                # Note that casting a Python float to string guarantees full precision in the
+                # resulting string: https://stackoverflow.com/a/60026172
+                value = str(constant.value)
             elif isinstance(constant, StringConstant):
                 type_declaration = "string"
                 value = f'"{constant.value}"'

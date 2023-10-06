@@ -421,10 +421,13 @@ class InterfaceGenerator(CommonGenerator):
                 type_declaration = " int"
                 value = str(constant.value)
             elif isinstance(constant, FloatConstant):
-                # Expand "const" to "constexpr", which is needed for static floats. See
+                # Expand "const" to "constexpr", which is needed for static floats:
                 # https://stackoverflow.com/questions/9141950/
-                # initializing-const-member-within-class-declaration-in-c
-                type_declaration = "expr float"
+                # Use "double", to match the VHDL type which is at least 64 bits
+                # (IEEE 1076-2008, 5.2.5.1).
+                type_declaration = "expr double"
+                # Note that casting a Python float to string guarantees full precision in the
+                # resulting string: https://stackoverflow.com/a/60026172
                 value = str(constant.value)
             elif isinstance(constant, StringConstant):
                 # Expand "const" to "constexpr", which is needed for static string literals.

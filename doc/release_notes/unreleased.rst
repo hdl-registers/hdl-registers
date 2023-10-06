@@ -1,3 +1,8 @@
+Fixes
+
+* Use ``double`` data type for generated C/C++ header floating-point constants.
+  Matches the precision in the generated VHDL code.
+
 Breaking changes
 
 * Break up ``hdl_registers.Constant`` class into :class:`.BooleanConstant`,

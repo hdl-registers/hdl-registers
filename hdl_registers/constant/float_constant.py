@@ -12,6 +12,17 @@ from .constant import Constant
 
 
 class FloatConstant(Constant):
+    """
+    Represent a floating-point constant.
+
+    .. note::
+
+      The ``value`` is stored with its native representation, which is a Python ``float``
+      if a decimal value is provided.
+      The Python ``float`` type is a double-precision value, so the precision in Python matches
+      the precision in C/C++/VHDL generators.
+    """
+
     def __init__(self, name: str, value: float, description: str = None):
         """
         Arguments:
