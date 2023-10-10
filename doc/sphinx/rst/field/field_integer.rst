@@ -36,14 +36,17 @@ The Python code below shows
 3. How to generate register artifacts.
 
 Note that the result of the ``create_from_api`` call is identical to that of the
-``parser_toml`` call.
-Meaning that using a TOML file or using the Python API is equivalent.
+``parse_toml`` call.
+Meaning that using a TOML file or using the Python API is completely equivalent.
+You choose yourself which method you want to use in your code base.
 
 .. literalinclude:: py/generate_integer.py
    :caption: Python code that sets up a register with integer fields.
    :language: Python
    :linenos:
    :lines: 10-
+
+See :meth:`.Register.append_integer` for more Python API details.
 
 
 Generated code
@@ -143,6 +146,7 @@ C header
 ________
 
 The C code below is produced by the ``generate()`` call in the Python example above.
+The range and mask of the each field are available as constants.
 
 .. collapse:: Click to expand/collapse code.
 

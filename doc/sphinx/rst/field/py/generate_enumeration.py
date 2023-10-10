@@ -29,7 +29,7 @@ def parse_toml() -> RegisterList:
 
 def create_from_api() -> RegisterList:
     """
-    Create the register list by using the Python API.
+    Alternative method: Create the register list by using the Python API.
     """
     register_list = RegisterList(name="caesar")
 
@@ -71,12 +71,12 @@ def generate(register_list: RegisterList, output_path: Path):
     register_list.create_cpp_interface(output_path)
     register_list.create_cpp_implementation(output_path)
 
-    register_list.create_vhdl_package(output_path)
-
     register_list.create_html_page(output_path)
 
+    register_list.create_vhdl_package(output_path)
 
-def main(output_path):
+
+def main(output_path: Path):
     generate(register_list=parse_toml(), output_path=output_path / "toml")
     generate(register_list=create_from_api(), output_path=output_path / "api")
 

@@ -19,6 +19,7 @@
     :caption: Register fields
     :hidden:
 
+    rst/field/field_overview
     rst/field/field_bit
     rst/field/field_bit_vector
     rst/field/field_enumeration

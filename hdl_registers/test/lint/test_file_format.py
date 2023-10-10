@@ -78,12 +78,14 @@ def test_no_checked_in_files_contain_trailing_whitespace():
 def test_no_checked_in_files_have_too_long_lines():
     test_ok = True
     excludes = [
-        # YAML format seems hard to break lines in
+        # YAML format seems hard to break lines in.
         REPO_ROOT / ".gitlab-ci.yml",
-        # We list the license text exactly as the original, with no line breaks
+        # We list the license text exactly as the original, with no line breaks.
         REPO_ROOT / "license.txt",
-        # Impossible to break RST syntax
+        # Impossible to break RST syntax.
         REPO_ROOT / "readme.rst",
+        HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_bit_vector.rst",
+        HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_bit.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_enumeration.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_integer.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "generator_html.rst",

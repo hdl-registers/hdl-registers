@@ -1,3 +1,5 @@
+.. _field_enumeration:
+
 Enumeration fields
 ==================
 
@@ -9,6 +11,8 @@ See Wikipedia if you are unfamiliar with this: https://en.wikipedia.org/wiki/Enu
 This page will show you how the set up enumeration fields in a register, and will showcase
 all the code that can be generated from it.
 
+
+.. _field_enumeration_toml:
 
 Usage in TOML
 -------------
@@ -37,14 +41,17 @@ The Python code below shows
 3. How to generate register artifacts.
 
 Note that the result of the ``create_from_api`` call is identical to that of the
-``parser_toml`` call.
-Meaning that using a TOML file or using the Python API is equivalent.
+``parse_toml`` call.
+Meaning that using a TOML file or using the Python API is completely equivalent.
+You choose yourself which method you want to use in your code base.
 
 .. literalinclude:: py/generate_enumeration.py
    :caption: Python code that sets up a register with enumeration fields.
    :language: Python
    :linenos:
    :lines: 10-
+
+See :meth:`.Register.append_enumeration` for more Python API details.
 
 
 Generated code
@@ -64,6 +71,8 @@ See :ref:`html_generator` for more details about the HTML generator and its capa
 
 :download:`HTML page <../../../../generated/sphinx_rst/register_code/field/generate_enumeration/api/caesar_regs.html>`
 
+
+.. _field_enumeration_vhdl:
 
 VHDL package
 ____________
@@ -111,7 +120,7 @@ Some interesting things to notice in the interface header:
 
 1. The valid enumeration values are defined using a C++ ``enum`` declaration in the namespace of
    each field.
-2. The setters and getters for each field value uses the enumeration type as argument or return
+2. The setters and getters for each field value use the enumeration type as argument or return
    value.
 
 
@@ -129,6 +138,7 @@ C header
 ________
 
 The C code below is produced by the ``generate()`` call in the Python example above.
+The range and mask of the each field are available as constants.
 Note how the valid enumeration values are defined using a C ``enum`` declaration.
 
 .. collapse:: Click to expand/collapse code.
