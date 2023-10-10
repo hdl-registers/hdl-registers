@@ -22,9 +22,7 @@ def parse_toml() -> RegisterList:
     """
     Create the register list by parsing a TOML data file.
     """
-    return from_toml(
-        module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "regs_enumeration.toml"
-    )
+    return from_toml(module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "field_bit.toml")
 
 
 def create_from_api() -> RegisterList:
@@ -37,26 +35,16 @@ def create_from_api() -> RegisterList:
         name="configuration", mode="r_w", description="Configuration register."
     )
 
-    register.append_enumeration(
-        name="severity_level",
-        description="Run-time configuration of severity.",
-        elements={
-            "info": "Informational message. Is not considered an error.",
-            "warning": "Warning message. Is not considered an error.",
-            "error": "Error message. Is considered an error.",
-            "failure": "Failure message. Is considered an error.",
-        },
-        default_value="warning",
+    register.append_bit(
+        name="enable",
+        description="Enable data passthrough.",
+        default_value="1",
     )
 
-    register.append_enumeration(
-        name="packet_source",
-        description="Set input mux.",
-        elements={
-            "streaming": "Process incoming streaming data.",
-            "dma": "Read packets from DMA.",
-        },
-        default_value="streaming",
+    register.append_bit(
+        name="invert",
+        description="Optionally enable inversion of data.",
+        default_value="0",
     )
 
     return register_list

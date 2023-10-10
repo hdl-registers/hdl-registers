@@ -1,0 +1,14 @@
+# This will allocate a register constant with the name "supports_pre_filtering" of type float.
+[constant.clock_frequency_mhz]
+
+# The "value" property MUST be present for a float constant.
+# The value specified must be a float.
+value = 156.25
+
+# The "description" property is optional for a constant. Will default to "" if not specified.
+# The value specified must be a string.
+description = "The clock frequency in MHz of the system clock."
+
+[constant.division_factor]
+
+value = 8.125

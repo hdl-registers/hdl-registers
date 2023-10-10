@@ -1,0 +1,14 @@
+# This will allocate a string constant with the name "supports_pre_filtering" of type string.
+[constant.module_name]
+
+# The "value" property MUST be present for a string constant.
+# The value specified must be a string.
+value = "preprocessing"
+
+# The "description" property is optional for a constant. Will default to "" if not specified.
+# The value specified must be a string.
+description = "The name of this module, to be used in FPGA as well as software."
+
+[constant.module_description]
+
+value = "This module removes glitches and filters incoming data."

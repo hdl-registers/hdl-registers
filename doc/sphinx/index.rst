@@ -26,6 +26,17 @@
     rst/field/field_integer
 
 .. toctree::
+    :caption: Register constants
+    :hidden:
+
+    rst/constant/constant_overview
+    rst/constant/constant_bit_vector
+    rst/constant/constant_boolean
+    rst/constant/constant_float
+    rst/constant/constant_integer
+    rst/constant/constant_string
+
+.. toctree::
     :caption: Code generators
     :hidden:
 

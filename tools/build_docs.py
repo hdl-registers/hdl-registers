@@ -123,10 +123,11 @@ def generate_register_code():
 
     register_list.create_python_class(output_path=output_path / "py")
 
-    for py_file in (SPHINX_DOC / "rst" / "field" / "py").glob("generate_*.py"):
-        load_python_module(py_file).main(
-            output_path=GENERATED_SPHINX / "register_code" / "field" / py_file.stem
-        )
+    for folder_name in ["constant", "field"]:
+        for py_file in (SPHINX_DOC / "rst" / folder_name / "py").glob("*.py"):
+            load_python_module(py_file).main(
+                output_path=GENERATED_SPHINX / "register_code" / folder_name / py_file.stem
+            )
 
 
 def generate_bibtex():

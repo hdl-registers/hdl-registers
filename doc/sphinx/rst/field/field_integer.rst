@@ -14,7 +14,7 @@ Usage in TOML
 The TOML file below shows how to set up a register with two integer fields.
 See comments for rules about the different properties.
 
-.. literalinclude:: toml/regs_integer.toml
+.. literalinclude:: toml/field_integer.toml
    :caption: TOML that sets up a register with integer fields.
    :language: TOML
    :linenos:
@@ -40,7 +40,7 @@ Note that the result of the ``create_from_api`` call is identical to that of the
 Meaning that using a TOML file or using the Python API is completely equivalent.
 You choose yourself which method you want to use in your code base.
 
-.. literalinclude:: py/generate_integer.py
+.. literalinclude:: py/field_integer.py
    :caption: Python code that sets up a register with integer fields.
    :language: Python
    :linenos:
@@ -64,7 +64,7 @@ Each integer field is documented with its valid range.
 
 See :ref:`html_generator` for more details about the HTML generator and its capabilities.
 
-:download:`HTML page <../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs.html>`
+:download:`HTML page <../../../../generated/sphinx_rst/register_code/field/field_integer/api/caesar_regs.html>`
 
 
 VHDL package
@@ -90,7 +90,7 @@ Some interesting things to notice:
 
 .. collapse:: Click to expand/collapse code.
 
- .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs_pkg.vhd
+ .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_integer/api/caesar_regs_pkg.vhd
     :caption: Generated VHDL code.
     :language: VHDL
     :linenos:
@@ -117,7 +117,7 @@ return value.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/i_caesar.h
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_integer/api/i_caesar.h
      :caption: Generated C++ class interface code.
      :language: C++
      :linenos:
@@ -134,7 +134,7 @@ This will catch calculation errors during testing and at run-time.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar.cpp
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_integer/api/caesar.cpp
      :caption: Generated C++ class implementation code.
      :language: C++
      :linenos:
@@ -150,7 +150,7 @@ The range and mask of the each field are available as constants.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/generate_integer/api/caesar_regs.h
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_integer/api/caesar_regs.h
      :caption: Generated C code.
      :language: C
      :linenos:

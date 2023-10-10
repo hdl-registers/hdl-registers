@@ -1,0 +1,20 @@
+# This will allocate a register constant with the name "base_address" of type unsigned bit vector.
+[constant.base_address]
+
+# The "value" property MUST be present for a bit vector constant.
+# The value specified must be a string, and must start with either "0x" or "0b".
+# Underscore (_) is allowed as a separator.
+value = "0xA_0000_0000"
+
+# The "data_type" must be provided to instruct the parser to interpret the "value" as an unsigned
+# bit vector rather than a string.
+data_type = "unsigned"
+
+# The "description" property is optional for a constant. Will default to "" if not specified.
+# The value specified must be a string.
+description = "The base address on the register bus for this module."
+
+[constant.data_mask]
+
+value = "0b1100_1111"
+data_type = "unsigned"

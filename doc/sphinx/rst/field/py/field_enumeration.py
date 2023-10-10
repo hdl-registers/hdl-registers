@@ -23,7 +23,7 @@ def parse_toml() -> RegisterList:
     Create the register list by parsing a TOML data file.
     """
     return from_toml(
-        module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "regs_bit_vector.toml"
+        module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "field_enumeration.toml"
     )
 
 
@@ -37,18 +37,26 @@ def create_from_api() -> RegisterList:
         name="configuration", mode="r_w", description="Configuration register."
     )
 
-    register.append_bit_vector(
-        name="tuser",
-        description="Value to set for **TUSER** in the data stream.",
-        width=4,
-        default_value="0101",
+    register.append_enumeration(
+        name="severity_level",
+        description="Run-time configuration of severity.",
+        elements={
+            "info": "Informational message. Is not considered an error.",
+            "warning": "Warning message. Is not considered an error.",
+            "error": "Error message. Is considered an error.",
+            "failure": "Failure message. Is considered an error.",
+        },
+        default_value="warning",
     )
 
-    register.append_bit_vector(
-        name="tid",
-        description="Value to set for **TID** in the data stream.",
-        width=8,
-        default_value="00000000",
+    register.append_enumeration(
+        name="packet_source",
+        description="Set input mux.",
+        elements={
+            "streaming": "Process incoming streaming data.",
+            "dma": "Read packets from DMA.",
+        },
+        default_value="streaming",
     )
 
     return register_list

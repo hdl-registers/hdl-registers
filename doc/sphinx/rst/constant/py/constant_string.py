@@ -22,7 +22,9 @@ def parse_toml() -> RegisterList:
     """
     Create the register list by parsing a TOML data file.
     """
-    return from_toml(module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "regs_bit.toml")
+    return from_toml(
+        module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "constant_string.toml"
+    )
 
 
 def create_from_api() -> RegisterList:
@@ -31,20 +33,16 @@ def create_from_api() -> RegisterList:
     """
     register_list = RegisterList(name="caesar")
 
-    register = register_list.append_register(
-        name="configuration", mode="r_w", description="Configuration register."
+    register_list.add_constant(
+        name="module_name",
+        value="preprocessing",
+        description="The name of this module, to be used in FPGA as well as software.",
     )
 
-    register.append_bit(
-        name="enable",
-        description="Enable data passthrough.",
-        default_value="1",
-    )
-
-    register.append_bit(
-        name="invert",
-        description="Optionally enable inversion of data.",
-        default_value="0",
+    register_list.add_constant(
+        name="module_description",
+        value="This module removes glitches and filters incoming data.",
+        description="",
     )
 
     return register_list
@@ -55,12 +53,8 @@ def generate(register_list: RegisterList, output_path: Path):
     Generate the artifacts that we are interested in.
     """
     register_list.create_c_header(output_path)
-
     register_list.create_cpp_interface(output_path)
-    register_list.create_cpp_implementation(output_path)
-
     register_list.create_html_page(output_path)
-
     register_list.create_vhdl_package(output_path)
 
 
