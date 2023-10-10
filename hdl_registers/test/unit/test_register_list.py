@@ -87,7 +87,7 @@ def test_generated_source_info(
 
 def test_header_constants():
     registers = RegisterList(name="apa", source_definition_file=None)
-    hest = registers.add_constant("hest", 123)
+    hest = registers.add_constant("hest", 123, "")
     zebra = registers.add_constant("zebra", 456, "description")
 
     assert len(registers.constants) == 2
@@ -246,7 +246,7 @@ def test_repr_with_constant_added():
     register_list_b = RegisterList(name="apa", source_definition_file=Path("."))
     assert repr(register_list_a) == repr(register_list_b)
 
-    register_list_a.add_constant(name="zebra", value=3)
+    register_list_a.add_constant(name="zebra", value=3, description="")
 
     assert repr(register_list_a) != repr(register_list_b)
 
@@ -283,7 +283,7 @@ def test_deep_copy_of_register_list_actually_copies_everything():
     assert copied_list.constants is not original_list.constants
     assert copied_list.constants[0] is not original_list.constants[0]
 
-    copied_list.add_constant(name="new_constant", value=5)
+    copied_list.add_constant(name="new_constant", value=5, description="")
     assert len(copied_list.constants) == 2 and len(original_list.constants) == 1
 
     assert copied_list.register_objects is not original_list.register_objects
@@ -332,11 +332,11 @@ description = "My register"
 
     def test_create_vhdl_package_should_not_run_if_nothing_has_changed(self):
         register_list = from_toml(self.module_name, self.toml_file)
-        register_list.add_constant(name="apa", value=3)
+        register_list.add_constant(name="apa", value=3, description="")
         register_list.create_vhdl_package(self.tmp_path)
 
         register_list = from_toml(self.module_name, self.toml_file)
-        register_list.add_constant(name="apa", value=3)
+        register_list.add_constant(name="apa", value=3, description="")
         with patch(
             "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package:
@@ -382,7 +382,7 @@ value = 3
         register_list.create_vhdl_package(self.tmp_path)
 
         register_list = from_toml(self.module_name, self.toml_file)
-        register_list.add_constant(name="apa", value=3)
+        register_list.add_constant(name="apa", value=3, description="")
         with patch(
             "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
         ) as mocked_create_vhdl_package:

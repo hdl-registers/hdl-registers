@@ -201,7 +201,7 @@ class RegisterList:
         self,
         name: str,
         value: Union[bool, float, int, str],
-        description: str = None,
+        description: str,
         data_type: StringConstantDataType = None,
     ) -> "Constant":
         """

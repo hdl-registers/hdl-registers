@@ -35,10 +35,10 @@ class RegisterConfiguration:
     def __init__(self, module_name, source_toml_file):
         self.register_list = from_toml(module_name=module_name, toml_file=source_toml_file)
 
-        self.register_list.add_constant(name="boolean_constant", value=True)
-        self.register_list.add_constant(name="integer_constant", value=3)
-        self.register_list.add_constant(name="real_constant", value=3.14)
-        self.register_list.add_constant(name="string_constant", value="apa")
+        self.register_list.add_constant(name="boolean_constant", value=True, description="")
+        self.register_list.add_constant(name="integer_constant", value=3, description="")
+        self.register_list.add_constant(name="real_constant", value=3.14, description="")
+        self.register_list.add_constant(name="string_constant", value="apa", description="")
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
         self.register_list.create_vhdl_package(output_path)

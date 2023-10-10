@@ -18,6 +18,8 @@ Breaking changes
 
 * Rename ``RegisterField.range`` to :meth:`.RegisterField.range_str`.
 
+* Remove default value ``description=None`` for argument to :meth:`.RegisterList.add_constant`.
+
 * Remove public method ``vhdl_typedef`` from :class:`.FieldType` class.
   This logic is instead moved to :class:`.RegisterVhdlGenerator`.
 
