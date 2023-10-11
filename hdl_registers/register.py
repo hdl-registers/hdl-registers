@@ -23,11 +23,11 @@ if TYPE_CHECKING:
 
 
 class RegisterMode:
-    def __init__(self, mode_readable, description):
+    def __init__(self, mode_readable: str, description: str):
         """
         Arguments:
-            mode_readable (str): The readable representation of this mode. E.g. "r" -> "Read-only".
-            description (str): Textual description of mode.
+            mode_readable: The readable representation of this mode. E.g. "r" -> "Read".
+            description: Textual description of mode.
         """
         self.mode_readable = mode_readable
         self.description = description
@@ -57,17 +57,17 @@ class Register:
     Used to represent a register and its fields.
     """
 
-    def __init__(self, name, index, mode, description):
+    def __init__(self, name: str, index: int, mode: str, description: str):
         """
         Arguments:
-            name (str): The name of the register.
-            index (int): The zero-based index of this register.
+            name: The name of the register.
+            index: The zero-based index of this register.
                 If this register is part of a register array, the index shall be relative to the
                 start of the array. I.e. the index is zero for the first register in the array.
                 If the register is a plain register, the index shall be relative to the start of
                 the register list.
-            mode (str): A valid register mode.
-            description (str): Textual register description.
+            mode: A valid register mode.
+            description: Textual register description.
         """
         if mode not in REGISTER_MODES:
             raise ValueError(f'Invalid mode "{mode}" for register "{name}"')
@@ -187,16 +187,16 @@ class Register:
 
         return default_value
 
-    def get_field(self, name):
+    def get_field(self, name: str) -> "RegisterField":
         """
         Get the field within this register that has the given name. Will raise exception if no
         field matches.
 
         Arguments:
-            name (str): The name of the field.
+            name: The name of the field.
 
         Returns:
-            :class:`.RegisterField`: The field.
+            The field.
         """
         for field in self.fields:
             if field.name == name:
@@ -205,21 +205,21 @@ class Register:
         raise ValueError(f'Could not find field "{name}" within register "{self.name}"')
 
     @property
-    def address(self):
+    def address(self) -> int:
         """
-        int: Byte address, within the register list, of this register.
+        Byte address, within the register list, of this register.
         """
         return 4 * self.index
 
     @property
-    def is_bus_readable(self):
+    def is_bus_readable(self) -> bool:
         """
         True if the register is readable by bus. Based on the register type.
         """
         return self.mode in ["r", "r_w", "r_wpulse"]
 
     @property
-    def is_bus_writeable(self):
+    def is_bus_writeable(self) -> bool:
         """
         True if the register is writeable by bus. Based on the register type.
         """
