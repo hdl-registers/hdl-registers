@@ -267,11 +267,6 @@ class RegisterList:
         """
         Create a VHDL package file with register, field and constant definitions.
 
-        This function assumes that the ``output_path`` folder already exists. This assumption makes
-        it slightly faster than the other functions that use ``create_file()``. Necessary since this
-        one is often used in real time (before simulations, etc..) and not in one-off scenarios
-        like the others (when making a release).
-
         In order to save time, there is a mechanism to only generate the VHDL file when necessary.
         A hash of this register list object will be written to the file along with all the register
         definitions. This hash will be inspected and compared, and the VHDL file will only be
@@ -289,10 +284,12 @@ class RegisterList:
     def _should_create_vhdl_package(self, vhd_file, self_hash):
         if not vhd_file.exists():
             return True
+
         if (self_hash, __version__) != self._find_hash_and_version_of_existing_vhdl_package(
             vhd_file
         ):
             return True
+
         return False
 
     @staticmethod
@@ -317,6 +314,10 @@ class RegisterList:
 
     def _create_vhdl_package(self, vhd_file, self_hash):
         print(f"Creating VHDL register package {vhd_file}")
+
+        # Create folder unless it already exists.
+        create_directory(vhd_file.parent, empty=False)
+
         # Add a header line with the hash
         generated_info = self.generated_source_info() + [f"Register hash {self_hash}."]
         register_vhdl_generator = RegisterVhdlGenerator(
