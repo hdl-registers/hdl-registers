@@ -18,14 +18,14 @@ class RegisterArray:
     number of times in a register list.
     """
 
-    def __init__(self, name, base_index, length, description):
+    def __init__(self, name: str, base_index: int, length: int, description: str):
         """
         Arguments:
-            name (str): The name of this register array.
-            base_index (int): The zero-based index of the first register of this array in
-                the register list.
-            length (int): The number of times the register sequence shall be repeated.
-            description (str): Textual register array description.
+            name: The name of this register array.
+            base_index: The zero-based index of the first register of this array in the
+                register list.
+            length: The number of times the register sequence shall be repeated.
+            description: Textual register array description.
         """
         self.name = name
         self.base_index = base_index
@@ -34,17 +34,17 @@ class RegisterArray:
 
         self.registers = []
 
-    def append_register(self, name, mode, description):
+    def append_register(self, name: str, mode: str, description: str) -> Register:
         """
         Append a register to this array.
 
         Arguments:
-            name (str): The name of the register.
-            mode (str): A valid register mode.
-            description (str): Textual register description.
+            name: The name of the register.
+            mode: A valid register mode.
+            description: Textual register description.
 
         Return:
-            :class:`.Register`: The register object that was created.
+            The register object that was created.
         """
         index = len(self.registers)
         register = Register(name, index, mode, description)
@@ -52,14 +52,14 @@ class RegisterArray:
         self.registers.append(register)
         return register
 
-    def get_register(self, name):
+    def get_register(self, name: str) -> Register:
         """
         Get a register from this array. Will raise exception if no register matches.
 
         Arguments:
-            name (str): The name of the register.
+            name: The name of the register.
         Return:
-            :class:`.Register`: The register.
+            The register.
         """
         for register in self.registers:
             if register.name == name:
@@ -68,21 +68,21 @@ class RegisterArray:
         raise ValueError(f'Could not find register "{name}" within register array "{self.name}"')
 
     @property
-    def index(self):
+    def index(self) -> int:
         """
         Property exists to be used analogously with ``Register.index``.
 
         Return:
-            int: The highest index occupied by this array.
+            The highest index occupied by this array.
         """
         return self.base_index + self.length * len(self.registers) - 1
 
-    def get_start_index(self, array_index):
+    def get_start_index(self, array_index: int) -> int:
         """
         The index within the register list where array iteration number ``array_index`` starts.
 
         Arguments:
-            array_index (int): The array iteration index.
+            array_index: The array iteration index.
                 Shall be less than or equal to the array ``length``.
         """
         if array_index >= self.length:
