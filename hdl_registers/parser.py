@@ -17,7 +17,7 @@ import tomli
 from tsfpga.system_utils import read_file
 
 # Local folder libraries
-from .constant.constant import StringConstantDataType
+from .constant.bit_vector_constant import UnsignedVector
 from .register_list import RegisterList
 
 if TYPE_CHECKING:
@@ -144,9 +144,7 @@ class RegisterParser:
         description = items.get("description", "")
         data_type_str = items.get("data_type")
 
-        if data_type_str is None:
-            data_type = None
-        else:
+        if data_type_str is not None:
             if not isinstance(value, str):
                 raise ValueError(
                     f'Error while parsing constant "{name}" in '
@@ -154,18 +152,16 @@ class RegisterParser:
                     'May not set "data_type" for non-string constant.'
                 )
 
-            try:
-                data_type = StringConstantDataType[data_type_str]
-            except KeyError as exception_info:
+            if data_type_str == "unsigned":
+                value = UnsignedVector(value)
+            else:
                 raise ValueError(
                     f'Error while parsing constant "{name}" in '
                     f"{self._source_definition_file}: "
                     f'Invalid data type "{data_type_str}".'
-                ) from exception_info
+                )
 
-        self._register_list.add_constant(
-            name=name, value=value, description=description, data_type=data_type
-        )
+        self._register_list.add_constant(name=name, value=value, description=description)
 
     def _parse_plain_register(self, name, items):
         for item_name in items.keys():

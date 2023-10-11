@@ -24,9 +24,8 @@ from tsfpga.system_utils import create_directory, create_file, read_file
 
 # Local folder libraries
 from . import __version__
-from .constant.bit_vector_constant import UnsignedVectorConstant
+from .constant.bit_vector_constant import UnsignedVector, UnsignedVectorConstant
 from .constant.boolean_constant import BooleanConstant
-from .constant.constant import StringConstantDataType
 from .constant.float_constant import FloatConstant
 from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
@@ -213,9 +212,8 @@ class RegisterList:
     def add_constant(
         self,
         name: str,
-        value: Union[bool, float, int, str],
+        value: Union[bool, float, int, str, UnsignedVector],
         description: str,
-        data_type: StringConstantDataType = None,
     ) -> "Constant":
         """
         Add a constant. Will be available in the generated packages and headers.
@@ -226,31 +224,25 @@ class RegisterList:
             name: The name of the constant.
             value: The constant value.
             description: Textual description for the constant.
-            data_type: The data type of the constant, shall only be set if a string ``value``
-                is supplied.
-                If ``value`` is a string and ``data_type`` is ``None``, the data type will default
-                to ``string``.
         Return:
             The constant object that was created.
         """
-        if isinstance(value, int):
-            if isinstance(value, bool):
-                constant = BooleanConstant(name=name, value=value, description=description)
-            else:
-                constant = IntegerConstant(name=name, value=value, description=description)
+        # Note that this is a sub-type of 'int', hence it must be before the check below.
+        if isinstance(value, bool):
+            constant = BooleanConstant(name=name, value=value, description=description)
+
+        elif isinstance(value, int):
+            constant = IntegerConstant(name=name, value=value, description=description)
 
         elif isinstance(value, float):
             constant = FloatConstant(name=name, value=value, description=description)
 
+        # Note that this is a sub-type of 'str', hence it must be before the check below.
+        elif isinstance(value, UnsignedVector):
+            constant = UnsignedVectorConstant(name=name, value=value, description=description)
+
         elif isinstance(value, str):
-            if data_type is None or data_type == StringConstantDataType.string:
-                constant = StringConstant(name=name, value=value, description=description)
-            elif data_type == StringConstantDataType.unsigned:
-                constant = UnsignedVectorConstant(name=name, value=value, description=description)
-            else:
-                raise TypeError(
-                    f"Unknown data type for string constant {name}. Data type: {data_type}"
-                )
+            constant = StringConstant(name=name, value=value, description=description)
 
         else:
             message = f'Error while parsing constant "{name}": Unknown type "{type(value)}".'

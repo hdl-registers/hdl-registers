@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 # First party libraries
-from hdl_registers.constant.constant import StringConstantDataType
+from hdl_registers.constant.bit_vector_constant import UnsignedVector
 from hdl_registers.parser import from_toml
 from hdl_registers.register_list import RegisterList
 
@@ -36,16 +36,12 @@ def create_from_api() -> RegisterList:
 
     register_list.add_constant(
         name="base_address",
-        value="0xA_0000_0000",
+        value=UnsignedVector("0xA_0000_0000"),
         description="The base address on the register bus for this module.",
-        data_type=StringConstantDataType.unsigned,
     )
 
     register_list.add_constant(
-        name="data_mask",
-        value="0b1100_1111",
-        description="",
-        data_type=StringConstantDataType.unsigned,
+        name="data_mask", value=UnsignedVector("0b1100_1111"), description=""
     )
 
     return register_list

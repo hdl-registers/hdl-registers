@@ -113,5 +113,17 @@ description={self.description},\
 )"""
 
 
+class UnsignedVector(str):
+    """
+    Represent a value that is of type unsigned vector
+    (as opposed to a **register constant** of the same type, which would use the
+    :class:`.UnsignedVectorConstant` class).
+    """
+
+
 class UnsignedVectorConstant(BitVectorConstant):
-    pass
+    """
+    Represent a register constant that is of type unsigned vector
+    (as opposed to a **plain value** of the same type in Python, which would use the
+    :class:`.UnsignedVector` class).
+    """

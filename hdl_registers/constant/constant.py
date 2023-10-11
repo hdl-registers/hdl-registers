@@ -9,7 +9,6 @@
 
 # Standard libraries
 from abc import ABC, abstractmethod
-from enum import IntEnum, auto
 
 
 class Constant(ABC):
@@ -28,16 +27,3 @@ class Constant(ABC):
         """
         The value of the constant. Return type depends on the child class.
         """
-
-
-class StringConstantDataType(IntEnum):
-    """
-    The data types that are supported for constants where the value is of type string.
-
-    We use pylint disable since Python constants shall usually be upper case.
-    In this case we want the enum key to exactly match the data type name, which we want as
-    lower case for readability in TOML.
-    """
-
-    string = auto()  # pylint: disable=invalid-name
-    unsigned = auto()  # pylint: disable=invalid-name
