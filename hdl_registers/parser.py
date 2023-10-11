@@ -9,6 +9,7 @@
 
 # Standard libraries
 import copy
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 # Third party libraries
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
     from .register import Register
 
 
-def load_toml_file(toml_file):
+def load_toml_file(toml_file: Path) -> str:
     if not toml_file.exists():
         raise FileNotFoundError(f"Requested TOML file does not exist: {toml_file}")
 
@@ -36,14 +37,16 @@ def load_toml_file(toml_file):
         raise ValueError(message) from exception_info
 
 
-def from_toml(module_name, toml_file, default_registers=None) -> RegisterList:
+def from_toml(
+    module_name: str, toml_file: Path, default_registers: list["Register"] = None
+) -> RegisterList:
     """
     Parse a register TOML file.
 
     Arguments:
-        module_name (str): The name of the module that these registers belong to.
-        toml_file (pathlib.Path): The TOML file path.
-        default_registers (list(Register)): List of default registers.
+        module_name: The name of the module that these registers belong to.
+        toml_file: The TOML file path.
+        default_registers: List of default registers.
 
     Returns:
         The resulting register list.
@@ -79,7 +82,12 @@ class RegisterParser:
     recognized_enumeration_items = {"description", "default_value", "element"}
     recognized_integer_items = {"description", "min_value", "max_value", "default_value"}
 
-    def __init__(self, module_name, source_definition_file, default_registers):
+    def __init__(
+        self,
+        module_name: str,
+        source_definition_file: Path,
+        default_registers: list["Register"] = None,
+    ):
         self._register_list = RegisterList(
             name=module_name, source_definition_file=source_definition_file
         )
@@ -92,15 +100,15 @@ class RegisterParser:
             for register in default_registers:
                 self._default_register_names.append(register.name)
 
-    def parse(self, register_data):
+    def parse(self, register_data: str) -> RegisterList:
         """
         Parse the TOML data.
 
         Arguments:
-            register_data (str): TOML register data.
+            register_data: TOML register data.
 
         Returns:
-            :class:`.RegisterList`: The resulting register list.
+            The resulting register list.
         """
         if "constant" in register_data:
             for name, items in register_data["constant"].items():
