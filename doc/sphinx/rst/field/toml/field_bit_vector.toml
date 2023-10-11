@@ -22,6 +22,7 @@ description = "Value to set for **TUSER** in the data stream."
 # Will default to all zeros if not specified.
 default_value = "0101"
 
+
 [register.configuration.bit_vector.tid]
 
 width = 8

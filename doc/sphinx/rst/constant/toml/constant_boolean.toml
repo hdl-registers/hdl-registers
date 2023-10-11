@@ -9,6 +9,7 @@ value = true
 # The value specified must be a string.
 description = "Will indicate **True** if the module supports data pre-filtering."
 
+
 [constant.is_release_version]
 
 value = false

@@ -14,6 +14,7 @@ data_type = "unsigned"
 # The value specified must be a string.
 description = "The base address on the register bus for this module."
 
+
 [constant.data_mask]
 
 value = "0b1100_1111"

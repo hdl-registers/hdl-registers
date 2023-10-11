@@ -9,6 +9,7 @@ value = "preprocessing"
 # The value specified must be a string.
 description = "The name of this module, to be used in FPGA as well as software."
 
+
 [constant.module_description]
 
 value = "This module removes glitches and filters incoming data."

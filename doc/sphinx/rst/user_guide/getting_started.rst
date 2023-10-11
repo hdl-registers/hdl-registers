@@ -58,18 +58,6 @@ See the sidebar under "Code Generators" for information on what can be generated
 invoke it.
 
 
-Default registers
------------------
-
-A lot of projects use a few default registers in standard locations that shall be present in
-all modules.
-For example, very commonly the first register of a module is an interrupt status register and the
-second one is an interrupt mask.
-In order to handle this, without having to duplicate names and descriptions in many places, there
-is a ``default_registers`` flag to the :func:`.from_toml` function.
-Passing a list of :class:`.Register` objects will insert these registers first in
-the :class:`.RegisterList`.
-
 
 Integration in tsfpga
 ---------------------

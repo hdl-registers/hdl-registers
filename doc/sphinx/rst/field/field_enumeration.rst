@@ -105,8 +105,8 @@ Some interesting things to notice:
 |
 
 
-C++ interface
-_____________
+C++ interface header
+____________________
 
 The C++ interface header code below is produced by the ``generate()`` call in the Python
 example above.

@@ -15,6 +15,7 @@ description = "Enable data passthrough."
 # The value specified must be a string, consisting of either a "1" or a "0".
 default_value = "1"
 
+
 [register.configuration.bit.invert]
 
 description = "Optionally enable inversion of data."

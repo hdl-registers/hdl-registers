@@ -9,6 +9,7 @@ value = 64
 # The value specified must be a string.
 description = "Data width of the AXI port used by this module."
 
+
 [constant.burst_length_beats]
 
 value = 256
