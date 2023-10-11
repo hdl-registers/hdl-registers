@@ -10,24 +10,35 @@ unknown fields, wrong data types for fields, etc.
 
 The parser is implemented in the :class:`.RegisterParser` class and :func:`.from_toml` function.
 
+
 Format
 ------
 
-Below is a compilation of all the TOML properties that are available.
-Comments describe what attributes are optional and which are required.
+Below is an example of a typical TOML file.
+It sets up:
 
-.. literalinclude:: ../../files/regs_example.toml
-   :caption: Register TOML format rules.
+1. Two registers, one of which contains a :ref:`bit field <field_bit>` and
+   an :ref:`enumeration field <field_enumeration>`.
+2. A :ref:`register array <basic_feature_register_array>` with two registers and fields.
+3. An :ref:`integer constant <constant_integer>` and a :ref:`float constant <constant_float>`.
+
+See the menu sidebar for details about how to set up the different fields, constants, etc.
+
+Also, see the "generator" articles for insight into the code that can be generated from this
+definition file.
+For example, the human-readable documentation from the data below can be seen in
+the :ref:`generator_html` article.
+
+.. literalinclude:: toml/toml_format.toml
+   :caption: Register TOML format example.
    :language: toml
    :linenos:
-
-See the other articles for an insight into the code that can be generated from this definition file.
 
 
 Why TOML?
 ---------
 
-The `TOML <https://toml.io/>`__ file format (short for Tom's Obvious Minimal Language) is a
+The `TOML <https://toml.io/>`__ file format (short for "Tom's Obvious Minimal Language") is a
 configuration file format that is easy to both read and write.
 Compared to XML, YAML and JSON, which would be the most obvious alternatives, it has the
 following advantages that are relevant when handling FPGA registers:

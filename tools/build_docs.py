@@ -30,7 +30,6 @@ from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 # First party libraries
 import hdl_registers
 from hdl_registers.about import get_readme_rst, get_short_slogan
-from hdl_registers.parser import from_toml
 
 GENERATED_SPHINX = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_rst"
 GENERATED_SPHINX_HTML = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_html"
@@ -103,27 +102,7 @@ def generate_apidoc():
 
 
 def generate_register_code():
-    toml_file = SPHINX_DOC / "files" / "regs_example.toml"
-    register_list = from_toml(module_name="example", toml_file=toml_file, default_registers=None)
-
-    output_path = GENERATED_SPHINX / "register_code"
-
-    create_directory(output_path / "vhdl")
-    register_list.create_vhdl_package(output_path=output_path / "vhdl")
-
-    register_list.create_html_page(output_path=output_path / "html")
-    register_list.create_html_register_table(output_path=output_path / "html")
-    register_list.create_html_constant_table(output_path=output_path / "html")
-
-    register_list.create_c_header(output_path=output_path / "c")
-
-    register_list.create_cpp_interface(output_path=output_path / "cpp")
-    register_list.create_cpp_header(output_path=output_path / "cpp")
-    register_list.create_cpp_implementation(output_path=output_path / "cpp")
-
-    register_list.create_python_class(output_path=output_path / "py")
-
-    for folder_name in ["basic_feature", "constant", "field"]:
+    for folder_name in ["basic_feature", "constant", "field", "user_guide"]:
         for py_file in (SPHINX_DOC / "rst" / folder_name / "py").glob("*.py"):
             load_python_module(py_file).main(
                 output_path=GENERATED_SPHINX / "register_code" / folder_name / py_file.stem

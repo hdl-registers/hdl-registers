@@ -67,7 +67,7 @@ See HTML file below for the human-readable documentation that is produced by the
 ``generate()`` call in the Python example above.
 Each enumeration field is documented and the description of each element is included.
 
-See :ref:`html_generator` for more details about the HTML generator and its capabilities.
+See :ref:`generator_html` for more details about the HTML generator and its capabilities.
 
 :download:`HTML page <../../../../generated/sphinx_rst/register_code/field/field_enumeration/api/caesar_regs.html>`
 
@@ -79,7 +79,7 @@ ____________
 
 The VHDL code below is produced by the ``generate()`` call in the Python example above.
 Click the button to expand and view the code.
-See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
+See :ref:`generator_vhdl` for instructions on how it can be used in your VHDL project.
 
 Some interesting things to notice:
 
@@ -114,7 +114,7 @@ Click the button to expand and view the code.
 
 The class header and implementation are skipped here, since their inclusion would make this page
 very long.
-See :ref:`cpp_generator` for more details and an example of how the excluded files might look.
+See :ref:`generator_cpp` for more details and an example of how the excluded files might look.
 
 Some interesting things to notice in the interface header:
 

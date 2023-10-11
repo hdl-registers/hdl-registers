@@ -1,3 +1,5 @@
+.. _constant_integer:
+
 Integer constants
 =================
 

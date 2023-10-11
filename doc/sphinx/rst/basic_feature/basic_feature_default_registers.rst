@@ -3,7 +3,7 @@
 Default registers
 =================
 
-A lot of projects use a few default registers in standard locations that shall be present in
+Many projects use a few *default registers* in standard locations that shall be present in
 all modules.
 For example, very commonly the first register of a module is an interrupt status register and the
 second one is an interrupt mask.
@@ -22,7 +22,6 @@ The TOML file below is used to showcase insertion of default registers.
    :caption: TOML for showcasing default registers.
    :language: TOML
    :linenos:
-
 
 
 Usage with Python API
@@ -60,7 +59,7 @@ _________
 See HTML file below for the human-readable documentation that is produced by the
 ``generate()`` call in the Python example above.
 
-See :ref:`html_generator` for more details about the HTML generator and its capabilities.
+See :ref:`generator_html` for more details about the HTML generator and its capabilities.
 
 :download:`HTML page <../../../../generated/sphinx_rst/register_code/basic_feature/basic_feature_default_registers/api/caesar_regs.html>`
 
@@ -70,7 +69,7 @@ ____________
 
 The VHDL code below is produced by the ``generate()`` call in the Python example above.
 Click the button to expand and view the code.
-See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
+See :ref:`generator_vhdl` for instructions on how it can be used in your VHDL project.
 
 .. collapse:: Click to expand/collapse code.
 

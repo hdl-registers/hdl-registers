@@ -1,0 +1,83 @@
+################################################################################
+[register.configuration]
+
+# The "mode" property MUST be present for a register.
+# The value specified must be a valid mode string value. Either of:
+# * "r" for Read.
+# * "w" for Write.
+# * "r_w" for Read, Write.
+# * "wpulse" for Write-pulse.
+# * "r_wpulse" for Read, Write-pulse.
+mode = "r_w"
+# The "description" property is optional for a register.
+# Will default to "" if not specified.
+# The value specified must be a string.
+description = """
+This is the description of my register.
+
+Rudimentary RST formatting can be used, such as **boldface** and *italics*.
+"""
+
+[register.configuration.bit.enable]
+
+description = "Enable operation."
+default_value = "1"
+
+[register.configuration.enumeration.direction]
+
+description = "Set the data direction."
+default_value = "high_z"
+
+element.data_in = "Receive data from outside the FPGA."
+element.high_z = """
+Set pins to high impedance.
+
+Will not process any incoming data, nor send anything out.
+"""
+element.data_out = "Send data from FPGA."
+
+
+################################################################################
+[register.status]
+
+mode = "r"
+
+
+################################################################################
+[register_array.channels]
+
+array_length = 4
+description = "Configuration for each channel."
+
+
+# ------------------------------------------------------------------------------
+[register_array.channels.register.read_address]
+
+mode = "r_w"
+description = "Read address for DMA data."
+
+
+# ------------------------------------------------------------------------------
+[register_array.channels.register.configuration]
+
+mode = "w"
+description = "Configuration of channel settings."
+
+bit.enable.description = "Enable this channel."
+
+bit_vector.tuser.width = 8
+bit_vector.tuser.description = "**TUSER** value for this channel."
+
+
+################################################################################
+[constant.axi_data_width]
+
+value = 64
+description = "Data width of the AXI port used by this module."
+
+
+################################################################################
+[constant.clock_rate_hz]
+
+value = 156.25e6
+description = "The clock rate used in the system, given in Hertz."

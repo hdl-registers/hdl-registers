@@ -1,7 +1,7 @@
 Added
 
 * Add :meth:`.RegisterList.create_python_class` method to create a Python pickle file.
-  Read more :ref:`here <python_generator>`.
+  Read more :ref:`here <generator_python>`.
 
 * Add optional ``field_type`` argument to :meth:`.RegisterList.append_register`
   and :class:`.Register`.

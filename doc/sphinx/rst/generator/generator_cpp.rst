@@ -1,54 +1,13 @@
-.. _cpp_generator:
+.. _generator_cpp:
 
 C++ code generator
 ==================
 
-A complete C++ class can be generated with methods that read or write the registers.
+A complete C++ class can be generated with methods to read/write the registers or fields.
 This is done with a call to :meth:`.RegisterList.create_cpp_interface`,
 :meth:`.RegisterList.create_cpp_header`, or :meth:`.RegisterList.create_cpp_implementation`.
 The first call will create an abstract interface header that can be used for mocking in a unit
 test environment.
-
-
-.. _interface_header:
-
-Interface header
-----------------
-
-Below is the resulting interface header code, generated from the
-:ref:`TOML format example <toml_format>`.
-Note that the register constants are also included here.
-
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/cpp/i_example.h
-   :caption: Example interface header
-   :language: C++
-   :linenos:
-
-
-Class header
-------------
-
-Below is the generated class header:
-
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/cpp/example.h
-   :caption: Example class header
-   :language: C++
-   :linenos:
-
-
-Implementation
---------------
-
-Below is the generated class implementation:
-
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/cpp/example.cpp
-   :caption: Example class implementation
-   :language: C++
-   :linenos:
-
-Note that when the register is part of an array, the register setter/getter takes a second
-argument ``array_index``.
-There is an assert that the user-provided array index is within the bounds of the array.
 
 
 Getters
@@ -103,4 +62,46 @@ However there are three register modes where the previously written register val
 read back over the bus and then modified: "write only", "write pulse", and "read, write pulse".
 The field setters for registers of this mode will write all bits outside of the current field
 as zero.
-This can for example be seen in the setter ``set_command_start()`` in the generated code above.
+This can for example be seen in the setter ``set_channels_configuration_enable()`` in the generated
+code below.
+
+
+.. _interface_header:
+
+Interface header
+----------------
+
+Below is the resulting abstract interface header code, generated from the
+:ref:`TOML format example <toml_format>`.
+Note that all register constants as well as field attributes are included here.
+
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/toml_format/cpp/i_example.h
+   :caption: Example interface header
+   :language: C++
+   :linenos:
+
+
+Class header
+------------
+
+Below is the generated class header:
+
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/toml_format/cpp/example.h
+   :caption: Example class header
+   :language: C++
+   :linenos:
+
+
+Implementation
+--------------
+
+Below is the generated class implementation:
+
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/toml_format/cpp/example.cpp
+   :caption: Example class implementation
+   :language: C++
+   :linenos:
+
+Note that when the register is part of an array, the register setter/getter takes a second
+argument ``array_index``.
+There is an assert that the user-provided array index is within the bounds of the array.

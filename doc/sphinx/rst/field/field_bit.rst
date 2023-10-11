@@ -1,3 +1,5 @@
+.. _field_bit:
+
 Bit fields
 ==========
 
@@ -62,7 +64,7 @@ See HTML file below for the human-readable documentation that is produced by the
 ``generate()`` call in the Python example above.
 Each bit field is documented with its bit index, default value and description.
 
-See :ref:`html_generator` for more details about the HTML generator and its capabilities.
+See :ref:`generator_html` for more details about the HTML generator and its capabilities.
 
 :download:`HTML page <../../../../generated/sphinx_rst/register_code/field/field_bit/api/caesar_regs.html>`
 
@@ -72,7 +74,7 @@ ____________
 
 The VHDL code below is produced by the ``generate()`` call in the Python example above.
 Click the button to expand and view the code.
-See :ref:`vhdl_generator` for instructions on how it can be used in your VHDL project.
+See :ref:`generator_vhdl` for instructions on how it can be used in your VHDL project.
 
 Some interesting things to notice:
 
@@ -101,7 +103,7 @@ the Python example above.
 Click the button to expand and view each code block.
 
 The class header is skipped here, since its inclusion would make this page very long.
-See :ref:`cpp_generator` for more details and an example of how the excluded file might look.
+See :ref:`generator_cpp` for more details and an example of how the excluded file might look.
 
 
 C++ interface header

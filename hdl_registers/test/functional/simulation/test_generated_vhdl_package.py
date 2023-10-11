@@ -26,7 +26,7 @@ from tsfpga.system_utils import create_directory
 from vunit import VUnit
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED
+from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_PATH
 from hdl_registers.field.register_field_type import (
     Signed,
     SignedFixedPoint,
@@ -78,8 +78,8 @@ def test_running_simulation(tmp_path):
 
 def _generate_registers(output_path):
     register_list = from_toml(
-        module_name="example",
-        toml_file=HDL_REGISTERS_DOC / "sphinx" / "files" / "regs_example.toml",
+        module_name="test",
+        toml_file=HDL_REGISTERS_PATH / "test" / "regs_test.toml",
     )
 
     # Add some bit vector fields with types.
@@ -109,7 +109,7 @@ def _generate_registers(output_path):
 
     register_list.create_vhdl_package(output_path=output_path)
 
-    return output_path / "example_regs_pkg.vhd"
+    return output_path / "test_regs_pkg.vhd"
 
 
 if __name__ == "__main__":

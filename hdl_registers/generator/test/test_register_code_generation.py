@@ -31,7 +31,7 @@ REGISTER_LISTS = [
     from_toml(module_name="test", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
     from_toml(
         module_name="example",
-        toml_file=HDL_REGISTERS_DOC / "sphinx" / "files" / "regs_example.toml",
+        toml_file=HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "toml" / "toml_format.toml",
     ),
 ]
 
@@ -86,7 +86,7 @@ def test_can_generate_python_class_file_without_error(tmp_path, register_list):
 def test_copy_source_definition(tmp_path, register_list):
     register_list.copy_source_definition(tmp_path)
 
-    assert read_file(tmp_path / f"regs_{register_list.name}.toml") == read_file(
+    assert read_file(tmp_path / register_list.source_definition_file.name) == read_file(
         register_list.source_definition_file
     )
 

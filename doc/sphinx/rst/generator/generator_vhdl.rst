@@ -1,4 +1,4 @@
-.. _vhdl_generator:
+.. _generator_vhdl:
 
 VHDL code generator
 ===================
@@ -23,33 +23,6 @@ Can be downloaded from gitlab here:
 https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
 
-Example
--------
-
-Below is the resulting code from the :ref:`TOML format example <toml_format>`.
-
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/vhdl/example_regs_pkg.vhd
-   :caption: example_regs_pkg.vhd
-   :language: vhdl
-   :linenos:
-
-For a plain register (e.g. ``configuration``) the register index is simply a natural
-(``example_configuration``, where "example" is the name of the module).
-For register arrays it is instead a function, e.g. ``example_base_addresses_read_address``
-(where ``base_addresses`` is the name of the array and ``read_address`` is the name of
-the register).
-
-Note that there is a large eco-system of register-related components in
-the `hdl_modules <https://hdl-modules.com>`__ project.
-Firstly there are wrappers available for easier working with VUnit verification components.
-See the :ref:`bfm library <module_bfm>` and :ref:`reg_file.reg_operations_pkg`.
-Furthermore there is a large number of synthesizable AXI components available that enable the
-register bus: AXI-to-AXI-Lite converter, AXI/AXI-Lite interconnect, AXI-Lite mux (splitter),
-AXI-Lite clock domain crossing, etc.
-See the :ref:`reg_file library <module_reg_file>` and :ref:`axi library <module_axi>` for
-more details.
-
-
 Unresolved types
 ----------------
 
@@ -62,3 +35,24 @@ Since e.g. ``std_logic`` is a sub-type of ``std_ulogic`` in VHDL-2008, it is no 
 hdl_registers components are integrated in a code base that still uses the resolved types.
 I.e. a ``std_logic`` signal can be assigned to a hdl_registers signal of type ``std_ulogic``,
 and vice versa, without problem.
+
+
+Example
+-------
+
+Below is the resulting code from the :ref:`TOML format example <toml_format>`.
+
+Note that there is a large eco-system of register-related components in
+the `hdl_modules <https://hdl-modules.com>`__ project.
+Firstly there are wrappers available for easier working with VUnit verification components.
+See the :ref:`bfm library <module_bfm>` and :ref:`reg_file.reg_operations_pkg`.
+Furthermore there is a large number of synthesizable AXI components available that enable the
+register bus: AXI-to-AXI-Lite converter, AXI/AXI-Lite interconnect, AXI-Lite mux (splitter),
+AXI-Lite clock domain crossing, etc.
+See the :ref:`reg_file library <module_reg_file>` and :ref:`axi library <module_axi>` for
+more details.
+
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/toml_format/vhdl/example_regs_pkg.vhd
+   :caption: example_regs_pkg.vhd
+   :language: vhdl
+   :linenos:
