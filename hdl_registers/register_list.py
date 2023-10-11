@@ -76,7 +76,7 @@ class RegisterList:
         cls, name: str, source_definition_file: Path, default_registers: list[Register]
     ) -> "RegisterList":
         """
-        Factory method. Create a RegisterList object from a plain list of registers.
+        Factory method. Create a ``RegisterList`` object from a plain list of registers.
 
         Arguments:
             name: The name of this register list.
@@ -87,6 +87,17 @@ class RegisterList:
                 use case.
             default_registers: These registers will be inserted in the register list.
         """
+        # Before proceeding, perform a basic sanity check.
+        # If the indexes are not correct, that will cause problems with the default registers
+        # as well as all upcoming registers.
+        for list_idx, register in enumerate(default_registers):
+            if register.index != list_idx:
+                message = (
+                    f'Default register index mismatch for "{register.name}". '
+                    f'Got "{register.index}", expected "{list_idx}".'
+                )
+                raise ValueError(message)
+
         register_list = cls(name=name, source_definition_file=source_definition_file)
         register_list.register_objects = copy.deepcopy(default_registers)
 

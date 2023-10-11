@@ -43,6 +43,21 @@ def test_from_default_registers():
     assert register_list.get_register("b").name == "b"
 
 
+def test_from_default_registers_with_bad_indexes_should_raise_exception():
+    register_a = Register(name="a", index=0, mode="r", description="")
+    register_b = Register(name="b", index=0, mode="w", description="")
+    default_registers = [register_a, register_b]
+
+    with pytest.raises(ValueError) as exception_info:
+        RegisterList.from_default_registers(
+            name="apa", source_definition_file=None, default_registers=default_registers
+        )
+    assert (
+        str(exception_info.value)
+        == 'Default register index mismatch for "b". Got "0", expected "1".'
+    )
+
+
 @patch("hdl_registers.register_list.git_commands_are_available", autospec=True)
 @patch("hdl_registers.register_list.get_git_commit", autospec=True)
 @patch("hdl_registers.register_list.svn_commands_are_available", autospec=True)
