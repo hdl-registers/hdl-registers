@@ -1,1 +1,1 @@
-Nothing here yet.
+Fix PyPI link to release notes.

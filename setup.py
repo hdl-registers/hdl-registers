@@ -60,7 +60,7 @@ def main():
         url="https://hdl-registers.com",
         project_urls={
             "Documentation": "https://hdl-registers.com/",
-            "Changelog": "https://hdl-registers.com/release_notes.html",
+            "Changelog": "https://hdl-registers.com/rst/about/release_notes.html",
             "Source": "https://gitlab.com/hdl_registers/hdl_registers",
             "Issues": "https://gitlab.com/hdl_registers/hdl_registers/-/issues",
         },
