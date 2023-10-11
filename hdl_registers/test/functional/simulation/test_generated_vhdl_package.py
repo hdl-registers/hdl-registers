@@ -113,5 +113,5 @@ def _generate_registers(output_path):
 
 
 if __name__ == "__main__":
-    vunit_output_path = create_directory(HDL_REGISTERS_GENERATED / "vunit_out", empty=True)
+    vunit_output_path = create_directory(HDL_REGISTERS_GENERATED / "vunit_out", empty=False)
     test_running_simulation(tmp_path=vunit_output_path)
