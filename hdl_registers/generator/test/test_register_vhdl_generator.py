@@ -58,6 +58,10 @@ class RegisterConfiguration:
                 "constant test_constant_base_address_hex : "
                 'unsigned(36 - 1 downto 0) := x"8_0000_0000";' in vhdl
             ), vhdl
+            assert (
+                "constant test_constant_base_address_bin : "
+                'unsigned(36 - 1 downto 0) := "100000000000000000000000000000000000";' in vhdl
+            ), vhdl
         else:
             assert "boolean_constant" not in vhdl, vhdl
             assert "integer_constant" not in vhdl, vhdl

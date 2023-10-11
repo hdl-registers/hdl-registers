@@ -321,8 +321,13 @@ std_ulogic_vector({self._register_range_type_name});
                 value = f'"{constant.value}"'
             elif isinstance(constant, UnsignedVectorConstant):
                 type_declaration = f"unsigned({constant.width} - 1 downto 0)"
-                prefix = "x" if constant.is_hexadecimal_not_binary else ""
-                value = f'{prefix}"{constant.value}"'
+
+                if constant.is_hexadecimal_not_binary:
+                    # Underscore separator is allowed in VHDL when defining a hexadecimal SLV.
+                    value = f'x"{constant.value}"'
+                else:
+                    # But not when defining a binary SLV.
+                    value = f'"{constant.value_without_separator}"'
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
