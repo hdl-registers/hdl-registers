@@ -72,35 +72,36 @@ class RegisterList:
         self.constants = []
 
     @classmethod
-    def from_default_registers(cls, name, source_definition_file, default_registers):
+    def from_default_registers(
+        cls, name: str, source_definition_file: Path, default_registers: list[Register]
+    ) -> "RegisterList":
         """
         Factory method. Create a RegisterList object from a plain list of registers.
 
         Arguments:
-            name (str): The name of this register list.
-            source_definition_file (pathlib.Path): The source file that defined this
-                register list. Will be displayed in generated source code and documentation
-                for traceability.
+            name: The name of this register list.
+            source_definition_file: The source file that defined this register list.
+                Will be displayed in generated source code and documentation for traceability.
 
                 Can be set to ``None`` if this information does not make sense in the current
                 use case.
-            default_registers (list(Register)): These registers will be inserted in the
-               register list.
+            default_registers: These registers will be inserted in the register list.
         """
         register_list = cls(name=name, source_definition_file=source_definition_file)
         register_list.register_objects = copy.deepcopy(default_registers)
+
         return register_list
 
-    def append_register(self, name, mode, description):
+    def append_register(self, name: str, mode: str, description: str) -> Register:
         """
         Append a register to this list.
 
         Arguments:
-            name (str): The name of the register.
-            mode (str): A valid register mode.
-            description (str): Textual register description.
+            name: The name of the register.
+            mode: A valid register mode.
+            description: Textual register description.
         Return:
-            Register: The register object that was created.
+            The register object that was created.
         """
         if self.register_objects:
             index = self.register_objects[-1].index + 1
@@ -112,15 +113,16 @@ class RegisterList:
 
         return register
 
-    def append_register_array(self, name, length, description):
+    def append_register_array(self, name: str, length: int, description: str) -> RegisterArray:
         """
         Append a register array to this list.
 
         Arguments:
-            name (str): The name of the register array.
-            length (int): The number of times the register sequence shall be repeated.
+            name: The name of the register array.
+            length: The number of times the register sequence shall be repeated.
+            description: Textual description of the register array.
         Return:
-            RegisterArray: The register array object that was created.
+            The register array object that was created.
         """
         if self.register_objects:
             base_index = self.register_objects[-1].index + 1
@@ -133,15 +135,15 @@ class RegisterList:
         self.register_objects.append(register_array)
         return register_array
 
-    def get_register(self, name):
+    def get_register(self, name: str) -> Register:
         """
         Get a register from this list. Will only find single registers, not registers in a
         register array. Will raise exception if no register matches.
 
         Arguments:
-            name (str): The name of the register.
+            name: The name of the register.
         Return:
-            Register: The register.
+            The register.
         """
         for register_object in self.register_objects:
             if isinstance(register_object, Register) and register_object.name == name:
@@ -149,14 +151,14 @@ class RegisterList:
 
         raise ValueError(f'Could not find register "{name}" within register list "{self.name}"')
 
-    def get_register_array(self, name):
+    def get_register_array(self, name: str) -> RegisterArray:
         """
         Get a register array from this list. Will raise exception if no register array matches.
 
         Arguments:
-            name (str): The name of the register array.
+            name: The name of the register array.
         Return:
-            RegisterArray: The register array.
+            The register array.
         """
         for register_object in self.register_objects:
             if isinstance(register_object, RegisterArray) and register_object.name == name:
@@ -167,20 +169,20 @@ class RegisterList:
         )
 
     def get_register_index(
-        self, register_name, register_array_name=None, register_array_index=None
-    ):
+        self, register_name: str, register_array_name: str = None, register_array_index: int = None
+    ) -> int:
         """
         Get the zero-based index within the register list for the specified register.
 
         Arguments:
-            register_name (str): The name of the register.
-            register_array_name (str): If the register is within a register array, the name
-                of the array must be specified.
-            register_array_name (str): If the register is within a register array, the array
-                iteration index must be specified.
+            register_name: The name of the register.
+            register_array_name: If the register is within a register array, the name of the array
+                must be specified.
+            register_array_index: If the register is within a register array, the array iteration
+                index must be specified.
 
         Return:
-            int: The index.
+            The index.
         """
         if register_array_name is None and register_array_index is None:
             # Target is plain register
@@ -246,14 +248,14 @@ class RegisterList:
         self.constants.append(constant)
         return constant
 
-    def get_constant(self, name):
+    def get_constant(self, name: str) -> "Constant":
         """
         Get a constant from this list. Will raise exception if no constant matches.
 
         Arguments:
-            name (str): The name of the constant.
+            name: The name of the constant.
         Return:
-            Constant: The constant.
+            The constant.
         """
         for constant in self.constants:
             if constant.name == name:
@@ -261,7 +263,7 @@ class RegisterList:
 
         raise ValueError(f'Could not find constant "{name}" within register list "{self.name}"')
 
-    def create_vhdl_package(self, output_path):
+    def create_vhdl_package(self, output_path: Path):
         """
         Create a VHDL package file with register, field and constant definitions.
 
@@ -276,7 +278,7 @@ class RegisterList:
         generated again if something has changed.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         vhd_file = output_path / (self.name + "_regs_pkg.vhd")
 
@@ -328,13 +330,13 @@ class RegisterList:
                 )
             )
 
-    def create_c_header(self, output_path, file_name=None):
+    def create_c_header(self, output_path: Path, file_name: str = None):
         """
         Create a C header file with register, field and constant definitions.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
-            file_name (str): Optionally specify an explicit file name.
+            output_path: Result will be placed in this folder.
+            file_name: Optionally specify an explicit file name.
                 If not specified, the name will be derived from the name of this register list.
         """
         file_name = f"{self.name}_regs.h" if file_name is None else file_name
@@ -345,13 +347,13 @@ class RegisterList:
             output_file, register_c_generator.get_header(self.register_objects, self.constants)
         )
 
-    def create_cpp_interface(self, output_path):
+    def create_cpp_interface(self, output_path: Path):
         """
         Create a C++ class interface header file, with register, field and constant definitions.
         The interface header contains only virtual methods.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         output_file = output_path / ("i_" + self.name + ".h")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
@@ -359,36 +361,36 @@ class RegisterList:
             output_file, register_cpp_generator.get_interface(self.register_objects, self.constants)
         )
 
-    def create_cpp_header(self, output_path):
+    def create_cpp_header(self, output_path: Path):
         """
         Create a C++ class header file with register, field and constant definitions.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         output_file = output_path / (self.name + ".h")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
         create_file(output_file, register_cpp_generator.get_header(self.register_objects))
 
-    def create_cpp_implementation(self, output_path):
+    def create_cpp_implementation(self, output_path: Path):
         """
         Create a C++ class implementation file.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         output_file = output_path / (self.name + ".cpp")
         register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
         create_file(output_file, register_cpp_generator.get_implementation(self.register_objects))
 
-    def create_html_page(self, output_path):
+    def create_html_page(self, output_path: Path):
         """
         Create a documentation HTML page with register, field and constant information.
         Will include the tables created by :meth:`.create_html_register_table` and
         :meth:`.create_html_constant_table`.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
 
@@ -405,63 +407,63 @@ class RegisterList:
             # HTML file?
             create_file(stylesheet_file, stylesheet)
 
-    def create_html_register_table(self, output_path):
+    def create_html_register_table(self, output_path: Path):
         """
         Create documentation HTML table with register and field information.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         output_file = output_path / (self.name + "_register_table.html")
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
         create_file(output_file, register_html_generator.get_register_table(self.register_objects))
 
-    def create_html_constant_table(self, output_path):
+    def create_html_constant_table(self, output_path: Path):
         """
         Create documentation HTML table with constant information.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         output_file = output_path / (self.name + "_constant_table.html")
         register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
         create_file(output_file, register_html_generator.get_constant_table(self.constants))
 
-    def create_python_class(self, output_path):
+    def create_python_class(self, output_path: Path):
         """
         Save a python class with all register, field and constant definitions.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         register_python_generator = RegisterPythonGenerator(self.name, self.generated_source_info())
         register_python_generator.create_class(register_list=self, output_folder=output_path)
 
-    def copy_source_definition(self, output_path):
+    def copy_source_definition(self, output_path: Path):
         """
         Copy the source file that created this register list. If no source file is set, nothing will
         be copied.
 
         Arguments:
-            output_path (pathlib.Path): Result will be placed in this folder.
+            output_path: Result will be placed in this folder.
         """
         if self.source_definition_file is not None:
             create_directory(output_path, empty=False)
             copy2(self.source_definition_file, output_path)
 
     @staticmethod
-    def generated_info():
+    def generated_info() -> list[str]:
         """
         Return:
-            list(str): Line(s) informing the user that a file is automatically generated.
+            Line(s) informing the user that a file is automatically generated.
         """
         return [f"This file is automatically generated by hdl_registers version {__version__}."]
 
-    def generated_source_info(self):
+    def generated_source_info(self) -> list[str]:
         """
         Return:
-            list(str): Line(s) informing the user that a file is automatically generated, containing
-            info about the source of the generated register information.
+            Line(s) informing the user that a file is automatically generated, containing info about
+            the source of the generated register information.
         """
         # Default to the user's current working directory
         directory = Path(".")
