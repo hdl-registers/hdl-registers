@@ -174,6 +174,10 @@ class CommonGenerator(RegisterCodeGenerator):
 
             return result
 
+        if isinstance(field, Integer) and field.is_signed:
+            # Type that can represent negative values also.
+            return "int32_t"
+
         # The default for most fields.
         return "uint32_t"
 
@@ -930,11 +934,26 @@ class ImplementationGenerator(CommonGenerator):
         else:
             if isinstance(field, Enumeration):
                 # "Cast" to the enum type.
-                cpp_code += f"    const auto result = {type_name}(result_shifted);\n"
+                cpp_code += f"    const auto result = {type_name}(result_shifted);\n\n"
+            elif isinstance(field, Integer) and field.is_signed:
+                cpp_code += f"""\
+    const {type_name} sign_bit_mask = 1 << {field.width - 1};
+
+    if (result_shifted & sign_bit_mask)
+    {{
+      // Value is to be interpreted as negative.
+      // Sign extend it from the width of the field to the width of the return type.
+      const {type_name} result = result_shifted - 2 * sign_bit_mask;
+      return result;
+    }}
+
+    // Value is positive.
+    const {type_name} result = result_shifted;
+"""
             else:
                 raise ValueError(f"Got unexpected field type: {type_name}")
 
-            cpp_code += "\n    return result;\n"
+            cpp_code += "    return result;\n"
 
         cpp_code += "  }\n\n"
 

@@ -119,21 +119,21 @@ def test_repr_when_static_members_have_different_value():
     ) != repr(original_field)
 
 
-def test_negative_range_should_raise_exception():
-    with pytest.raises(ValueError) as exception_info:
-        Integer(
-            name="apa",
+def test_is_signed():
+    def get_is_signed(min_value, max_value):
+        return Integer(
+            name="",
             base_index=0,
             description="",
-            min_value=-10,
-            max_value=10,
-            default_value=0,
-        )
+            min_value=min_value,
+            max_value=max_value,
+            default_value=min_value,
+        ).is_signed
 
-    assert (
-        str(exception_info.value)
-        == 'Integer field "apa" should have a non-negative range. Got: [-10, 10].'
-    )
+    assert get_is_signed(min_value=-10, max_value=10)
+    assert get_is_signed(min_value=-10, max_value=-5)
+    assert not get_is_signed(min_value=0, max_value=10)
+    assert not get_is_signed(min_value=5, max_value=10)
 
 
 def test_non_ascending_range_should_raise_exception():
@@ -176,6 +176,25 @@ def test_non_integer_range_should_raise_exception():
         str(exception_info.value)
         == 'Integer field "apa" should have integer value for "max_value". Got: "X".'
     )
+
+
+def test_default_value_uint():
+    def _get_default_value_uint(min_value, max_value, default_value):
+        return Integer(
+            name="",
+            base_index=0,
+            description="",
+            min_value=min_value,
+            max_value=max_value,
+            default_value=default_value,
+        ).default_value_uint
+
+    assert _get_default_value_uint(min_value=5, max_value=10, default_value=7) == 7
+    assert _get_default_value_uint(min_value=-10, max_value=10, default_value=3) == 3
+
+    # Negative values, converted to positive and sign extended to the width of the field.
+    assert _get_default_value_uint(min_value=-10, max_value=10, default_value=-9) == 0b10111
+    assert _get_default_value_uint(min_value=-10, max_value=10, default_value=-6) == 0b11010
 
 
 def test_default_value_of_bad_type_should_raise_exception():
@@ -242,22 +261,68 @@ def test_default_value_out_of_range_should_raise_exception():
     )
 
 
-def test_width():
-    def get_width(min_value, max_value):
-        return Integer(
-            name="",
-            base_index=0,
-            description="",
-            min_value=min_value,
-            max_value=max_value,
-            default_value=min_value,
-        ).width
+def _get_field_width(min_value, max_value):
+    return Integer(
+        name="",
+        base_index=0,
+        description="",
+        min_value=min_value,
+        max_value=max_value,
+        default_value=min_value,
+    ).width
 
-    assert get_width(min_value=0, max_value=127) == 7
-    assert get_width(min_value=0, max_value=128) == 8
-    assert get_width(min_value=0, max_value=255) == 8
-    assert get_width(min_value=0, max_value=256) == 9
+
+def test_unsigned_width():
+    assert _get_field_width(min_value=0, max_value=127) == 7
+    assert _get_field_width(min_value=0, max_value=128) == 8
+    assert _get_field_width(min_value=0, max_value=255) == 8
+    assert _get_field_width(min_value=0, max_value=256) == 9
 
     # The lower bound of the range does not affect the width
     # (but it will add checkers in our generated code).
-    assert get_width(min_value=255, max_value=255) == 8
+    assert _get_field_width(min_value=255, max_value=255) == 8
+
+
+def test_signed_width():
+    # Positive range has greater demand than negative
+    assert _get_field_width(min_value=-4, max_value=16) == 5 + 1
+    assert _get_field_width(min_value=-4, max_value=4) == 3 + 1
+
+    # Negative range has greater demand than positive
+    assert _get_field_width(min_value=-7, max_value=2) == 4
+    assert _get_field_width(min_value=-8, max_value=2) == 4
+    assert _get_field_width(min_value=-9, max_value=2) == 5
+
+    assert _get_field_width(min_value=-15, max_value=7) == 5
+    assert _get_field_width(min_value=-16, max_value=7) == 5
+    assert _get_field_width(min_value=-17, max_value=7) == 6
+
+    # The upper bound of the range here does not affect the width
+    # (but it will add checkers in our generated code).
+    assert _get_field_width(min_value=-8, max_value=-3) == 4
+    assert _get_field_width(min_value=-16, max_value=-4) == 5
+
+
+def test_width_out_of_range_should_raise_exception():
+    def _test_width_out_of_range(min_value, max_value):
+        with pytest.raises(ValueError) as exception_info:
+            _get_field_width(min_value=min_value, max_value=max_value)
+        assert (
+            str(exception_info.value)
+            == f"Supplied integer range [{min_value}, {max_value}] does not fit in a register."
+        )
+
+    # Unsigned. Just within range, should not raise exception.
+    _get_field_width(min_value=128, max_value=2**32 - 1)
+    # Just outside of range.
+    _test_width_out_of_range(min_value=128, max_value=2**32)
+
+    # Signed, limited by negative range. Just within range, should not raise exception.
+    _get_field_width(min_value=-(2**31), max_value=128)
+    # Just outside of range.
+    _test_width_out_of_range(min_value=-(2**31) - 1, max_value=128)
+
+    # Signed, limited by positive range. Just within range, should not raise exception.
+    _get_field_width(min_value=-128, max_value=2**31 - 1)
+    # Just outside of range.
+    _test_width_out_of_range(min_value=-128, max_value=2**31)

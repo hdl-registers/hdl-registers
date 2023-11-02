@@ -24,7 +24,7 @@ default_value = "0011"
 [register.plain_dummy_reg.integer.plain_integer]
 
 description = "Integer"
-min_value = 50
+min_value = -50
 max_value = 100
 default_value = 66
 

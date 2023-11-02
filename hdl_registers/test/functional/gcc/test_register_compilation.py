@@ -301,7 +301,7 @@ void test_field_getters(fpga_regs::Test *test)
 {
   // Assert field getters of plain register
   test->set_plain_dummy_reg(
-    (0b1010011 << 9) | (0b100 << 6) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0)
+    (0b01010011 << 9) | (0b100 << 6) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0)
   );
   assert(test->get_plain_dummy_reg_plain_bit_a() == 1);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 0);
@@ -313,7 +313,7 @@ void test_field_getters(fpga_regs::Test *test)
   assert(test->get_plain_dummy_reg_plain_integer() == 83);
 
   test->set_plain_dummy_reg(
-    (0b0011100 << 9) | (0b011 << 6) | (0b1011 << 2) | (0b1  << 1) | (0b0 << 0)
+    (0b11011100 << 9) | (0b011 << 6) | (0b1011 << 2) | (0b1  << 1) | (0b0 << 0)
   );
   assert(test->get_plain_dummy_reg_plain_bit_a() == 0);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 1);
@@ -322,7 +322,7 @@ void test_field_getters(fpga_regs::Test *test)
     test->get_plain_dummy_reg_plain_enumeration()
     == fpga_regs::test::plain_dummy_reg::plain_enumeration::Enumeration::fourth
   );
-  assert(test->get_plain_dummy_reg_plain_integer() == 28);
+  assert(test->get_plain_dummy_reg_plain_integer() == -36);
 
   // Assert field getters of array register
   test->set_dummy_regs_array_dummy_reg(
@@ -357,7 +357,7 @@ void test_field_getters_from_value(fpga_regs::Test *test)
 
   // Assert field getters of plain register
 
-  register_value = (0b1010011 << 9) | (0b100 << 6) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0);
+  register_value = (0b01010011 << 9) | (0b100 << 6) | (0b1010 << 2) | (0b0  << 1) | (0b1 << 0);
   assert(test->get_plain_dummy_reg_plain_bit_a_from_value(register_value) == 1);
   assert(test->get_plain_dummy_reg_plain_bit_b_from_value(register_value) == 0);
   assert(test->get_plain_dummy_reg_plain_bit_vector_from_value(register_value) == 10);
@@ -367,7 +367,7 @@ void test_field_getters_from_value(fpga_regs::Test *test)
   );
   assert(test->get_plain_dummy_reg_plain_integer_from_value(register_value) == 83);
 
-  register_value = (0b0011100 << 9) | (0b011 << 6)| (0b1011 << 2) | (0b1  << 1) | (0b0 << 0);
+  register_value = (0b11011100 << 9) | (0b011 << 6)| (0b1011 << 2) | (0b1  << 1) | (0b0 << 0);
   assert(test->get_plain_dummy_reg_plain_bit_a_from_value(register_value) == 0);
   assert(test->get_plain_dummy_reg_plain_bit_b_from_value(register_value) == 1);
   assert(test->get_plain_dummy_reg_plain_bit_vector_from_value(register_value) == 11);
@@ -375,7 +375,7 @@ void test_field_getters_from_value(fpga_regs::Test *test)
     test->get_plain_dummy_reg_plain_enumeration_from_value(register_value)
     == fpga_regs::test::plain_dummy_reg::plain_enumeration::Enumeration::fourth
   );
-  assert(test->get_plain_dummy_reg_plain_integer_from_value(register_value) == 28);
+  assert(test->get_plain_dummy_reg_plain_integer_from_value(register_value) == -36);
 
 
   // Assert field getters of array register
@@ -431,7 +431,7 @@ void test_field_setters(fpga_regs::Test *test)
   test->set_plain_dummy_reg_plain_enumeration(
     fpga_regs::test::plain_dummy_reg::plain_enumeration::Enumeration::fifth
   );
-  test->set_plain_dummy_reg_plain_integer(99);
+  test->set_plain_dummy_reg_plain_integer(-45);
   assert(test->get_plain_dummy_reg_plain_bit_a() == 0);
   assert(test->get_plain_dummy_reg_plain_bit_b() == 1);
   assert(test->get_plain_dummy_reg_plain_bit_vector() == 11);
@@ -439,7 +439,7 @@ void test_field_setters(fpga_regs::Test *test)
     test->get_plain_dummy_reg_plain_enumeration()
     == fpga_regs::test::plain_dummy_reg::plain_enumeration::Enumeration::fifth
   );
-  assert(test->get_plain_dummy_reg_plain_integer() == 99);
+  assert(test->get_plain_dummy_reg_plain_integer() == -45);
 
   // Assert field setters of array register
 
@@ -636,13 +636,13 @@ int main()
 
     def test_setting_cpp_integer_field_out_of_range_should_crash(self):
         test_code = """\
-  test.set_plain_dummy_reg_plain_integer(20);
+  test.set_plain_dummy_reg_plain_integer(-1024);
 """
         executable = self._test_basic(test_code=test_code)
 
         with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
             stderr = process.communicate()
-        assert "Assertion `field_value >= 50' failed." in str(stderr), stderr
+        assert "Assertion `field_value >= -50' failed." in str(stderr), stderr
 
         test_code = """\
   test.set_plain_dummy_reg_plain_integer(110);

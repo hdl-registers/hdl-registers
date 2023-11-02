@@ -107,7 +107,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         )
         self._check_field(
             name="plain_integer",
-            index="15:9",
+            index="16:9",
             default_value="66",
             html=html,
         )

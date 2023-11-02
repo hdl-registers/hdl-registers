@@ -11,7 +11,7 @@ all the code that can be generated from it.
 Usage in TOML
 -------------
 
-The TOML file below shows how to set up a register with two integer fields.
+The TOML file below shows how to set up a register with three integer fields.
 See comments for rules about the different properties.
 
 .. literalinclude:: toml/field_integer.toml
@@ -19,9 +19,10 @@ See comments for rules about the different properties.
    :language: TOML
    :linenos:
 
-Note that the second field does not have any lower bound specified, meaning it will default to zero.
-It also does not have any default value, meaning that it will automatically default to the lower
-bound, i.e. zero.
+Note that the second field has a negative range, which is fully supported.
+Note also that the third field does not any lower bound specified, meaning it will default to zero.
+It furthermore does not have any default value, meaning it will automatically default to the
+lower bound, i.e. zero.
 
 Below you will see how you can parse this TOML file and generate artifacts from it.
 
@@ -77,11 +78,9 @@ See :ref:`generator_vhdl` for instructions on how it can be used in your VHDL pr
 Some interesting things to notice:
 
 1. There is only one register, at index 0.
-2. The first field is nine bits wide, occupying bits 8 down to 0, while the second one is three
-   bits wide, occupying but 11 down to 9.
-3. VHDL supports integer types natively.
+2. VHDL supports integer types natively.
    For each field there is a sub-type that is a properly ranged ``integer``.
-4. For each integer field, there are conversion functions for
+3. For each integer field, there are conversion functions for
 
    a. Converting from the integer type to ``std_logic_vector``.
    b. Slicing a register value at the correct range and converting from ``std_logic_vector``
@@ -112,8 +111,9 @@ See :ref:`generator_cpp` for more details and an example of how the excluded fil
 C++ interface header
 ~~~~~~~~~~~~~~~~~~~~
 
-Note that the setters and getters for each field value use an integer type as argument or
+Note that the setters and getters for each field value use integer types as argument or
 return value.
+The signed field uses ``int32_t`` while the unsigned fields use ``uint32_t``.
 
 .. collapse:: Click to expand/collapse code.
 

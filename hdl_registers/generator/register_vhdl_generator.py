@@ -367,11 +367,12 @@ std_ulogic_vector({self._register_range_type_name});
     constant result : {name}_t := {name}_t'val(field_int);
 """
                 elif isinstance(field, Integer):
+                    vector_type = "signed" if field.is_signed else "unsigned"
                     to_slv = f"""\
-    constant result : {name}_slv_t := std_ulogic_vector(to_unsigned(data, {name}_width));
+    constant result : {name}_slv_t := std_ulogic_vector(to_{vector_type}(data, {name}_width));
 """
                     from_slv = f"""\
-    constant result : natural := to_integer(unsigned(data({name})));
+    constant result : integer := to_integer({vector_type}(data({name})));
 """
                 else:
                     raise TypeError(f'Got unexpected field type: "{field}".')

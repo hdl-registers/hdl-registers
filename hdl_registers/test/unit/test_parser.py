@@ -157,9 +157,8 @@ default_value = "0110"
 [register.status.integer.count]
 
 description = "The number of things"
-min_value = 10
+min_value = -5
 max_value = 15
-
 
 
 ################################################################################
@@ -259,8 +258,10 @@ default_value="0000000000000011"
         # Integer fields
         assert registers[1].fields[4].name == "count"
         assert registers[1].fields[4].description == "The number of things"
-        assert registers[1].fields[4].width == 4
-        assert registers[1].fields[4].default_value == 10
+        assert registers[1].fields[4].width == 5
+        assert registers[1].fields[4].min_value == -5
+        assert registers[1].fields[4].max_value == 15
+        assert registers[1].fields[4].default_value == -5
 
         assert registers[1].default_value == (
             # Bits
@@ -270,8 +271,8 @@ default_value="0000000000000011"
             + 6 * 2**2
             # Enum
             + 1 * 2**6
-            # Integer
-            + 10 * 2**8
+            # Integer, negative value converted to positive
+            + 0b11011 * 2**8
         )
 
         assert registers[2].name == "configuration"

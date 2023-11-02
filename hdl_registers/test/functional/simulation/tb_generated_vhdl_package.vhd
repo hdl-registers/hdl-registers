@@ -160,31 +160,44 @@ begin
       assert to_test_plain_dummy_reg_plain_enumeration(reg) = plain_enumeration_fifth;
 
     elsif run("test_integer_to_slv") then
-      check_equal(to_test_plain_dummy_reg_plain_integer_slv(64), std_logic_vector'("1000000"));
-      check_equal(to_test_plain_dummy_reg_plain_integer_slv(63), std_logic_vector'("0111111"));
-      check_equal(to_test_plain_dummy_reg_plain_integer_slv(65), std_logic_vector'("1000001"));
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(-17), std_logic_vector'("11101111"));
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(-16), std_logic_vector'("11110000"));
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(-15), std_logic_vector'("11110001"));
+
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(63), std_logic_vector'("00111111"));
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(64), std_logic_vector'("01000000"));
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(65), std_logic_vector'("01000001"));
 
     elsif run("test_integer_to_slv_out_of_range") then
       -- vunit: .expected_failure
       -- Is outside of the numeric range of the field.
-      check_equal(to_test_plain_dummy_reg_plain_integer_slv(8), std_logic_vector'("0001000"));
+      check_equal(to_test_plain_dummy_reg_plain_integer_slv(127), std_logic_vector'("01111111"));
 
     elsif run("test_integer_from_slv") then
       reg := (others => '1');
 
-      reg(test_plain_dummy_reg_plain_integer) := "1000000";
-      assert to_test_plain_dummy_reg_plain_integer(reg) = 64;
+      reg(test_plain_dummy_reg_plain_integer) := "11101111";
+      assert to_test_plain_dummy_reg_plain_integer(reg) = -17;
 
-      reg(test_plain_dummy_reg_plain_integer) := "0111111";
+      reg(test_plain_dummy_reg_plain_integer) := "11110000";
+      assert to_test_plain_dummy_reg_plain_integer(reg) = -16;
+
+      reg(test_plain_dummy_reg_plain_integer) := "11110001";
+      assert to_test_plain_dummy_reg_plain_integer(reg) = -15;
+
+      reg(test_plain_dummy_reg_plain_integer) := "00111111";
       assert to_test_plain_dummy_reg_plain_integer(reg) = 63;
 
-      reg(test_plain_dummy_reg_plain_integer) := "1000001";
+      reg(test_plain_dummy_reg_plain_integer) := "01000000";
+      assert to_test_plain_dummy_reg_plain_integer(reg) = 64;
+
+      reg(test_plain_dummy_reg_plain_integer) := "01000001";
       assert to_test_plain_dummy_reg_plain_integer(reg) = 65;
 
     elsif run("test_integer_from_slv_out_of_range") then
       -- vunit: .expected_failure
       -- Is outside of the numeric range of the field.
-      reg(test_plain_dummy_reg_plain_integer) := "0000001";
+      reg(test_plain_dummy_reg_plain_integer) := "01111111";
       assert to_test_plain_dummy_reg_plain_integer(reg) = 1;
     end if;
 

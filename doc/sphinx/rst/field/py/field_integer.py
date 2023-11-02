@@ -46,6 +46,14 @@ def create_from_api() -> RegisterList:
     )
 
     register.append_integer(
+        name="increment",
+        description="Offset that will be added to data.",
+        min_value=-4,
+        max_value=3,
+        default_value=0,
+    )
+
+    register.append_integer(
         name="retry_count",
         description="Number of retry attempts before giving up.",
         min_value=0,
