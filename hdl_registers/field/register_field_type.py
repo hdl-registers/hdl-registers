@@ -32,16 +32,16 @@ def _from_unsigned_binary(
         https://vhdlguru.blogspot.com/2010/03/fixed-point-operations-in-vhdl-tutorial.html
 
     Arguments:
-        bit_width (int) : Width of the field.
-        unsigned_binary (int): Unsigned binary integer representation of the field.
-        integer_bit_width (int): If fixed point, the number of bits assigned to the
-            integer part of the field value.
-        fraction_bit_width (int): If fixed point, the number of bits assigned to the
-            fractional part of the field value.
-        is_signed (bool): Is the field signed (Two's compliment)?
+        bit_width: Width of the field.
+        unsigned_binary: Unsigned binary integer representation of the field.
+        integer_bit_width: If fixed point, the number of bits assigned to the integer part of the
+            field value.
+        fraction_bit_width: If fixed point, the number of bits assigned to the fractional part of
+            the field value.
+        is_signed: Is the field signed (two's complement)?
 
     Returns:
-        float: Native Python representation of the field value.
+        Native Python representation of the field value.
     """
     integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
 
@@ -80,16 +80,16 @@ def _to_unsigned_binary(
         https://vhdlguru.blogspot.com/2010/03/fixed-point-operations-in-vhdl-tutorial.html
 
     Arguments:
-        bit_width (int) : Width of the field.
-        value (float): Native Python representation of the field value.
-        integer_bit_width (int): If fixed point, the number of bits assigned to the
-            integer part of the field value.
-        fraction_bit_width (int): If fixed point, the number of bits assigned to the
-            fractional part of the field value.
-        is_signed (bool): Is the field signed (Two's compliment)?
+        bit_width: Width of the field.
+        value: Native Python representation of the field value.
+        integer_bit_width: If fixed point, the number of bits assigned to the integer part of the
+            field value.
+        fraction_bit_width: If fixed point, the number of bits assigned to the fractional part of
+            the field value.
+        is_signed: Is the field signed (two's complement)?
 
     Returns:
-        int: Unsigned binary integer representation of the field.
+        Unsigned binary integer representation of the field.
     """
     integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
 
@@ -111,12 +111,16 @@ class FieldType(ABC):
     def min_value(self, bit_width: int):
         """
         Minimum representable value for this field type.
+
+        Return type is the native Python representation of the value.
         """
 
     @abstractmethod
     def max_value(self, bit_width: int):
         """
         Maximum representable value for this field type.
+
+        Return type is the native Python representation of the value.
         """
 
     @abstractmethod
@@ -126,8 +130,8 @@ class FieldType(ABC):
         into the native Python value of the field.
 
         Arguments:
-            bit_width (int) : Width of the field.
-            unsigned_binary (int): Unsigned binary integer representation of the field.
+            bit_width: Width of the field.
+            unsigned_binary: Unsigned binary integer representation of the field.
         """
 
     @abstractmethod
@@ -137,11 +141,11 @@ class FieldType(ABC):
         unsigned binary integer representation which can be written to a register.
 
         Arguments:
-            bit_width (int) : Width of the field.
-            value : Native Python representation of the field value.
+            bit_width: Width of the field.
+            value: Native Python representation of the field value.
 
         Returns:
-            int: Unsigned binary integer representation of the field.
+            Unsigned binary integer representation of the field.
         """
 
     @abstractmethod
@@ -153,8 +157,8 @@ class FieldType(ABC):
         Check that a given field value is valid within the allowed range.
 
         Arguments:
-            bit_width (int) : Width of the field.
-            value : Native Python representation of the field value.
+            bit_width: Width of the field.
+            value: Native Python representation of the field value.
         """
         min_ = self.min_value(bit_width)
         max_ = self.max_value(bit_width)
@@ -218,9 +222,9 @@ class Fixed(FieldType, ABC):
         fractional portion.
 
         Arguments:
-            is_signed (bool): Is the field signed (Two's compliment)?
-            max_bit_index (int): Position of the upper bit relative to the decimal point.
-            min_bit_index (int): Position of the lower bit relative to the decimal point.
+            is_signed: Is the field signed (two's complement)?
+            max_bit_index: Position of the upper bit relative to the decimal point.
+            min_bit_index: Position of the lower bit relative to the decimal point.
         """
         self.is_signed = is_signed
         self._integer = Signed() if is_signed else Unsigned()
@@ -284,8 +288,8 @@ class UnsignedFixedPoint(Fixed):
         with 5 bits of decimal. Consequently y = 6.5 = "00110.10000".
 
         Arguments:
-            max_bit_index (int): Position of the upper bit relative to the decimal point.
-            min_bit_index (int): Position of the lower bit relative to the decimal point.
+            max_bit_index: Position of the upper bit relative to the decimal point.
+            min_bit_index: Position of the lower bit relative to the decimal point.
         """
         super().__init__(is_signed=False, max_bit_index=max_bit_index, min_bit_index=min_bit_index)
 
@@ -297,10 +301,9 @@ class UnsignedFixedPoint(Fixed):
         Create instance via the respective fixed point bit widths.
 
         Arguments:
-            integer_bit_width (int): The number of bits assigned to the
-                integer part of the field value.
-            fraction_bit_width (int): The number of bits assigned to the
-                fractional part of the field value.
+            integer_bit_width: The number of bits assigned to the integer part of the field value.
+            fraction_bit_width: The number of bits assigned to the fractional part of the
+                field value.
         """
         return cls(max_bit_index=integer_bit_width - 1, min_bit_index=-fraction_bit_width)
 
@@ -321,8 +324,8 @@ class SignedFixedPoint(Fixed):
         with 5 bits of decimal. Consequently y = -6.5 = "11001.10000".
 
         Arguments:
-            max_bit_index (int): Position of the upper bit relative to the decimal point.
-            min_bit_index (int): Position of the lower bit relative to the decimal point.
+            max_bit_index: Position of the upper bit relative to the decimal point.
+            min_bit_index: Position of the lower bit relative to the decimal point.
         """
         super().__init__(is_signed=True, max_bit_index=max_bit_index, min_bit_index=min_bit_index)
 
@@ -332,9 +335,8 @@ class SignedFixedPoint(Fixed):
         Create instance via the respective fixed point bit widths.
 
         Arguments:
-            integer_bit_width (int): The number of bits assigned to the
-                integer part of the field value.
-            fraction_bit_width (int): The number of bits assigned to the
-                fractional part of the field value.
+            integer_bit_width: The number of bits assigned to the integer part of the field value.
+            fraction_bit_width: The number of bits assigned to the fractional part of the
+                field value.
         """
         return cls(max_bit_index=integer_bit_width - 1, min_bit_index=-fraction_bit_width)
