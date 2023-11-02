@@ -4,7 +4,7 @@
 ======================
 
 The register TOML parser reads a ``.toml`` file and constructs a :class:`.RegisterList` object.
-It is important that the TOML is formatted correctly and has the necessary fields.
+It is important that the TOML is formatted correctly and has the necessary properties.
 The register TOML parser will warn if there are any errors in the TOML, such as missing properties,
 unknown properties, wrong data type for properties, etc.
 
@@ -17,8 +17,11 @@ Format
 Below is an example of a typical TOML file.
 It sets up:
 
-1. Two registers, one of which contains a :ref:`bit field <field_bit>` and
-   an :ref:`enumeration field <field_enumeration>`.
+1. Two registers with different :ref:`modes <basic_feature_register_modes>`.
+
+   a. One of which contains a :ref:`bit field <field_bit>` and
+      an :ref:`enumeration field <field_enumeration>`.
+
 2. A :ref:`register array <basic_feature_register_array>` with two registers and fields.
 3. An :ref:`integer constant <constant_integer>` and a :ref:`float constant <constant_float>`.
 

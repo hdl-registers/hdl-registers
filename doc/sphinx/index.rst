@@ -19,6 +19,7 @@
     :caption: Basic features
     :hidden:
 
+    rst/basic_feature/basic_feature_register_modes
     rst/basic_feature/basic_feature_register_array
     rst/basic_feature/basic_feature_default_registers
 

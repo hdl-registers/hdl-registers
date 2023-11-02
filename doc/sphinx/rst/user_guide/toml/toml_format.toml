@@ -2,12 +2,13 @@
 [register.configuration]
 
 # The "mode" property MUST be present for a register.
-# The value specified must be a valid mode string value. Either of:
+# The value specified must be a valid shorthand mode name. Either of:
 # * "r" for Read.
 # * "w" for Write.
 # * "r_w" for Read, Write.
 # * "wpulse" for Write-pulse.
 # * "r_wpulse" for Read, Write-pulse.
+# See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html for details.
 mode = "r_w"
 # The "description" property is optional for a register.
 # Will default to "" if not specified.

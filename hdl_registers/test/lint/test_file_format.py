@@ -90,6 +90,7 @@ def test_no_checked_in_files_have_too_long_lines():
         / "basic_feature"
         / "basic_feature_default_registers.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "basic_feature" / "basic_feature_register_array.rst",
+        HDL_REGISTERS_DOC / "sphinx" / "rst" / "basic_feature" / "basic_feature_register_modes.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "constant" / "constant_bit_vector.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "constant" / "constant_boolean.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "constant" / "constant_float.rst",

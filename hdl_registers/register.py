@@ -34,19 +34,28 @@ class RegisterMode:
 
 
 REGISTER_MODES = dict(
-    r=RegisterMode("Read", "Bus can read a value that fabric provides."),
-    w=RegisterMode("Write", "Bus can write a value that is available for fabric usage."),
+    r=RegisterMode(mode_readable="Read", description="Bus can read a value that fabric provides."),
+    w=RegisterMode(
+        mode_readable="Write",
+        description="Bus can write a value that is available for fabric usage.",
+    ),
     r_w=RegisterMode(
-        "Read, Write",
-        "Bus can write a value and read it back. The written value is available for fabric usage.",
+        mode_readable="Read, Write",
+        description=(
+            "Bus can write a value and read it back. "
+            "The written value is available for fabric usage."
+        ),
     ),
     wpulse=RegisterMode(
-        "Write-pulse", "Bus can write a value that is asserted for one clock cycle in fabric."
+        mode_readable="Write-pulse",
+        description="Bus can write a value that is asserted for one clock cycle in fabric.",
     ),
     r_wpulse=RegisterMode(
-        "Read, Write-pulse",
-        "Bus can read a value that fabric provides. "
-        "Bus can write a value that is asserted for one clock cycle in fabric.",
+        mode_readable="Read, Write-pulse",
+        description=(
+            "Bus can read a value that fabric provides. "
+            "Bus can write a value that is asserted for one clock cycle in fabric."
+        ),
     ),
 )
 
@@ -66,7 +75,10 @@ class Register:
                 start of the array. I.e. the index is zero for the first register in the array.
                 If the register is a plain register, the index shall be relative to the start of
                 the register list.
-            mode: A valid register mode.
+            mode: A valid register mode. Should be a key in the ``REGISTER_MODES`` dictionary.
+                I.e. the shorthand name for the mode, e.g. ``"r_w"``.
+                See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
+                for more information.
             description: Textual register description.
         """
         if mode not in REGISTER_MODES:

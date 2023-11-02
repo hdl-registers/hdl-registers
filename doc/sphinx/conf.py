@@ -59,6 +59,18 @@ html_theme_options = {
 
 html_logo = "hdl_registers_sphinx.png"
 
+# These folders are copied to the documentation's HTML output
+html_static_path = ["css"]
+
+# These paths are either relative to html_static_path
+# or fully qualified paths (eg. https://...)
+html_css_files = [
+    # A hack to get the table captions below the table.
+    # Per instructions at
+    # https://stackoverflow.com/questions/69845499/
+    "docutils_table_caption_below.css",
+]
+
 
 # Make autodoc include __init__ class method.
 # https://stackoverflow.com/a/5599712
