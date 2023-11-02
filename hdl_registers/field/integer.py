@@ -51,7 +51,10 @@ class Integer(RegisterField):
         self.default_value = default_value
 
     @property
-    def is_signed(self):
+    def is_signed(self) -> bool:
+        """
+        Returns True if the field can hold negative numbers.
+        """
         return self._min_value < 0
 
     @property
