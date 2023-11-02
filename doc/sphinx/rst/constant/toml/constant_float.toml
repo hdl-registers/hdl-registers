@@ -1,4 +1,4 @@
-# This will allocate a register constant with the name "supports_pre_filtering" of type float.
+# This will allocate a register constant with the name "clock_frequency_hz" of type float.
 [constant.clock_frequency_hz]
 
 # The "value" property MUST be present for a float constant.
