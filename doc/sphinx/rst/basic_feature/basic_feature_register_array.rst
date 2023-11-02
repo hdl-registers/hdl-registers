@@ -6,7 +6,7 @@ Register arrays
 A register list, i.e. the register set of one module, can contain *register arrays*.
 Meaning, a set of registers within the register list that are repeated a number of times.
 
-This page will show you how the set up register arrays, and will showcase
+This page will show you how to set up register arrays, and will showcase
 all the code that can be generated from it.
 
 
