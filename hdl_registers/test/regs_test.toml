@@ -1,52 +1,32 @@
 
 ################################################################################
-[register.plain_dummy_reg]
+[register.config]
 
 mode = "r_w"
 description = "A plain **dummy** register."
 
-[register.plain_dummy_reg.bit.plain_bit_a]
+bit.plain_bit_a.description = "Bit A"
+bit.plain_bit_a.default_value = "0"
 
-description = "Bit A"
-default_value = "0"
+bit.plain_bit_b.description = "Bit B"
+bit.plain_bit_b.default_value = "1"
 
-[register.plain_dummy_reg.bit.plain_bit_b]
+bit_vector.plain_bit_vector.description = "Bit **vector**"
+bit_vector.plain_bit_vector.width = 4
+bit_vector.plain_bit_vector.default_value = "0011"
 
-description = "Bit B"
-default_value = "1"
+integer.plain_integer.description = "Integer"
+integer.plain_integer.min_value = -50
+integer.plain_integer.max_value = 100
+integer.plain_integer.default_value = 66
 
-[register.plain_dummy_reg.bit_vector.plain_bit_vector]
-
-description = "Bit **vector**"
-width = 4
-default_value = "0011"
-
-[register.plain_dummy_reg.integer.plain_integer]
-
-description = "Integer"
-min_value = -50
-max_value = 100
-default_value = 66
-
-[register.plain_dummy_reg.enumeration.plain_enumeration]
-
-description = "Enumeration"
-default_value = "third"
-
-element.first = "element 0"
-element.second = "element 1"
-element.third = "element 2"
-element.fourth = "element 3"
-element.fifth = "element 4"
-
-
-################################################################################
-[register.status]
-
-mode = "r"
-
-bit.a.description = "Bit A"
-bit.b.description = "Bit B"
+enumeration.plain_enumeration.description = "Enumeration"
+enumeration.plain_enumeration.default_value = "third"
+enumeration.plain_enumeration.element.first = "element 0"
+enumeration.plain_enumeration.element.second = "element 1"
+enumeration.plain_enumeration.element.third = "element 2"
+enumeration.plain_enumeration.element.fourth = "element 3"
+enumeration.plain_enumeration.element.fifth = "element 4"
 
 
 ################################################################################
@@ -54,8 +34,8 @@ bit.b.description = "Bit B"
 
 mode = "wpulse"
 
-bit.a.description = "Bit A"
-bit.b.description = "Bit B"
+bit.start.description = "First bit"
+bit.abort.description = "Second bit"
 
 
 ################################################################################
@@ -68,73 +48,114 @@ bit.b.description = "Bit B"
 
 
 ################################################################################
+[register.status]
+
+mode = "r"
+description = "A register with fields that is only 'up'."
+
+bit.a.description = "Bit A"
+bit.b.description = "Bit B"
+
+
+################################################################################
 [register.address]
 
 mode = "w"
+description = "A register with fields that is only 'down'."
 
 bit_vector.a.width = 8
 bit_vector.b.width = 8
 
 
 ################################################################################
-[register_array.dummy_regs]
+[register.current_timestamp]
+
+mode = "r"
+description = "An empty register that is only 'up'."
+
+
+################################################################################
+[register.tuser]
+
+mode = "w"
+description = "An empty register that is only 'down'."
+
+
+################################################################################
+[register_array.dummies]
 
 array_length = 3
 description = "An **array** with some dummy regs"
 
+
 # ------------------------------------------------------------------------------
-[register_array.dummy_regs.register.array_dummy_reg]
+[register_array.dummies.register.first]
 
 mode = "r_w"
 description = "The first register in the array."
 
-[register_array.dummy_regs.register.array_dummy_reg.bit.array_bit_a]
+bit.array_bit_a.description = "Array register bit A"
+bit.array_bit_a.default_value = "1"
 
-description = "Array register bit A"
-default_value = "1"
+bit.array_bit_b.description = "Array register bit B"
+bit.array_bit_b.default_value = "0"
 
-[register_array.dummy_regs.register.array_dummy_reg.bit.array_bit_b]
+bit_vector.array_bit_vector.description = "Array register bit vector"
+bit_vector.array_bit_vector.width = 5
+bit_vector.array_bit_vector.default_value = "01100"
 
-description = "Array register bit B"
-default_value = "0"
+integer.array_integer.description = "Array register integer"
+integer.array_integer.max_value = 100
 
-[register_array.dummy_regs.register.array_dummy_reg.bit_vector.array_bit_vector]
-
-description = "Array register bit vector"
-width = 5
-default_value = "01100"
-
-[register_array.dummy_regs.register.array_dummy_reg.enumeration.array_enumeration]
-
-description = "Array register enumeration"
-default_value = "element1"
-
-element.element0 = "element index 0"
-element.element1 = "element index 1"
-
-[register_array.dummy_regs.register.array_dummy_reg.integer.array_integer]
-
-description = "Array register integer"
-max_value = 100
+enumeration.array_enumeration.description = "Array register enumeration"
+enumeration.array_enumeration.default_value = "element1"
+enumeration.array_enumeration.element.element0 = "element index 0"
+enumeration.array_enumeration.element.element1 = "element index 1"
 
 
 # ------------------------------------------------------------------------------
-[register_array.dummy_regs.register.second_array_dummy_reg]
+[register_array.dummies.register.second]
 
 description = "The second register in the array."
 mode = "r"
 
 
 ################################################################################
-[register_array.further_regs]
+[register_array.dummies2]
 
 array_length = 1
+description = "Length 1, i.e. no repetition, which is a little bit odd, but allowed."
+
 
 # ------------------------------------------------------------------------------
-[register_array.further_regs.register.dummy_reg]
+[register_array.dummies2.register.dummy]
 
 mode = "r_w"
-description = "A register in a second register array"
+description = "A register in a second register array. Is both 'up' and 'down'."
+
+
+################################################################################
+[register_array.dummies3]
+
+array_length = 2
+description = "An array that contains only 'up' register(s)."
+
+# ------------------------------------------------------------------------------
+[register_array.dummies3.register.dummy]
+
+mode = "r"
+
+
+################################################################################
+[register_array.dummies4]
+
+array_length = 2
+description = "An array that contains only 'down' register(s)."
+
+# ------------------------------------------------------------------------------
+[register_array.dummies4.register.dummy]
+
+mode = "wpulse"
 
 
 ################################################################################

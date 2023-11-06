@@ -54,7 +54,7 @@ class CTest(CompileAndRunTest):
 
 int main()
 {{
-  assert(TEST_NUM_REGS == {12 * test_registers});
+  assert(TEST_NUM_REGS == {18 * test_registers});
 
 {main_function}
 

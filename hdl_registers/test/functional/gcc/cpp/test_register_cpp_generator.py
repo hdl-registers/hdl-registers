@@ -86,7 +86,7 @@ def base_cpp_test(tmp_path):
 
 class CppTest(BaseCppTest):
     def compile_and_run(self, test_constants, test_registers):
-        test_code = f"  assert(fpga_regs::Test::num_registers == {12 * test_registers});\n"
+        test_code = f"  assert(fpga_regs::Test::num_registers == {18 * test_registers});\n"
 
         tests = ["test_constants"] if test_constants else []
         tests += ["test_registers"] if test_registers else []
@@ -127,18 +127,18 @@ def test_cpp_with_only_constants(cpp_test):
 def test_setting_cpp_register_array_out_of_bounds_should_crash(base_cpp_test):
     test_code = """\
   // Index 3 is out of bounds (should be less than 3)
-  test.set_dummy_regs_array_dummy_reg(3, 1337);
+  test.set_dummies_first(3, 1337);
 """
     executable = base_cpp_test.compile(test_code=test_code)
 
     with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
         stderr = process.communicate()
-    assert "Assertion `array_index < dummy_regs_array_length' failed" in str(stderr), stderr
+    assert "Assertion `array_index < dummies_array_length' failed" in str(stderr), stderr
 
 
 def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
-  test.set_plain_dummy_reg_plain_integer(-1024);
+  test.set_config_plain_integer(-1024);
 """
     executable = base_cpp_test.compile(test_code=test_code)
 
@@ -147,7 +147,7 @@ def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
     assert "Assertion `field_value >= -50' failed." in str(stderr), stderr
 
     test_code = """\
-  test.set_plain_dummy_reg_plain_integer(110);
+  test.set_config_plain_integer(110);
 """
     executable = base_cpp_test.compile(test_code=test_code)
 

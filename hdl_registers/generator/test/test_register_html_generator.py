@@ -34,7 +34,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         html = self._create_html_page()
 
         self._check_register(
-            name="plain_dummy_reg",
+            name="config",
             index=0,
             address="0x0000",
             mode="Read, Write",
@@ -44,7 +44,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         )
 
         self._check_register_array(
-            name="dummy_regs",
+            name="dummies",
             length=3,
             iterator_range="i &isin; [0, 2]",
             description="An <strong>array</strong> with some dummy regs",
@@ -52,9 +52,9 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         )
 
         self._check_register(
-            name="array_dummy_reg",
-            index="5 + i &times; 2",
-            address="0x0014 + i &times; 0x0008",
+            name="first",
+            index="7 + i &times; 2",
+            address="0x001C + i &times; 0x0008",
             mode="Read, Write",
             default_value="0xB1",
             description="The first register in the array.",
@@ -62,9 +62,9 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         )
 
         self._check_register(
-            name="second_array_dummy_reg",
-            index="6 + i &times; 2",
-            address="0x0018 + i &times; 0x0008",
+            name="second",
+            index="8 + i &times; 2",
+            address="0x0020 + i &times; 0x0008",
             mode="Read",
             default_value="0x0",
             description="The second register in the array.",
@@ -146,7 +146,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 
         # Check that registers are there
         assert "Registers" in html, html
-        assert "dummy_regs" in html, html
+        assert "dummies" in html, html
 
         # Check that constants are there
         assert constants_text in html, html
@@ -163,7 +163,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 
         # Registers should still be there
         assert "Registers" in html, html
-        assert "dummy_regs" in html, html
+        assert "dummies" in html, html
 
         # But no constants
         assert constants_text not in html, html
@@ -174,7 +174,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         html = self._create_html_page()
 
         assert "This module does not have any registers" in html, html
-        assert "dummy_regs" not in html, html
+        assert "dummies" not in html, html
 
         assert "<h2>Constants</h2>" in html, html
         self._check_constant(name="data_width", value=24, html=html)
