@@ -62,3 +62,4 @@
     rst/api_reference/hdl_registers.field
     rst/api_reference/hdl_registers.constant
     rst/api_reference/hdl_registers.generator
+    rst/api_reference/hdl_registers.generator.vhdl

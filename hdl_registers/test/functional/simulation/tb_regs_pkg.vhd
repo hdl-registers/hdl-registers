@@ -20,7 +20,7 @@ use reg_file.reg_file_pkg.all;
 use work.test_regs_pkg.all;
 
 
-entity tb_generated_vhdl_package is
+entity tb_regs_pkg is
   generic (
     test_integer_lower_range : boolean := false;
     test_integer_upper_range : boolean := false;
@@ -28,7 +28,7 @@ entity tb_generated_vhdl_package is
   );
 end entity;
 
-architecture tb of tb_generated_vhdl_package is
+architecture tb of tb_regs_pkg is
 
 begin
 
@@ -116,23 +116,23 @@ begin
 
     elsif run("test_enumeration_to_slv") then
       check_equal(
-        to_test_config_plain_enumeration_slv(plain_enumeration_first),
+        to_slv(plain_enumeration_first),
         std_logic_vector'("000")
       );
       check_equal(
-        to_test_config_plain_enumeration_slv(plain_enumeration_second),
+        to_slv(plain_enumeration_second),
         std_logic_vector'("001")
       );
       check_equal(
-        to_test_config_plain_enumeration_slv(plain_enumeration_third),
+        to_slv(plain_enumeration_third),
         std_logic_vector'("010")
       );
       check_equal(
-        to_test_config_plain_enumeration_slv(plain_enumeration_fourth),
+        to_slv(plain_enumeration_fourth),
         std_logic_vector'("011")
       );
       check_equal(
-        to_test_config_plain_enumeration_slv(plain_enumeration_fifth),
+        to_slv(plain_enumeration_fifth),
         std_logic_vector'("100")
       );
 

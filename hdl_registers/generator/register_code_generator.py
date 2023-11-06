@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 
 # First party libraries
 from hdl_registers.register import Register
+from hdl_registers.register_array import RegisterArray
 
 
 class RegisterCodeGenerator(ABC):
@@ -28,6 +29,12 @@ class RegisterCodeGenerator(ABC):
             else:
                 for register in register_object.registers:
                     yield (register, register_object)
+
+    @staticmethod
+    def _iterate_register_arrays(register_objects):
+        for register_object in register_objects:
+            if isinstance(register_object, RegisterArray):
+                yield register_object
 
     @staticmethod
     @abstractmethod

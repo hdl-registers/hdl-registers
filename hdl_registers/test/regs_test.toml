@@ -43,8 +43,19 @@ bit.abort.description = "Second bit"
 
 mode = "r_wpulse"
 
-bit.a.description = "Bit A"
-bit.b.description = "Bit B"
+bit.a.default_value = "1"
+bit.b.default_value = "0"
+
+bit_vector.c.width = 3
+bit_vector.c.default_value = "101"
+
+enumeration.d.default_value = "second"
+enumeration.d.element.first = "element 0"
+enumeration.d.element.second = "element 1"
+
+integer.e.min_value = -100
+integer.e.max_value = 100
+integer.e.default_value = -10
 
 
 ################################################################################
@@ -123,25 +134,51 @@ mode = "r"
 ################################################################################
 [register_array.dummies2]
 
-array_length = 1
-description = "Length 1, i.e. no repetition, which is a little bit odd, but allowed."
-
+array_length = 2
+description = "An array that contains both 'up' and 'down' register."
 
 # ------------------------------------------------------------------------------
 [register_array.dummies2.register.dummy]
 
-mode = "r_w"
-description = "A register in a second register array. Is both 'up' and 'down'."
+mode = "r_wpulse"
+
+bit.f.default_value = "0"
+bit.g.default_value = "1"
+
+bit_vector.h.width = 5
+bit_vector.h.default_value = "01010"
+
+enumeration.i.default_value = "third"
+enumeration.i.element.first = "element 0"
+enumeration.i.element.second = "element 1"
+enumeration.i.element.third = "element 2"
+enumeration.i.element.fourth = "element 4"
+
+integer.j.min_value = -100
+integer.j.max_value = 100
+integer.j.default_value = -19
 
 
 ################################################################################
 [register_array.dummies3]
 
-array_length = 2
-description = "An array that contains only 'up' register(s)."
+array_length = 1
+description = """
+An array that contains only 'up' register(s).
+Length 1, i.e. no repetition, which is a little bit odd, but allowed.
+"""
 
 # ------------------------------------------------------------------------------
 [register_array.dummies3.register.dummy]
+
+mode = "r"
+
+integer.count.max_value = 19
+bit.enable.default_value = "1"
+
+
+# ------------------------------------------------------------------------------
+[register_array.dummies3.register.status]
 
 mode = "r"
 

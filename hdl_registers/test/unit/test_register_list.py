@@ -415,3 +415,76 @@ value = 3
         ) as _:
             register_list.create_vhdl_package(self.tmp_path)
             mocked_create_vhdl_package.assert_called_once()
+
+
+def test_create_vhdl_axi_lite_reg_file_per_default(tmp_path):
+    register_list = RegisterList(name="apa")
+    register_list.append_register(name="hest", mode="r_w", description="")
+
+    register_list.create_vhdl_package(output_path=tmp_path)
+
+    assert (tmp_path / "apa_regs_pkg.vhd").exists()
+    assert (tmp_path / "apa_reg_file.vhd").exists()
+
+
+def test_do_not_create_vhdl_axi_lite_reg_file(tmp_path):
+    register_list = RegisterList(name="apa")
+    register_list.append_register(name="hest", mode="r_w", description="")
+
+    register_list.create_vhdl_package(output_path=tmp_path, create_axi_lite_reg_file=False)
+
+    assert (tmp_path / "apa_regs_pkg.vhd").exists()
+    assert not (tmp_path / "apa_reg_file.vhd").exists()
+
+    register_list.create_vhdl_package(output_path=tmp_path, create_axi_lite_reg_file=False)
+
+    assert (tmp_path / "apa_regs_pkg.vhd").exists()
+    assert not (tmp_path / "apa_reg_file.vhd").exists()
+
+    register_list.create_vhdl_package(output_path=tmp_path)
+
+    assert (tmp_path / "apa_regs_pkg.vhd").exists()
+    assert (tmp_path / "apa_reg_file.vhd").exists()
+
+
+def test_create_vhdl_axi_lite_reg_file_should_run_again_if_file_is_deleted(tmp_path):
+    register_list = RegisterList(name="apa")
+    register_list.append_register(name="hest", mode="r_w", description="")
+
+    register_list.create_vhdl_package(output_path=tmp_path)
+
+    (tmp_path / "apa_reg_file.vhd").unlink()
+
+    with patch(
+        "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
+    ) as mocked_create_vhdl_package:
+        register_list.create_vhdl_package(output_path=tmp_path)
+        mocked_create_vhdl_package.assert_not_called()
+
+    assert (tmp_path / "apa_reg_file.vhd").exists()
+
+
+def test_create_vhdl_axi_lite_reg_file_should_not_run_again_if_nothing_has_changed(tmp_path):
+    register_list = RegisterList(name="apa")
+    register_list.append_register(name="hest", mode="r_w", description="")
+
+    register_list.create_vhdl_package(output_path=tmp_path)
+
+    with patch(
+        "hdl_registers.register_list.RegisterList._create_vhdl_package", autospec=True
+    ) as mocked_create_vhdl_package, patch(
+        "hdl_registers.register_list.RegisterList._create_vhdl_axi_lite_reg_file", autospec=True
+    ) as mocked_create_vhdl_axi_lite_reg_file:
+        register_list.create_vhdl_package(output_path=tmp_path)
+        mocked_create_vhdl_package.assert_not_called()
+        mocked_create_vhdl_axi_lite_reg_file.assert_not_called()
+
+
+def test_create_vhdl_axi_lite_reg_file_should_not_run_if_register_list_has_no_registers(tmp_path):
+    register_list = RegisterList(name="apa")
+    register_list.add_constant(name="hest", value=3, description="")
+
+    register_list.create_vhdl_package(output_path=tmp_path)
+
+    assert (tmp_path / "apa_regs_pkg.vhd").exists()
+    assert not (tmp_path / "apa_reg_file.vhd").exists()

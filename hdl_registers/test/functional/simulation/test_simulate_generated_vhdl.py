@@ -33,6 +33,9 @@ from hdl_registers.field.register_field_type import (
     Unsigned,
     UnsignedFixedPoint,
 )
+from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+    generate_strange_register_maps,
+)
 from hdl_registers.parser import from_toml
 
 THIS_FOLDER = Path(__file__).parent.resolve()
@@ -40,20 +43,26 @@ THIS_FOLDER = Path(__file__).parent.resolve()
 
 def test_running_simulation(tmp_path):
     """
-    Run the testbench .vhd file that is next to this file. Contains assertions on the
-    VHDL package generated from the example TOML file. Shows that the file can be compiled and
-    that (some of) the information is correct.
+    Run the testbench .vhd files that are next to this file.
+    Contains assertions on types and type conversions.
+    Shows that the files can be compiled and that the information is correct.
     """
-    regs_pkg_path = _generate_registers(output_path=tmp_path)
+    _generate_toml_registers(output_path=tmp_path)
+    generate_strange_register_maps(output_path=tmp_path)
 
     def run(args, exit_code):
-        argv = ["--minimal", "--num-threads", "4", "--output-path", str(tmp_path)] + args
+        argv = ["--minimal", "--num-threads", "10", "--output-path", str(tmp_path)] + args
         vunit_proj = VUnit.from_argv(argv=argv)
+        vunit_proj.add_verification_components()
         vunit_proj.add_vhdl_builtins()
 
         library = vunit_proj.add_library(library_name="example")
-        library.add_source_file(THIS_FOLDER / "tb_generated_vhdl_package.vhd")
-        library.add_source_file(regs_pkg_path)
+
+        for vhd_file in THIS_FOLDER.glob("*.vhd"):
+            library.add_source_file(vhd_file)
+
+        for vhd_file in tmp_path.glob("*.vhd"):
+            library.add_source_file(vhd_file)
 
         for module in get_hdl_modules():
             vunit_library = vunit_proj.add_library(library_name=module.library_name)
@@ -76,7 +85,7 @@ def test_running_simulation(tmp_path):
     run(args=["--with-attribute", ".expected_failure"], exit_code=1)
 
 
-def _generate_registers(output_path):
+def _generate_toml_registers(output_path):
     register_list = from_toml(
         module_name="test",
         toml_file=HDL_REGISTERS_PATH / "test" / "regs_test.toml",
@@ -108,8 +117,6 @@ def _generate_registers(output_path):
     )
 
     register_list.create_vhdl_package(output_path=output_path)
-
-    return output_path / "test_regs_pkg.vhd"
 
 
 if __name__ == "__main__":
