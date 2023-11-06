@@ -231,7 +231,10 @@ enum {self._to_pascal_case(field_name)}
                 value = str(constant.value)
             elif isinstance(constant, StringConstant):
                 # C string literal: Raw value enclosed in double quotation marks.
-                declaration = f'char *{constant_name} = "{constant.value}";'
+                # Without "static", we get a linker warning about multiple definitions
+                # despite the multiple-include guard.
+                # See here https://stackoverflow.com/a/9196883 for some other information.
+                declaration = f'static char *{constant_name} = "{constant.value}";'
             elif isinstance(constant, UnsignedVectorConstant):
                 # "unsigned" and "long" as suffix.
                 # Makes it possible to use large numbers for e.g. base addresses.

@@ -22,7 +22,7 @@ from hdl_registers.parser import from_toml
 @pytest.mark.usefixtures("fixture_tmp_path")
 class TestRegisterCppGenerator(unittest.TestCase):
     """
-    Note that there are further tests in test_register_compilation.py.
+    Note that there are further tests in the test/functional/gcc folder.
     """
 
     tmp_path = None
