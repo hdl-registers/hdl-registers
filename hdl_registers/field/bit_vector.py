@@ -9,7 +9,7 @@
 
 # Local folder libraries
 from .register_field import DEFAULT_FIELD_TYPE, RegisterField
-from .register_field_type import FieldType
+from .register_field_type import FieldType, Fixed
 
 
 class BitVector(RegisterField):
@@ -45,12 +45,13 @@ class BitVector(RegisterField):
         # The width of the field affects the base index of the next fields.
         # Hence the user is not allowed to change it, nor the base index of this field,
         # after initialization.
-        self._check_width(width)
+        self._check_width(width=width, field_type=field_type)
         self._width = width
 
         self._default_value = None
         # Assign self._default_value via setter
         self.default_value = default_value
+
         self._field_type = field_type
 
     @property
@@ -61,18 +62,28 @@ class BitVector(RegisterField):
     def width(self):
         return self._width
 
-    def _check_width(self, value):
+    def _check_width(self, width: int, field_type: FieldType):
         """
         Sanity checks for the provided width
         """
-        if not isinstance(value, int):
+        if not isinstance(width, int):
             message = (
-                f'Bit vector "{self.name}" should have integer value for "width". Got: "{value}".'
+                f'Bit vector "{self.name}" should have integer value for "width". Got: "{width}".'
             )
             raise ValueError(message)
 
-        if value < 1 or value > 32:
-            raise ValueError(f'Invalid bit vector width for "{self.name}". Got: "{value}".')
+        if width < 1 or width > 32:
+            raise ValueError(f'Invalid width for bit vector "{self.name}". Got: "{width}".')
+
+        # A fixed-point field type specifies its integer width and fractional width,
+        # which together form a total width.
+        # Check that this does not clash with the width specified for the field.
+        if isinstance(field_type, Fixed):
+            if width != field_type.expected_bit_width:
+                raise ValueError(
+                    f'Inconsistent width for bit vector "{self.name}". '
+                    f'Field is "{width}" bits, type is "{field_type.expected_bit_width}".'
+                )
 
     @property
     def base_index(self):
@@ -125,9 +136,9 @@ class BitVector(RegisterField):
     def __repr__(self):
         return f"""{self.__class__.__name__}(\
 name={self.name},\
-base_index={self.base_index},\
+_base_index={self._base_index},\
 description={self.description},
-width={self.width},\
-default_value={self.default_value},\
-field_type={self.field_type},\
+_width={self._width},\
+_default_value={self._default_value},\
+_field_type={self._field_type},\
 )"""

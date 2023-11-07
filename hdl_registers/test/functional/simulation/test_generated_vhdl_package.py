@@ -95,15 +95,15 @@ def _generate_registers(output_path):
     register.append_bit_vector(
         name="ufixed0",
         description="",
-        width=2,
-        default_value="11",
+        width=8,
+        default_value="1" * 8,
         field_type=UnsignedFixedPoint(5, -2),
     )
     register.append_bit_vector(
         name="sfixed0",
         description="",
-        width=2,
-        default_value="11",
+        width=6,
+        default_value="1" * 6,
         field_type=SignedFixedPoint(2, -3),
     )
 

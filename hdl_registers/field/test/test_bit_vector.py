@@ -153,24 +153,24 @@ def test_repr():
         name="apa",
         base_index=0,
         description="",
-        width=8,
-        default_value="0" * 8,
+        width=10,
+        default_value="0" * 10,
         field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
     )
     field1 = BitVector(
         name="apa",
         base_index=0,
         description="",
-        width=8,
-        default_value="0" * 8,
+        width=10,
+        default_value="0" * 10,
         field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
     )
     field2 = BitVector(
         name="apa",
         base_index=0,
         description="",
-        width=8,
-        default_value="0" * 8,
+        width=10,
+        default_value="0" * 10,
         field_type=UnsignedFixedPoint(max_bit_index=8, min_bit_index=-1),
     )
     assert repr(field0) == repr(field1) != repr(field2)
@@ -186,11 +186,11 @@ def test_invalid_width():
 
     with pytest.raises(ValueError) as exception_info:
         BitVector(name="foo", base_index=0, width=33, description="", default_value="0")
-    assert str(exception_info.value) == 'Invalid bit vector width for "foo". Got: "33".'
+    assert str(exception_info.value) == 'Invalid width for bit vector "foo". Got: "33".'
 
     with pytest.raises(ValueError) as exception_info:
         BitVector(name="foo", base_index=0, width=0, description="", default_value="0")
-    assert str(exception_info.value) == 'Invalid bit vector width for "foo". Got: "0".'
+    assert str(exception_info.value) == 'Invalid width for bit vector "foo". Got: "0".'
 
 
 def test_invalid_default_value_should_raise_exception():
@@ -262,8 +262,8 @@ def test_field_type():
         name="",
         base_index=0,
         description="",
-        width=4,
-        default_value="1111",
+        width=10,
+        default_value="1" * 10,
         field_type=SignedFixedPoint(max_bit_index=7, min_bit_index=-2),
     )
     assert isinstance(bit_vector.field_type, SignedFixedPoint)
@@ -274,10 +274,35 @@ def test_field_type():
         name="",
         base_index=0,
         description="",
-        width=4,
-        default_value="1111",
+        width=10,
+        default_value="1" * 10,
         field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
     )
     assert isinstance(bit_vector.field_type, UnsignedFixedPoint)
     assert bit_vector.field_type.max_bit_index == 7
     assert bit_vector.field_type.min_bit_index == -2
+
+
+def test_invalid_field_type_width_should_raise_exception():
+    def test(field_type):
+        with pytest.raises(ValueError) as exception_info:
+            BitVector(
+                name="apa",
+                base_index=0,
+                description="",
+                width=4,
+                default_value="1111",
+                field_type=field_type,
+            )
+
+        type_width = field_type.integer_bit_width + field_type.fraction_bit_width
+        expected = (
+            f'Inconsistent width for bit vector "apa". Field is "4" bits, type is "{type_width}".'
+        )
+        assert str(exception_info.value) == expected
+
+    test(SignedFixedPoint(max_bit_index=7, min_bit_index=0))
+    test(UnsignedFixedPoint(max_bit_index=9, min_bit_index=-3))
+
+    test(SignedFixedPoint(max_bit_index=5, min_bit_index=0))
+    test(UnsignedFixedPoint(max_bit_index=3, min_bit_index=-3))
