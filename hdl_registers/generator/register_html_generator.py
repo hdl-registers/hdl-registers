@@ -49,7 +49,7 @@ class RegisterHtmlGenerator:
         Get a HTML table with register information. Can be included in other documents.
 
         Arguments:
-            register_objects: Register arrays and registers to be included.
+            register_objects: Registers and register arrays to be included.
 
         Returns:
             str: HTML code.
@@ -85,7 +85,7 @@ class RegisterHtmlGenerator:
         Get a complete HTML page with register and constant information.
 
         Arguments:
-            register_objects: Register arrays and registers to be included.
+            register_objects: Registers and register arrays to be included.
             constants: Constants to be included.
 
         Returns:

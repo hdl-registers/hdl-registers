@@ -58,7 +58,7 @@ class RegisterCGenerator(RegisterCodeGenerator):
         Get a complete C header with all constants and all registers.
 
         Arguments:
-            register_objects: Register arrays and registers to be included.
+            register_objects: Registers and register arrays to be included.
             constants: Constants to be included.
 
         Returns:

@@ -60,8 +60,8 @@ class RegisterCppGenerator:
         all methods.
 
         Arguments:
-            register_objects (list): Register arrays and registers to be included.
-            constants (list(Constant)): Constants to be included.
+            register_objects: Registers and register arrays to be included.
+            constants: Constants to be included.
 
         Returns:
             str: C++ code.
@@ -76,7 +76,7 @@ class RegisterCppGenerator:
         Get a complete C++ class header for the implementation of all methods.
 
         Arguments:
-            register_objects: Register arrays and registers to be included.
+            register_objects: Registers and register arrays to be included.
 
         Returns:
             str: C++ code.
@@ -91,7 +91,7 @@ class RegisterCppGenerator:
         Get a complete C++ class implementation with all methods.
 
         Arguments:
-            register_objects: Register arrays and registers to be included.
+            register_objects: Registers and register arrays to be included.
 
         Returns:
             str: C++ code.
