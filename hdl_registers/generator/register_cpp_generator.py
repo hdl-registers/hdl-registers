@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import TYPE_CHECKING, Union
+
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
@@ -23,6 +26,11 @@ from hdl_registers.register_array import RegisterArray
 # Local folder libraries
 from .register_code_generator import RegisterCodeGenerator
 
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.constant.constant import Constant
+    from hdl_registers.register import Register
+
 
 class RegisterCppGenerator:
     """
@@ -35,16 +43,18 @@ class RegisterCppGenerator:
     That test is considered more meaningful and exhaustive than a unit test would be.
     """
 
-    def __init__(self, module_name, generated_info):
+    def __init__(self, module_name: str, generated_info: list[str]):
         """
         Arguments:
-            module_name (str): The name of the register map.
-            generated_info (list(str)): Will be placed in the file headers.
+            module_name: The name of the register map.
+            generated_info: Will be placed in the file headers.
         """
         self.module_name = module_name
         self.generated_info = generated_info
 
-    def get_interface(self, register_objects, constants):
+    def get_interface(
+        self, register_objects: list[Union["Register", RegisterArray]], constants: list["Constant"]
+    ):
         """
         Get a complete C++ interface class header with all constant values and the signatures of
         all methods.
@@ -61,12 +71,12 @@ class RegisterCppGenerator:
         )
         return generator.get_interface(register_objects=register_objects, constants=constants)
 
-    def get_header(self, register_objects):
+    def get_header(self, register_objects: list[Union["Register", RegisterArray]]):
         """
         Get a complete C++ class header for the implementation of all methods.
 
         Arguments:
-            register_objects (list): Register arrays and registers to be included.
+            register_objects: Register arrays and registers to be included.
 
         Returns:
             str: C++ code.
@@ -76,12 +86,12 @@ class RegisterCppGenerator:
         )
         return generator.get_header(register_objects=register_objects)
 
-    def get_implementation(self, register_objects):
+    def get_implementation(self, register_objects: list[Union["Register", RegisterArray]]):
         """
         Get a complete C++ class implementation with all methods.
 
         Arguments:
-            register_objects (list): Register arrays and registers to be included.
+            register_objects: Register arrays and registers to be included.
 
         Returns:
             str: C++ code.

@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import TYPE_CHECKING, Union
+
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
@@ -17,6 +20,11 @@ from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.register import REGISTER_MODES, Register
 
+if TYPE_CHECKING:
+    # Third party libraries
+    from hdl_registers.constant.constant import Constant
+    from hdl_registers.register_array import RegisterArray
+
 # Local folder libraries
 from .html_translator import HtmlTranslator
 
@@ -26,22 +34,22 @@ class RegisterHtmlGenerator:
     Generate a HTML page with register information.
     """
 
-    def __init__(self, module_name, generated_info):
+    def __init__(self, module_name: str, generated_info: list[str]):
         """
         Arguments:
-            module_name (str): The name of the register map.
-            generated_info (list(str)): Will be placed in the file headers.
+            module_name: The name of the register map.
+            generated_info: Will be placed in the file headers.
         """
         self.module_name = module_name
         self.generated_info = generated_info
         self._html_translator = HtmlTranslator()
 
-    def get_register_table(self, register_objects):
+    def get_register_table(self, register_objects: list[Union[Register, "RegisterArray"]]):
         """
         Get a HTML table with register information. Can be included in other documents.
 
         Arguments:
-            register_objects (list): Register arrays and registers to be included.
+            register_objects: Register arrays and registers to be included.
 
         Returns:
             str: HTML code.
@@ -53,12 +61,12 @@ class RegisterHtmlGenerator:
         html += self._get_register_table(register_objects)
         return html
 
-    def get_constant_table(self, constants):
+    def get_constant_table(self, constants: list["Constant"]):
         """
         Get a HTML table with constant information. Can be included in other documents.
 
         Arguments:
-            constants (list(Constant)): Constants to be included.
+            constants: Constants to be included.
 
         Returns:
             str: HTML code.
@@ -70,13 +78,15 @@ class RegisterHtmlGenerator:
         html += self._get_constant_table(constants)
         return html
 
-    def get_page(self, register_objects, constants):
+    def get_page(
+        self, register_objects: list[Union[Register, "RegisterArray"]], constants: list["Constant"]
+    ):
         """
         Get a complete HTML page with register and constant information.
 
         Arguments:
-            register_objects (list): Register arrays and registers to be included.
-            constants (list(Constant)): Constants to be included.
+            register_objects: Register arrays and registers to be included.
+            constants: Constants to be included.
 
         Returns:
             str: HTML code.
@@ -90,7 +100,7 @@ class RegisterHtmlGenerator:
 <head>
   <title>{title}</title>
     <!-- Include the style both inline and as a link to a separate CSS file. -->
-    <!-- Some tools, e.g. Jenkins, will not render with an inline styleesheet. -->
+    <!-- Some tools, e.g. Jenkins, will not render with an inline stylesheet. -->
     <!-- For other tools, e.g. page inclusion in sphinx, the style must be in the file. -->
     <link rel="stylesheet" href="regs_style.css">
     <style>
