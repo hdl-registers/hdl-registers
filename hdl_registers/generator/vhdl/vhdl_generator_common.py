@@ -48,6 +48,21 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
             return f"{self.module_name}_{register.name}"
         return f"{self.module_name}_{register_array.name}_{register.name}"
 
+    def _register_array_name(self, register_array) -> str:
+        """
+        Get the qualified register array name.
+        To be used where the scope requires it, i.e. outside of records.
+        """
+        return f"{self.module_name}_{register_array.name}"
+
+    def _field_name(self, register, register_array, field) -> str:
+        """
+        Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
+        To be used where the scope requires it, i.e. outside of records.
+        """
+        register_name = self._register_name(register=register, register_array=register_array)
+        return f"{register_name}_{field.name}"
+
     @staticmethod
     def _register_comment(register, register_array=None) -> str:
         """
@@ -59,14 +74,6 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
             return result
 
         return f"{result} within the '{register_array.name}' register array"
-
-    def _field_name(self, register, register_array, field) -> str:
-        """
-        Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
-        To be used where the scope requires it, i.e. outside of records.
-        """
-        register_name = self._register_name(register=register, register_array=register_array)
-        return f"{register_name}_{field.name}"
 
     @staticmethod
     def _register_mode_has_up(mode: str) -> bool:
@@ -93,9 +100,11 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
         """
         Return True if the provided register mode is one where the register is bus-readable.
 
-        Note that this is currently the same thing as the register being of an 'up' mode.
+        Note that this is NOT the same thing as the register being of a 'down' mode.
+
+        Analogous to the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
         """
-        return self._register_mode_has_up(mode=mode)
+        return "r" in mode
 
     def _has_any_bus_readable_registers(self, register_objects) -> bool:
         """
@@ -133,6 +142,8 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
         Return True if the provided register mode is one where the register is bus-writable.
 
         Note that this is NOT the same thing as the register being of a 'down' mode.
+
+        Analogous to the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
         """
         return "w" in mode
 
