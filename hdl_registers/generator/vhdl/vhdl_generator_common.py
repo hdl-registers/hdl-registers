@@ -96,22 +96,12 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
 
         return False
 
-    def _register_mode_is_bus_readable(self, mode: str) -> bool:
-        """
-        Return True if the provided register mode is one where the register is bus-readable.
-
-        Note that this is NOT the same thing as the register being of a 'down' mode.
-
-        Analogous to the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
-        """
-        return "r" in mode
-
     def _has_any_bus_readable_registers(self, register_objects) -> bool:
         """
         Return True if the register list contains any register that is bus-readable.
         """
         for register, _ in self._iterate_registers(register_objects=register_objects):
-            if self._register_mode_is_bus_readable(mode=register.mode):
+            if register.is_bus_readable:
                 return True
 
         return False
@@ -137,16 +127,6 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
 
         return False
 
-    def _register_mode_is_bus_writable(self, mode: str) -> bool:
-        """
-        Return True if the provided register mode is one where the register is bus-writable.
-
-        Note that this is NOT the same thing as the register being of a 'down' mode.
-
-        Analogous to the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
-        """
-        return "w" in mode
-
     def _has_any_bus_writable_registers(self, register_objects) -> bool:
         """
         Return True if the register list contains any registers that is bus-writable.
@@ -154,7 +134,7 @@ class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
         Note that this is NOT the same thing as having a register of a 'down' mode.
         """
         for register, _ in self._iterate_registers(register_objects=register_objects):
-            if self._register_mode_is_bus_writable(mode=register.mode):
+            if register.is_bus_writeable:
                 return True
 
         return False
