@@ -67,7 +67,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
             index="8 + i &times; 2",
             address="0x0020 + i &times; 0x0008",
             mode="Read",
-            default_value="0x0",
+            default_value="0xC7",
             description="The second register in the array.",
             html=html,
         )

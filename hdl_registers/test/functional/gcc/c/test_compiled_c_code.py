@@ -54,7 +54,7 @@ class CTest(CompileAndRunTest):
 
 int main()
 {{
-  assert(CAESAR_NUM_REGS == {19 * test_registers});
+  assert(CAESAR_NUM_REGS == {21 * test_registers});
 
 {main_function}
 

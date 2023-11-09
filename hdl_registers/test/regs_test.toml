@@ -34,8 +34,8 @@ enumeration.plain_enumeration.element.fifth = "element 4"
 
 mode = "wpulse"
 
-bit.start.description = "First bit"
-bit.abort.description = "Second bit"
+bit.start.default_value = "1"
+bit.abort.default_value = "0"
 
 
 ################################################################################
@@ -64,8 +64,8 @@ integer.e.default_value = -10
 mode = "r"
 description = "A register with fields that is only 'up'."
 
-bit.a.description = "Bit A"
-bit.b.description = "Bit B"
+bit.a.default_value = "0"
+bit.b.default_value = "1"
 
 
 ################################################################################
@@ -75,7 +75,10 @@ mode = "w"
 description = "A register with fields that is only 'down'."
 
 bit_vector.a.width = 8
+bit_vector.a.default_value = "11001100"
+
 bit_vector.b.width = 8
+bit_vector.b.default_value = "10101010"
 
 
 ################################################################################
@@ -129,6 +132,11 @@ enumeration.array_enumeration.element.element1 = "element index 1"
 
 description = "The second register in the array."
 mode = "r"
+
+bit.flip.default_value = "1"
+
+integer.flop.max_value = 100
+integer.flop.default_value = 99
 
 
 ################################################################################
@@ -193,6 +201,20 @@ description = "An array that contains only 'down' register(s)."
 [register_array.dummies4.register.dummy]
 
 mode = "wpulse"
+
+bit.a.default_value = "0"
+bit.b.default_value = "1"
+
+
+# ------------------------------------------------------------------------------
+[register_array.dummies4.register.flabby]
+
+mode = "w"
+
+integer.count.min_value = -19
+integer.count.max_value = 19
+
+bit.enable.default_value = "1"
 
 
 ################################################################################

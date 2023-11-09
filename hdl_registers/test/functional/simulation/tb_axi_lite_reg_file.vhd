@@ -9,6 +9,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library vunit_lib;
 context vunit_lib.vc_context;
@@ -27,6 +28,7 @@ use reg_file.reg_file_pkg.all;
 use reg_file.reg_operations_pkg.all;
 
 use work.caesar_regs_pkg.all;
+use work.caesar_regs_sim_pkg.all;
 
 
 entity tb_axi_lite_reg_file is
@@ -37,6 +39,7 @@ end entity;
 
 architecture tb of tb_axi_lite_reg_file is
 
+  constant clk_period : time := 10 ns;
   signal clk : std_ulogic := '0';
 
   signal axi_lite_m2s : axi_lite_m2s_t := axi_lite_m2s_init;
@@ -51,10 +54,19 @@ architecture tb of tb_axi_lite_reg_file is
     others => 0
   );
 
+  signal command_start_low_count, command_abort_high_count : natural := 0;
+  signal irq_status_a_low_count, irq_status_b_high_count : natural := 0;
+  signal dummies_f_high_count, dummies_g_low_count : natural_vec_t(regs_down.dummies4'range) := (
+    others => 0
+  );
+  signal dummies_a_high_count, dummies_b_low_count : natural_vec_t(regs_down.dummies4'range) := (
+    others => 0
+  );
+
 begin
 
+  clk <= not clk after clk_period / 2;
   test_runner_watchdog(runner, 1 ms);
-  clk <= not clk after 2 ns;
 
 
   ------------------------------------------------------------------------------
@@ -91,19 +103,451 @@ begin
       check_equal(value.j, caesar_dummies2_dummy_j_init);
     end procedure;
 
-    variable reg : reg_t := (others => '0');
+    variable reg_was_read_expected, reg_was_written_expected : natural_vec_t(reg_was_read'range) :=
+      (others => 0);
+
+    procedure test_plain_r_register is
+      procedure check(
+        reg : caesar_status_t; a : std_logic := '0'; b : std_logic := '1'
+      ) is
+      begin
+        check_equal(reg.a, a);
+        check_equal(reg.b, b);
+      end procedure;
+
+      variable status : caesar_status_t := caesar_status_init;
+    begin
+      -- Check init values in the register record and the aggregated record.
+      check(caesar_status_init);
+      check(caesar_regs_up_init.status);
+
+      -- Check that read gets initial value.
+      read_caesar_status(net=>net, value=>status);
+      check(status);
+
+      -- Check read updated value.
+      regs_up.status.a <= '1';
+      regs_up.status.b <= '0';
+      read_caesar_status(net=>net, value=>status);
+      check(status, '1', '0');
+
+      -- Check that the correct register index was accessed.
+      reg_was_read_expected(caesar_status) := 2;
+    end procedure;
+
+    procedure test_array_r_register is
+      procedure check(
+        reg : caesar_dummies_second_t; flip : std_logic := '1'; flop : integer := 99
+      ) is
+      begin
+        check_equal(reg.flip, flip);
+        check_equal(reg.flop, flop);
+      end procedure;
+
+      variable dummies_second : caesar_dummies_second_t := caesar_dummies_second_init;
+    begin
+      -- Check init values in the register record, the aggregated record and the register file.
+      check(caesar_dummies_second_init);
+      for array_index in regs_up.dummies'range loop
+        check(caesar_regs_up_init.dummies(array_index).second);
+
+        read_caesar_dummies_second(net=>net, array_index=>array_index, value=>dummies_second);
+        check(dummies_second);
+
+        -- Check that the correct register index was accessed.
+        reg_was_read_expected(caesar_dummies_second(array_index=>array_index)) := 1;
+        assert reg_was_read_expected = reg_was_read_count;
+      end loop;
+
+      -- Check read updated value.
+      regs_up.dummies(0).second.flip <= '0';
+      regs_up.dummies(0).second.flop <= 66;
+      read_caesar_dummies_second(net=>net, array_index=>0, value=>dummies_second);
+      check(dummies_second, '0', 66);
+
+      -- Check that the correct register index was accessed.
+      reg_was_read_expected(caesar_dummies_second(array_index=>0)) := 2;
+      assert reg_was_read_expected = reg_was_read_count;
+
+      -- Check that another indexes of the array still have the init value.
+      for array_index in 1 to regs_up.dummies'high loop
+        read_caesar_dummies_second(net=>net, array_index=>array_index, value=>dummies_second);
+        check(dummies_second);
+
+        reg_was_read_expected(caesar_dummies_second(array_index=>array_index)) := 2;
+      end loop;
+    end procedure;
+
+    procedure test_plain_w_register is
+      procedure check(
+        reg : caesar_address_t;
+        a : unsigned(7 downto 0) := "11001100";
+        b : unsigned(7 downto 0) := "10101010"
+      ) is
+      begin
+        check_equal(reg.a, a);
+        check_equal(reg.b, b);
+      end procedure;
+
+      variable address : caesar_address_t := caesar_address_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_address_init);
+      check(caesar_regs_down_init.address);
+      check(regs_down.address);
+
+      -- Check writing updated value.
+      address.a := "01010101";
+      address.b := "00110011";
+      write_caesar_address(net=>net, value=>address);
+      wait_for_write;
+      check(regs_down.address, "01010101", "00110011");
+
+      -- Check that the correct register index was accessed.
+      reg_was_written_expected(caesar_address) := 1;
+    end procedure;
+
+    procedure test_array_w_register is
+      procedure check(
+        reg : caesar_dummies4_flabby_t;
+        count : integer := -19;
+        enable : std_logic := '1'
+      ) is
+      begin
+        check_equal(reg.count, count);
+        check_equal(reg.enable, enable);
+      end procedure;
+
+      variable flabby : caesar_dummies4_flabby_t := caesar_dummies4_flabby_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_dummies4_flabby_init);
+      for array_index in regs_down.dummies4'range loop
+        check(caesar_regs_down_init.dummies4(array_index).flabby);
+        check(regs_down.dummies4(array_index).flabby);
+      end loop;
+
+      -- Check writing updated value.
+      flabby.count := -13;
+      flabby.enable := '0';
+      write_caesar_dummies4_flabby(net=>net, array_index=>regs_down.dummies4'high, value=>flabby);
+      wait_for_write;
+      check(regs_down.dummies4(regs_down.dummies4'high).flabby, -13, '0');
+
+      -- Check that other indexes of the array still have the init value.
+      for array_index in 0 to regs_down.dummies4'high - 1 loop
+        check(regs_down.dummies4(array_index).flabby);
+      end loop;
+
+      -- Check that the correct register index was accessed.
+      reg_was_written_expected(caesar_dummies4_flabby(array_index=>regs_down.dummies4'high)) := 1;
+    end procedure;
+
+    procedure test_plain_r_w_register is
+      procedure check(
+        reg : caesar_config_t;
+        plain_integer : integer := 66;
+        plain_enumeration : caesar_config_plain_enumeration_t := plain_enumeration_third
+      ) is
+      begin
+        check_equal(reg.plain_integer, plain_integer);
+        assert reg.plain_enumeration = plain_enumeration;
+      end procedure;
+
+      variable config : caesar_config_t := caesar_config_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_config_init);
+      check(caesar_regs_down_init.config);
+      check(regs_down.config);
+
+      read_caesar_config(net=>net, value=>config);
+      check(config);
+
+      -- Check writing updated value.
+      config.plain_integer := -10;
+      config.plain_enumeration := plain_enumeration_fourth;
+      write_caesar_config(net=>net, value=>config);
+      wait_for_write;
+
+      -- Should be set in register as well as in the read-back value.
+      check(regs_down.config, -10, plain_enumeration_fourth);
+      read_caesar_config(net=>net, value=>config);
+      check(config, -10, plain_enumeration_fourth);
+
+      -- Check that the correct register index was accessed.
+      reg_was_read_expected(caesar_config) := 2;
+      reg_was_written_expected(caesar_config) := 1;
+    end procedure;
+
+    procedure test_array_r_w_register is
+      procedure check(
+        reg : caesar_dummies_first_t;
+        array_bit_a : std_logic := '1';
+        array_bit_b : std_logic := '0'
+      ) is
+      begin
+        check_equal(reg.array_bit_a, array_bit_a);
+        check_equal(reg.array_bit_b, array_bit_b);
+      end procedure;
+
+      variable first : caesar_dummies_first_t := caesar_dummies_first_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_dummies_first_init);
+
+      for array_index in regs_down.dummies'range loop
+        check(caesar_regs_down_init.dummies(array_index).first);
+        check(regs_down.dummies(array_index).first);
+
+        read_caesar_dummies_first(net=>net, array_index=>array_index, value=>first);
+        check(first);
+
+        -- Check that the correct register index was accessed.
+        reg_was_read_expected(caesar_dummies_first(array_index=>array_index)) := 1;
+        assert reg_was_read_expected = reg_was_read_count;
+      end loop;
+
+      -- Check writing updated value.
+      first.array_bit_a := '0';
+      first.array_bit_b := '1';
+      write_caesar_dummies_first(net=>net, array_index=>2, value=>first);
+      wait_for_write;
+
+      -- Should be set in register as well as in the read-back value.
+      check(regs_down.dummies(2).first, '0', '1');
+      read_caesar_dummies_first(net=>net, array_index=>2, value=>first);
+      check(first, '0', '1');
+
+      -- Check that the correct register index was accessed.
+      reg_was_read_expected(caesar_dummies_first(array_index=>2)) := 2;
+      assert reg_was_read_expected = reg_was_read_count;
+
+      -- Check that other indexes in the array still have the init value.
+      for array_index in 0 to 1 loop
+        read_caesar_dummies_first(net=>net, array_index=>array_index, value=>first);
+        check(first);
+
+        reg_was_read_expected(caesar_dummies_first(array_index=>array_index)) := 2;
+      end loop;
+
+      -- Check that the correct register index was accessed.
+      reg_was_written_expected(caesar_dummies_first(array_index=>2)) := 1;
+    end procedure;
+
+    procedure test_plain_wpulse_register is
+      procedure check(
+        reg : caesar_command_t;
+        start : std_logic := '1';
+        abort : std_logic := '0'
+      ) is
+      begin
+        check_equal(reg.start, start);
+        check_equal(reg.abort, abort);
+      end procedure;
+
+      variable command : caesar_command_t := caesar_command_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_command_init);
+      check(caesar_regs_down_init.command);
+      check(regs_down.command);
+
+      wait for 10 * clk_period;
+      check_equal(command_start_low_count, 0);
+      check_equal(command_abort_high_count, 0);
+
+      -- Write with one bit having a non-default value.
+      command.start := '0';
+      write_caesar_command(net=>net, value=>command);
+      wait_for_write;
+      check_equal(command_start_low_count, 1);
+      check_equal(command_abort_high_count, 0);
+
+      -- Write with two bits having a non-default value.
+      command.abort := '1';
+      write_caesar_command(net=>net, value=>command);
+      wait_for_write;
+      check_equal(command_start_low_count, 2);
+      check_equal(command_abort_high_count, 1);
+
+      -- Should still be the same after a while.
+      wait for 10 * clk_period;
+      check_equal(command_start_low_count, 2);
+      check_equal(command_abort_high_count, 1);
+
+      -- Check that the correct register index was accessed.
+      reg_was_written_expected(caesar_command) := 2;
+    end procedure;
+
+    procedure test_array_wpulse_register is
+      procedure check(
+        reg : caesar_dummies4_dummy_t;
+        a : std_logic := '0';
+        b : std_logic := '1'
+      ) is
+      begin
+        check_equal(reg.a, a);
+        check_equal(reg.b, b);
+      end procedure;
+
+      variable dummy : caesar_dummies4_dummy_t := caesar_dummies4_dummy_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_dummies4_dummy_init);
+      for array_index in caesar_regs_down_init.dummies4'range loop
+        check(caesar_regs_down_init.dummies4(array_index).dummy);
+        check(regs_down.dummies4(array_index).dummy);
+      end loop;
+
+      wait for 10 * clk_period;
+      assert dummies_a_high_count = (0, 0);
+      assert dummies_b_low_count = (0, 0);
+
+      -- Write with one bit having a non-default value.
+      dummy.a := '1';
+      write_caesar_dummies4_dummy(net=>net, array_index=>1, value=>dummy);
+      wait_for_write;
+      assert dummies_a_high_count = (0, 1);
+      assert dummies_b_low_count = (0, 0);
+
+      -- Write with two bits having a non-default value.
+      dummy.b := '0';
+      write_caesar_dummies4_dummy(net=>net, array_index=>1, value=>dummy);
+      wait_for_write;
+      assert dummies_a_high_count = (0, 2);
+      assert dummies_b_low_count = (0, 1);
+
+      -- Should still be the same after a while.
+      wait for 10 * clk_period;
+      assert dummies_a_high_count = (0, 2);
+      assert dummies_b_low_count = (0, 1);
+
+      -- Check that the correct register index was accessed.
+      reg_was_written_expected(caesar_dummies4_dummy(array_index=>1)) := 2;
+    end procedure;
+
+    procedure test_plain_r_wpulse_register is
+      procedure check(
+        reg : caesar_irq_status_t;
+        a : std_logic := '1';
+        b : std_logic := '0'
+      ) is
+      begin
+        check_equal(reg.a, a);
+        check_equal(reg.b, b);
+      end procedure;
+
+      variable irq_status : caesar_irq_status_t := caesar_irq_status_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_irq_status_init);
+      check(caesar_regs_down_init.irq_status);
+      check(regs_down.irq_status);
+
+      wait for 10 * clk_period;
+      check_equal(irq_status_a_low_count, 0);
+      check_equal(irq_status_b_high_count, 0);
+
+      -- Check setting an updated read value.
+      regs_up.irq_status.a <= '0';
+      regs_up.irq_status.b <= '1';
+      read_caesar_irq_status(net=>net, value=>irq_status);
+      check(irq_status, '0', '1');
+
+      -- Read value should not affect the 'down' value.
+      wait for 10 * clk_period;
+      check_equal(irq_status_a_low_count, 0);
+      check_equal(irq_status_b_high_count, 0);
+
+      -- Write with one bit having a non-default value.
+      irq_status.a := '1';
+      irq_status.b := '1';
+      write_caesar_irq_status(net=>net, value=>irq_status);
+      wait_for_write;
+      wait for 10 * clk_period;
+      check_equal(irq_status_a_low_count, 0);
+      check_equal(irq_status_b_high_count, 1);
+
+      -- Should not affect the read value which we set above.
+      read_caesar_irq_status(net=>net, value=>irq_status);
+      check(irq_status, '0', '1');
+
+      -- Check that the correct register index was accessed.
+      reg_was_read_expected(caesar_irq_status) := 2;
+      reg_was_written_expected(caesar_irq_status) := 1;
+    end procedure;
+
+    procedure test_array_r_wpulse_register is
+      procedure check(
+        reg : caesar_dummies2_dummy_t;
+        f : std_logic := '0';
+        g : std_logic := '1'
+      ) is
+      begin
+        check_equal(reg.f, f);
+        check_equal(reg.g, g);
+      end procedure;
+
+      variable dummy : caesar_dummies2_dummy_t := caesar_dummies2_dummy_init;
+    begin
+      -- Check init values in the register record, the aggregated record and in the register file.
+      check(caesar_dummies2_dummy_init);
+      for array_index in caesar_regs_down_init.dummies2'range loop
+        check(caesar_regs_down_init.dummies2(array_index).dummy);
+        check(regs_down.dummies2(array_index).dummy);
+      end loop;
+
+      wait for 10 * clk_period;
+      assert dummies_f_high_count = (0, 0);
+      assert dummies_g_low_count = (0, 0);
+
+      -- Check setting an updated read value.
+      regs_up.dummies2(1).dummy.f <= '1';
+      regs_up.dummies2(1).dummy.g <= '0';
+      read_caesar_dummies2_dummy(net=>net, array_index=>1, value=>dummy);
+      check(dummy, '1', '0');
+
+      -- Read value should not affect the 'down' value.
+      wait for 10 * clk_period;
+      assert dummies_f_high_count = (0, 0);
+      assert dummies_g_low_count = (0, 0);
+
+      -- Write with one bit having a non-default value.
+      dummy.f := '1';
+      dummy.g := '1';
+      write_caesar_dummies2_dummy(net=>net, array_index=>1, value=>dummy);
+      wait_for_write;
+      assert dummies_f_high_count = (0, 1);
+      assert dummies_g_low_count = (0, 0);
+
+      -- Should not affect the read value which we set above.
+      read_caesar_dummies2_dummy(net=>net, array_index=>1, value=>dummy);
+      check(dummy, '1', '0');
+
+      -- Check that the correct register index was accessed.
+      reg_was_read_expected(caesar_dummies2_dummy(array_index=>1)) := 2;
+      reg_was_written_expected(caesar_dummies2_dummy(array_index=>1)) := 1;
+    end procedure;
 
     variable config : caesar_config_t;
     variable irq_status : caesar_irq_status_t;
     variable dummies_first : caesar_dummies_first_t;
     variable dummies2_dummy : caesar_dummies2_dummy_t;
 
-    variable reg_was_read_expected, reg_was_written_expected : natural_vec_t(reg_was_read'range) :=
-      (others => 0);
+    variable reg : reg_t := (others => '0');
   begin
     test_runner_setup(runner, runner_cfg);
 
-    if run("test_default_values_of_plain_registers") then
+    if run("test_reading_write_only_register_should_fail") then
+      -- vunit: .expected_failure
+      read_reg(net=>net, reg_index=>caesar_command, value=>reg);
+
+    elsif run("test_writing_read_only_register_should_fail") then
+      -- vunit: .expected_failure
+      write_reg(net=>net, reg_index=>caesar_status, value=>reg);
+
+    elsif run("test_default_values_of_plain_registers") then
       -- Compare to the explicit values set in TOML.
 
       -- A plain register of type 'r_w' that has all the different field types.
@@ -121,8 +565,7 @@ begin
       -- An 'r_w' register gets its default value from the 'default_values' generic,
       -- which is an SLV value calculated in Python.
       -- Show that converting to record from SLV works correctly.
-      read_reg(net=>net, reg_index=>caesar_config, value=>reg);
-      config := to_caesar_config(reg);
+      read_caesar_config(net=>net, value=>config);
       check_config_default_values(config);
 
       reg_was_read_expected(caesar_config) := 1;
@@ -141,8 +584,7 @@ begin
       -- Reading the value of a 'r_wpulse' register, you get the value from 'regs_up'.
       -- Hence, the value is converted from record to SLV, read over register bus as an SLV below,
       -- and then converted back to record.
-      read_reg(net=>net, reg_index=>caesar_irq_status, value=>reg);
-      irq_status := to_caesar_irq_status(reg);
+      read_caesar_irq_status(net=>net, value=>irq_status);
       check_irq_status_default_values(irq_status);
 
       reg_was_read_expected(caesar_irq_status) := 1;
@@ -162,15 +604,14 @@ begin
       check_equal(caesar_regs_up_init.dummies2'length, 2);
       check_equal(caesar_regs_down_init.dummies2'length, 2);
 
-      for array_idx in caesar_regs_up_init.dummies2'range loop
-        check_dummies2_dummy_default_values(caesar_regs_up_init.dummies2(array_idx).dummy);
-        check_dummies2_dummy_default_values(caesar_regs_down_init.dummies2(array_idx).dummy);
+      for array_index in caesar_regs_up_init.dummies2'range loop
+        check_dummies2_dummy_default_values(caesar_regs_up_init.dummies2(array_index).dummy);
+        check_dummies2_dummy_default_values(caesar_regs_down_init.dummies2(array_index).dummy);
 
-        read_reg(net=>net, reg_index=>caesar_dummies2_dummy(array_idx), value=>reg);
-        dummies2_dummy := to_caesar_dummies2_dummy(reg);
+        read_caesar_dummies2_dummy(net=>net, array_index=>array_index, value=>dummies2_dummy);
         check_dummies2_dummy_default_values(dummies2_dummy);
 
-        reg_was_read_expected(caesar_dummies2_dummy(array_idx)) := 1;
+        reg_was_read_expected(caesar_dummies2_dummy(array_index)) := 1;
       end loop;
 
     elsif run("test_write_value_to_plain_register") then
@@ -183,7 +624,7 @@ begin
 
       -- Convert to SLV, write over register bus.
       -- Register file converts it back to a record for the checks below.
-      write_reg(net=>net, reg_index=>caesar_config, value=>to_slv(config));
+      write_caesar_config(net=>net, value=>config);
       reg_was_written_expected(caesar_config) := 1;
       wait_for_write;
 
@@ -202,7 +643,7 @@ begin
       dummies_first.array_enumeration := array_enumeration_element1;
       dummies_first.array_integer := 13;
 
-      write_reg(net=>net, reg_index=>caesar_dummies_first(0), value=>to_slv(dummies_first));
+      write_caesar_dummies_first(net=>net, array_index=>0, value=>dummies_first);
       reg_was_written_expected(caesar_dummies_first(0)) := 1;
 
       dummies_first.array_bit_a := '0';
@@ -211,7 +652,7 @@ begin
       dummies_first.array_enumeration := array_enumeration_element1;
       dummies_first.array_integer := 57;
 
-      write_reg(net=>net, reg_index=>caesar_dummies_first(1), value=>to_slv(dummies_first));
+      write_caesar_dummies_first(net=>net, array_index=>1, value=>dummies_first);
       reg_was_written_expected(caesar_dummies_first(1)) := 1;
 
       dummies_first.array_bit_a := '1';
@@ -220,7 +661,7 @@ begin
       dummies_first.array_enumeration := array_enumeration_element0;
       dummies_first.array_integer := 99;
 
-      write_reg(net=>net, reg_index=>caesar_dummies_first(2), value=>to_slv(dummies_first));
+      write_caesar_dummies_first(net=>net, array_index=>2, value=>dummies_first);
       reg_was_written_expected(caesar_dummies_first(2)) := 1;
 
       wait_for_write;
@@ -243,29 +684,77 @@ begin
       assert regs_down.dummies(2).first.array_enumeration = array_enumeration_element0;
       check_equal(regs_down.dummies(2).first.array_integer, 99);
 
-    elsif run("test_reading_write_only_register_should_fail") then
-      -- vunit: .expected_failure
-      read_reg(net=>net, reg_index=>caesar_command, value=>reg);
+    elsif run("test_operations_on_plain_r_register") then
+      test_plain_r_register;
 
-    elsif run("test_writing_read_only_register_should_fail") then
-      -- vunit: .expected_failure
-      write_reg(net=>net, reg_index=>caesar_status, value=>reg);
+    elsif run("test_operations_on_array_r_register") then
+      test_array_r_register;
+
+    elsif run("test_operations_on_plain_w_register") then
+      test_plain_w_register;
+
+    elsif run("test_operations_on_array_w_register") then
+      test_array_w_register;
+
+    elsif run("test_operations_on_plain_r_w_register") then
+      test_plain_r_w_register;
+
+    elsif run("test_operations_on_array_r_w_register") then
+      test_array_r_w_register;
+
+    elsif run("test_operations_on_plain_wpulse_register") then
+      test_plain_wpulse_register;
+
+    elsif run("test_operations_on_array_wpulse_register") then
+      test_array_wpulse_register;
+
+    elsif run("test_operations_on_plain_r_wpulse_register") then
+      test_plain_r_wpulse_register;
+
+    elsif run("test_operations_on_array_r_wpulse_register") then
+      test_array_r_wpulse_register;
 
     end if;
 
     wait_for_write;
 
-    assert reg_was_read_expected = reg_was_read_count;
-    assert reg_was_written_expected = reg_was_written_count;
+    assert reg_was_read_expected = reg_was_read_count report "Incorrect register read count";
+    assert reg_was_written_expected = reg_was_written_count report "Incorrect register write count";
 
     test_runner_cleanup(runner);
   end process;
 
 
   ------------------------------------------------------------------------------
-  count : process
+  count_register_status : process
   begin
     wait until rising_edge(clk);
+
+    command_start_low_count <= command_start_low_count + to_int(not regs_down.command.start);
+    command_abort_high_count <= command_abort_high_count + to_int(regs_down.command.abort);
+
+    irq_status_a_low_count <= irq_status_a_low_count + to_int(not regs_down.irq_status.a);
+    irq_status_b_high_count <= irq_status_b_high_count + to_int(regs_down.irq_status.b);
+
+    for array_index in regs_down.dummies2'range loop
+      dummies_f_high_count(array_index) <= (
+        dummies_f_high_count(array_index) + to_int(regs_down.dummies2(array_index).dummy.f)
+      );
+
+      dummies_g_low_count(array_index) <= (
+        dummies_g_low_count(array_index) + to_int(not regs_down.dummies2(array_index).dummy.g)
+      );
+    end loop;
+
+    for array_index in regs_down.dummies4'range loop
+      dummies_a_high_count(array_index) <= (
+        dummies_a_high_count(array_index) + to_int(regs_down.dummies4(array_index).dummy.a)
+      );
+
+      dummies_b_low_count(array_index) <= (
+        dummies_b_low_count(array_index) + to_int(not regs_down.dummies4(array_index).dummy.b)
+      );
+    end loop;
 
     for reg_idx in reg_was_read'range loop
       reg_was_read_count(reg_idx) <= reg_was_read_count(reg_idx) + to_int(reg_was_read(reg_idx));

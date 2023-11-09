@@ -86,7 +86,7 @@ def base_cpp_test(tmp_path):
 
 class CppTest(BaseCppTest):
     def compile_and_run(self, test_constants, test_registers):
-        test_code = f"  assert(fpga_regs::Caesar::num_registers == {19 * test_registers});\n"
+        test_code = f"  assert(fpga_regs::Caesar::num_registers == {21 * test_registers});\n"
 
         tests = ["test_constants"] if test_constants else []
         tests += ["test_registers"] if test_registers else []

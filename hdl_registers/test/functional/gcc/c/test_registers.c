@@ -30,7 +30,7 @@ void test_addresses()
     assert(CAESAR_DUMMIES_SECOND_ADDR(2) == 48);
     assert(CAESAR_DUMMIES2_DUMMY_ADDR(0) == 52);
     // Last register
-    assert(CAESAR_DUMMIES4_DUMMY_ADDR(1) == 4 * (CAESAR_NUM_REGS - 1));
+    assert(CAESAR_DUMMIES4_FLABBY_ADDR(1) == 4 * (CAESAR_NUM_REGS - 1));
 }
 
 void test_generated_type()
