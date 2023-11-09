@@ -10,6 +10,6 @@
 #include <assert.h>
 #include <stdint.h>
 
-#include "test_regs.h"
+#include "caesar_regs.h"
 
 void test_registers();

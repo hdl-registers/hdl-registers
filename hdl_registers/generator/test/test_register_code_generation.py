@@ -28,7 +28,7 @@ REGISTER_LISTS = [
         toml_file=tsfpga.TSFPGA_EXAMPLE_MODULES / "ddr_buffer" / "regs_ddr_buffer.toml",
         default_registers=get_default_registers(),
     ),
-    from_toml(module_name="test", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
+    from_toml(module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
     from_toml(
         module_name="example",
         toml_file=HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "toml" / "toml_format.toml",

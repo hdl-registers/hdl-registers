@@ -11,19 +11,19 @@
 
 void test_constants()
 {
-  assert(TEST_DATA_WIDTH == 24);
-  assert(TEST_DECREMENT == -8);
+  assert(CAESAR_DATA_WIDTH == 24);
+  assert(CAESAR_DECREMENT == -8);
 
-  assert(TEST_ENABLED);
-  assert(!TEST_DISABLED);
-  assert(TEST_ENABLED && !TEST_DISABLED);
+  assert(CAESAR_ENABLED);
+  assert(!CAESAR_DISABLED);
+  assert(CAESAR_ENABLED && !CAESAR_DISABLED);
 
-  assert(TEST_RATE == 3.5);
-  assert(TEST_RATE != 3.6);
+  assert(CAESAR_RATE == 3.5);
+  assert(CAESAR_RATE != 3.6);
 
-  assert(TEST_PARAGRAPH == "hello there :)");
-  assert(TEST_PARAGRAPH != "-");
+  assert(CAESAR_PARAGRAPH == "hello there :)");
+  assert(CAESAR_PARAGRAPH != "-");
 
-  assert(TEST_BASE_ADDRESS_BIN == TEST_BASE_ADDRESS_HEX);
-  assert(TEST_BASE_ADDRESS_BIN == 34359738368);
+  assert(CAESAR_BASE_ADDRESS_BIN == CAESAR_BASE_ADDRESS_HEX);
+  assert(CAESAR_BASE_ADDRESS_BIN == 34359738368);
 }

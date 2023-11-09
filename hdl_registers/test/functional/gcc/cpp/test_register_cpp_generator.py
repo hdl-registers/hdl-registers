@@ -27,15 +27,15 @@ class BaseCppTest(CompileAndRunTest):
         return f"""\
 #include <assert.h>
 
-#include "include/test.h"
+#include "include/caesar.h"
 
 {includes}
 
 int main()
 {{
-  uint32_t memory[fpga_regs::Test::num_registers];
+  uint32_t memory[fpga_regs::Caesar::num_registers];
   volatile uint8_t *base_address = reinterpret_cast<volatile uint8_t *>(memory);
-  fpga_regs::Test test = fpga_regs::Test(base_address);
+  fpga_regs::Caesar caesar = fpga_regs::Caesar(base_address);
 
   {test_code}
 
@@ -50,7 +50,7 @@ int main()
         self.registers.create_cpp_interface(self.include_dir)
         self.registers.create_cpp_header(self.include_dir)
         self.registers.create_cpp_implementation(self.working_dir)
-        cpp_class_file = self.working_dir / "test.cpp"
+        cpp_class_file = self.working_dir / "caesar.cpp"
 
         main_file = self.working_dir / "main.cpp"
 
@@ -86,13 +86,13 @@ def base_cpp_test(tmp_path):
 
 class CppTest(BaseCppTest):
     def compile_and_run(self, test_constants, test_registers):
-        test_code = f"  assert(fpga_regs::Test::num_registers == {19 * test_registers});\n"
+        test_code = f"  assert(fpga_regs::Caesar::num_registers == {19 * test_registers});\n"
 
         tests = ["test_constants"] if test_constants else []
         tests += ["test_registers"] if test_registers else []
 
         includes = "\n".join([f'#include "{test}.h"' for test in tests])
-        test_code += "\n  ".join([f"{test}(memory, &test);" for test in tests])
+        test_code += "\n  ".join([f"{test}(memory, &caesar);" for test in tests])
         source_files = [THIS_DIR / f"{test}.cpp" for test in tests]
 
         executable = self.compile(
@@ -127,7 +127,7 @@ def test_cpp_with_only_constants(cpp_test):
 def test_setting_cpp_register_array_out_of_bounds_should_crash(base_cpp_test):
     test_code = """\
   // Index 3 is out of bounds (should be less than 3)
-  test.set_dummies_first(3, 1337);
+  caesar.set_dummies_first(3, 1337);
 """
     executable = base_cpp_test.compile(test_code=test_code)
 
@@ -138,7 +138,7 @@ def test_setting_cpp_register_array_out_of_bounds_should_crash(base_cpp_test):
 
 def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
-  test.set_config_plain_integer(-1024);
+  caesar.set_config_plain_integer(-1024);
 """
     executable = base_cpp_test.compile(test_code=test_code)
 
@@ -147,7 +147,7 @@ def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
     assert "Assertion `field_value >= -50' failed." in str(stderr), stderr
 
     test_code = """\
-  test.set_config_plain_integer(110);
+  caesar.set_config_plain_integer(110);
 """
     executable = base_cpp_test.compile(test_code=test_code)
 

@@ -87,7 +87,7 @@ def test_running_simulation(tmp_path):
 
 def _generate_toml_registers(output_path):
     register_list = from_toml(
-        module_name="test",
+        module_name="caesar",
         toml_file=HDL_REGISTERS_PATH / "test" / "regs_test.toml",
     )
 

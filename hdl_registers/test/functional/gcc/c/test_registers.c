@@ -12,32 +12,32 @@
 void test_addresses()
 {
     // Assert that indexes are correct
-    assert(TEST_CONFIG_INDEX == 0);
-    assert(TEST_DUMMIES_FIRST_INDEX(0) == 7);
-    assert(TEST_DUMMIES_SECOND_INDEX(0) == 8);
-    assert(TEST_DUMMIES_FIRST_INDEX(1) == 9);
-    assert(TEST_DUMMIES_SECOND_INDEX(1) == 10);
-    assert(TEST_DUMMIES_FIRST_INDEX(2) == 11);
-    assert(TEST_DUMMIES_SECOND_INDEX(2) == 12);
+    assert(CAESAR_CONFIG_INDEX == 0);
+    assert(CAESAR_DUMMIES_FIRST_INDEX(0) == 7);
+    assert(CAESAR_DUMMIES_SECOND_INDEX(0) == 8);
+    assert(CAESAR_DUMMIES_FIRST_INDEX(1) == 9);
+    assert(CAESAR_DUMMIES_SECOND_INDEX(1) == 10);
+    assert(CAESAR_DUMMIES_FIRST_INDEX(2) == 11);
+    assert(CAESAR_DUMMIES_SECOND_INDEX(2) == 12);
 
     // Assert that addresses are correct
-    assert(TEST_CONFIG_ADDR == 0);
-    assert(TEST_DUMMIES_FIRST_ADDR(0) == 28);
-    assert(TEST_DUMMIES_SECOND_ADDR(0) == 32);
-    assert(TEST_DUMMIES_FIRST_ADDR(1) == 36);
-    assert(TEST_DUMMIES_SECOND_ADDR(1) == 40);
-    assert(TEST_DUMMIES_FIRST_ADDR(2) == 44);
-    assert(TEST_DUMMIES_SECOND_ADDR(2) == 48);
-    assert(TEST_DUMMIES2_DUMMY_ADDR(0) == 52);
+    assert(CAESAR_CONFIG_ADDR == 0);
+    assert(CAESAR_DUMMIES_FIRST_ADDR(0) == 28);
+    assert(CAESAR_DUMMIES_SECOND_ADDR(0) == 32);
+    assert(CAESAR_DUMMIES_FIRST_ADDR(1) == 36);
+    assert(CAESAR_DUMMIES_SECOND_ADDR(1) == 40);
+    assert(CAESAR_DUMMIES_FIRST_ADDR(2) == 44);
+    assert(CAESAR_DUMMIES_SECOND_ADDR(2) == 48);
+    assert(CAESAR_DUMMIES2_DUMMY_ADDR(0) == 52);
     // Last register
-    assert(TEST_DUMMIES4_DUMMY_ADDR(1) == 4 * (TEST_NUM_REGS - 1));
+    assert(CAESAR_DUMMIES4_DUMMY_ADDR(1) == 4 * (CAESAR_NUM_REGS - 1));
 }
 
 void test_generated_type()
 {
     // Assert positions within the generated type
-    test_regs_t regs;
-    assert(sizeof(regs) == 4 * TEST_NUM_REGS);
+    caesar_regs_t regs;
+    assert(sizeof(regs) == 4 * CAESAR_NUM_REGS);
 
     assert((void *)&regs == (void *)&regs.config);
     assert((void *)&regs + 28 == (void *)&regs.dummies[0].first);
@@ -50,52 +50,52 @@ void test_generated_type()
 
     // Some dummy code that uses the generated type
     regs.config = 0;
-    regs.dummies[0].first = TEST_DUMMIES_FIRST_ARRAY_BIT_VECTOR_MASK;
+    regs.dummies[0].first = CAESAR_DUMMIES_FIRST_ARRAY_BIT_VECTOR_MASK;
     regs.dummies[2].second =
-        (1 << TEST_DUMMIES_FIRST_ARRAY_BIT_B_SHIFT);
+        (1 << CAESAR_DUMMIES_FIRST_ARRAY_BIT_B_SHIFT);
 }
 
 void test_field_indexes()
 {
     // Assert field indexes of plain register
-    assert(TEST_CONFIG_PLAIN_BIT_A_SHIFT == 0);
-    assert(TEST_CONFIG_PLAIN_BIT_A_MASK == 1);
-    assert(TEST_CONFIG_PLAIN_BIT_A_MASK_INVERSE == 0b11111111111111111111111111111110);
+    assert(CAESAR_CONFIG_PLAIN_BIT_A_SHIFT == 0);
+    assert(CAESAR_CONFIG_PLAIN_BIT_A_MASK == 1);
+    assert(CAESAR_CONFIG_PLAIN_BIT_A_MASK_INVERSE == 0b11111111111111111111111111111110);
 
-    assert(TEST_CONFIG_PLAIN_BIT_B_SHIFT == 1);
-    assert(TEST_CONFIG_PLAIN_BIT_B_MASK == 2);
-    assert(TEST_CONFIG_PLAIN_BIT_B_MASK_INVERSE == 0b11111111111111111111111111111101);
+    assert(CAESAR_CONFIG_PLAIN_BIT_B_SHIFT == 1);
+    assert(CAESAR_CONFIG_PLAIN_BIT_B_MASK == 2);
+    assert(CAESAR_CONFIG_PLAIN_BIT_B_MASK_INVERSE == 0b11111111111111111111111111111101);
 
-    assert(TEST_CONFIG_PLAIN_BIT_VECTOR_SHIFT == 2);
-    assert(TEST_CONFIG_PLAIN_BIT_VECTOR_MASK == 15 << 2);
-    assert(TEST_CONFIG_PLAIN_BIT_VECTOR_MASK_INVERSE == 0b11111111111111111111111111000011);
+    assert(CAESAR_CONFIG_PLAIN_BIT_VECTOR_SHIFT == 2);
+    assert(CAESAR_CONFIG_PLAIN_BIT_VECTOR_MASK == 15 << 2);
+    assert(CAESAR_CONFIG_PLAIN_BIT_VECTOR_MASK_INVERSE == 0b11111111111111111111111111000011);
 
     // Assert field indexes of array register
-    assert(TEST_DUMMIES_FIRST_ARRAY_BIT_A_SHIFT == 0);
-    assert(TEST_DUMMIES_FIRST_ARRAY_BIT_A_MASK == 1);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_BIT_A_SHIFT == 0);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_BIT_A_MASK == 1);
     assert(
-        TEST_DUMMIES_FIRST_ARRAY_BIT_A_MASK_INVERSE == 0b11111111111111111111111111111110);
+        CAESAR_DUMMIES_FIRST_ARRAY_BIT_A_MASK_INVERSE == 0b11111111111111111111111111111110);
 
-    assert(TEST_DUMMIES_FIRST_ARRAY_BIT_B_SHIFT == 1);
-    assert(TEST_DUMMIES_FIRST_ARRAY_BIT_B_MASK == 2);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_BIT_B_SHIFT == 1);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_BIT_B_MASK == 2);
     assert(
-        TEST_DUMMIES_FIRST_ARRAY_BIT_B_MASK_INVERSE == 0b11111111111111111111111111111101);
+        CAESAR_DUMMIES_FIRST_ARRAY_BIT_B_MASK_INVERSE == 0b11111111111111111111111111111101);
 
-    assert(TEST_DUMMIES_FIRST_ARRAY_BIT_VECTOR_SHIFT == 2);
-    assert(TEST_DUMMIES_FIRST_ARRAY_BIT_VECTOR_MASK == 31 << 2);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_BIT_VECTOR_SHIFT == 2);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_BIT_VECTOR_MASK == 31 << 2);
     assert(
-        TEST_DUMMIES_FIRST_ARRAY_BIT_VECTOR_MASK_INVERSE == 0b11111111111111111111111110000011);
+        CAESAR_DUMMIES_FIRST_ARRAY_BIT_VECTOR_MASK_INVERSE == 0b11111111111111111111111110000011);
 }
 
 void test_enumeration_fields()
 {
     // Assert elements of enumeration fields.
-    assert(TEST_CONFIG_PLAIN_ENUMERATION_FIRST == 0);
-    assert(TEST_CONFIG_PLAIN_ENUMERATION_SECOND == 1);
-    assert(TEST_CONFIG_PLAIN_ENUMERATION_FIFTH == 4);
+    assert(CAESAR_CONFIG_PLAIN_ENUMERATION_FIRST == 0);
+    assert(CAESAR_CONFIG_PLAIN_ENUMERATION_SECOND == 1);
+    assert(CAESAR_CONFIG_PLAIN_ENUMERATION_FIFTH == 4);
 
-    assert(TEST_DUMMIES_FIRST_ARRAY_ENUMERATION_ELEMENT0 == 0);
-    assert(TEST_DUMMIES_FIRST_ARRAY_ENUMERATION_ELEMENT1 == 1);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_ENUMERATION_ELEMENT0 == 0);
+    assert(CAESAR_DUMMIES_FIRST_ARRAY_ENUMERATION_ELEMENT1 == 1);
 }
 
 void test_registers()

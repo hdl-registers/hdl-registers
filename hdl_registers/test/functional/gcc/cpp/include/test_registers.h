@@ -9,6 +9,6 @@
 
 #include <assert.h>
 
-#include "test.h"
+#include "caesar.h"
 
-void test_registers(uint32_t *memory, fpga_regs::Test *test);
+void test_registers(uint32_t *memory, fpga_regs::Caesar *caesar);

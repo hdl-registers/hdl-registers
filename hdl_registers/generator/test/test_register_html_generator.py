@@ -24,8 +24,9 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
     tmp_path = None
 
     def setUp(self):
-        toml_file = HDL_REGISTERS_TEST / "regs_test.toml"
-        self.registers = from_toml("test", toml_file)
+        self.registers = from_toml(
+            module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
+        )
 
     def test_registers(self):
         """
@@ -182,7 +183,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 
     def _create_html_page(self):
         self.registers.create_html_page(self.tmp_path)
-        html = read_file(self.tmp_path / "test_regs.html")
+        html = read_file(self.tmp_path / "caesar_regs.html")
         return html
 
     @staticmethod
@@ -245,12 +246,12 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         self.registers.register_objects = []
 
         self.registers.create_html_register_table(self.tmp_path)
-        html = read_file(self.tmp_path / "test_register_table.html")
+        html = read_file(self.tmp_path / "caesar_register_table.html")
         assert html == "", html
 
     def test_constant_table_is_empty_string_if_no_constants_are_available(self):
         self.registers.constants = []
 
         self.registers.create_html_constant_table(self.tmp_path)
-        html = read_file(self.tmp_path / "test_constant_table.html")
+        html = read_file(self.tmp_path / "caesar_constant_table.html")
         assert html == "", html

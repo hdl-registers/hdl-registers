@@ -16,12 +16,11 @@ from hdl_registers.parser import from_toml
 
 
 def test_recreating_register_list_object(tmp_path):
-    toml_file = HDL_REGISTERS_TEST / "regs_test.toml"
-    test_regs = from_toml("test", toml_file)
+    test_regs = from_toml(module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml")
     test_regs.create_python_class(tmp_path)
 
-    test_recreated = load_python_module(tmp_path / "test.py").Test()
+    test_recreated = load_python_module(tmp_path / "caesar.py").Caesar()
     assert repr(test_recreated) == repr(test_regs)
 
-    test_recreated = load_python_module(tmp_path / "test.py").get_register_list()
+    test_recreated = load_python_module(tmp_path / "caesar.py").get_register_list()
     assert repr(test_recreated) == repr(test_regs)

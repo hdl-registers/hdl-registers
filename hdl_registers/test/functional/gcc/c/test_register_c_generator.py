@@ -48,13 +48,13 @@ class CTest(CompileAndRunTest):
 #include <assert.h>
 #include <stdint.h>
 
-#include "test_regs.h"
+#include "caesar_regs.h"
 
 {includes}
 
 int main()
 {{
-  assert(TEST_NUM_REGS == {19 * test_registers});
+  assert(CAESAR_NUM_REGS == {19 * test_registers});
 
 {main_function}
 
