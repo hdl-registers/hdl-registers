@@ -47,6 +47,10 @@ def test_running_simulation(tmp_path):
     Contains assertions on types and type conversions.
     Shows that the files can be compiled and that the information is correct.
     """
+    # Remove any previously-generated register files before the test.
+    for vhd_file in tmp_path.glob("*.vhd"):
+        vhd_file.unlink()
+
     _generate_toml_registers(output_path=tmp_path)
     generate_strange_register_maps(output_path=tmp_path)
 
