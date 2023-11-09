@@ -9,6 +9,7 @@
 
 # Standard libraries
 from abc import ABC, abstractmethod
+from typing import Iterator
 
 # First party libraries
 from hdl_registers.register import Register
@@ -22,7 +23,10 @@ class RegisterCodeGenerator(ABC):
     """
 
     @staticmethod
-    def _iterate_registers(register_objects):
+    def _iterate_registers(register_objects) -> Iterator[tuple[Register, RegisterArray]]:
+        """
+        Iterate over all registers, plain or in array.
+        """
         for register_object in register_objects:
             if isinstance(register_object, Register):
                 yield (register_object, None)
@@ -31,7 +35,19 @@ class RegisterCodeGenerator(ABC):
                     yield (register, register_object)
 
     @staticmethod
-    def _iterate_register_arrays(register_objects):
+    def _iterate_plain_registers(register_objects) -> Iterator[Register]:
+        """
+        Iterate over all plain registers (i.e. registers not in array).
+        """
+        for register_object in register_objects:
+            if isinstance(register_object, Register):
+                yield register_object
+
+    @staticmethod
+    def _iterate_register_arrays(register_objects) -> Iterator[RegisterArray]:
+        """
+        Iterate over all register arrays.
+        """
         for register_object in register_objects:
             if isinstance(register_object, RegisterArray):
                 yield register_object

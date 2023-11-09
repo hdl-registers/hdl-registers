@@ -110,26 +110,21 @@ class RegisterVhdlGenerator(RegisterVhdlGeneratorCommon):
 """
         return vhdl
 
-    def _array_length_constant_name(self, register_array):
-        """
-        The name of the constant that specifies the number of times a register array is repeated.
-        """
-        return f"{self.module_name}_{register_array.name}_array_length"
-
     def _array_constants(self, register_objects):
         """
         A list of constants defining how many times each register array is repeated.
         """
         vhdl = ""
         for register_array in self._iterate_register_arrays(register_objects=register_objects):
-            constant = self._array_length_constant_name(register_array)
-            vhdl += (
-                f"  -- Number of times the '{register_array.name}' " "register array is repeated.\n"
-            )
-            vhdl += f"  constant {constant} : natural := {register_array.length};\n"
+            array_name = self._register_array_name(register_array=register_array)
 
-        if vhdl:
-            vhdl += "\n"
+            vhdl += f"""\
+  -- Number of times the '{register_array.name}' register array is repeated.
+  constant {array_name}_array_length : natural := {register_array.length};
+  -- Range for indexing '{register_array.name}' register array repetitions.
+  subtype {array_name}_range is natural range 0 to {register_array.length - 1};
+
+"""
 
         return vhdl
 
@@ -138,9 +133,10 @@ class RegisterVhdlGenerator(RegisterVhdlGeneratorCommon):
         Signature for the function that returns a register index for the specified index in a
         register array.
         """
+        array_name = self._register_array_name(register_array=register_array)
         vhdl = f"""\
   function {self._register_name(register, register_array)}(
-    array_index : natural range 0 to {self._array_length_constant_name(register_array)} - 1
+    array_index : {array_name}_range
   ) return {self._register_range_type_name}"""
         return vhdl
 
@@ -494,7 +490,7 @@ return {self.module_name}_regs_down_t;
             vhdl_array_type = ""
             vhdl_array_init = []
 
-            array_name = self._register_name(register=register_array)
+            array_name = self._register_array_name(register_array=register_array)
 
             for register in register_array.registers:
                 if mode_direction_checker(mode=register.mode):
