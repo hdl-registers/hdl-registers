@@ -22,8 +22,6 @@ use work.caesar_regs_pkg.all;
 
 entity tb_regs_pkg is
   generic (
-    test_integer_lower_range : boolean := false;
-    test_integer_upper_range : boolean := false;
     runner_cfg : string
   );
 end entity;
