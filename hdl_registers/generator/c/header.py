@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import TYPE_CHECKING, Union
+from pathlib import Path
 
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -17,18 +17,12 @@ from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.enumeration import Enumeration
+from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.register import REGISTER_MODES, Register
-
-# Local folder libraries
-from .register_code_generator import RegisterCodeGenerator
-
-if TYPE_CHECKING:
-    # First party libraries
-    from hdl_registers.constant.constant import Constant
-    from hdl_registers.register_array import RegisterArray
+from hdl_registers.register_list import RegisterList
 
 
-class RegisterCGenerator(RegisterCodeGenerator):
+class CHeaderGenerator(RegisterCodeGenerator):
     """
     Generate a C code header with register information.
 
@@ -38,88 +32,73 @@ class RegisterCGenerator(RegisterCodeGenerator):
     That test is considered more meaningful and exhaustive than a unit test would be.
     """
 
+    SHORT_DESCRIPTION = "C header"
+    COMMENT_START = "//"
     # The most commonly used indentation.
     # For code at the top level.
-    default_indent = 0
+    DEFAULT_INDENTATION_LEVEL = 0
 
-    def __init__(self, module_name: str, generated_info: list[str]):
+    @property
+    def output_file(self):
+        return self.output_folder / self._file_name
+
+    def __init__(self, register_list: RegisterList, output_folder: Path, file_name: str = None):
         """
+        For argument description, please see the parent class.
+
         Arguments:
-            module_name: The name of the register map.
-            generated_info: Will be placed in the file headers.
+                file_name: Optionally specify an explicit result file name.
+                    If not specified, the name will be derived from the name of the register list.
         """
-        self.module_name = module_name
-        self.generated_info = generated_info
+        super().__init__(register_list=register_list, output_folder=output_folder)
 
-    def get_header(
-        self, register_objects: list[Union[Register, "RegisterArray"]], constants: list["Constant"]
-    ):
+        self._file_name = f"{self.name}_regs.h" if file_name is None else file_name
+
+    def get_code(self, **kwargs):
         """
         Get a complete C header with all constants and all registers.
-
-        Arguments:
-            register_objects: Registers and register arrays to be included.
-            constants: Constants to be included.
-
-        Returns:
-            str: C code.
         """
-        define_name = self.module_name.upper() + "_REGS_H"
+        define_name = f"{self.name.upper()}_REGS_H"
 
         c_code = f"""\
-{self._file_header()}
+{self.header}
 #ifndef {define_name}
 #define {define_name}
 
-{self._constants(constants)}
-{self._number_of_registers(register_objects)}
-{self._register_struct(register_objects)}
-{self._register_defines(register_objects)}\
-#endif {self._comment(define_name)}"""
+{self._constants()}
+{self._number_of_registers()}
+{self._register_struct()}
+{self._register_defines()}\
+#endif {self.comment(define_name)}"""
 
         return c_code
 
-    @staticmethod
-    def _comment(comment, indent=default_indent):
-        """
-        Defaults to the most commonly used indentation.
-        """
-        indentation = " " * indent
-        return f"{indentation}// {comment}\n"
-
-    def _comment_block(self, text, indent=default_indent):
-        """
-        Defaults to the most commonly used indentation.
-        """
-        return super()._comment_block(text=text, indent=indent)
-
-    def _file_header(self):
-        return "".join([self._comment(header_line) for header_line in self.generated_info])
-
-    def _register_struct(self, register_objects):
+    def _register_struct(self):
         array_structs = ""
 
-        register_struct_type = f"{self.module_name}_regs_t"
-        register_struct = self._comment("Type for this register map.")
+        register_struct_type = f"{self.name}_regs_t"
+
+        register_struct = self.comment("Type for this register map.")
         register_struct += f"typedef struct {register_struct_type}\n"
         register_struct += "{\n"
-        for register_object in register_objects:
+
+        for register_object in self.iterate_register_objects():
             if isinstance(register_object, Register):
-                register_struct += self._comment(
+                register_struct += self.comment(
                     f'Mode "{REGISTER_MODES[register_object.mode].mode_readable}".', indent=2
                 )
                 register_struct += f"  uint32_t {register_object.name};\n"
 
             else:
-                array_struct_type = f"{self.module_name}_{register_object.name}_t"
+                array_struct_type = f"{self.name}_{register_object.name}_t"
 
-                array_structs += self._comment(
+                array_structs += self.comment(
                     f'Type for the "{register_object.name}" register array.'
                 )
                 array_structs += f"typedef struct {array_struct_type}\n"
                 array_structs += "{\n"
                 for register in register_object.registers:
-                    array_structs += self._comment(
+                    array_structs += self.comment(
                         f'Mode "{REGISTER_MODES[register.mode].mode_readable}".', indent=2
                     )
                     array_structs += f"  uint32_t {register.name};\n"
@@ -128,23 +107,25 @@ class RegisterCGenerator(RegisterCodeGenerator):
                 register_struct += (
                     f"  {array_struct_type} {register_object.name}[{register_object.length}];\n"
                 )
+
         register_struct += f"}} {register_struct_type};\n"
+
         return array_structs + register_struct
 
-    def _number_of_registers(self, register_objects):
+    def _number_of_registers(self):
         # It is possible that we have constants but no registers
         num_regs = 0
-        if register_objects:
-            num_regs = register_objects[-1].index + 1
+        if self.register_list.register_objects:
+            num_regs = self.register_list.register_objects[-1].index + 1
 
-        c_code = self._comment("Number of registers within this register map.")
-        c_code += f"#define {self.module_name.upper()}_NUM_REGS ({num_regs}u)\n"
+        c_code = self.comment("Number of registers within this register map.")
+        c_code += f"#define {self.name.upper()}_NUM_REGS ({num_regs}u)\n"
 
         return c_code
 
-    def _register_defines(self, register_objects):
+    def _register_defines(self):
         c_code = ""
-        for register, register_array in self._iterate_registers(register_objects):
+        for register, register_array in self.iterate_registers():
             c_code += self._addr_define(register, register_array)
             c_code += self._field_definitions(register, register_array)
             c_code += "\n"
@@ -162,7 +143,7 @@ class RegisterCGenerator(RegisterCodeGenerator):
             )
         comment += f'.\nMode "{REGISTER_MODES[register.mode].mode_readable}".'
 
-        c_code = self._comment_block(comment)
+        c_code = self.comment_block(comment)
 
         if register_array:
             c_code += (
@@ -184,7 +165,7 @@ class RegisterCGenerator(RegisterCodeGenerator):
 
         c_code = ""
         for field in register.fields:
-            c_code += self._comment(
+            c_code += self.comment(
                 f'Attributes for the "{field.name}" field in the {register_string}.'
             )
 
@@ -204,7 +185,7 @@ class RegisterCGenerator(RegisterCodeGenerator):
                 separator = "\n  "
 
                 c_code += f"""\
-enum {self._to_pascal_case(field_name)}
+enum {self.to_pascal_case(field_name)}
 {{
   {separator.join(name_value_pairs)}
 }};
@@ -214,15 +195,15 @@ enum {self._to_pascal_case(field_name)}
 
     def _register_define_name(self, register, register_array):
         if register_array is None:
-            name = f"{self.module_name}_{register.name}"
+            name = f"{self.name}_{register.name}"
         else:
-            name = f"{self.module_name}_{register_array.name}_{register.name}"
+            name = f"{self.name}_{register_array.name}_{register.name}"
         return name.upper()
 
-    def _constants(self, constants):
+    def _constants(self):
         c_code = ""
-        for constant in constants:
-            constant_name = f"{self.module_name.upper()}_{constant.name.upper()}"
+        for constant in self.iterate_constants():
+            constant_name = f"{self.name.upper()}_{constant.name.upper()}"
 
             # Most of the types are a simple "#define". But some are special, where we explicitly
             # set the declaration.
@@ -252,7 +233,7 @@ enum {self._to_pascal_case(field_name)}
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
-            c_code += self._comment(f'Value of register constant "{constant.name}".')
+            c_code += self.comment(f'Value of register constant "{constant.name}".')
 
             if declaration:
                 c_code += f"{declaration}\n"

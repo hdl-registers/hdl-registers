@@ -7,24 +7,22 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from typing import TYPE_CHECKING, Union
-
 # Local folder libraries
-from .vhdl_generator_common import RegisterVhdlGeneratorCommon
-
-if TYPE_CHECKING:
-    # First party libraries
-    from hdl_registers.register import Register
-    from hdl_registers.register_array import RegisterArray
+from .vhdl_generator_common import VhdlGeneratorCommon
 
 
-class RegisterVhdlGeneratorSimulationPackage(RegisterVhdlGeneratorCommon):
+class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
     """
     Generate code that simplifies simulation of a register map.
     """
 
-    def get_package(self, register_objects: list[Union["Register", "RegisterArray"]]):
+    SHORT_DESCRIPTION = "VHDL simulation package"
+
+    @property
+    def output_file(self):
+        return self.output_folder / f"{self.name}_regs_sim_pkg.vhd"
+
+    def get_code(self, **kwargs):
         """
         Get a package with methods for reading/writing registers.
         Uses the VHDL record types for register read/write values.
@@ -37,11 +35,11 @@ class RegisterVhdlGeneratorSimulationPackage(RegisterVhdlGeneratorCommon):
         Returns:
             str: VHDL code.
         """
-        pkg_name = f"{self.module_name}_regs_pkg"
-        sim_pkg_name = f"{self.module_name}_regs_sim_pkg"
+        pkg_name = f"{self.name}_regs_pkg"
+        sim_pkg_name = self.output_file.stem
 
         vhdl = f"""\
-{self._header()}
+{self.header}
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -61,12 +59,12 @@ use work.{pkg_name}.all;
 
 package {sim_pkg_name} is
 
-{self._declarations(register_objects=register_objects)}\
+{self._declarations()}\
 end package;
 
 package body {sim_pkg_name} is
 
-{self._implementations(register_objects=register_objects)}\
+{self._implementations()}\
 end package body;
 """
 
@@ -81,11 +79,11 @@ end package body;
         direction = "read" if is_read_not_write else "write"
         value_direction = "out" if is_read_not_write else "in"
 
-        register_name = self._register_name(register=register, register_array=register_array)
+        register_name = self.register_name(register=register, register_array=register_array)
         value_type = f"{register_name}_t" if register.fields else "reg_t"
 
         if register_array:
-            array_name = self._register_array_name(register_array=register_array)
+            array_name = self.register_array_name(register_array=register_array)
             array_index_port = f"    array_index : in {array_name}_range;\n"
         else:
             array_index_port = ""
@@ -99,14 +97,14 @@ end package body;
     bus_handle : in bus_master_t := regs_bus_master
   )"""
 
-    def _declarations(self, register_objects):
+    def _declarations(self):
         """
         Get procedure declarations for all 'read_reg'/'write_reg' procedures.
         """
         vhdl = ""
 
-        for register, register_array in self._iterate_registers(register_objects=register_objects):
-            register_comment = self._register_comment(
+        for register, register_array in self.iterate_registers():
+            register_description = self.register_description(
                 register=register, register_array=register_array
             )
 
@@ -115,7 +113,7 @@ end package body;
                     is_read_not_write=True, register=register, register_array=register_array
                 )
                 vhdl += f"""\
-  -- Read the {register_comment}.
+  -- Read the {register_description}.
 {signature};
 
 """
@@ -125,7 +123,7 @@ end package body;
                     is_read_not_write=False, register=register, register_array=register_array
                 )
                 vhdl += f"""\
-  -- Write the {register_comment}.
+  -- Write the {register_description}.
 {signature};
 
 """
@@ -141,7 +139,7 @@ end package body;
         signature = self._register_read_write_signature(
             is_read_not_write=is_read_not_write, register=register, register_array=register_array
         )
-        register_name = self._register_name(register=register, register_array=register_array)
+        register_name = self.register_name(register=register, register_array=register_array)
 
         reg_index = (
             f"{register_name}(array_index=>array_index)" if register_array else register_name
@@ -149,7 +147,7 @@ end package body;
 
         return f"""\
 {signature} is
-    constant reg_index : {self.module_name}_reg_range := {reg_index};\
+    constant reg_index : {self.name}_reg_range := {reg_index};\
 """
 
     def _register_read_implementation(self, register, register_array):
@@ -160,7 +158,7 @@ end package body;
             is_read_not_write=True, register=register, register_array=register_array
         )
 
-        register_name = self._register_name(register=register, register_array=register_array)
+        register_name = self.register_name(register=register, register_array=register_array)
         conversion = f"to_{register_name}(reg_value)" if register.fields else "reg_value"
 
         return f"""\
@@ -204,13 +202,13 @@ end package body;
 
 """
 
-    def _implementations(self, register_objects):
+    def _implementations(self):
         """
-        TODO
+        Get implementations of 'read_reg'/'write_reg' procedures.
         """
         vhdl = ""
 
-        for register, register_array in self._iterate_registers(register_objects=register_objects):
+        for register, register_array in self.iterate_registers():
             if register.is_bus_readable:
                 vhdl += self._register_read_implementation(
                     register=register, register_array=register_array

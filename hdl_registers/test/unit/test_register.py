@@ -34,8 +34,8 @@ def test_repr_basic():
     )
 
     # Different description
-    assert repr(Register(name="apa", index=0, mode="r", description="Blaah")) != repr(
-        Register(name="apa", index=0, mode="r", description="Gaah")
+    assert repr(Register(name="apa", index=0, mode="r", description="Blah")) != repr(
+        Register(name="apa", index=0, mode="r", description="Gah")
     )
 
 

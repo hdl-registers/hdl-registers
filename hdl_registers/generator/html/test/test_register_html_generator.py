@@ -16,6 +16,9 @@ from tsfpga.system_utils import read_file
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
+from hdl_registers.generator.html.page import HtmlPageGenerator
+from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
 from hdl_registers.parser import from_toml
 
 
@@ -24,7 +27,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
     tmp_path = None
 
     def setUp(self):
-        self.registers = from_toml(
+        self.register_list = from_toml(
             module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
         )
 
@@ -159,7 +162,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         self._check_constant(name="paragraph", value='"hello there :)"', html=html)
 
         # Test again with no constants
-        self.registers.constants = []
+        self.register_list.constants = []
         html = self._create_html_page()
 
         # Registers should still be there
@@ -170,7 +173,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert constants_text not in html, html
 
     def test_constants_and_no_registers(self):
-        self.registers.register_objects = []
+        self.register_list.register_objects = []
 
         html = self._create_html_page()
 
@@ -182,7 +185,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         self._check_constant(name="decrement", value=-8, html=html)
 
     def _create_html_page(self):
-        self.registers.create_html_page(self.tmp_path)
+        HtmlPageGenerator(self.register_list, self.tmp_path).create()
         html = read_file(self.tmp_path / "caesar_regs.html")
         return html
 
@@ -243,15 +246,15 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert expected in html, f"{expected}\n\n{html}"
 
     def test_register_table_is_empty_string_if_no_registers_are_available(self):
-        self.registers.register_objects = []
+        self.register_list.register_objects = []
 
-        self.registers.create_html_register_table(self.tmp_path)
+        HtmlRegisterTableGenerator(self.register_list, self.tmp_path).create()
         html = read_file(self.tmp_path / "caesar_register_table.html")
         assert html == "", html
 
     def test_constant_table_is_empty_string_if_no_constants_are_available(self):
-        self.registers.constants = []
+        self.register_list.constants = []
 
-        self.registers.create_html_constant_table(self.tmp_path)
+        HtmlConstantTableGenerator(self.register_list, self.tmp_path).create()
         html = read_file(self.tmp_path / "caesar_constant_table.html")
         assert html == "", html

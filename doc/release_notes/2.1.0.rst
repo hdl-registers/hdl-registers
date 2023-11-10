@@ -1,12 +1,12 @@
 Added
 
-* Add :meth:`.RegisterList.create_python_class` method to create a Python pickle file.
+* Add ``.RegisterList.create_python_class`` method to create a Python pickle file.
   Read more :ref:`here <generator_python>`.
 
 * Add optional ``field_type`` argument to :meth:`.RegisterList.append_register`
   and :class:`.Register`.
 
-* Add support for generating ``ieee.fixed_pkg`` types in :class:`.RegisterVhdlGenerator` based
+* Add support for generating ``ieee.fixed_pkg`` types in ``RegisterVhdlGenerator`` class based
   on the register ``field_type``.
 
 Fixed

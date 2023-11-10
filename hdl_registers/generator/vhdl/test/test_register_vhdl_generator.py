@@ -27,6 +27,8 @@ from hdl_registers.field.register_field_type import (
     Unsigned,
     UnsignedFixedPoint,
 )
+from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
+from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.parser import from_toml
 from hdl_registers.register_list import RegisterList
 
@@ -41,7 +43,7 @@ class RegisterConfiguration:
         self.register_list.add_constant(name="string_constant", value="apa", description="")
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
-        self.register_list.create_vhdl_package(output_path)
+        VhdlRegisterPackageGenerator(self.register_list, output_path).create()
         vhdl = read_file(output_path / "test_regs_pkg.vhd")
 
         if test_registers:
@@ -98,7 +100,7 @@ def test_vhdl_package_with_only_one_register(tmp_path):
     """
     register_list = RegisterList(name="apa", source_definition_file=None)
     register_list.append_register(name="hest", mode="r", description="a single register")
-    register_list.create_vhdl_package(tmp_path)
+    VhdlRegisterPackageGenerator(register_list, tmp_path).create()
     vhdl = read_file(tmp_path / "apa_regs_pkg.vhd")
 
     expected = """
@@ -159,7 +161,7 @@ def test_vhdl_typedef(tmp_path):
         name="integer0", description="", min_value=1, max_value=3, default_value=2
     )
 
-    register_list.create_vhdl_package(tmp_path)
+    VhdlRegisterPackageGenerator(register_list, tmp_path).create()
     vhdl = read_file(tmp_path / "test_regs_pkg.vhd")
 
     assert "subtype test_number_u0_t is u_unsigned(1 downto 0);" in vhdl, vhdl
@@ -181,6 +183,14 @@ def generate_strange_register_maps(output_path):
     """
 
     def create_packages(direction, mode):
+        def generate_vhdl(register_list):
+            VhdlRegisterPackageGenerator(
+                register_list=register_list, output_folder=output_path
+            ).create()
+            VhdlAxiLiteWrapperGenerator(
+                register_list=register_list, output_folder=output_path
+            ).create()
+
         def append_register(data, name):
             """
             Append a register with some fields.
@@ -204,7 +214,7 @@ def generate_strange_register_maps(output_path):
         # Some plain registers, in one direction only.
         register_list = RegisterList(name=f"plain_only_{direction}")
         append_registers(data=register_list)
-        register_list.create_vhdl_package(output_path=output_path)
+        generate_vhdl(register_list=register_list)
 
         # Some register arrays, in one direction only.
         register_list = RegisterList(name=f"array_only_{direction}")
@@ -212,7 +222,7 @@ def generate_strange_register_maps(output_path):
         append_registers(data=register_array)
         register_array = register_list.append_register_array(name="hest", length=10, description="")
         append_registers(data=register_array)
-        register_list.create_vhdl_package(output_path=output_path)
+        generate_vhdl(register_list=register_list)
 
         # Plain registers and some register arrays, in one direction only.
         register_list = RegisterList(name=f"plain_and_array_only_{direction}")
@@ -221,7 +231,7 @@ def generate_strange_register_maps(output_path):
         append_registers(data=register_array)
         register_array = register_list.append_register_array(name="hest", length=10, description="")
         append_registers(data=register_array)
-        register_list.create_vhdl_package(output_path=output_path)
+        generate_vhdl(register_list=register_list)
 
     # Mode 'Read only' should give registers only in the 'up' direction'
     create_packages(direction="up", mode="r")

@@ -51,8 +51,8 @@
     rst/generator/generator_c
     rst/generator/generator_cpp
     rst/generator/generator_html
-    rst/generator/generator_vhdl
     rst/generator/generator_python
+    rst/generator/generator_vhdl
 
 .. toctree::
     :caption: API reference
@@ -62,4 +62,8 @@
     rst/api_reference/hdl_registers.field
     rst/api_reference/hdl_registers.constant
     rst/api_reference/hdl_registers.generator
+    rst/api_reference/hdl_registers.generator.c
+    rst/api_reference/hdl_registers.generator.cpp
+    rst/api_reference/hdl_registers.generator.html
+    rst/api_reference/hdl_registers.generator.python
     rst/api_reference/hdl_registers.generator.vhdl

@@ -48,9 +48,10 @@ architecture tb of tb_axi_lite_reg_file is
   signal regs_up : caesar_regs_up_t := caesar_regs_up_init;
   signal regs_down : caesar_regs_down_t := caesar_regs_down_init;
 
-  signal reg_was_read, reg_was_written : caesar_reg_was_accessed_t := (others => '0');
+  signal reg_was_read : caesar_reg_was_read_t := caesar_reg_was_read_init;
+  signal reg_was_written : caesar_reg_was_written_t := caesar_reg_was_written_init;
 
-  signal reg_was_read_count, reg_was_written_count : natural_vec_t(reg_was_read'range) := (
+  signal reg_was_read_count, reg_was_written_count : natural_vec_t(caesar_reg_range) := (
     others => 0
   );
 
@@ -103,8 +104,9 @@ begin
       check_equal(value.j, caesar_dummies2_dummy_j_init);
     end procedure;
 
-    variable reg_was_read_expected, reg_was_written_expected : natural_vec_t(reg_was_read'range) :=
-      (others => 0);
+    variable reg_was_read_expected, reg_was_written_expected : natural_vec_t(caesar_reg_range) := (
+      others => 0
+    );
 
     procedure test_plain_r_register is
       procedure check(
@@ -755,12 +757,75 @@ begin
         dummies_b_low_count(array_index) + to_int(not regs_down.dummies4(array_index).dummy.b)
       );
     end loop;
+  end process;
 
-    for reg_idx in reg_was_read'range loop
-      reg_was_read_count(reg_idx) <= reg_was_read_count(reg_idx) + to_int(reg_was_read(reg_idx));
-      reg_was_written_count(reg_idx) <= (
-        reg_was_written_count(reg_idx) + to_int(reg_was_written(reg_idx))
-      );
+
+  ------------------------------------------------------------------------------
+  count_register_accesses : process
+  begin
+    wait until rising_edge(clk);
+
+    assert reg_was_read_count'length = 22;
+
+    reg_was_read_count(caesar_config) <=
+      reg_was_read_count(caesar_config) + to_int(reg_was_read.config);
+    reg_was_read_count(caesar_irq_status) <=
+      reg_was_read_count(caesar_irq_status) + to_int(reg_was_read.irq_status);
+    reg_was_read_count(caesar_status) <=
+      reg_was_read_count(caesar_status) + to_int(reg_was_read.status);
+    reg_was_read_count(caesar_current_timestamp) <=
+      reg_was_read_count(caesar_current_timestamp) + to_int(reg_was_read.current_timestamp);
+
+    reg_was_written_count(caesar_config) <=
+      reg_was_written_count(caesar_config) + to_int(reg_was_written.config);
+    reg_was_written_count(caesar_command) <=
+      reg_was_written_count(caesar_command) + to_int(reg_was_written.command);
+    reg_was_written_count(caesar_irq_status) <=
+      reg_was_written_count(caesar_irq_status) + to_int(reg_was_written.irq_status);
+    reg_was_written_count(caesar_address) <=
+      reg_was_written_count(caesar_address) + to_int(reg_was_written.address);
+    reg_was_written_count(caesar_tuser) <=
+      reg_was_written_count(caesar_tuser) + to_int(reg_was_written.tuser);
+
+    for array_idx in caesar_dummies_range loop
+      reg_was_read_count(caesar_dummies_first(array_idx)) <=
+        reg_was_read_count(caesar_dummies_first(array_idx))
+        + to_int(reg_was_read.dummies(array_idx).first);
+      reg_was_read_count(caesar_dummies_second(array_idx)) <=
+        reg_was_read_count(caesar_dummies_second(array_idx))
+        + to_int(reg_was_read.dummies(array_idx).second);
+
+      reg_was_written_count(caesar_dummies_first(array_idx)) <=
+        reg_was_written_count(caesar_dummies_first(array_idx))
+        + to_int(reg_was_written.dummies(array_idx).first);
+    end loop;
+
+    for array_idx in caesar_dummies2_range loop
+      reg_was_read_count(caesar_dummies2_dummy(array_idx)) <=
+        reg_was_read_count(caesar_dummies2_dummy(array_idx))
+        + to_int(reg_was_read.dummies2(array_idx).dummy);
+
+      reg_was_written_count(caesar_dummies2_dummy(array_idx)) <=
+        reg_was_written_count(caesar_dummies2_dummy(array_idx))
+        + to_int(reg_was_written.dummies2(array_idx).dummy);
+    end loop;
+
+    for array_idx in caesar_dummies3_range loop
+      reg_was_read_count(caesar_dummies3_dummy(array_idx)) <=
+        reg_was_read_count(caesar_dummies3_dummy(array_idx))
+        + to_int(reg_was_read.dummies3(array_idx).dummy);
+      reg_was_read_count(caesar_dummies3_status(array_idx)) <=
+        reg_was_read_count(caesar_dummies3_status(array_idx))
+        + to_int(reg_was_read.dummies3(array_idx).status);
+    end loop;
+
+    for array_idx in caesar_dummies4_range loop
+      reg_was_written_count(caesar_dummies4_dummy(array_idx)) <=
+        reg_was_written_count(caesar_dummies4_dummy(array_idx))
+        + to_int(reg_was_written.dummies4(array_idx).dummy);
+      reg_was_written_count(caesar_dummies4_flabby(array_idx)) <=
+        reg_was_written_count(caesar_dummies4_flabby(array_idx))
+        + to_int(reg_was_written.dummies4(array_idx).flabby);
     end loop;
   end process;
 

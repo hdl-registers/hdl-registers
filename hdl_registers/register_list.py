@@ -13,13 +13,11 @@ import datetime
 import hashlib
 import re
 from pathlib import Path
-from shutil import copy2
 from typing import TYPE_CHECKING, Union
 
 # Third party libraries
 from tsfpga.git_utils import get_git_commit, git_commands_are_available
 from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_available
-from tsfpga.system_utils import create_directory, create_file, read_file
 
 # Local folder libraries
 from . import __version__
@@ -28,13 +26,6 @@ from .constant.boolean_constant import BooleanConstant
 from .constant.float_constant import FloatConstant
 from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
-from .generator.register_c_generator import RegisterCGenerator
-from .generator.register_cpp_generator import RegisterCppGenerator
-from .generator.register_html_generator import RegisterHtmlGenerator
-from .generator.register_python_generator import RegisterPythonGenerator
-from .generator.register_vhdl_generator import RegisterVhdlGenerator
-from .generator.vhdl.vhdl_generator_axi_lite import RegisterVhdlGeneratorAxiLite
-from .generator.vhdl.vhdl_generator_simulation_package import RegisterVhdlGeneratorSimulationPackage
 from .register import Register
 from .register_array import RegisterArray
 
@@ -267,279 +258,42 @@ class RegisterList:
 
         raise ValueError(f'Could not find constant "{name}" within register list "{self.name}"')
 
-    def create_vhdl_package(
-        self,
-        output_path: Path,
-        create_axi_lite_reg_file: bool = True,
-        create_simulation_package: bool = True,
-    ):
-        """
-        Create a VHDL package file with register, field and constant definitions.
-
-        In order to save time, there is a mechanism to only generate the VHDL file when necessary.
-        A hash of this register list object will be written to the file along with all the register
-        definitions. This hash will be inspected and compared, and the VHDL file will only be
-        generated again if something has changed.
-
-        If ``create_axi_lite_reg_file`` is set to ``True``, a wrapper file for the generic AXI-Lite
-        register file will be created in the ``output_path``.
-        This wrapper will set the correct generics and will have easy-to-use register
-        record types for its registers up and down.
-        See :class:`.RegisterVhdlGeneratorAxiLite` for details.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-            create_axi_lite_reg_file: Additionally create a wrapper around generic AXI-Lite
-                register file.
-        """
-        package_file = output_path / f"{self.name}_regs_pkg.vhd"
-
-        self_hash = self._hash()
-        should_create_package = self._should_create_vhdl_package(package_file, self_hash)
-
-        if should_create_package:
-            self._create_vhdl_package(package_file, self_hash)
-
-        if create_axi_lite_reg_file:
-            axi_lite_file = output_path / f"{self.name}_reg_file.vhd"
-
-            if (should_create_package or not axi_lite_file.exists()) and self.register_objects:
-                self._create_vhdl_axi_lite_reg_file(vhd_file=axi_lite_file)
-
-        if create_simulation_package:
-            simulation_package_file = output_path / f"{self.name}_regs_sim_pkg.vhd"
-
-            if (
-                should_create_package or not simulation_package_file.exists()
-            ) and self.register_objects:
-                self._create_vhdl_simulation_package(vhd_file=simulation_package_file)
-
-    def _should_create_vhdl_package(self, vhd_file, self_hash):
-        if not vhd_file.exists():
-            return True
-
-        if (self_hash, __version__) != self._find_hash_and_version_of_existing_vhdl_package(
-            vhd_file
-        ):
-            return True
-
-        return False
-
-    @staticmethod
-    def _find_hash_and_version_of_existing_vhdl_package(vhd_file):
-        """
-        Returns `None` if nothing found, otherwise the matching strings in a tuple.
-        """
-        existing_file_content = read_file(vhd_file)
-
-        result_hash = None
-        result_version = None
-
-        hash_match = VHDL_PACKAGE_HASH_REGEXP.search(existing_file_content)
-        if hash_match:
-            result_hash = hash_match.group(1)
-
-        version_match = VHDL_PACKAGE_VERSION_REGEXP.search(existing_file_content)
-        if version_match:
-            result_version = version_match.group(1)
-
-        return result_hash, result_version
-
-    def _create_vhdl_package(self, vhd_file, self_hash):
-        print(f"Creating VHDL register package {vhd_file}")
-
-        # Add a header line with the hash.
-        generated_info = self.generated_source_info() + [f"Register hash {self_hash}."]
-
-        generator = RegisterVhdlGenerator(module_name=self.name, generated_info=generated_info)
-        vhdl = generator.get_package(
-            register_objects=self.register_objects, constants=self.constants
-        )
-
-        # Will create the containing folder unless it already exists.
-        create_file(file=vhd_file, contents=vhdl)
-
-    def _create_vhdl_axi_lite_reg_file(self, vhd_file):
-        print(f"Creating VHDL AXI-Lite register file {vhd_file}")
-
-        generator = RegisterVhdlGeneratorAxiLite(
-            module_name=self.name,
-            generated_info=self.generated_source_info(),
-        )
-        vhdl = generator.get_reg_file(register_objects=self.register_objects)
-
-        # Will create the containing folder unless it already exists.
-        create_file(file=vhd_file, contents=vhdl)
-
-    def _create_vhdl_simulation_package(self, vhd_file):
-        print(f"Creating VHDL simulation package {vhd_file}")
-
-        generator = RegisterVhdlGeneratorSimulationPackage(
-            module_name=self.name,
-            generated_info=self.generated_source_info(),
-        )
-        vhdl = generator.get_package(register_objects=self.register_objects)
-
-        # Will create the containing folder unless it already exists.
-        create_file(file=vhd_file, contents=vhdl)
-
-    def create_c_header(self, output_path: Path, file_name: str = None):
-        """
-        Create a C header file with register, field and constant definitions.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-            file_name: Optionally specify an explicit file name.
-                If not specified, the name will be derived from the name of this register list.
-        """
-        file_name = f"{self.name}_regs.h" if file_name is None else file_name
-        output_file = output_path / file_name
-
-        register_c_generator = RegisterCGenerator(self.name, self.generated_source_info())
-        create_file(
-            output_file, register_c_generator.get_header(self.register_objects, self.constants)
-        )
-
-    def create_cpp_interface(self, output_path: Path):
-        """
-        Create a C++ class interface header file, with register, field and constant definitions.
-        The interface header contains only virtual methods.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        output_file = output_path / ("i_" + self.name + ".h")
-        register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
-        create_file(
-            output_file, register_cpp_generator.get_interface(self.register_objects, self.constants)
-        )
-
-    def create_cpp_header(self, output_path: Path):
-        """
-        Create a C++ class header file with register, field and constant definitions.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        output_file = output_path / (self.name + ".h")
-        register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
-        create_file(output_file, register_cpp_generator.get_header(self.register_objects))
-
-    def create_cpp_implementation(self, output_path: Path):
-        """
-        Create a C++ class implementation file.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        output_file = output_path / (self.name + ".cpp")
-        register_cpp_generator = RegisterCppGenerator(self.name, self.generated_source_info())
-        create_file(output_file, register_cpp_generator.get_implementation(self.register_objects))
-
-    def create_html_page(self, output_path: Path):
-        """
-        Create a documentation HTML page with register, field and constant information.
-        Will include the tables created by :meth:`.create_html_register_table` and
-        :meth:`.create_html_constant_table`.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
-
-        html_file = output_path / (self.name + "_regs.html")
-        create_file(
-            html_file, register_html_generator.get_page(self.register_objects, self.constants)
-        )
-
-        stylesheet = register_html_generator.get_page_style()
-        stylesheet_file = output_path / "regs_style.css"
-        if (not stylesheet_file.exists()) or read_file(stylesheet_file) != stylesheet:
-            # Create the file only once. This mechanism could be made more smart, but at the moment
-            # there is no use case. Perhaps there should be a separate stylesheet for each
-            # HTML file?
-            create_file(stylesheet_file, stylesheet)
-
-    def create_html_register_table(self, output_path: Path):
-        """
-        Create documentation HTML table with register and field information.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        output_file = output_path / (self.name + "_register_table.html")
-        register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
-        create_file(output_file, register_html_generator.get_register_table(self.register_objects))
-
-    def create_html_constant_table(self, output_path: Path):
-        """
-        Create documentation HTML table with constant information.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        output_file = output_path / (self.name + "_constant_table.html")
-        register_html_generator = RegisterHtmlGenerator(self.name, self.generated_source_info())
-        create_file(output_file, register_html_generator.get_constant_table(self.constants))
-
-    def create_python_class(self, output_path: Path):
-        """
-        Save a python class with all register, field and constant definitions.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        register_python_generator = RegisterPythonGenerator(self.name, self.generated_source_info())
-        register_python_generator.create_class(register_list=self, output_folder=output_path)
-
-    def copy_source_definition(self, output_path: Path):
-        """
-        Copy the source file that created this register list. If no source file is set, nothing will
-        be copied.
-
-        Arguments:
-            output_path: Result will be placed in this folder.
-        """
-        if self.source_definition_file is not None:
-            create_directory(output_path, empty=False)
-            copy2(self.source_definition_file, output_path)
-
-    @staticmethod
-    def generated_info() -> list[str]:
-        """
-        Return:
-            Line(s) informing the user that a file is automatically generated.
-        """
-        return [f"This file is automatically generated by hdl_registers version {__version__}."]
-
+    @property
     def generated_source_info(self) -> list[str]:
         """
         Return line(s) informing the user that a file is automatically generated, containing info
         about the source of the generated register information.
         """
-        # Default to the user's current working directory
+        # Default: Get git SHA from the user's current working directory.
         directory = Path(".")
 
         time_info = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
         file_info = ""
         if self.source_definition_file is not None:
+            # If the source definition file exists, get git SHA from that directory instead.
             directory = self.source_definition_file.parent
             file_info = f" from file {self.source_definition_file.name}"
 
         commit_info = ""
-        if git_commands_are_available(directory):
-            commit_info = f" at commit {get_git_commit(directory)}"
-        elif svn_commands_are_available(directory):
-            commit_info = f" at revision {get_svn_revision_information(directory)}"
+        if git_commands_are_available(directory=directory):
+            commit_info = f" at commit {get_git_commit(directory=directory)}"
+        elif svn_commands_are_available(cwd=directory):
+            commit_info = f" at revision {get_svn_revision_information(cwd=directory)}"
 
         info = f"Generated {time_info}{file_info}{commit_info}."
 
-        return self.generated_info() + [info]
+        return [
+            f"This file is automatically generated by hdl_registers version {__version__}.",
+            info,
+            f"Register hash {self.object_hash}.",
+        ]
 
-    def _hash(self):
+    @property
+    def object_hash(self) -> str:
         """
-        Get a hash of this object representation. SHA1 is the fastest method according to e.g.
+        Get a hash of this object representation.
+        SHA1 is the fastest method according to e.g.
         http://atodorov.org/blog/2013/02/05/performance-test-md5-sha1-sha256-sha512/
         Result is a lowercase hexadecimal string.
         """

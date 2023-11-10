@@ -1,7 +1,7 @@
 Added
 
-* Add field setters and getters to :class:`.RegisterCppGenerator`.
-* Add ``*_MASK_INVERSE`` defines for fields to :class:`.RegisterCGenerator`.
+* Add field setters and getters to ``RegisterCppGenerator``.
+* Add ``*_MASK_INVERSE`` defines for fields to ``RegisterCGenerator``.
 * Add support for register constants of boolean and floating point type.
 
 Breaking changes
@@ -9,7 +9,7 @@ Breaking changes
 * Remove the field ``_mask`` and ``_shift`` public constants from the generated C++
   interface header.
   These are not needed now that setters and getters are available.
-* Change to use unresolved VHDL types in :class:`.RegisterVhdlGenerator`.
+* Change to use unresolved VHDL types in ``RegisterVhdlGenerator`` class.
 
   * ``std_ulogic_vector`` instead of ``std_logic_vector``.
   * ``u_signed`` instead of ``signed``.

@@ -33,6 +33,9 @@ from hdl_registers.field.register_field_type import (
     Unsigned,
     UnsignedFixedPoint,
 )
+from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
+from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
+from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackageGenerator
 from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
     generate_strange_register_maps,
 )
@@ -51,7 +54,7 @@ def test_running_simulation(tmp_path):
     for vhd_file in tmp_path.glob("*.vhd"):
         vhd_file.unlink()
 
-    _generate_toml_registers(output_path=tmp_path)
+    generate_toml_registers(output_path=tmp_path)
     generate_strange_register_maps(output_path=tmp_path)
 
     def run(args, exit_code):
@@ -89,7 +92,7 @@ def test_running_simulation(tmp_path):
     run(args=["--with-attribute", ".expected_failure"], exit_code=1)
 
 
-def _generate_toml_registers(output_path):
+def generate_toml_registers(output_path):
     register_list = from_toml(
         module_name="caesar",
         toml_file=HDL_REGISTERS_PATH / "test" / "regs_test.toml",
@@ -120,7 +123,17 @@ def _generate_toml_registers(output_path):
         field_type=SignedFixedPoint(2, -3),
     )
 
-    register_list.create_vhdl_package(output_path=output_path)
+    VhdlRegisterPackageGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
+
+    VhdlAxiLiteWrapperGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
+
+    VhdlSimulationPackageGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
 
 
 if __name__ == "__main__":

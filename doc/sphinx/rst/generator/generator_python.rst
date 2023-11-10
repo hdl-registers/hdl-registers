@@ -8,9 +8,14 @@ object to a Python :py:mod:`pickle`.
 It is not intended to be used during development, but bundling the Python class pickles when making
 an FPGA release can be very useful.
 
-Running the :meth:`.RegisterList.create_python_class` method will create a binary pickle, which
-represents the object precisely, as well as a convenient Python file to re-create the pickle,
-shown below:
+The pickle is created e.g. like this:
+
+.. code-block:: python
+
+   PythonClassGenerator(register_list=register_list, output_folder=output_folder).create()
+
+This will save the binary pickle, which represents the object precisely,
+as well as a convenient Python file to re-create the pickle, shown below:
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/toml_format/py/example.py
    :caption: Example Python class

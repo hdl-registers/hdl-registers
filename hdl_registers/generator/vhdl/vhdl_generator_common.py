@@ -7,134 +7,214 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import TYPE_CHECKING, Iterator, Union
+
 # First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
 
-class RegisterVhdlGeneratorCommon(RegisterCodeGenerator):
+
+class BusAccessDirection:
+    """
+    Keep track of and test the bus access direction.
+    """
+
+    def __init__(self, read_or_write: str):
+        if read_or_write not in ["read", "write"]:
+            raise ValueError(f"Unknown bus access direction name: {read_or_write}")
+
+        self.name = read_or_write
+
+        self.is_read_not_write = read_or_write == "read"
+        self.name_past = "read" if self.is_read_not_write else "written"
+
+    @property
+    def name_adjective(self):
+        """
+        Return "readable" or "writeable".
+        """
+        return f"{self.name}able"
+
+    def register_is_accessible(self, register: "Register") -> bool:
+        """
+        Return True if the supplied register is accessible in this direction.
+        """
+        if self.is_read_not_write:
+            return register.is_bus_readable
+
+        return register.is_bus_writeable
+
+
+class FabricAccessDirection:
+    """
+    Keep track of and test the bus access direction.
+    """
+
+    def __init__(self, up_or_down: str):
+        if up_or_down not in ["up", "down"]:
+            raise ValueError(f"Unknown fabric access direction name: {up_or_down}")
+
+        self.name = up_or_down
+        self.is_up_not_down = up_or_down == "up"
+
+    def register_is_accessible(self, register: "Register") -> bool:
+        """
+        Return True if the supplied register is accessible in this direction.
+        """
+        if self.is_up_not_down:
+            # Modes where fabric provides a value to the bus.
+            # Analogous the 'reg_file.reg_file_pkg.is_fabric_gives_value_type' VHDL function.
+            return register.mode in ["r", "r_wpulse"]
+
+        # Modes where the bus provides a value to the fabric.
+        # Analogous the 'reg_file.reg_file_pkg.is_write_type' VHDL function.
+        return register.mode in ["w", "r_w", "wpulse", "r_wpulse"]
+
+
+# The valid bus access directions.
+BUS_ACCESS_DIRECTIONS = dict(
+    read=BusAccessDirection(read_or_write="read"), write=BusAccessDirection(read_or_write="write")
+)
+
+# The valid fabric access directions.
+FABRIC_ACCESS_DIRECTIONS = dict(
+    up=FabricAccessDirection(up_or_down="up"), down=FabricAccessDirection(up_or_down="down")
+)
+
+
+class VhdlGeneratorCommon(RegisterCodeGenerator):
     """
     Common methods for generation of VHDL code.
     """
 
-    def __init__(self, module_name: str, generated_info: list[str]):
-        """
-        Arguments:
-            module_name: The name of the register map.
-            generated_info: Will be placed in the file headers.
-        """
-        self.module_name = module_name
-        self.generated_info = generated_info
+    COMMENT_START = "--"
 
-    @staticmethod
-    def _comment(comment, indent=0) -> str:
-        """
-        Get a single-line comment with the correct leading comment character.
-        """
-        indentation = " " * indent
-        return f"{indentation}-- {comment}\n"
-
-    def _header(self) -> str:
-        """
-        Get file header formatted as a comment block.
-        """
-        return self._comment_block(text="\n".join(self.generated_info), indent=0)
-
-    def _register_name(self, register, register_array=None) -> str:
+    def register_name(self, register: "Register", register_array: "RegisterArray" = None) -> str:
         """
         Get the qualified register name, e.g. "<module name>_<register name>".
         To be used where the scope requires it, i.e. outside of records.
         """
         if register_array is None:
-            return f"{self.module_name}_{register.name}"
-        return f"{self.module_name}_{register_array.name}_{register.name}"
+            return f"{self.name}_{register.name}"
 
-    def _register_array_name(self, register_array) -> str:
+        return f"{self.name}_{register_array.name}_{register.name}"
+
+    def register_array_name(self, register_array: "RegisterArray") -> str:
         """
         Get the qualified register array name.
         To be used where the scope requires it, i.e. outside of records.
         """
-        return f"{self.module_name}_{register_array.name}"
+        return f"{self.name}_{register_array.name}"
 
-    def _field_name(self, register, register_array, field) -> str:
+    def field_name(
+        self, register: "Register", register_array: "RegisterArray", field: "RegisterField"
+    ) -> str:
         """
         Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
         To be used where the scope requires it, i.e. outside of records.
         """
-        register_name = self._register_name(register=register, register_array=register_array)
+        register_name = self.register_name(register=register, register_array=register_array)
         return f"{register_name}_{field.name}"
 
-    @staticmethod
-    def _register_comment(register, register_array=None) -> str:
+    def has_any_bus_accessible_register(self, direction: BusAccessDirection) -> bool:
         """
-        Get a comment describing the register.
+        Return True if the register list contains any register, plain or in array, that is
+        bus-accessible in the given direction.
         """
-        result = f"'{register.name}' register"
-
-        if register_array is None:
-            return result
-
-        return f"{result} within the '{register_array.name}' register array"
-
-    @staticmethod
-    def _register_mode_has_up(mode: str) -> bool:
-        """
-        Return True if the provided register mode is one where fabric provides a value
-        to the bus.
-
-        Analogous the ``reg_file.reg_file_pkg.is_fabric_gives_value_type`` VHDL function.
-        """
-        return mode in ["r", "r_wpulse"]
-
-    def _has_any_up_registers(self, register_objects) -> bool:
-        """
-        Return True if the register list contains any register of a mode where fabric provides
-        a value to the bus.
-        """
-        for register, _ in self._iterate_registers(register_objects=register_objects):
-            if self._register_mode_has_up(mode=register.mode):
+        for register, _ in self.iterate_registers():
+            if direction.register_is_accessible(register=register):
                 return True
 
         return False
 
-    def _has_any_bus_readable_registers(self, register_objects) -> bool:
+    def iterate_bus_accessible_plain_registers(
+        self, direction: BusAccessDirection
+    ) -> Iterator["Register"]:
         """
-        Return True if the register list contains any register that is bus-readable.
+        Iterate all plain registers in the register list that are bus-accessible in the
+        given direction.
         """
-        for register, _ in self._iterate_registers(register_objects=register_objects):
-            if register.is_bus_readable:
+        for register in self.iterate_plain_registers():
+            if direction.register_is_accessible(register=register):
+                yield register
+
+    def iterate_bus_accessible_array_registers(
+        self, register_array: "RegisterArray", direction: BusAccessDirection
+    ) -> Iterator["Register"]:
+        """
+        Iterate all registers in the register array that are bus-accessible in the given direction.
+        """
+        for register in register_array.registers:
+            if direction.register_is_accessible(register=register):
+                yield register
+
+    def iterate_bus_accessible_register_arrays(
+        self, direction: BusAccessDirection
+    ) -> Iterator["RegisterArray"]:
+        """
+        Iterate all register arrays in the register list that contain at least one register that
+        is bus-accessible in the given direction.
+        """
+        for register_array in self.iterate_register_arrays():
+            accessible_registers = list(
+                self.iterate_bus_accessible_array_registers(
+                    register_array=register_array, direction=direction
+                )
+            )
+            if accessible_registers:
+                yield register_array
+
+    def has_any_fabric_accessible_register(self, direction: FabricAccessDirection) -> bool:
+        """
+        Return True if the register list contains at least one register, plain or in array, with a
+        mode where fabric accesses the value in the given direction.
+        """
+        for register, _ in self.iterate_registers():
+            if direction.register_is_accessible(register=register):
                 return True
 
         return False
 
-    @staticmethod
-    def _register_mode_has_down(mode: str) -> bool:
+    def iterate_fabric_accessible_registers(
+        self, direction: FabricAccessDirection
+    ) -> Iterator[tuple["Register", Union[None, "RegisterArray"]]]:
         """
-        Return True if the provided register mode is one where the bus provides a value to
-        the fabric.
-
-        Note that this is NOT an inversion of :meth:`._register_mode_has_up`.
+        Iterate all registers in the register list, plain or in array, that are fabric-accessible in
+        the given direction.
         """
-        return mode in ["w", "r_w", "wpulse", "r_wpulse"]
+        for register, register_array in self.iterate_registers():
+            if direction.register_is_accessible(register=register):
+                yield register, register_array
 
-    def _has_any_down_registers(self, register_objects) -> bool:
+    def iterate_fabric_accessible_array_registers(
+        self, register_array: "RegisterArray", direction: FabricAccessDirection
+    ) -> Iterator["Register"]:
         """
-        Return True if the register list contains any register of a mode where bus provides
-        a value to the fabric.
+        Iterate all registers in the register array that are fabric-accessible in the
+        given direction.
         """
-        for register, _ in self._iterate_registers(register_objects=register_objects):
-            if self._register_mode_has_down(mode=register.mode):
-                return True
+        for register in register_array.registers:
+            if direction.register_is_accessible(register=register):
+                yield register
 
-        return False
-
-    def _has_any_bus_writable_registers(self, register_objects) -> bool:
+    def iterate_fabric_accessible_register_arrays(
+        self, direction: FabricAccessDirection
+    ) -> Iterator["RegisterArray"]:
         """
-        Return True if the register list contains any registers that is bus-writable.
-
-        Note that this is NOT the same thing as having a register of a 'down' mode.
+        Iterate all register arrays in the register list that contain at least one register that
+        is fabric-accessible in the given direction.
         """
-        for register, _ in self._iterate_registers(register_objects=register_objects):
-            if register.is_bus_writeable:
-                return True
-
-        return False
+        for register_array in self.iterate_register_arrays():
+            accessible_registers = list(
+                self.iterate_fabric_accessible_array_registers(
+                    register_array=register_array, direction=direction
+                )
+            )
+            if accessible_registers:
+                yield register_array

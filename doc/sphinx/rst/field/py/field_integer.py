@@ -12,6 +12,11 @@ import sys
 from pathlib import Path
 
 # First party libraries
+from hdl_registers.generator.c.header import CHeaderGenerator
+from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
+from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
+from hdl_registers.generator.html.page import HtmlPageGenerator
+from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.parser import from_toml
 from hdl_registers.register_list import RegisterList
 
@@ -68,14 +73,14 @@ def generate(register_list: RegisterList, output_path: Path):
     """
     Generate the artifacts that we are interested in.
     """
-    register_list.create_c_header(output_path)
+    CHeaderGenerator(register_list=register_list, output_folder=output_path).create()
 
-    register_list.create_cpp_interface(output_path)
-    register_list.create_cpp_implementation(output_path)
+    CppImplementationGenerator(register_list=register_list, output_folder=output_path).create()
+    CppInterfaceGenerator(register_list=register_list, output_folder=output_path).create()
 
-    register_list.create_html_page(output_path)
+    HtmlPageGenerator(register_list=register_list, output_folder=output_path).create()
 
-    register_list.create_vhdl_package(output_path)
+    VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_path).create()
 
 
 def main(output_path: Path):

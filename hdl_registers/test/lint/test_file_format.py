@@ -105,6 +105,7 @@ def test_no_checked_in_files_have_too_long_lines():
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "generator_html.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "generator_python.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "generator_vhdl.rst",
+        HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "getting_started.rst",
         HDL_REGISTERS_TEST / "functional" / "gcc" / "c" / "test_registers.c",
         HDL_REGISTERS_TEST / "functional" / "gcc" / "cpp" / "test_registers.cpp",
     ]

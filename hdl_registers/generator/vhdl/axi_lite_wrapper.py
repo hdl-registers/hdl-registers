@@ -7,24 +7,27 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from typing import TYPE_CHECKING, Union
 
 # Local folder libraries
-from .vhdl_generator_common import RegisterVhdlGeneratorCommon
+from .vhdl_generator_common import (
+    BUS_ACCESS_DIRECTIONS,
+    FABRIC_ACCESS_DIRECTIONS,
+    VhdlGeneratorCommon,
+)
 
-if TYPE_CHECKING:
-    # First party libraries
-    from hdl_registers.register import Register
-    from hdl_registers.register_array import RegisterArray
 
-
-class RegisterVhdlGeneratorAxiLite(RegisterVhdlGeneratorCommon):
+class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
     """
     Generate a wrapper around generic AXI-Lite register files with correct generics and ports.
     """
 
-    def get_reg_file(self, register_objects: list[Union["Register", "RegisterArray"]]):
+    SHORT_DESCRIPTION = "VHDL AXI-Lite register file"
+
+    @property
+    def output_file(self):
+        return self.output_folder / f"{self.name}_reg_file.vhd"
+
+    def get_code(self, **kwargs):
         """
         Get VHDL code for a wrapper around the generic AXi_lite register file from hdl_modules:
 
@@ -47,32 +50,24 @@ src/axi_lite_reg_file.vhd
         value to the fabric, e.g. "Read, Write".
 
         Similar concept for the ``reg_was_read`` and ``reg_was_written`` ports.
-        They are only present if there are any readable/writable registers in the register map.
+        They are only present if there are any readable/writeable registers in the register map.
 
         Arguments:
           register_objects: Registers and register arrays to be included.
         Returns:
             str: VHDL code.
         """
-        # Remove the trailing newline, so we can have a comment separator directly after.
-        generated_header = self._header()[:-1]
+        entity_name = self.output_file.stem
 
-        entity_name = f"{self.module_name}_reg_file"
+        up_port = f"    regs_up : in {self.name}_regs_up_t := {self.name}_regs_up_init;\n"
+        has_any_up = self.has_any_fabric_accessible_register(FABRIC_ACCESS_DIRECTIONS["up"])
 
-        has_any_up_register = self._has_any_up_registers(register_objects=register_objects)
-        has_any_down_register = self._has_any_down_registers(register_objects=register_objects)
-
-        up_port = (
-            f"    regs_up : in {self.module_name}_regs_up_t := {self.module_name}_regs_up_init;\n"
-        )
         down_port = (
-            f"    regs_down : out {self.module_name}_regs_down_t "
-            f":= {self.module_name}_regs_down_init;\n"
+            f"    regs_down : out {self.name}_regs_down_t " f":= {self.name}_regs_down_init;\n"
         )
+        has_any_down = self.has_any_fabric_accessible_register(FABRIC_ACCESS_DIRECTIONS["down"])
 
-        was_read_port, was_written_port = self._get_was_accessed_ports(
-            register_objects=register_objects
-        )
+        was_read_port, was_written_port = self._get_was_accessed_ports()
 
         # Note that either of 'reg_was_read' or 'reg_was_written' is always present, otherwise
         # there would be no registers and we would not create this wrapper.
@@ -87,8 +82,8 @@ entity {entity_name} is
     axi_lite_s2m : out axi_lite_s2m_t := axi_lite_s2m_init;
     --# {{}}
     -- Register values
-{up_port if has_any_up_register else ""}\
-{down_port if has_any_down_register else ""}\
+{up_port if has_any_up else ""}\
+{down_port if has_any_down else ""}\
     --# {{}}
     -- Each bit is pulsed for one cycle when the corresponding register is read/written.
 {was_read_port}\
@@ -114,13 +109,35 @@ end entity;
   -- we want to use in our application.
   assign_regs_down : process(regs_down_slv)
   begin
-    regs_down <= to_{self.module_name}_regs_down(regs_down_slv);
+    regs_down <= to_{self.name}_regs_down(regs_down_slv);
+  end process;
+"""
+
+        was_read_conversion = f"""
+
+  ------------------------------------------------------------------------------
+  -- Combinatorially convert status mask to a record where only the applicable registers \
+are present.
+  assign_reg_was_read : process(reg_was_read_slv)
+  begin
+    reg_was_read <= to_{self.name}_reg_was_read(reg_was_read_slv);
+  end process;
+"""
+
+        was_written_conversion = f"""
+
+  ------------------------------------------------------------------------------
+  -- Combinatorially convert status mask to a record where only the applicable registers \
+are present.
+  assign_reg_was_written : process(reg_was_written_slv)
+  begin
+    reg_was_written <= to_{self.name}_reg_was_written(reg_was_written_slv);
   end process;
 """
 
         vhdl = f"""\
 -- -----------------------------------------------------------------------------
--- AXI-Lite register file for the '{self.module_name}' module registers.
+-- AXI-Lite register file for the '{self.name}' module registers.
 --
 -- Is a wrapper around the generic AXI-Lite register file from hdl_modules:
 -- * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
@@ -129,7 +146,7 @@ src/axi_lite_reg_file.vhd
 --
 -- Sets correct generics, and performs conversion to the easy-to-use register record types.
 -- -----------------------------------------------------------------------------
-{generated_header}
+{self.header}\
 -- -----------------------------------------------------------------------------
 
 library ieee;
@@ -141,13 +158,17 @@ use axi.axi_lite_pkg.all;
 library reg_file;
 use reg_file.reg_file_pkg.all;
 
-use work.{self.module_name}_regs_pkg.all;
+use work.{self.name}_regs_pkg.all;
 
 
 {entity}
 architecture a of {entity_name} is
 
-  signal regs_up_slv, regs_down_slv : {self.module_name}_regs_t := {self.module_name}_regs_init;
+  signal regs_up_slv, regs_down_slv : {self.name}_regs_t := {self.name}_regs_init;
+
+  signal reg_was_read_slv, reg_was_written_slv : {self.name}_reg_was_accessed_t := (
+    others => '0'
+  );
 
 begin
 
@@ -158,8 +179,8 @@ begin
 src/axi_lite_reg_file.vhd
   axi_lite_reg_file_inst : entity reg_file.axi_lite_reg_file
     generic map (
-      regs => {self.module_name}_reg_map,
-      default_values => {self.module_name}_regs_init
+      regs => {self.name}_reg_map,
+      default_values => {self.name}_regs_init
     )
     port map(
       clk => clk,
@@ -170,30 +191,45 @@ src/axi_lite_reg_file.vhd
       regs_up => regs_up_slv,
       regs_down => regs_down_slv,
       --
-      reg_was_read => {"reg_was_read" if was_read_port else "open"},
-      reg_was_written => {"reg_was_written"  if was_written_port else "open"}
+      reg_was_read => reg_was_read_slv,
+      reg_was_written => reg_was_written_slv
     );
-{up_conversion if has_any_up_register else ""}\
-{down_conversion if has_any_down_register else ""}\
+{up_conversion if has_any_up else ""}\
+{down_conversion if has_any_down else ""}\
+{was_read_conversion if was_read_port else ""}\
+{was_written_conversion if was_written_port else ""}\
 
 end architecture;
 """
 
         return vhdl
 
-    def _get_was_accessed_ports(self, register_objects):
-        has_any_readable = self._has_any_bus_readable_registers(register_objects=register_objects)
-        has_any_writable = self._has_any_bus_writable_registers(register_objects=register_objects)
-
-        was_accessed_port_type = f"out {self.module_name}_reg_was_accessed_t := (others => '0')"
+    def _get_was_accessed_ports(self):
+        has_any_read = self.has_any_bus_accessible_register(direction=BUS_ACCESS_DIRECTIONS["read"])
+        has_any_write = self.has_any_bus_accessible_register(
+            direction=BUS_ACCESS_DIRECTIONS["write"]
+        )
 
         # If present, is always the last port so no trailing semicolon needed.
         was_written = (
-            f"    reg_was_written : {was_accessed_port_type}\n" if has_any_writable else ""
+            (
+                f"    reg_was_written : out {self.name}_reg_was_written_t := "
+                f"{self.name}_reg_was_written_init\n"
+            )
+            if has_any_write
+            else ""
         )
 
-        was_read = f"    reg_was_read : {was_accessed_port_type}" if has_any_readable else ""
-        if has_any_readable:
+        was_read = (
+            (
+                f"    reg_was_read : out {self.name}_reg_was_read_t := "
+                f"{self.name}_reg_was_read_init"
+            )
+            if has_any_read
+            else ""
+        )
+
+        if has_any_read:
             was_read += ";\n" if was_written else "\n"
 
         return was_read, was_written

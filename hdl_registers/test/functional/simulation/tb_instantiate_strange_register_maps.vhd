@@ -67,7 +67,7 @@ begin
 
     signal regs_up : array_only_up_regs_up_t := array_only_up_regs_up_init;
 
-    signal reg_was_read : array_only_up_reg_was_accessed_t := (others => '0');
+    signal reg_was_read : array_only_up_reg_was_read_t := array_only_up_reg_was_read_init;
   begin
 
     ------------------------------------------------------------------------------
@@ -106,7 +106,9 @@ begin
 
     signal regs_down : array_only_down_regs_down_t := array_only_down_regs_down_init;
 
-    signal reg_was_written : array_only_down_reg_was_accessed_t := (others => '0');
+    signal reg_was_written : array_only_down_reg_was_written_t := (
+      array_only_down_reg_was_written_init
+    );
   begin
 
     ------------------------------------------------------------------------------
@@ -145,7 +147,9 @@ begin
 
     signal regs_up : plain_and_array_only_up_regs_up_t := plain_and_array_only_up_regs_up_init;
 
-    signal reg_was_read : plain_and_array_only_up_reg_was_accessed_t := (others => '0');
+    signal reg_was_read : plain_and_array_only_up_reg_was_read_t := (
+      plain_and_array_only_up_reg_was_read_init
+    );
   begin
 
     ------------------------------------------------------------------------------
@@ -185,7 +189,9 @@ begin
     signal regs_down : plain_and_array_only_down_regs_down_t :=
       plain_and_array_only_down_regs_down_init;
 
-    signal reg_was_written : plain_and_array_only_down_reg_was_accessed_t := (others => '0');
+    signal reg_was_written : plain_and_array_only_down_reg_was_written_t := (
+      plain_and_array_only_down_reg_was_written_init
+    );
   begin
 
     ------------------------------------------------------------------------------
@@ -224,7 +230,7 @@ begin
 
     signal regs_up : plain_only_up_regs_up_t := plain_only_up_regs_up_init;
 
-    signal reg_was_read : plain_only_up_reg_was_accessed_t := (others => '0');
+    signal reg_was_read : plain_only_up_reg_was_read_t := plain_only_up_reg_was_read_init;
   begin
 
     ------------------------------------------------------------------------------
@@ -263,7 +269,9 @@ begin
 
     signal regs_down : plain_only_down_regs_down_t := plain_only_down_regs_down_init;
 
-    signal reg_was_written : plain_only_down_reg_was_accessed_t := (others => '0');
+    signal reg_was_written : plain_only_down_reg_was_written_t := (
+      plain_only_down_reg_was_written_init
+    );
   begin
 
     ------------------------------------------------------------------------------

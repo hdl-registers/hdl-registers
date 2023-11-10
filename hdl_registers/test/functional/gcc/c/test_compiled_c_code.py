@@ -15,6 +15,7 @@ import pytest
 from tsfpga.system_utils import create_file, run_command
 
 # First party libraries
+from hdl_registers.generator.c.header import CHeaderGenerator
 from hdl_registers.test.functional.gcc.compile_and_run_test import CompileAndRunTest
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -22,7 +23,7 @@ THIS_DIR = Path(__file__).parent.resolve()
 
 class CTest(CompileAndRunTest):
     def compile_and_run(self, test_constants, test_registers):
-        self.registers.create_c_header(self.include_dir)
+        CHeaderGenerator(self.register_list, self.include_dir).create()
 
         main_file = self.working_dir / "main.c"
 
@@ -82,10 +83,10 @@ def test_c_header_with_registers_and_constants(c_test):
 
 
 def test_c_header_with_only_registers(c_test):
-    c_test.registers.constants = []
+    c_test.register_list.constants = []
     c_test.compile_and_run(test_registers=True, test_constants=False)
 
 
 def test_c_header_with_only_constants(c_test):
-    c_test.registers.register_objects = []
+    c_test.register_list.register_objects = []
     c_test.compile_and_run(test_registers=False, test_constants=True)

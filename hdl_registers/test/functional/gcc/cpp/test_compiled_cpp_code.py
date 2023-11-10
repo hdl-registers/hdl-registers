@@ -16,6 +16,9 @@ import pytest
 from tsfpga.system_utils import create_file, run_command
 
 # First party libraries
+from hdl_registers.generator.cpp.header import CppHeaderGenerator
+from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
+from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.test.functional.gcc.compile_and_run_test import CompileAndRunTest
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -47,9 +50,9 @@ int main()
         include_directories = [] if include_directories is None else include_directories
         source_files = [] if source_files is None else source_files
 
-        self.registers.create_cpp_interface(self.include_dir)
-        self.registers.create_cpp_header(self.include_dir)
-        self.registers.create_cpp_implementation(self.working_dir)
+        CppInterfaceGenerator(self.register_list, self.include_dir).create()
+        CppHeaderGenerator(self.register_list, self.include_dir).create()
+        CppImplementationGenerator(self.register_list, self.working_dir).create()
         cpp_class_file = self.working_dir / "caesar.cpp"
 
         main_file = self.working_dir / "main.cpp"
@@ -115,12 +118,12 @@ def test_cpp_with_registers_and_constants(cpp_test):
 
 
 def test_cpp_with_only_registers(cpp_test):
-    cpp_test.registers.constants = []
+    cpp_test.register_list.constants = []
     cpp_test.compile_and_run(test_registers=True, test_constants=False)
 
 
 def test_cpp_with_only_constants(cpp_test):
-    cpp_test.registers.register_objects = []
+    cpp_test.register_list.register_objects = []
     cpp_test.compile_and_run(test_registers=False, test_constants=True)
 
 

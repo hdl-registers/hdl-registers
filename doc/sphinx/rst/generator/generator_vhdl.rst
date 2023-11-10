@@ -3,15 +3,19 @@
 VHDL code generator
 ===================
 
-A VHDL package can be generated with a call to :meth:`.RegisterList.create_vhdl_package`.
+A VHDL package can be generated from the :class:`.VhdlRegisterPackageGenerator` by e.g. calling:
+
+.. code-block:: python
+
+   VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_folder).create_if_needed()
+
 The VHDL package file is designed to be used with the generic AXI-Lite register file available in
 the `hdl_modules <https://hdl-modules.com>`__ project: :ref:`reg_file.axi_lite_reg_file`.
 
 Since generation of VHDL packages is usually run in real time (e.g. before running a simulation) the
 speed of the tool is important.
-In order the save time, :meth:`.RegisterList.create_vhdl_package` maintains a hash of the
-register definitions,
-and will only generate the VHDL file when necessary.
+In order the save time, :meth:`.RegisterCodeGenerator.create_if_needed` maintains a hash of the
+register definitions, and will only generate the VHDL file when necessary.
 
 
 Requirements

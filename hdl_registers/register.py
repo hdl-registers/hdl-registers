@@ -226,14 +226,16 @@ class Register:
     @property
     def is_bus_readable(self) -> bool:
         """
-        True if the register is readable by bus. Based on the register type.
+        True if the register is readable by bus. Based on the register mode.
+        Analogous the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
         """
         return self.mode in ["r", "r_w", "r_wpulse"]
 
     @property
     def is_bus_writeable(self) -> bool:
         """
-        True if the register is writeable by bus. Based on the register type.
+        True if the register is writeable by bus. Based on the register mode.
+        Analogous the ``reg_file.reg_file_pkg.is_write_type`` VHDL function.
         """
         return self.mode in ["w", "r_w", "wpulse", "r_wpulse"]
 
@@ -243,6 +245,5 @@ name={self.name},\
 index={self.index},\
 mode={self.mode},\
 description={self.description},\
-default_value={self.default_value},\
 fields={','.join([repr(field) for field in self.fields])},\
 )"""

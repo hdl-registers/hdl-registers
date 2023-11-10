@@ -12,6 +12,15 @@ import sys
 from pathlib import Path
 
 # First party libraries
+from hdl_registers.generator.c.header import CHeaderGenerator
+from hdl_registers.generator.cpp.header import CppHeaderGenerator
+from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
+from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
+from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
+from hdl_registers.generator.html.page import HtmlPageGenerator
+from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
+from hdl_registers.generator.python.python_class_generator import PythonClassGenerator
+from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.parser import from_toml
 
 THIS_DIR = Path(__file__).parent
@@ -22,19 +31,19 @@ def main(output_path: Path):
         module_name="example", toml_file=THIS_DIR.parent / "toml" / "toml_format.toml"
     )
 
-    register_list.create_vhdl_package(output_path=output_path / "vhdl")
+    CHeaderGenerator(register_list, output_path / "c").create()
 
-    register_list.create_html_page(output_path=output_path / "html")
-    register_list.create_html_register_table(output_path=output_path / "html")
-    register_list.create_html_constant_table(output_path=output_path / "html")
+    CppImplementationGenerator(register_list, output_path / "cpp").create()
+    CppHeaderGenerator(register_list, output_path / "cpp").create()
+    CppInterfaceGenerator(register_list, output_path / "cpp").create()
 
-    register_list.create_c_header(output_path=output_path / "c")
+    HtmlConstantTableGenerator(register_list, output_path / "html").create()
+    HtmlPageGenerator(register_list, output_path / "html").create()
+    HtmlRegisterTableGenerator(register_list, output_path / "html").create()
 
-    register_list.create_cpp_interface(output_path=output_path / "cpp")
-    register_list.create_cpp_header(output_path=output_path / "cpp")
-    register_list.create_cpp_implementation(output_path=output_path / "cpp")
+    PythonClassGenerator(register_list, output_path / "py").create()
 
-    register_list.create_python_class(output_path=output_path / "py")
+    VhdlRegisterPackageGenerator(register_list, output_path / "vhdl").create()
 
 
 if __name__ == "__main__":

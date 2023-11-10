@@ -37,13 +37,14 @@ A minimal usage example:
 
   from pathlib import Path
 
+  from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
   from hdl_registers.parser import from_toml
 
 
   this_dir = Path(__file__).parent
 
   register_list = from_toml(module_name="caesar", toml_file=this_dir / "caesar_registers.toml")
-  register_list.create_vhdl_package(output_path=this_dir)
+  VhdlRegisterPackageGenerator(register_list=register_list, output_folder=this_dir).create_if_needed()
 
 The basis of all register operations is the :class:`.RegisterList` class.
 An object of this type is returned when calling :func:`.from_toml` on a TOML file with the
@@ -53,7 +54,7 @@ If you have more than one module with registers in your project then these are r
 :class:`.RegisterList` object each.
 
 Register code generation is then done using the class methods on this object.
-For example :meth:`.create_vhdl_package` as seen above.
+For example :class:`.VhdlRegisterPackageGenerator` as seen above.
 See the sidebar under "Code Generators" for information on what can be generated and how to
 invoke it.
 
@@ -66,8 +67,8 @@ The tsfpga project (https://tsfpga.com, https://gitlab.com/tsfpga/tsfpga), which
 sister project of hdl_registers, integrates register code generation in an elegant way.
 If a file named ``regs_<name>.toml`` is placed in the root of a module, and ``<name>`` matches the
 name of the module, it will be parsed and used as that module's register map.
-In the simulation and build scripts there is then a call to :meth:`.create_vhdl_package` for
-each module that has registers before each run.
+In the simulation and build scripts there is then a call to :class:`.VhdlRegisterPackageGenerator`
+for each module that has registers before each run.
 This makes sure that an up-to-date register definition is always used.
 
 This is a good example of how hdl_registers can be used in an effective way.
