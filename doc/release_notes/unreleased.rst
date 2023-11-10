@@ -3,7 +3,7 @@ Added
 * Add register record generation to :class:`.RegisterVhdlGenerator` via
   :meth:`.RegisterList.create_vhdl_package`.
 
-  * For each register, plain or in array, a record with correctly-typed members for each
+  * For each register, plain or in array, a record with natively-typed members for each
     register field.
   * For each register array, a correctly-ranged array of records for the registers in that array.
   * Combined record with all the registers and register arrays.
@@ -14,8 +14,12 @@ Added
 * Add generation of a wrapper around :ref:`reg_file.axi_lite_reg_file` to
   :class:`.RegisterVhdlGeneratorAxiLite` via :meth:`.RegisterList.create_vhdl_package`.
 
-  * Sets correct generics and has the easy-to-use records above for its register values up
-    and down.
+  * Sets correct generics and has the natively typed records for its up/down register values.
+
+* Add generation of simulation package for reading/writing registers via VUnit
+  Verification Components.
+  Implementation in :class:`.RegisterVhdlGeneratorSimulationPackage`, is generated via
+  :meth:`.RegisterList.create_vhdl_package`.
 
 Breaking changes
 
