@@ -3,8 +3,8 @@
 Register modes
 ==============
 
-Each register, as well as each register in a :ref:`register array <basic_feature_register_array>`,
-shall have a specified *mode*.
+Each register, whether plain or in a :ref:`register array <basic_feature_register_array>`,
+must have a specified *mode*.
 
 The available register modes are listed in the table below.
 
