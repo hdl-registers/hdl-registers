@@ -20,7 +20,7 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
 
     @property
     def output_file(self):
-        return self.output_folder / f"{self.name}_regs_sim_pkg.vhd"
+        return self.output_folder / f"{self.name}_register_simulation_pkg.vhd"
 
     def get_code(self, **kwargs):
         """
@@ -35,8 +35,7 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
         Returns:
             str: VHDL code.
         """
-        pkg_name = f"{self.name}_regs_pkg"
-        sim_pkg_name = self.output_file.stem
+        package_name = self.output_file.stem
 
         vhdl = f"""\
 {self.header}
@@ -54,15 +53,16 @@ library reg_file;
 use reg_file.reg_file_pkg.all;
 use reg_file.reg_operations_pkg.all;
 
-use work.{pkg_name}.all;
+use work.{self.name}_regs_pkg.all;
+use work.{self.name}_register_record_pkg.all;
 
 
-package {sim_pkg_name} is
+package {package_name} is
 
 {self._declarations()}\
 end package;
 
-package body {sim_pkg_name} is
+package body {package_name} is
 
 {self._implementations()}\
 end package body;

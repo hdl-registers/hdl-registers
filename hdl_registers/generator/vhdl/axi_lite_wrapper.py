@@ -8,6 +8,9 @@
 # --------------------------------------------------------------------------------------------------
 
 
+# Third party libraries
+from tsfpga.system_utils import delete
+
 # Local folder libraries
 from .vhdl_generator_common import (
     BUS_ACCESS_DIRECTIONS,
@@ -38,6 +41,9 @@ src/axi_lite_reg_file.vhd
         The wrapper will set the correct generics and will use record types for ``regs_up`` and
         ``regs_down``.
         This makes it very easy-to-use and saves a lot of manual conversion.
+
+        The generated VHDL file needs also the generated packages from
+        :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
 
         Note that the ``regs_up`` port is only available if there are any registers of a type where
         fabric gives a value to the bus.
@@ -77,11 +83,11 @@ entity {entity_name} is
   port (
     clk : in std_ulogic;
     --# {{}}
-    --# Register control bus
+    --# Register control bus.
     axi_lite_m2s : in axi_lite_m2s_t;
     axi_lite_s2m : out axi_lite_s2m_t := axi_lite_s2m_init;
     --# {{}}
-    -- Register values
+    -- Register values.
 {up_port if has_any_up else ""}\
 {down_port if has_any_down else ""}\
     --# {{}}
@@ -159,6 +165,7 @@ library reg_file;
 use reg_file.reg_file_pkg.all;
 
 use work.{self.name}_regs_pkg.all;
+use work.{self.name}_register_record_pkg.all;
 
 
 {entity}
@@ -233,3 +240,17 @@ end architecture;
             was_read += ";\n" if was_written else "\n"
 
         return was_read, was_written
+
+    def create(self, **kwargs):
+        """
+        Overload the parent method to implement our custom behavior.
+        """
+        if not self.register_list.register_objects:
+            # If there are no registers, we shall not create a register file wrapper.
+            # In fact, any existing file shall be deleted, so the user doesn't use an old file
+            # by mistake.
+            delete(self.output_file)
+
+        else:
+            # Otherwise, if there are registers, create as usual.
+            super().create(**kwargs)

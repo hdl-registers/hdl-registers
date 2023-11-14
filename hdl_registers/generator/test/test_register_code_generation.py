@@ -27,6 +27,7 @@ from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
 from hdl_registers.generator.python.python_class_generator import PythonClassGenerator
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
+from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackageGenerator
 from hdl_registers.parser import from_toml
@@ -51,15 +52,18 @@ def test_can_generate_vhdl_without_error(tmp_path, register_list):
     VhdlRegisterPackageGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}_regs_pkg.vhd").exists()
 
+    VhdlRecordPackageGenerator(register_list, tmp_path).create()
+    assert (tmp_path / f"{register_list.name}_register_record_pkg.vhd").exists()
+
+    VhdlSimulationPackageGenerator(register_list, tmp_path).create()
+    assert (tmp_path / f"{register_list.name}_register_simulation_pkg.vhd").exists()
+
     VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}_reg_file.vhd").exists()
 
-    VhdlSimulationPackageGenerator(register_list, tmp_path).create()
-    assert (tmp_path / f"{register_list.name}_regs_sim_pkg.vhd").exists()
-
 
 @pytest.mark.parametrize("register_list", REGISTER_LISTS)
-def test_can_generate_c_header_without_error(tmp_path, register_list):
+def test_can_generate_c_without_error(tmp_path, register_list):
     CHeaderGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}_regs.h").exists()
 
@@ -92,6 +96,6 @@ def test_can_generate_html_without_error(tmp_path, register_list):
 
 
 @pytest.mark.parametrize("register_list", REGISTER_LISTS)
-def test_can_generate_python_class_file_without_error(tmp_path, register_list):
+def test_can_generate_python_without_error(tmp_path, register_list):
     PythonClassGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}.py").exists()

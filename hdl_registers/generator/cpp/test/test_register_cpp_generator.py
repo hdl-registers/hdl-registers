@@ -8,7 +8,8 @@
 # --------------------------------------------------------------------------------------------------
 
 """
-Note that there are further tests in the test/functional/gcc folder.
+Some limited unit tests that check the generated code.
+Note that the generated C++ code is also simulated in a functional test.
 """
 
 # Third party libraries

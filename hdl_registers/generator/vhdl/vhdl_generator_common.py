@@ -11,6 +11,8 @@
 from typing import TYPE_CHECKING, Iterator, Union
 
 # First party libraries
+from hdl_registers.field.enumeration import Enumeration
+from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 
 if TYPE_CHECKING:
@@ -121,6 +123,27 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         """
         register_name = self.register_name(register=register, register_array=register_array)
         return f"{register_name}_{field.name}"
+
+    @staticmethod
+    def field_to_slv_function_name(field: "RegisterField", field_name: str) -> str:
+        """
+        Name of the function that converts the field's native VHDL representation to SLV.
+
+        Arguments:
+            field: A field.
+            field_name: The field's qualified name.
+        """
+        if isinstance(field, Integer):
+            # All integer field values will be sub-type of VHDL integer.
+            # If many of these functions have the same name "to_slv", that will be a name clash.
+            # Hence we need to qualify the function name.
+            return f"to_{field_name}_slv"
+
+        if isinstance(field, Enumeration):
+            # For the enumeration field on the other hand, the type is unambiguous.
+            return "to_slv"
+
+        raise TypeError(f"Field {field} does not have a conversion function.")
 
     def has_any_bus_accessible_register(self, direction: BusAccessDirection) -> bool:
         """
