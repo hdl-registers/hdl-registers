@@ -7,23 +7,20 @@ Fixes
 
 Added
 
-* Add register record generation to :class:`.VhdlRegisterPackageGenerator`.
-
-  * For each register, plain or in array, a record with natively-typed members for each
-    register field.
-  * For each register array, a correctly-ranged array of records for the registers in that array.
-  * Combined record with all the registers and register arrays.
-    One each for registers in the up direction and in the down direction.
-  * Constants with default values for all of the above types.
-  * Conversion functions to/from ``std_logic_vector`` representation for all of the above types.
+* Add generation of register records with natively-typed members for each register
+  field to :class:`.VhdlRecordPackageGenerator`.
 
 * Add generation of a wrapper around :ref:`reg_file.axi_lite_reg_file` to
   :class:`.VhdlAxiLiteWrapperGenerator`.
 
-  * Sets correct generics and has the natively typed records for its up/down register values.
+  * Sets correct generics and uses the natively typed records from
+    :class:`.VhdlRecordPackageGenerator` for its up/down register values.
 
 * Add generation of simulation package for reading/writing registers via VUnit
   Verification Components to :class:`.VhdlSimulationPackageGenerator`.
+
+  * Uses the natively typed records from
+    :class:`.VhdlRecordPackageGenerator` for register values.
 
 
 Breaking changes

@@ -39,10 +39,15 @@ class CHeaderGenerator(RegisterCodeGenerator):
     DEFAULT_INDENTATION_LEVEL = 0
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / self._file_name
 
-    def __init__(self, register_list: RegisterList, output_folder: Path, file_name: str = None):
+    def __init__(
+        self, register_list: RegisterList, output_folder: Path, file_name: str = None
+    ) -> str:
         """
         For argument description, please see the parent class.
 

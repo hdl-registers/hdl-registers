@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
 
@@ -20,10 +23,13 @@ class CppHeaderGenerator(CppGeneratorCommon):
     DEFAULT_INDENTATION_LEVEL = 4
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}.h"
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         cpp_code = f"  class {self._class_name} : public I{self._class_name}\n"
         cpp_code += "  {\n"
 

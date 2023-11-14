@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # First party libraries
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
@@ -25,12 +28,28 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
     """
     Generate a VHDL package with register record types containing natively-typed members for
     each register field.
+
+    * For each register, plain or in array, a record with natively-typed members for each
+      register field.
+    * For each register array, a correctly-ranged array of records for the registers in
+      that array.
+    * Combined record with all the registers and register arrays.
+      One each for registers in the up direction and in the down direction.
+    * Constants with default values for all of the above types.
+    * Conversion functions to/from ``std_logic_vector`` representation for all of the
+      above types.
+
+    The generated VHDL file needs also the generated package
+    from :class:`.VhdlRegisterPackageGenerator`.
     """
 
     SHORT_DESCRIPTION = "VHDL record package"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}_register_record_pkg.vhd"
 
     def _register_field_records(self):
@@ -539,7 +558,7 @@ of {array_name}_was_{direction.name_past}_t;
 
 """
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Get a complete VHDL package with register record types.
         """

@@ -35,7 +35,10 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
     SHORT_DESCRIPTION = "HTML constant table"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}_constant_table.html"
 
     def __init__(self, register_list: "RegisterList", output_folder: Path):
@@ -43,7 +46,7 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
 
         self._html_translator = HtmlTranslator()
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         if not self.register_list.constants:
             return ""
 

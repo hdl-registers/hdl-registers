@@ -25,7 +25,10 @@ class PythonClassGenerator(RegisterCodeGenerator):
     COMMENT_START = "#"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}.py"
 
     def __init__(self, register_list: RegisterList, output_folder: Path):
@@ -45,7 +48,7 @@ class PythonClassGenerator(RegisterCodeGenerator):
         with self.pickle_file.open("wb") as file_handle:
             pickle.dump(self.register_list, file_handle)
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Save register list object to binary file (pickle) and create a python class
         that recreates it.

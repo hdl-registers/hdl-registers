@@ -7,6 +7,8 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
 
 # Third party libraries
 from tsfpga.system_utils import delete
@@ -22,46 +24,44 @@ from .vhdl_generator_common import (
 class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
     """
     Generate a wrapper around generic AXI-Lite register files with correct generics and ports.
+
+    * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
+    * https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/\
+src/axi_lite_reg_file.vhd
+
+    The wrapper will set the correct generics and will use record types for ``regs_up`` and
+    ``regs_down``.
+    This makes it very easy-to-use and saves a lot of manual conversion.
+
+    The generated VHDL file needs also the generated packages from
+    :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
+
+    Note that the ``regs_up`` port is only available if there are any registers of a type where
+    fabric gives a value to the bus.
+    For example a "Read" register.
+    If instead, for example, there are only "Write" registers, the ``regs_up`` port will not be
+    available and the type for it is not available in the VHDL package.
+
+    Same, but vice versa, for the ``regs_down`` port.
+    Will only be available if there are any registers of a type where the bus provides a
+    value to the fabric, e.g. "Read, Write".
+
+    Similar concept for the ``reg_was_read`` and ``reg_was_written`` ports.
+    They are only present if there are any readable/writeable registers in the register map.
     """
 
     SHORT_DESCRIPTION = "VHDL AXI-Lite register file"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}_reg_file.vhd"
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Get VHDL code for a wrapper around the generic AXi_lite register file from hdl_modules:
-
-        * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
-        * https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/\
-src/axi_lite_reg_file.vhd
-
-        The wrapper will set the correct generics and will use record types for ``regs_up`` and
-        ``regs_down``.
-        This makes it very easy-to-use and saves a lot of manual conversion.
-
-        The generated VHDL file needs also the generated packages from
-        :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
-
-        Note that the ``regs_up`` port is only available if there are any registers of a type where
-        fabric gives a value to the bus.
-        For example a "Read" register.
-        If instead, for example, there are only "Write" registers, the ``regs_up`` port will not be
-        available and the type for it is not available in the VHDL package.
-
-        Same, but vice versa, for the ``regs_down`` port.
-        Will only be available if there are any registers of a type where the bus provides a
-        value to the fabric, e.g. "Read, Write".
-
-        Similar concept for the ``reg_was_read`` and ``reg_was_written`` ports.
-        They are only present if there are any readable/writeable registers in the register map.
-
-        Arguments:
-          register_objects: Registers and register arrays to be included.
-        Returns:
-            str: VHDL code.
         """
         entity_name = self.output_file.stem
 

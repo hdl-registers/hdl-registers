@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # Local folder libraries
 from .vhdl_generator_common import VhdlGeneratorCommon
 
@@ -14,21 +17,27 @@ from .vhdl_generator_common import VhdlGeneratorCommon
 class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
     """
     Generate code that simplifies simulation of a register map.
+    Uses the VHDL record types for register read/write values.
+
+    Uses VUnit Verification Component calls, via :ref:`reg_file.reg_operations_pkg`
+    from hdl_modules.
+
+    The generated VHDL file needs also the generated packages from
+    :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
     """
 
     SHORT_DESCRIPTION = "VHDL simulation package"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}_register_simulation_pkg.vhd"
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Get a package with methods for reading/writing registers.
-        Uses the VHDL record types for register read/write values.
-
-        Uses VUnit Verification Component calls, via :ref:`reg_file.reg_operations_pkg`
-        from hdl_modules.
 
         Arguments:
           register_objects: Registers and register arrays to be included.

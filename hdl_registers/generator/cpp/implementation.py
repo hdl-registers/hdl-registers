@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # First party libraries
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
@@ -24,10 +27,13 @@ class CppImplementationGenerator(CppGeneratorCommon):
     DEFAULT_INDENTATION_LEVEL = 4
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}.cpp"
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Get a complete C++ class implementation with all methods.
         """

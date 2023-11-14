@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # First party libraries
 from hdl_registers.register import REGISTER_MODES
 
@@ -24,10 +27,13 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
     SHORT_DESCRIPTION = "HTML page"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}_regs.html"
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Get a complete HTML page with register and constant information.
 

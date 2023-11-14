@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
@@ -32,10 +35,13 @@ class CppInterfaceGenerator(CppGeneratorCommon):
     DEFAULT_INDENTATION_LEVEL = 4
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"i_{self.name}.h"
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         cpp_code = ""
 
         for register, register_array in self.iterate_registers():

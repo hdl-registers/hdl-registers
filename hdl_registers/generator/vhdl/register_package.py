@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
@@ -33,12 +36,24 @@ from .vhdl_generator_common import VhdlGeneratorCommon
 class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
     """
     Generate a VHDL package with register information.
+
+    * For each register constant, the value as a native VHDL constant.
+    * For each register, the index within the register map.
+    * A register map constant, mapping indexes to modes.
+    * For each field in each register
+
+      * Register bit index range definitions.
+      * Native VHDL type corresponding to the field type.
+      * Conversion of a field value to/from SLV.
     """
 
     SHORT_DESCRIPTION = "VHDL register package"
 
     @property
-    def output_file(self):
+    def output_file(self) -> Path:
+        """
+        Result will be placed in this file.
+        """
         return self.output_folder / f"{self.name}_regs_pkg.vhd"
 
     def _constants(self):
@@ -467,7 +482,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         return vhdl
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs) -> str:
         """
         Get a complete VHDL package with register and constant information.
         """
