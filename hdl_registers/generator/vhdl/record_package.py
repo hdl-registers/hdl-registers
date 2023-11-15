@@ -238,7 +238,7 @@ the '{direction.name}' direction.
         init = "    " + ",\n    ".join(record_init)
 
         return f"""\
-{vhdl}
+{vhdl}\
   end record;
   -- Default value of the above record.
   constant {self.name}_regs_{direction.name}_init : \
