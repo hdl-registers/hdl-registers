@@ -1,3 +1,5 @@
+.. _field_integer:
+
 Integer fields
 ==============
 

@@ -26,7 +26,7 @@ from tsfpga.system_utils import create_directory
 from vunit import VUnit
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_PATH
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED, HDL_REGISTERS_PATH
 from hdl_registers.field.register_field_type import (
     Signed,
     SignedFixedPoint,
@@ -44,6 +44,8 @@ from hdl_registers.parser import from_toml
 
 THIS_FOLDER = Path(__file__).parent.resolve()
 
+DOC_SIM_FOLDER = HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "sim"
+
 
 def test_running_simulation(tmp_path):
     """
@@ -57,6 +59,7 @@ def test_running_simulation(tmp_path):
 
     generate_toml_registers(output_path=tmp_path)
     generate_strange_register_maps(output_path=tmp_path)
+    generate_doc_registers(output_path=tmp_path)
 
     def run(args, exit_code):
         argv = ["--minimal", "--num-threads", "10", "--output-path", str(tmp_path)] + args
@@ -67,6 +70,9 @@ def test_running_simulation(tmp_path):
         library = vunit_proj.add_library(library_name="example")
 
         for vhd_file in THIS_FOLDER.glob("*.vhd"):
+            library.add_source_file(vhd_file)
+
+        for vhd_file in DOC_SIM_FOLDER.glob("*.vhd"):
             library.add_source_file(vhd_file)
 
         for vhd_file in tmp_path.glob("*.vhd"):
@@ -123,6 +129,26 @@ def generate_toml_registers(output_path):
         default_value="1" * 6,
         field_type=SignedFixedPoint(2, -3),
     )
+
+    VhdlRegisterPackageGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
+
+    VhdlRecordPackageGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
+
+    VhdlSimulationPackageGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
+
+    VhdlAxiLiteWrapperGenerator(
+        register_list=register_list, output_folder=output_path
+    ).create_if_needed()
+
+
+def generate_doc_registers(output_path):
+    register_list = from_toml(module_name="counter", toml_file=DOC_SIM_FOLDER / "regs_counter.toml")
 
     VhdlRegisterPackageGenerator(
         register_list=register_list, output_folder=output_path

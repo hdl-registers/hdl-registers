@@ -833,9 +833,6 @@ begin
 
   ------------------------------------------------------------------------------
   axi_lite_master_inst : entity bfm.axi_lite_master
-    generic map (
-      bus_handle => regs_bus_master
-    )
     port map (
       clk => clk,
       --
