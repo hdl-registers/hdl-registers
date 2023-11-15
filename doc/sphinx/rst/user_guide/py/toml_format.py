@@ -26,25 +26,25 @@ from hdl_registers.parser import from_toml
 THIS_DIR = Path(__file__).parent
 
 
-def main(output_path: Path):
+def main(output_folder: Path):
     register_list = from_toml(
         module_name="example", toml_file=THIS_DIR.parent / "toml" / "toml_format.toml"
     )
 
-    CHeaderGenerator(register_list, output_path / "c").create()
+    CHeaderGenerator(register_list, output_folder / "c").create()
 
-    CppImplementationGenerator(register_list, output_path / "cpp").create()
-    CppHeaderGenerator(register_list, output_path / "cpp").create()
-    CppInterfaceGenerator(register_list, output_path / "cpp").create()
+    CppImplementationGenerator(register_list, output_folder / "cpp").create()
+    CppHeaderGenerator(register_list, output_folder / "cpp").create()
+    CppInterfaceGenerator(register_list, output_folder / "cpp").create()
 
-    HtmlConstantTableGenerator(register_list, output_path / "html").create()
-    HtmlPageGenerator(register_list, output_path / "html").create()
-    HtmlRegisterTableGenerator(register_list, output_path / "html").create()
+    HtmlConstantTableGenerator(register_list, output_folder / "html").create()
+    HtmlPageGenerator(register_list, output_folder / "html").create()
+    HtmlRegisterTableGenerator(register_list, output_folder / "html").create()
 
-    PythonClassGenerator(register_list, output_path / "py").create()
+    PythonClassGenerator(register_list, output_folder / "py").create()
 
-    VhdlRegisterPackageGenerator(register_list, output_path / "vhdl").create()
+    VhdlRegisterPackageGenerator(register_list, output_folder / "vhdl").create()
 
 
 if __name__ == "__main__":
-    main(output_path=Path(sys.argv[1]))
+    main(output_folder=Path(sys.argv[1]))

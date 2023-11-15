@@ -102,10 +102,10 @@ def generate_apidoc():
 
 
 def generate_register_code():
-    for folder_name in ["basic_feature", "constant", "field", "user_guide"]:
-        for py_file in (SPHINX_DOC / "rst" / folder_name / "py").glob("*.py"):
+    for folder in (SPHINX_DOC / "rst").glob("*"):
+        for py_file in (folder / "py").glob("*.py"):
             load_python_module(py_file).main(
-                output_path=GENERATED_SPHINX / "register_code" / folder_name / py_file.stem
+                output_folder=GENERATED_SPHINX / "register_code" / folder.name / py_file.stem
             )
 
 

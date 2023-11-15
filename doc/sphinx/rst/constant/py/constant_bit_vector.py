@@ -51,20 +51,20 @@ def create_from_api() -> RegisterList:
     return register_list
 
 
-def generate(register_list: RegisterList, output_path: Path):
+def generate(register_list: RegisterList, output_folder: Path):
     """
     Generate the artifacts that we are interested in.
     """
-    CHeaderGenerator(register_list=register_list, output_folder=output_path).create()
-    CppInterfaceGenerator(register_list=register_list, output_folder=output_path).create()
-    HtmlPageGenerator(register_list=register_list, output_folder=output_path).create()
-    VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_path).create()
+    CHeaderGenerator(register_list=register_list, output_folder=output_folder).create()
+    CppInterfaceGenerator(register_list=register_list, output_folder=output_folder).create()
+    HtmlPageGenerator(register_list=register_list, output_folder=output_folder).create()
+    VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_folder).create()
 
 
-def main(output_path: Path):
-    generate(register_list=parse_toml(), output_path=output_path / "toml")
-    generate(register_list=create_from_api(), output_path=output_path / "api")
+def main(output_folder: Path):
+    generate(register_list=parse_toml(), output_folder=output_folder / "toml")
+    generate(register_list=create_from_api(), output_folder=output_folder / "api")
 
 
 if __name__ == "__main__":
-    main(output_path=Path(sys.argv[1]))
+    main(output_folder=Path(sys.argv[1]))

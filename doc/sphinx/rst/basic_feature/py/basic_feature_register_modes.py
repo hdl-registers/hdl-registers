@@ -18,7 +18,7 @@ from tsfpga.system_utils import create_file
 from hdl_registers.register import REGISTER_MODES
 
 
-def main(output_path: Path):
+def main(output_folder: Path):
     rst = """
 .. list-table:: All available register modes.
    :header-rows: 1
@@ -36,8 +36,8 @@ def main(output_path: Path):
      - {mode.description}
 """
 
-    create_file(file=output_path / "modes_table.rst", contents=rst)
+    create_file(file=output_folder / "modes_table.rst", contents=rst)
 
 
 if __name__ == "__main__":
-    main(output_path=Path(sys.argv[1]))
+    main(output_folder=Path(sys.argv[1]))
