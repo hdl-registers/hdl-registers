@@ -55,6 +55,12 @@
     rst/generator/generator_vhdl
 
 .. toctree::
+    :caption: Extensions
+    :hidden:
+
+    rst/extensions/extensions_custom_generator
+
+.. toctree::
     :caption: API reference
     :hidden:
 

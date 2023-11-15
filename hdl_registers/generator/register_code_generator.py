@@ -39,6 +39,7 @@ class RegisterCodeGenerator(ABC):
     def SHORT_DESCRIPTION() -> str:  # pylint: disable=invalid-name
         """
         A short description of what this generator produces.
+        Will be used when printing status messages.
 
         Overload in child class by setting e.g.
 
@@ -56,7 +57,6 @@ class RegisterCodeGenerator(ABC):
         """
         The character(s) that start a comment line in the programming language that we are
         generating code for.
-        Will be used when printing status messages.
 
         Overload in child class by setting e.g.
 
@@ -80,7 +80,7 @@ class RegisterCodeGenerator(ABC):
         .. code-block:: python
 
           @property
-          def output_file(self):
+          def output_file(self) -> Path:
               return self.output_folder / f"{self.name}_regs.html"
         """
 
@@ -138,7 +138,15 @@ class RegisterCodeGenerator(ABC):
 
     def create_if_needed(self, **kwargs) -> bool:
         """
-        Generate the result file if needed, i.e. if :meth:`.should_create` is ``True``:
+        Generate the result file if needed.
+        I.e. call :meth:`.create` if :meth:`.should_create` is ``True``.
+
+        This method is recommended rather than :meth:`.create` in time-critical scenarios,
+        such as before a user simulation run.
+        The :meth:`.should_create` check is very fast (0.5 ms on a decent computer with a typical
+        register list), while a typical register generator is quite slow by comparison.
+        Hence it makes sense to run this method in order to save execution time.
+        This increased speed gives a much nicer user experience.
 
         Arguments:
             kwargs: Further optional parameters that will be sent on to the
@@ -182,7 +190,7 @@ class RegisterCodeGenerator(ABC):
         self, file_path: Path
     ) -> Union[None, tuple[str, str]]:
         """
-        Returns ``None`` if nothing found, otherwise the matching strings in a tuple.
+        Returns the matching strings in a tuple. Either field can be ``None`` if nothing found.
         """
         existing_file_content = read_file(file=file_path)
 

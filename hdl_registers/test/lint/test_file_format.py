@@ -96,6 +96,7 @@ def test_no_checked_in_files_have_too_long_lines():
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "constant" / "constant_float.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "constant" / "constant_integer.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "constant" / "constant_string.rst",
+        HDL_REGISTERS_DOC / "sphinx" / "rst" / "extensions" / "extensions_custom_generator.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_bit_vector.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_bit.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "field" / "field_enumeration.rst",

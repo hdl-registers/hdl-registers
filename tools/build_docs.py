@@ -10,9 +10,9 @@
 # Standard libraries
 import argparse
 import shutil
+import subprocess
 import sys
 from pathlib import Path
-from subprocess import check_call
 from xml.etree import ElementTree
 
 # Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install
@@ -24,7 +24,7 @@ import tools.tools_pythonpath  # noqa: F401
 
 # Third party libraries
 from pybadges import badge
-from tsfpga.system_utils import create_directory, create_file, delete, load_python_module, read_file
+from tsfpga.system_utils import create_directory, create_file, delete, read_file
 from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 # First party libraries
@@ -98,15 +98,23 @@ def generate_api_documentation():
         # exclude pattern
         "**/test/**",
     ]
-    check_call(cmd, cwd=hdl_registers.REPO_ROOT)
+    subprocess.check_call(cmd, cwd=hdl_registers.REPO_ROOT)
 
 
 def generate_register_code():
+    # Set the path environment variable in the python calls below so they find e.g. tsfpga.
+    env = dict(PYTHONPATH=":".join(sys.path))
+
     for folder in (SPHINX_DOC / "rst").glob("*"):
         for py_file in (folder / "py").glob("*.py"):
-            load_python_module(py_file).main(
-                output_folder=GENERATED_SPHINX / "register_code" / folder.name / py_file.stem
-            )
+            output_folder = GENERATED_SPHINX / "register_code" / folder.name / py_file.stem
+
+            command = [sys.executable, str(py_file), str(output_folder)]
+            output = subprocess.check_output(command, cwd=hdl_registers.REPO_ROOT, env=env)
+            output = output.decode("utf-8")
+
+            print(output)
+            create_file(file=output_folder / "stdout.txt", contents=output)
 
 
 def generate_bibtex():
