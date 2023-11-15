@@ -46,7 +46,7 @@ def main():
     )
     create_file(GENERATED_SPHINX / "release_notes.rst", rst)
 
-    generate_apidoc()
+    generate_api_documentation()
 
     generate_register_code()
 
@@ -82,7 +82,7 @@ def arguments():
     return parser.parse_args()
 
 
-def generate_apidoc():
+def generate_api_documentation():
     output_path = delete(GENERATED_SPHINX / "apidoc")
 
     cmd = [
