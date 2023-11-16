@@ -18,11 +18,12 @@ from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register import REGISTER_MODES, Register
 from hdl_registers.register_list import RegisterList
 
 
-class CHeaderGenerator(RegisterCodeGenerator):
+class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
     """
     Generate a C code header with register information.
 

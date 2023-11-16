@@ -28,7 +28,8 @@ Breaking changes
 * Rename VHDL field conversion function for enumerations from ``to_<field name>_slv`` to ``to_slv``.
 * Rework code generator API for better performance and scalability.
 
-  * Remove ``copy_source_definition`` method from :class:`.RegisterList`.
+  * Remove public members ``copy_source_definition``, ``generated_info``, ``generated_source_info``
+    from :class:`.RegisterList`.
   * Remove ``create_vhdl_package`` method from :class:`.RegisterList`.
     Move ``hdl_registers.register_vhdl_generator.RegisterVhdlGenerator`` class to
     :class:`.VhdlRegisterPackageGenerator` and update API.

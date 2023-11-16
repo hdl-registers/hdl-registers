@@ -7,15 +7,11 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+
 # First party libraries
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 
 
-class HtmlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
-    """
-    Common for HTML code generators.
-    """
-
-    COMMENT_START = "<!--"
-    COMMENT_END = " -->"
+def test_to_pascal_case():
+    assert RegisterCodeGeneratorHelpers.to_pascal_case("test") == "Test"
+    assert RegisterCodeGeneratorHelpers.to_pascal_case("test_two") == "TestTwo"

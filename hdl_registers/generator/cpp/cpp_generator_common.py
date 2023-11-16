@@ -14,10 +14,11 @@ from pathlib import Path
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register_list import RegisterList
 
 
-class CppGeneratorCommon(RegisterCodeGenerator):
+class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
     """
     Class with common methods for generating C++ code.
     """

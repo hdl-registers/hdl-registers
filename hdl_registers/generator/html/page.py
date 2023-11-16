@@ -47,7 +47,6 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
         title = f"Documentation of {self.name} registers"
         html = f"""\
 {self.header}
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,7 +63,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
   <h1>{title}</h1>
   <p>This document is a specification for the register interface of the FPGA module \
 <b>{self.name}</b>.</p>
-  <p>{' '.join(self.register_list.generated_source_info)}</p>
+  <p>{' '.join(self.generated_source_info)}</p>
   <h2>Register modes</h2>
   <p>The following register modes are available.</p>
 {self._get_mode_descriptions()}

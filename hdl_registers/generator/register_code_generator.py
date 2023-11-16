@@ -8,22 +8,22 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
+import datetime
 import re
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterator, Union
+from typing import TYPE_CHECKING, Union
 
 # Third party libraries
+from tsfpga.git_utils import get_git_commit, git_commands_are_available
+from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_available
 from tsfpga.system_utils import create_file, read_file
 
 # First party libraries
 from hdl_registers import __version__
-from hdl_registers.register import Register
-from hdl_registers.register_array import RegisterArray
 
 if TYPE_CHECKING:
     # First party libraries
-    from hdl_registers.constant.constant import Constant
     from hdl_registers.register_list import RegisterList
 
 
@@ -166,12 +166,16 @@ class RegisterCodeGenerator(ABC):
     def should_create(self) -> bool:
         """
         Indicates if a (re-)create of artifacts is needed.
-        Will be True if
+        Will be True if any of these conditions are true:
 
-        * artifact file does not exist,
-        * generator version of artifact does not match current code version, or
-        * :meth:`.RegisterList.object_hash` of artifact does not match the user-supplied
-          register list, i.e. something has changed.
+        * File does not exist.
+        * Generator version of artifact does not match current code version.
+        * Artifact hash does not match :meth:`.RegisterList.object_hash` of the current
+          register list.
+          I.e. something has changed since the previous file was generated.
+
+        The version and hash checks above are dependent on the artifact file having a header
+        as given by :meth:`.header`.
         """
         output_file = self.output_file
 
@@ -220,118 +224,42 @@ class RegisterCodeGenerator(ABC):
     @property
     def header(self) -> str:
         """
-        Get file header with version, register hash, time/date information, etc.
-        Formatted as a comment block.
+        Get file header informing the user that the file is automatically generated,
+        The information from :meth:`.generated_source_info` formatted as a comment block.
         """
-        generated_source_info = "\n".join(self.register_list.generated_source_info)
-        return self.comment_block(text=generated_source_info, indent=0)
-
-    def iterate_constants(self) -> Iterator["Constant"]:
-        """
-        Iterate of all constants in the register list.
-        """
-        for constant in self.register_list.constants:
-            yield constant
-
-    def iterate_register_objects(self) -> Iterator[Union[Register, RegisterArray]]:
-        """
-        Iterate over all register objects in the register list.
-        I.e. all plain registers and all register arrays.
-        """
-        for register_object in self.register_list.register_objects:
-            yield register_object
-
-    def iterate_registers(self) -> Iterator[tuple[Register, Union[RegisterArray, None]]]:
-        """
-        Iterate over all registers, plain or in array, in the register list.
-
-        Return:
-            If the register is plain, the array return value in the tuple will be ``None``.
-            If the register is in an array, the array return value will conversely be non-``None``.
-        """
-        for register_object in self.iterate_register_objects():
-            if isinstance(register_object, Register):
-                yield (register_object, None)
-            else:
-                for register in register_object.registers:
-                    yield (register, register_object)
-
-    def iterate_plain_registers(self) -> Iterator[Register]:
-        """
-        Iterate over all plain registers (i.e. registers not in array) in the register list.
-        """
-        for register_object in self.iterate_register_objects():
-            if isinstance(register_object, Register):
-                yield register_object
-
-    def iterate_register_arrays(self) -> Iterator[RegisterArray]:
-        """
-        Iterate over all register arrays in the register list.
-        """
-        for register_object in self.iterate_register_objects():
-            if isinstance(register_object, RegisterArray):
-                yield register_object
-
-    def get_indentation(self, indent: int = None) -> str:
-        """
-        Get the requested indentation in spaces.
-        Will use the default indentation for this generator if not specified.
-        """
-        indent = self.DEFAULT_INDENTATION_LEVEL if indent is None else indent
-        return " " * indent
-
-    def get_separator_line(self, indent: int = None) -> str:
-        """
-        Get a separator line, e.g. ``# ---------------------------------``.
-        """
-        indentation = self.get_indentation(indent=indent)
-        result = f"{indentation}{self.COMMENT_START} "
-
-        num_dash = 80 - len(result) - len(self.COMMENT_END)
-        result += "-" * num_dash
-        result += f"{self.COMMENT_END}\n"
+        result = ""
+        for line in self.generated_source_info:
+            result += f"{self.COMMENT_START} {line}{self.COMMENT_END}\n"
 
         return result
 
-    def comment(self, comment: str, indent: int = None) -> str:
+    @property
+    def generated_source_info(self) -> list[str]:
         """
-        Create a one-line comment.
+        Return lines informing the user that the file is automatically generated,
+        Containing info about the source of the generated register information.
         """
-        indentation = self.get_indentation(indent=indent)
-        return f"{indentation}{self.COMMENT_START} {comment}{self.COMMENT_END}\n"
+        # Default: Get git SHA from the user's current working directory.
+        directory = Path(".")
 
-    def comment_block(self, text: str, indent: int = None) -> str:
-        """
-        Create a comment block from a string with newlines.
-        """
-        text_lines = text.split("\n")
+        time_info = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
-        # Very common that the last line is empty.
-        # An effect of TOML formatting with multi-line strings.
-        # Remove to make the output look more clean.
-        if text_lines[-1] == "":
-            text_lines.pop()
+        file_info = ""
+        if self.register_list.source_definition_file is not None:
+            # If the source definition file does exist, get git SHA from that directory instead.
+            directory = self.register_list.source_definition_file.parent
+            file_info = f" from file {self.register_list.source_definition_file.name}"
 
-        return "".join(self.comment(comment=line, indent=indent) for line in text_lines)
+        commit_info = ""
+        if git_commands_are_available(directory=directory):
+            commit_info = f" at commit {get_git_commit(directory=directory)}"
+        elif svn_commands_are_available(cwd=directory):
+            commit_info = f" at revision {get_svn_revision_information(cwd=directory)}"
 
-    @staticmethod
-    def register_description(register: Register, register_array: RegisterArray = None) -> str:
-        """
-        Get a comment describing the register.
-        """
-        result = f"'{register.name}' register"
+        info = f"Generated {time_info}{file_info}{commit_info}."
 
-        if register_array is None:
-            return result
-
-        return f"{result} within the '{register_array.name}' register array"
-
-    @staticmethod
-    def to_pascal_case(snake_string: str) -> str:
-        """
-        Converts e.g., "my_funny_string" to "MyFunnyString".
-
-        Pascal case is like camel case but with the initial character being capitalized.
-        I.e. how classes are named in Python, C and C++.
-        """
-        return snake_string.title().replace("_", "")
+        return [
+            f"This file is automatically generated by hdl_registers version {__version__}.",
+            info,
+            f"Register hash {self.register_list.object_hash}.",
+        ]
