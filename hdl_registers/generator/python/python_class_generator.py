@@ -22,7 +22,10 @@ class PythonClassGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
     Generate a Python class with register definitions.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "Python class"
+
     COMMENT_START = "#"
 
     @property

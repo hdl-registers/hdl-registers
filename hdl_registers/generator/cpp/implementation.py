@@ -23,7 +23,10 @@ class CppImplementationGenerator(CppGeneratorCommon):
     Class to generate a C++ implementation.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "C++ implementation"
+
     DEFAULT_INDENTATION_LEVEL = 4
 
     @property

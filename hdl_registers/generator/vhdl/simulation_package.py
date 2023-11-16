@@ -26,6 +26,8 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "VHDL simulation package"
 
     @property

@@ -33,8 +33,12 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
     That test is considered more meaningful and exhaustive than a unit test would be.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "C header"
+
     COMMENT_START = "//"
+
     # The most commonly used indentation.
     # For code at the top level.
     DEFAULT_INDENTATION_LEVEL = 0

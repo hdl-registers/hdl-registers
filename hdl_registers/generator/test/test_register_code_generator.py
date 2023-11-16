@@ -16,15 +16,16 @@ import pytest
 from tsfpga.system_utils import create_file
 
 # First party libraries
-from hdl_registers import __version__
+from hdl_registers import __version__ as hdl_registers_version
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.parser import from_toml
 from hdl_registers.register_list import RegisterList
 
 
-class Generator(RegisterCodeGenerator):
+class CustomGenerator(RegisterCodeGenerator):
     SHORT_DESCRIPTION = "for test"
     COMMENT_START = "#"
+    __version__ = "3.0.1"
 
     @property
     def output_file(self):
@@ -64,18 +65,18 @@ description = "My register"
 def test_create_should_not_run_if_nothing_has_changed(register_list_from_toml, tmp_path):
     register_list = register_list_from_toml()
     register_list.add_constant(name="apa", value=3, description="")
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
 
     register_list = register_list_from_toml()
     register_list.add_constant(name="apa", value=3, description="")
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
         mocked_create.assert_not_called()
 
 
 def test_create_should_run_if_hash_or_version_can_not_be_read(register_list_from_toml, tmp_path):
     register_list = register_list_from_toml()
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
 
     # Overwrite the generated file, without a valid header
     file_path = tmp_path / "sensor.x"
@@ -83,14 +84,14 @@ def test_create_should_run_if_hash_or_version_can_not_be_read(register_list_from
     create_file(file_path, contents="# Mumbo jumbo\n")
 
     register_list = register_list_from_toml()
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
         mocked_create.assert_called_once()
 
 
 def test_create_should_run_again_if_toml_file_has_changed(register_list_from_toml, tmp_path):
     register_list = register_list_from_toml()
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
 
     register_list = register_list_from_toml(
         """
@@ -99,8 +100,8 @@ def test_create_should_run_again_if_toml_file_has_changed(register_list_from_tom
 value = 3
 """
     )
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
         mocked_create.assert_called_once()
 
 
@@ -108,7 +109,7 @@ def test_create_should_not_run_again_if_toml_file_has_only_cosmetic_change(
     register_list_from_toml, tmp_path
 ):
     register_list = register_list_from_toml()
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
 
     register_list = register_list_from_toml(
         """
@@ -116,30 +117,43 @@ def test_create_should_not_run_again_if_toml_file_has_only_cosmetic_change(
 # A comment.
 """
     )
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
         mocked_create.assert_not_called()
 
 
 def test_create_should_run_again_if_register_list_is_modified(register_list_from_toml, tmp_path):
     register_list = register_list_from_toml()
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
 
     register_list = register_list_from_toml()
     register_list.add_constant(name="apa", value=3, description="")
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
         mocked_create.assert_called_once()
 
 
-def test_create_should_run_again_if_version_is_changed(register_list_from_toml, tmp_path):
+def test_create_should_run_again_if_package_version_is_changed(register_list_from_toml, tmp_path):
     register_list = register_list_from_toml()
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
 
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create, patch(
-        "hdl_registers.generator.register_code_generator.__version__", autospec=True
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create, patch(
+        "hdl_registers.generator.register_code_generator.hdl_registers_version", autospec=True
     ) as _:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        mocked_create.assert_called_once()
+
+
+def test_create_should_run_again_if_generator_version_is_changed(register_list_from_toml, tmp_path):
+    register_list = register_list_from_toml()
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create, patch(
+        f"{__name__}.CustomGenerator.__version__", new_callable=PropertyMock
+    ) as mocked_generator_version:
+        mocked_generator_version.return_value = "4.0.0"
+
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
         mocked_create.assert_called_once()
 
 
@@ -150,13 +164,13 @@ def test_version_header_is_detected_even_if_not_on_first_line(register_list_from
 # #########################
 """
     register_list = register_list_from_toml()
-    Generator(register_list=register_list, output_folder=tmp_path).create_if_needed(
+    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed(
         before_header=before_header
     )
 
     register_list = register_list_from_toml()
-    with patch(f"{__name__}.Generator.create", autospec=True) as mocked_create:
-        Generator(register_list=register_list, output_folder=tmp_path).create_if_needed(
+    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed(
             before_header=before_header
         )
         mocked_create.assert_not_called()
@@ -179,35 +193,39 @@ def test_generated_source_info(
     register_list = RegisterList(name="", source_definition_file=Path("/apa/whatever/regs.toml"))
 
     expected_first_line = (
-        f"This file is automatically generated by hdl_registers version {__version__}."
+        f"This file is automatically generated by hdl_registers version {hdl_registers_version}."
     )
+    expected_second_line = "Code generator CustomGenerator version 3.0.1."
     object_hash.return_value = "REGISTER_SHA"
 
     # Test with git information
     git_commands_are_available.return_value = True
     get_git_commit.return_value = "GIT_SHA"
 
-    got = Generator(register_list=register_list, output_folder=None).generated_source_info
+    got = CustomGenerator(register_list=register_list, output_folder=None).generated_source_info
 
     assert got[0] == expected_first_line
-    assert " from file regs.toml at commit GIT_SHA." in got[1]
-    assert got[2] == "Register hash REGISTER_SHA."
+    assert got[1] == expected_second_line
+    assert " from file regs.toml at commit GIT_SHA." in got[2]
+    assert got[3] == "Register hash REGISTER_SHA."
 
     # Test with SVN information
     git_commands_are_available.return_value = False
     svn_commands_are_available.return_value = True
     get_svn_revision_information.return_value = "REVISION"
 
-    got = Generator(register_list=register_list, output_folder=None).generated_source_info
+    got = CustomGenerator(register_list=register_list, output_folder=None).generated_source_info
     assert got[0] == expected_first_line
-    assert " from file regs.toml at revision REVISION." in got[1]
-    assert got[2] == "Register hash REGISTER_SHA."
+    assert got[1] == expected_second_line
+    assert " from file regs.toml at revision REVISION." in got[2]
+    assert got[3] == "Register hash REGISTER_SHA."
 
     # Test with no source definition file
     register_list.source_definition_file = None
 
-    got = Generator(register_list=register_list, output_folder=None).generated_source_info
+    got = CustomGenerator(register_list=register_list, output_folder=None).generated_source_info
     assert got[0] == expected_first_line
-    assert "from file" not in got[1]
-    assert " at revision REVISION." in got[1]
-    assert got[2] == "Register hash REGISTER_SHA."
+    assert got[1] == expected_second_line
+    assert "from file" not in got[2]
+    assert " at revision REVISION." in got[2]
+    assert got[3] == "Register hash REGISTER_SHA."

@@ -24,6 +24,8 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
     Generate a HTML page with register and constant information.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "HTML page"
 
     @property

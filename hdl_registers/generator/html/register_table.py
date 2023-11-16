@@ -30,6 +30,8 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
     Generate HTML code with register information in a table.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "HTML register table"
 
     @property

@@ -47,6 +47,8 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
       * Conversion of a field value to/from SLV.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "VHDL register package"
 
     @property

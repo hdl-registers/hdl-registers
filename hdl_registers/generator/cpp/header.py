@@ -19,7 +19,10 @@ class CppHeaderGenerator(CppGeneratorCommon):
     Class to generate a C++ header.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "C++ header"
+
     DEFAULT_INDENTATION_LEVEL = 4
 
     @property

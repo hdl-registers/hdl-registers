@@ -50,6 +50,8 @@ src/axi_lite_reg_file.vhd
     They are only present if there are any readable/writeable registers in the register map.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "VHDL AXI-Lite register file"
 
     @property

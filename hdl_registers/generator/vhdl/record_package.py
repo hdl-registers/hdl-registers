@@ -43,6 +43,8 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
     from :class:`.VhdlRegisterPackageGenerator`.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "VHDL record package"
 
     @property

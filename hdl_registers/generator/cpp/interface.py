@@ -31,7 +31,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
     Class to generate a C++ interface header.
     """
 
+    __version__ = "1.0.0"
+
     SHORT_DESCRIPTION = "C++ interface header"
+
     DEFAULT_INDENTATION_LEVEL = 4
 
     @property
