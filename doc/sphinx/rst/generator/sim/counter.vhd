@@ -88,13 +88,13 @@ begin
     -- One bit extra to avoid overflow.
     constant counter_max_value : positive := 2 ** (counter_width + 1) - 1;
 
-    signal counter : natural range 0 to counter_max_value := 0;
+    signal count : natural range 0 to counter_max_value := 0;
 
     signal clock_enable_p1 : std_ulogic := '0';
   begin
 
     ------------------------------------------------------------------------------
-    count : process
+    count_events : process
     begin
       wait until rising_edge(clk);
 
@@ -102,21 +102,21 @@ begin
 
       case regs_down.config.mode is
         when mode_clock_cycles =>
-          counter <= counter + regs_down.config.increment;
+          count <= count + regs_down.config.increment;
 
         when mode_clock_cycles_with_enable =>
           if clock_enable then
-            counter <= counter + regs_down.config.increment;
+            count <= count + regs_down.config.increment;
           end if;
 
         when mode_enable_edges =>
           if clock_enable /= clock_enable_p1 then
-            counter <= counter + regs_down.config.increment;
+            count <= count + regs_down.config.increment;
           end if;
       end case;
 
-      if counter >= counter_activate_value then
-        counter <= 0;
+      if count >= counter_activate_value then
+        count <= 0;
         pulse <= regs_up.status.enabled;
       end if;
 
