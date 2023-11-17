@@ -387,9 +387,11 @@ of {array_name}_was_{direction.name_past}_t;
                 else:
                     raise TypeError(f'Got unexpected field type: "{field}".')
 
+            # Set "don't care" on the bits that have no field, so that a register value comparison
+            # can be true even if there is junk in the unused bits.
             return f"""\
   function to_slv(data : {register_name}_t) return reg_t is
-    variable result : reg_t := (others => '0');
+    variable result : reg_t := (others => '-');
   begin
 {to_slv}
     return result;

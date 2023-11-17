@@ -118,12 +118,15 @@ The VHDL below is the testbench for our VHDL example counter implementation abov
 1. The testbench uses register read/write procedures from the package produced by
    :class:`.VhdlSimulationPackageGenerator`, which can be seen
    :ref:`below <example_counter_simulation_package>`.
-2. The type of the ``value`` for each procedure is the native record type for that register.
+   For example ``write_counter_config``.
+2. The ``wait_until_counter_status_equals`` call will continuously read the ``status`` register
+   until it is exactly equal to the supplied value.
+3. The type of the ``value`` for each procedure is the native record type for that register.
 
    a. For example, ``read_counter_status`` returns a value of type ``counter_status_t`` which is
       a record that contains a bit ``enabled`` and an integer ``pulse_count``.
 
-3. The testbench instantiates :ref:`bfm.axi_lite_master` which creates AXI-Lite transactions
+4. The testbench instantiates :ref:`bfm.axi_lite_master` which creates AXI-Lite transactions
    based on the VUnit bus master verification component interface commands created by the
    generated simulation package.
 

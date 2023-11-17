@@ -85,12 +85,9 @@ begin
     check_equal(status.pulse_count, 0);
 
     -- Wait until a number of pulses have passed.
-    wait_until_reg_equals : while true loop
-      read_counter_status(net=>net, value=>status);
-      if status.pulse_count > 10 then
-        exit wait_until_reg_equals;
-      end if;
-    end loop;
+    status.enabled := '1';
+    status.pulse_count := 10;
+    wait_until_counter_status_equals(net=>net, value=>status);
 
     test_runner_cleanup(runner);
   end process;

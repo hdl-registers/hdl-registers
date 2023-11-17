@@ -65,6 +65,23 @@ architecture tb of tb_axi_lite_reg_file is
     others => 0
   );
 
+  constant write_register_timeout : time := 500 * clk_period;
+  signal start_write_plain_register, start_write_array_register : boolean := false;
+  constant write_config_timeout_value : caesar_config_t := (
+    plain_bit_a => '1',
+    plain_bit_b => '1',
+    plain_bit_vector => (others => '1'),
+    plain_enumeration => plain_enumeration_fourth,
+    plain_integer => 0
+  );
+  constant write_dummies_first_timeout_value : caesar_dummies_first_t := (
+    array_bit_a => '1',
+    array_bit_b => '1',
+    array_bit_vector => (others => '1'),
+    array_enumeration => array_enumeration_element0,
+    array_integer => 0
+  );
+
 begin
 
   clk <= not clk after clk_period / 2;
@@ -539,6 +556,8 @@ begin
     variable dummies2_dummy : caesar_dummies2_dummy_t;
 
     variable reg : reg_t := (others => '0');
+
+    variable check_register_access_counts : boolean := true;
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -717,14 +736,119 @@ begin
     elsif run("test_operations_on_array_r_wpulse_register") then
       test_array_r_wpulse_register;
 
+    elsif run("test_wait_until_plain_register_equals") then
+      start_write_plain_register <= true;
+      wait until rising_edge(clk);
+      start_write_plain_register <= true;
+
+      wait_until_caesar_config_equals(
+        net=>net,
+        value=>write_config_timeout_value,
+        timeout=>write_register_timeout + 10 * clk_period
+      );
+
+      -- Check that it took roughly the time we expect it to.
+      assert now > write_register_timeout;
+      assert now < write_register_timeout + 10 * clk_period;
+
+      -- This test reads a lot. The exact amount is not relevant.
+      check_register_access_counts := false;
+
+    elsif run("test_wait_until_plain_register_equals_timeout") then
+      -- vunit: .expected_failure
+      -- We never set the register, so it will never assume this value.
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      wait_until_caesar_config_equals(
+        net=>net, value=>write_config_timeout_value, timeout=>100 * clk_period
+      );
+
+    elsif run("test_wait_until_array_register_equals") then
+      start_write_array_register <= true;
+      wait until rising_edge(clk);
+      start_write_array_register <= true;
+
+      wait_until_caesar_dummies_first_equals(
+        net=>net,
+        array_index => 1,
+        value=>write_dummies_first_timeout_value,
+        timeout=>write_register_timeout + 10 * clk_period
+      );
+
+      -- Check that it took roughly the time we expect it to.
+      assert now > write_register_timeout;
+      assert now < write_register_timeout + 10 * clk_period;
+
+      -- This test reads a lot. The exact amount is not relevant.
+      check_register_access_counts := false;
+
+    elsif run("test_wait_until_array_register_equals_timeout") then
+      -- vunit: .expected_failure
+      -- We never set the register, so it will never assume this value.
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      wait_until_caesar_dummies_first_equals(
+        net=>net,
+        array_index => 1,
+        value=>write_dummies_first_timeout_value,
+        timeout=>100 * clk_period,
+        message=>"Extra printout that can be set!"
+      );
+
+    elsif run("test_wait_until_reg_equals_works_even_when_there_is_junk_in_unused_bits") then
+      -- The fields of the register currently occupy bits 14:0.
+      -- Write junk to some other bits of the register.
+      reg := to_slv(write_config_timeout_value);
+      reg(31 downto 20) := "101010101010";
+      write_reg(net=>net, reg_index=>caesar_config, value=>reg);
+
+      wait_until_caesar_config_equals(net=>net, value=>write_config_timeout_value);
+
+      -- This test reads a lot. The exact amount is not relevant.
+      check_register_access_counts := false;
+
+    elsif run("test_using_wildcard_in_slv_register_value_is_possible") then
+      -- Use "don't care" as a wildcard. The wait should end after the very first write.
+      wait_until_caesar_current_timestamp_equals(net=>net, value=>(others => '-'));
+
+      -- Should only read once.
+      reg_was_read_expected(caesar_current_timestamp) := 1;
+
     end if;
 
     wait_for_write;
 
-    assert reg_was_read_expected = reg_was_read_count report "Incorrect register read count";
-    assert reg_was_written_expected = reg_was_written_count report "Incorrect register write count";
+    if check_register_access_counts then
+      assert reg_was_read_expected = reg_was_read_count report "Incorrect register read count";
+      assert reg_was_written_expected = reg_was_written_count
+        report "Incorrect register write count";
+    end if;
 
     test_runner_cleanup(runner);
+  end process;
+
+
+  ------------------------------------------------------------------------------
+  write_plain_register_after_timeout : process
+  begin
+    wait until start_write_plain_register and rising_edge(clk);
+
+    wait for write_register_timeout;
+
+    write_caesar_config(net=>net, value=>write_config_timeout_value);
+  end process;
+
+
+  ------------------------------------------------------------------------------
+  write_array_register_after_timeout : process
+  begin
+    wait until start_write_array_register and rising_edge(clk);
+
+    -- Write the two array indexes that are not affected straight away.
+    write_caesar_dummies_first(net=>net, array_index=>0, value=>write_dummies_first_timeout_value);
+    write_caesar_dummies_first(net=>net, array_index=>2, value=>write_dummies_first_timeout_value);
+
+    wait for write_register_timeout;
+
+    write_caesar_dummies_first(net=>net, array_index=>1, value=>write_dummies_first_timeout_value);
   end process;
 
 
