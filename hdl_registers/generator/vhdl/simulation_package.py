@@ -81,33 +81,6 @@ end package body;
 
         return vhdl
 
-    def _register_read_write_signature(
-        self, is_read_not_write: bool, register, register_array=None
-    ):
-        """
-        Get signature for a 'read_reg'/'write_reg' procedure.
-        """
-        direction = "read" if is_read_not_write else "write"
-        value_direction = "out" if is_read_not_write else "in"
-
-        register_name = self.register_name(register=register, register_array=register_array)
-        value_type = f"{register_name}_t" if register.fields else "reg_t"
-
-        if register_array:
-            array_name = self.register_array_name(register_array=register_array)
-            array_index_port = f"    array_index : in {array_name}_range;\n"
-        else:
-            array_index_port = ""
-
-        return f"""\
-  procedure {direction}_{register_name}(
-    signal net : inout network_t;
-{array_index_port}\
-    value : {value_direction} {value_type};
-    base_address : in addr_t := (others => '0');
-    bus_handle : in bus_master_t := regs_bus_master
-  )"""
-
     def _declarations(self):
         """
         Get procedure declarations for all 'read_reg'/'write_reg' procedures.
@@ -141,25 +114,51 @@ end package body;
 
         return vhdl
 
-    def _register_read_write_implementation_start(
-        self, is_read_not_write, register, register_array
+    def _register_read_write_signature(
+        self, is_read_not_write: bool, register, register_array=None
     ):
         """
-        Get implementation for all 'read_reg' procedures.
+        Get signature for a 'read_reg'/'write_reg' procedure.
         """
-        signature = self._register_read_write_signature(
-            is_read_not_write=is_read_not_write, register=register, register_array=register_array
-        )
-        register_name = self.register_name(register=register, register_array=register_array)
+        direction = "read" if is_read_not_write else "write"
+        value_direction = "out" if is_read_not_write else "in"
 
-        reg_index = (
-            f"{register_name}(array_index=>array_index)" if register_array else register_name
-        )
+        register_name = self.register_name(register=register, register_array=register_array)
+        value_type = f"{register_name}_t" if register.fields else "reg_t"
+
+        if register_array:
+            array_name = self.register_array_name(register_array=register_array)
+            array_index_port = f"    array_index : in {array_name}_range;\n"
+        else:
+            array_index_port = ""
 
         return f"""\
-{signature} is
-    constant reg_index : {self.name}_reg_range := {reg_index};\
-"""
+  procedure {direction}_{register_name}(
+    signal net : inout network_t;
+{array_index_port}\
+    value : {value_direction} {value_type};
+    base_address : in addr_t := (others => '0');
+    bus_handle : in bus_master_t := regs_bus_master
+  )"""
+
+    def _implementations(self):
+        """
+        Get implementations of 'read_reg'/'write_reg' procedures.
+        """
+        vhdl = ""
+
+        for register, register_array in self.iterate_registers():
+            if register.is_bus_readable:
+                vhdl += self._register_read_implementation(
+                    register=register, register_array=register_array
+                )
+
+            if register.is_bus_writeable:
+                vhdl += self._register_write_implementation(
+                    register=register, register_array=register_array
+                )
+
+        return vhdl
 
     def _register_read_implementation(self, register, register_array):
         """
@@ -188,6 +187,26 @@ end package body;
 
 """
 
+    def _register_read_write_implementation_start(
+        self, is_read_not_write, register, register_array
+    ):
+        """
+        Get the first two lines of a 'read_reg'/'write_reg' procedure implementation.
+        """
+        signature = self._register_read_write_signature(
+            is_read_not_write=is_read_not_write, register=register, register_array=register_array
+        )
+        register_name = self.register_name(register=register, register_array=register_array)
+
+        reg_index = (
+            f"{register_name}(array_index=>array_index)" if register_array else register_name
+        )
+
+        return f"""\
+{signature} is
+    constant reg_index : {self.name}_reg_range := {reg_index};\
+"""
+
     def _register_write_implementation(self, register, register_array):
         """
         Get implementation for a 'write_reg' procedure.
@@ -212,22 +231,3 @@ end package body;
   end procedure;
 
 """
-
-    def _implementations(self):
-        """
-        Get implementations of 'read_reg'/'write_reg' procedures.
-        """
-        vhdl = ""
-
-        for register, register_array in self.iterate_registers():
-            if register.is_bus_readable:
-                vhdl += self._register_read_implementation(
-                    register=register, register_array=register_array
-                )
-
-            if register.is_bus_writeable:
-                vhdl += self._register_write_implementation(
-                    register=register, register_array=register_array
-                )
-
-        return vhdl
