@@ -64,6 +64,20 @@ Please open an `issue <https://gitlab.com/hdl_registers/hdl_registers/-/issues>`
 or a `merge request <https://gitlab.com/hdl_registers/hdl_registers/-/merge_requests>`__.
 
 
+Performance
+-----------
+
+Since code generation is usually quite slow, there is a mechanism in place for speeding up the
+process and giving a better user experience.
+For code generation that is time-critical, such as generating a register package before a user
+simulation run, it is recommended to call the
+:meth:`.RegisterCodeGenerator.create_if_needed` method.
+This method will only re-create the artifact if some register definition has changed or a tool
+version is bumped.
+Hence using this method as opposed to :meth:`.RegisterCodeGenerator.create` saves a lot of time,
+especially in a large project.
+
+
 Code templating engine
 ----------------------
 
