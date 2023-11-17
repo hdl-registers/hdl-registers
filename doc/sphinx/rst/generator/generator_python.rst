@@ -22,6 +22,7 @@ as well as a convenient Python file to re-create the pickle, shown below:
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_python/example.py
    :caption: Example Python class
    :language: Python
+   :linenos:
 
 A Python-based system test environment can use the re-created :class:`.RegisterList` objects from
 the FPGA release to perform register reads/writes on the correct registers addresses and

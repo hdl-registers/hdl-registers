@@ -65,8 +65,14 @@ class PythonClassGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return f'''\
 {self.header}
+# Standard libraries
 import pickle
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    # Third party libraries
+    from hdl_registers.register_list import RegisterList
 
 THIS_DIR = Path(__file__).parent
 
@@ -85,10 +91,10 @@ class {class_name}:
             return pickle.load(file_handle)
 
 
-def get_register_list():
+def get_register_list() -> "RegisterList":
     """
     Return a RegisterList object with the registers/constants from the '{self.name}' module.
-    Recreated from a python pickle file.
+    Recreated from a Python pickle file.
     """
     return {class_name}()
 '''
