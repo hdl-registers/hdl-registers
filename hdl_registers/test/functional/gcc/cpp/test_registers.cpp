@@ -18,7 +18,7 @@ void test_register_attributes()
     assert(fpga_regs::caesar::config::plain_bit_vector::width == 4);
     assert(fpga_regs::caesar::config::plain_bit_vector::default_value == 3);
 
-    assert(fpga_regs::Caesar::dummies_array_length == 3);
+    assert(fpga_regs::caesar::dummies::array_length == 3);
     assert(fpga_regs::caesar::dummies::first::array_bit_vector::width == 5);
     assert(fpga_regs::caesar::dummies::first::array_bit_vector::default_value == 12);
 }

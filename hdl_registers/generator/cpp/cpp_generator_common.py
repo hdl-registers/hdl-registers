@@ -41,10 +41,6 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
     def _constructor_signature(self):
         return f"{self._class_name}(volatile uint8_t *base_address)"
 
-    @staticmethod
-    def _array_length_constant_name(register_array):
-        return f"{register_array.name}_array_length"
-
     def _get_methods_description(self, register, register_array):
         register_description = self.register_description(
             register=register, register_array=register_array

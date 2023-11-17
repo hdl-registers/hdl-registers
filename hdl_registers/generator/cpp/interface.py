@@ -59,6 +59,9 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             if field_cpp_code:
                 cpp_code += "\n"
 
+        for register_array in self.iterate_register_arrays():
+            cpp_code += self._register_array_attributes(register_array=register_array)
+
         cpp_code += f"  class I{self._class_name}\n"
         cpp_code += "  {\n"
         cpp_code += "  public:\n"
@@ -66,11 +69,6 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += self._constants()
 
         cpp_code += self._num_registers()
-
-        for register_array in self.iterate_register_arrays():
-            cpp_code += self.comment(f'Length of the "{register_array.name}" register array')
-            constant_name = self._array_length_constant_name(register_array)
-            cpp_code += f"    static const size_t {constant_name} = {register_array.length}uL;\n\n"
 
         cpp_code += f"    virtual ~I{self._class_name}() {{}}\n\n"
 
@@ -272,7 +270,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         field_description = self._field_description(
             register=register, register_array=register_array, field=field
         )
-        cpp_code = self.comment_block(text=f"Attributes for {field_description}.", indent=2)
+        cpp_code = self.comment(f"Attributes for {field_description}.", indent=2)
 
         array_namespace = f"::{register_array.name}" if register_array else ""
         namespace = f"{self.name}{array_namespace}::{register.name}::{field.name}"
@@ -297,3 +295,14 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += "  }\n"
 
         return cpp_code
+
+    def _register_array_attributes(self, register_array):
+        return f"""\
+  // Attributes for the "{register_array.name}" register array.
+  namespace {self.name}::{register_array.name}
+  {{
+    // Number of times the registers of the array are repeated.
+    static const auto array_length = {register_array.length};
+  }};
+
+"""

@@ -136,7 +136,7 @@ def test_setting_cpp_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
         stderr = process.communicate()
-    assert "Assertion `array_index < dummies_array_length' failed" in str(stderr), stderr
+    assert "Assertion `array_index < caesar::dummies::array_length' failed" in str(stderr), stderr
 
 
 def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):

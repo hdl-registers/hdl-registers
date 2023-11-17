@@ -89,7 +89,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         if register_array:
             cpp_code += (
-                f"    assert(array_index < {self._array_length_constant_name(register_array)});\n"
+                f"    assert(array_index < {self.name}::{register_array.name}::array_length);\n"
             )
             cpp_code += (
                 f"    const size_t index = {register_array.base_index} "
@@ -214,7 +214,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         if register_array:
             cpp_code += (
-                f"    assert(array_index < {self._array_length_constant_name(register_array)});\n"
+                f"    assert(array_index < {self.name}::{register_array.name}::array_length);\n"
             )
             cpp_code += (
                 f"    const size_t index = {register_array.base_index} "

@@ -26,6 +26,9 @@ Added
 Breaking changes
 
 * Rename VHDL field conversion function for enumerations from ``to_<field name>_slv`` to ``to_slv``.
+* Remove C++ interface header constant ``<register array name>_array_length``.
+  Information is instead available as an
+  attribute ``fpga_regs::<module name>::<register array name>::array_length``.
 * Rework code generator API for better performance and scalability.
 
   * Remove public members ``copy_source_definition``, ``generated_info``, ``generated_source_info``
