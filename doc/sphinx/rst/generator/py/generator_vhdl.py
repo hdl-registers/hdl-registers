@@ -29,10 +29,21 @@ def main(output_folder: Path):
         module_name="counter", toml_file=THIS_DIR.parent / "sim" / "regs_counter.toml"
     )
 
-    VhdlRegisterPackageGenerator(register_list, output_folder).create_if_needed()
-    VhdlRecordPackageGenerator(register_list, output_folder).create_if_needed()
-    VhdlSimulationPackageGenerator(register_list, output_folder).create_if_needed()
-    VhdlAxiLiteWrapperGenerator(register_list, output_folder).create_if_needed()
+    VhdlRegisterPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlRecordPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlSimulationPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlAxiLiteWrapperGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
 
 
 if __name__ == "__main__":

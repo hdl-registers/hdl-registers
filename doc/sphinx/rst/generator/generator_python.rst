@@ -10,14 +10,16 @@ an FPGA release can be very useful.
 
 The pickle is created e.g. like this:
 
-.. code-block:: python
-
-   PythonClassGenerator(register_list=register_list, output_folder=output_folder).create()
+.. literalinclude:: py/generator_html.py
+   :caption: Python code that parses the example TOML file and generates Python register artifacts.
+   :language: Python
+   :linenos:
+   :lines: 10-
 
 This will save the binary pickle, which represents the object precisely,
 as well as a convenient Python file to re-create the pickle, shown below:
 
-.. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/toml_format/py/example.py
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_python/example.py
    :caption: Example Python class
    :language: Python
 
