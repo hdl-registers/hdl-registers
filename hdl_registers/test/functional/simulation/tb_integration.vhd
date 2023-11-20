@@ -550,9 +550,10 @@ begin
       reg_was_written_expected(caesar_dummies2_dummy(array_index=>1)) := 1;
     end procedure;
 
-    variable config : caesar_config_t;
+    variable config, config2 : caesar_config_t;
+    variable command : caesar_command_t := caesar_command_init;
     variable irq_status : caesar_irq_status_t;
-    variable dummies_first : caesar_dummies_first_t;
+    variable dummies_first, dummies_first2 : caesar_dummies_first_t;
     variable dummies2_dummy : caesar_dummies2_dummy_t;
 
     variable reg : reg_t := (others => '0');
@@ -917,6 +918,68 @@ begin
         timeout=>100 * clk_period,
         message=>"Extra printout that can be set!"
       );
+
+    elsif run("test_plain_field_read_modify_write") then
+      -- This register is of mode "r_w", so the procedure will read-modify-write.
+      read_caesar_config(net=>net, value=>config);
+      assert config = caesar_config_init;
+
+      -- Write a new value.
+      config.plain_bit_a := not config.plain_bit_a;
+      write_caesar_config_plain_bit_a(net=>net, value=>config.plain_bit_a);
+
+      -- Check updated value.
+      read_caesar_config(net=>net, value=>config2);
+      assert config2 = config;
+
+      reg_was_read_expected(caesar_config) := 3;
+      reg_was_written_expected(caesar_config) := 1;
+
+      -- Write a new value on a different bit.
+      config.plain_bit_b := not config.plain_bit_b;
+      write_caesar_config_plain_bit_b(net=>net, value=>config.plain_bit_b);
+
+      -- Check updated value.
+      read_caesar_config(net=>net, value=>config2);
+      assert config2 = config;
+
+      reg_was_read_expected(caesar_config) := 5;
+      reg_was_written_expected(caesar_config) := 2;
+
+    elsif run("test_plain_field_write") then
+      -- This register is of mode "wpulse", so the procedure will only write.
+      command.abort := not command.abort;
+      write_caesar_command_abort(net=>net, value=>command.abort);
+
+      wait until regs_down.command'event for 10 * clk_period;
+      wait until rising_edge(clk);
+      assert regs_down.command.abort = '1';
+      assert regs_down.command.start = '1';
+
+      -- Should go back to default at the next clock cycle.
+      wait until rising_edge(clk);
+      assert regs_down.command.abort = '0';
+      assert regs_down.command.start = '1';
+
+      reg_was_written_expected(caesar_command) := 1;
+
+    elsif run("test_array_field_read_modify_write") then
+      -- This register is of mode "r_w", so the procedure will read-modify-write.
+      read_caesar_dummies_first(net=>net, array_index=>1, value=>dummies_first);
+      assert dummies_first.array_enumeration = array_enumeration_element1;
+
+      -- Write a new value.
+      dummies_first.array_enumeration := array_enumeration_element0;
+      write_caesar_dummies_first_array_enumeration(
+        net=>net, array_index=>1, value=>dummies_first.array_enumeration
+      );
+
+      -- Check updated value.
+      read_caesar_dummies_first(net=>net, array_index=>1, value=>dummies_first2);
+      assert dummies_first2 = dummies_first;
+
+      reg_was_read_expected(caesar_dummies_first(array_index=>1)) := 3;
+      reg_was_written_expected(caesar_dummies_first(array_index=>1)) := 1;
 
     end if;
 

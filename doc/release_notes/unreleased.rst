@@ -21,7 +21,7 @@ Added
 
     * Wait until register equals.
 
-    * Read each field.
+    * Read/write for each field.
 
     * Wait until field equals.
 

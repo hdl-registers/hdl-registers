@@ -31,6 +31,8 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
 
     * For each writeable register, a procedure that writes a given natively typed record value.
 
+    * For each field in each writeable register, a procedure that writes a given field value.
+
     Uses VUnit Verification Component calls, via :ref:`reg_file.reg_operations_pkg`
     from hdl_modules.
 
@@ -134,6 +136,15 @@ end package body;
                 )
                 declarations.append(f"{signature};\n")
 
+                for field in register.fields:
+                    signature = self._field_read_write_signature(
+                        is_read_not_write=False,
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                    )
+                    declarations.append(f"{signature};\n")
+
             vhdl += separator
             vhdl += "\n".join(declarations)
             vhdl += separator
@@ -222,6 +233,19 @@ end package body;
             register=register, field=field, register_array=register_array
         )
 
+        comment = ""
+        if not is_read_not_write:
+            if self._can_read_modify_write_register(register=register):
+                comment = (
+                    "  -- Will read-modify-write the register to set the field to the "
+                    "supplied 'value'.\n"
+                )
+            else:
+                comment = (
+                    "  -- Will write the whole register, with the field set to the \n"
+                    "  -- supplied 'value' and all other fields to their default values.\n"
+                )
+
         value_direction = "out" if is_read_not_write else "in"
         value_type = self.field_type_name(
             register=register, register_array=register_array, field=field
@@ -235,6 +259,7 @@ end package body;
 
         return f"""\
   -- {direction.capitalize()} the {field_description}.
+{comment}\
   procedure {direction}_{field_name}(
     signal net : inout network_t;
 {array_index_port}\
@@ -318,6 +343,13 @@ end package body;
                         register=register, register_array=register_array
                     )
                 )
+
+                for field in register.fields:
+                    implementations.append(
+                        self._field_write_implementation(
+                            register=register, register_array=register_array, field=field
+                        )
+                    )
 
             vhdl += separator
             vhdl += "\n".join(implementations)
@@ -513,3 +545,58 @@ end package body;
     );
   end procedure;
 """
+
+    def _field_write_implementation(self, register, register_array, field):
+        """
+        Get implementation for a 'write_field' procedure.
+        """
+        signature = self._field_read_write_signature(
+            is_read_not_write=False, register=register, register_array=register_array, field=field
+        )
+        register_name = self.register_name(register=register, register_array=register_array)
+
+        array_index_association = "      array_index => array_index,\n" if register_array else ""
+
+        if self._can_read_modify_write_register(register=register):
+            set_base_value = f"""\
+    read_{register_name}(
+      net => net,
+{array_index_association}\
+      value => reg_value,
+      base_address => base_address,
+      bus_handle => bus_handle
+    );
+"""
+        else:
+            set_base_value = ""
+
+        return f"""\
+{signature} is
+    variable reg_value : {register_name}_t := {register_name}_init;
+  begin
+{set_base_value}\
+    reg_value.{field.name} := value;
+
+    write_{register_name}(
+      net => net,
+{array_index_association}\
+      value => reg_value,
+      base_address => base_address,
+      bus_handle => bus_handle
+    );
+  end procedure;
+"""
+
+    @staticmethod
+    def _can_read_modify_write_register(register):
+        """
+        Return true if the register is of a writeable type where the bus can also read back
+        a previously-written value.
+        """
+        if register.mode == "r_w":
+            return True
+
+        if register.mode in ["w", "wpulse", "r_wpulse"]:
+            return False
+
+        raise ValueError(f"Got non-writeable register: {register}")

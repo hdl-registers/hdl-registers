@@ -51,7 +51,6 @@ begin
   ------------------------------------------------------------------------------
   main : process
     variable config : counter_config_t := counter_config_init;
-    variable command : counter_command_t := counter_command_init;
     variable status : counter_status_t := counter_status_init;
   begin
     test_runner_setup(runner, runner_cfg);
@@ -76,8 +75,7 @@ begin
     write_counter_config(net=>net, value=>config);
 
     -- Enable the operation.
-    command.start := '1';
-    write_counter_command(net=>net, value=>command);
+    write_counter_command_start(net=>net, value=>'1');
 
     -- Check updated status.
     read_counter_status(net=>net, value=>status);
