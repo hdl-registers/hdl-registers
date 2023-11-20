@@ -10,7 +10,7 @@
 # Standard libraries
 import copy
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 # Third party libraries
 import tomli
@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from .register import Register
 
 
-def load_toml_file(toml_file: Path) -> str:
+def load_toml_file(toml_file: Path) -> dict[str, Any]:
     if not toml_file.exists():
         raise FileNotFoundError(f"Requested TOML file does not exist: {toml_file}")
 
@@ -38,7 +38,7 @@ def load_toml_file(toml_file: Path) -> str:
 
 
 def from_toml(
-    module_name: str, toml_file: Path, default_registers: list["Register"] = None
+    module_name: str, toml_file: Path, default_registers: Optional[list["Register"]] = None
 ) -> RegisterList:
     """
     Parse a register TOML file.
@@ -58,7 +58,7 @@ def from_toml(
     )
     toml_data = load_toml_file(toml_file)
 
-    return parser.parse(toml_data)
+    return parser.parse(register_data=toml_data)
 
 
 class RegisterParser:
@@ -86,7 +86,7 @@ class RegisterParser:
         self,
         module_name: str,
         source_definition_file: Path,
-        default_registers: list["Register"] = None,
+        default_registers: Optional[list["Register"]] = None,
     ):
         self._register_list = RegisterList(
             name=module_name, source_definition_file=source_definition_file
@@ -94,13 +94,15 @@ class RegisterParser:
         self._source_definition_file = source_definition_file
 
         self._default_register_names = []
-        if default_registers is not None:
-            # Perform deep copy of the mutable register objects
-            self._register_list.register_objects = copy.deepcopy(default_registers)
+        if default_registers:
+            # Perform deep copy of the mutable register objects.
+            self._register_list.register_objects = copy.deepcopy(
+                default_registers  # type: ignore[arg-type]
+            )
             for register in default_registers:
                 self._default_register_names.append(register.name)
 
-    def parse(self, register_data: str) -> RegisterList:
+    def parse(self, register_data: dict[str, Any]) -> RegisterList:
         """
         Parse the TOML data.
 

@@ -9,7 +9,3 @@
 
 # Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
 import tools.tools_pythonpath  # noqa: F401
-
-# Third party libraries
-# pylint: disable=unused-import
-from tsfpga.test.conftest import fixture_tmp_path  # noqa: F401

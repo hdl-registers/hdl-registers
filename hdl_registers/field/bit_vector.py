@@ -48,7 +48,7 @@ class BitVector(RegisterField):
         self._check_width(width=width, field_type=field_type)
         self._width = width
 
-        self._default_value = None
+        self._default_value = ""
         # Assign self._default_value via setter
         self.default_value = default_value
 
@@ -59,10 +59,10 @@ class BitVector(RegisterField):
         return self._field_type
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self._width
 
-    def _check_width(self, width: int, field_type: FieldType):
+    def _check_width(self, width: int, field_type: FieldType) -> None:
         """
         Sanity checks for the provided width
         """
@@ -86,18 +86,18 @@ class BitVector(RegisterField):
                 )
 
     @property
-    def base_index(self):
+    def base_index(self) -> int:
         return self._base_index
 
     @property
-    def default_value(self):
+    def default_value(self) -> str:
         """
         Getter for private member.
         """
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value):
+    def default_value(self, value: str) -> None:
         """
         Setter for ``default_value`` that performs sanity checks.
         """
@@ -126,14 +126,14 @@ class BitVector(RegisterField):
         self._default_value = value
 
     @property
-    def default_value_str(self):
+    def default_value_str(self) -> str:
         return f"0b{self.default_value}"
 
     @property
-    def default_value_uint(self):
+    def default_value_uint(self) -> int:
         return int(self.default_value, base=2)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 _base_index={self._base_index},\

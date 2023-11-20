@@ -11,19 +11,25 @@
 from hdl_registers.field.register_field import RegisterField
 
 
-def test_register_field():
+def test_range_str() -> None:
     class MyField(RegisterField):
         base_index = 3
         width = 1
-        default_value_str = None
-        default_value_uint = None
+        default_value_str = ""
+        default_value_uint = 0
+
+        def __repr__(self) -> str:
+            return ""
 
     assert MyField().range_str == "3"
 
     class MyOtherField(RegisterField):
         base_index = 4
         width = 8
-        default_value_str = None
-        default_value_uint = None
+        default_value_str = ""
+        default_value_uint = 0
+
+        def __repr__(self) -> str:
+            return ""
 
     assert MyOtherField().range_str == "11:4"

@@ -46,7 +46,7 @@ class Integer(RegisterField):
         self._min_value = min_value
         self._max_value = max_value
 
-        self._default_value = None
+        self._default_value = 0
         # Assign self._default_value via setter
         self.default_value = default_value
 
@@ -58,7 +58,7 @@ class Integer(RegisterField):
         return self._min_value < 0
 
     @property
-    def width(self):
+    def width(self) -> int:
         # Calculate the width based on the supplied numerical limits.
         error_message = (
             f"Supplied integer range [{self._min_value}, {self._max_value}] does not fit "
@@ -85,10 +85,10 @@ class Integer(RegisterField):
         raise ValueError(error_message)
 
     @property
-    def base_index(self):
+    def base_index(self) -> int:
         return self._base_index
 
-    def _check_range(self, min_value, max_value):
+    def _check_range(self, min_value: int, max_value: int) -> None:
         """
         Perform some sanity checks on user-supplied values.
         """
@@ -114,28 +114,28 @@ class Integer(RegisterField):
             raise ValueError(message)
 
     @property
-    def min_value(self):
+    def min_value(self) -> int:
         """
         Getter for private member.
         """
         return self._min_value
 
     @property
-    def max_value(self):
+    def max_value(self) -> int:
         """
         Getter for private member.
         """
         return self._max_value
 
     @property
-    def default_value(self):
+    def default_value(self) -> int:
         """
         Getter for private member.
         """
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: int):
+    def default_value(self, value: int) -> None:
         """
         Setter for default_value that performs sanity checks.
         """
@@ -156,11 +156,11 @@ class Integer(RegisterField):
         self._default_value = value
 
     @property
-    def default_value_str(self):
+    def default_value_str(self) -> str:
         return str(self.default_value)
 
     @property
-    def default_value_uint(self):
+    def default_value_uint(self) -> int:
         if self.default_value >= 0:
             return self.default_value
 
@@ -169,7 +169,7 @@ class Integer(RegisterField):
         # Offset the sign bit.
         return self.default_value + 2**self.width
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 _base_index={self._base_index},\

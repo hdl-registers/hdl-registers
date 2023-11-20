@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import Optional
 
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -51,8 +52,8 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return self.output_folder / self._file_name
 
     def __init__(
-        self, register_list: RegisterList, output_folder: Path, file_name: str = None
-    ) -> str:
+        self, register_list: RegisterList, output_folder: Path, file_name: Optional[str] = None
+    ):
         """
         For argument description, please see the parent class.
 

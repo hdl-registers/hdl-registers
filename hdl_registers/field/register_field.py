@@ -9,6 +9,7 @@
 
 # Standard libraries
 from abc import ABC, abstractmethod
+from typing import Any
 
 # Local folder libraries
 from .register_field_type import FieldType, Unsigned
@@ -22,6 +23,15 @@ class RegisterField(ABC):
     Meta class for all register fields (bits, bit vectors, integers, ...).
     Lists a few methods that must be implemented.
     """
+
+    name: str
+
+    # @property
+    # @abstractmethod
+    # def name(self) -> str:
+    #     """
+    #     The name of the field.
+    #     """
 
     @property
     def max_binary_value(self) -> int:
@@ -84,7 +94,7 @@ class RegisterField(ABC):
         """
         raise NotImplementedError("Must be implemented in child class")
 
-    def get_value(self, register_value: int) -> float:
+    def get_value(self, register_value: int) -> Any:
         """
         Get the value of this field, given the supplied register value.
         Child classes might implement sanity checks on the value.
@@ -93,7 +103,7 @@ class RegisterField(ABC):
             register_value: Value of the register that this field belongs to.
 
         Returns:
-            The value of the field.
+            The value of the field. Type depends on the field.
         """
         shift = self.base_index
 
@@ -113,6 +123,9 @@ class RegisterField(ABC):
 
         Arguments:
             field_value: Desired value to set the field to.
+                Note that a subclass might have a different type for this argument.
+                Subclasses should convert their argument value to an integer/float and call
+                this super method.
 
         Returns:
             The register value
@@ -128,3 +141,7 @@ class RegisterField(ABC):
         value_shifted = value_unsigned << self.base_index
 
         return value_shifted & mask
+
+    @abstractmethod
+    def __repr__(self) -> str:
+        pass

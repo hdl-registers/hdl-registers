@@ -7,13 +7,19 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import Optional
 
-class BitVectorConstant:
+# Local folder libraries
+from .constant import Constant
+
+
+class BitVectorConstant(Constant):
     separator_character = "_"
     allowed_binary_characters = "01" + separator_character
     allowed_hexadecimal_characters = "0123456789abcdefABCDEF" + separator_character
 
-    def __init__(self, name: str, value: str, description: str = None):
+    def __init__(self, name: str, value: str, description: Optional[str] = None):
         """
         Arguments:
             name: The name of the constant.
@@ -25,10 +31,10 @@ class BitVectorConstant:
         self.description = "" if description is None else description
 
         # Assigned in 'value' setter.
-        self._is_hexadecimal_not_binary = None
-        self._prefix = None
+        self._is_hexadecimal_not_binary = False
+        self._prefix = ""
 
-        self._value = None
+        self._value = ""
         # Assign self._value via setter
         self.value = value
 
@@ -46,15 +52,8 @@ class BitVectorConstant:
         """
         return self._value
 
-    @property
-    def value_without_separator(self) -> str:
-        """
-        Getter for ``value``, without any separator characters.
-        """
-        return self._value.replace(self.separator_character, "")
-
     @value.setter
-    def value(self, value: str):
+    def value(self, value: str) -> None:
         """
         Setter for ``value`` that performs sanity checks.
         """
@@ -87,6 +86,13 @@ class BitVectorConstant:
                     f'Constant "{self.name}" contains illegal character "{character}". '
                     f'Value: "{value}".'
                 )
+
+    @property
+    def value_without_separator(self) -> str:
+        """
+        Getter for ``value``, without any separator characters.
+        """
+        return self._value.replace(self.separator_character, "")
 
     @property
     def is_hexadecimal_not_binary(self) -> bool:

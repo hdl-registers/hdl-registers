@@ -11,7 +11,7 @@
 import copy
 import hashlib
 from pathlib import Path
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 # Local folder libraries
 from .constant.bit_vector_constant import UnsignedVector, UnsignedVectorConstant
@@ -33,7 +33,7 @@ class RegisterList:
     Used to handle the registers of a module. Also known as a register map.
     """
 
-    def __init__(self, name: str, source_definition_file: Path = None):
+    def __init__(self, name: str, source_definition_file: Optional[Path] = None):
         """
         Arguments:
             name: The name of this register list. Typically the name of the module that uses it.
@@ -45,8 +45,8 @@ class RegisterList:
         self.name = name
         self.source_definition_file = source_definition_file
 
-        self.register_objects = []
-        self.constants = []
+        self.register_objects: list[Union[Register, RegisterArray]] = []
+        self.constants: list["Constant"] = []
 
     @classmethod
     def from_default_registers(
@@ -76,7 +76,7 @@ class RegisterList:
                 raise ValueError(message)
 
         register_list = cls(name=name, source_definition_file=source_definition_file)
-        register_list.register_objects = copy.deepcopy(default_registers)
+        register_list.register_objects = copy.deepcopy(default_registers)  # type: ignore[arg-type]
 
         return register_list
 
@@ -157,7 +157,10 @@ class RegisterList:
         )
 
     def get_register_index(
-        self, register_name: str, register_array_name: str = None, register_array_index: int = None
+        self,
+        register_name: str,
+        register_array_name: Optional[str] = None,
+        register_array_index: Optional[int] = None,
     ) -> int:
         """
         Get the zero-based index within the register list for the specified register.
@@ -172,7 +175,7 @@ class RegisterList:
         Return:
             The index.
         """
-        if register_array_name is None and register_array_index is None:
+        if register_array_name is None or register_array_index is None:
             # Target is plain register
             register = self.get_register(register_name)
 
@@ -207,7 +210,7 @@ class RegisterList:
         """
         # Note that this is a sub-type of 'int', hence it must be before the check below.
         if isinstance(value, bool):
-            constant = BooleanConstant(name=name, value=value, description=description)
+            constant: "Constant" = BooleanConstant(name=name, value=value, description=description)
 
         elif isinstance(value, int):
             constant = IntegerConstant(name=name, value=value, description=description)
@@ -254,7 +257,7 @@ class RegisterList:
         """
         return hashlib.sha1(repr(self).encode()).hexdigest()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 source_definition_file={repr(self.source_definition_file)},\

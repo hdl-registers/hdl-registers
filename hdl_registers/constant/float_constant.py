@@ -7,6 +7,9 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import Optional
+
 # Local folder libraries
 from .constant import Constant
 
@@ -23,7 +26,7 @@ class FloatConstant(Constant):
       the precision in C/C++/VHDL generators.
     """
 
-    def __init__(self, name: str, value: float, description: str = None):
+    def __init__(self, name: str, value: float, description: Optional[str] = None):
         """
         Arguments:
             name: The name of the constant.
@@ -33,7 +36,7 @@ class FloatConstant(Constant):
         self.name = name
         self.description = "" if description is None else description
 
-        self._value = None
+        self._value = 0.0
         # Assign self._value via setter
         self.value = value
 
@@ -45,7 +48,7 @@ class FloatConstant(Constant):
         return self._value
 
     @value.setter
-    def value(self, value: float):
+    def value(self, value: float) -> None:
         """
         Setter for value that performs sanity checks.
         """
@@ -56,7 +59,7 @@ class FloatConstant(Constant):
 
         self._value = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 value={self.value},\

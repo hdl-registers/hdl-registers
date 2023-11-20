@@ -44,7 +44,7 @@ class EnumerationElement:
         return self._name
 
     @property
-    def value(self) -> str:
+    def value(self) -> int:
         """
         Getter for ``value``.
         This member is read-only, since changing the value of an element poses the risk of value
@@ -52,7 +52,7 @@ class EnumerationElement:
         """
         return self._value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 _name={self._name},\
 _value={self._value},\
@@ -105,18 +105,18 @@ class Enumeration(RegisterField):
             )
             self._elements.append(element)
 
-        self._default_value = None
+        self._default_value = self._elements[0]
         self.set_default_value(default_value)
 
     @property
-    def width(self):
+    def width(self) -> int:
         num_elements = len(self._elements)
         num_bits = (num_elements - 1).bit_length() if num_elements > 1 else 1
 
         return num_bits
 
     @property
-    def base_index(self):
+    def base_index(self) -> int:
         return self._base_index
 
     @property
@@ -171,7 +171,7 @@ class Enumeration(RegisterField):
         """
         return self._default_value
 
-    def set_default_value(self, value: str):
+    def set_default_value(self, value: str) -> None:
         """
         Set the default value for this enumeration field.
 
@@ -190,21 +190,21 @@ class Enumeration(RegisterField):
         raise ValueError(message)
 
     @property
-    def default_value_str(self):
+    def default_value_str(self) -> str:
         return self.default_value.name
 
     @property
-    def default_value_uint(self):
+    def default_value_uint(self) -> int:
         return self.default_value.value
 
     def get_value(self, register_value: int) -> EnumerationElement:
         value_integer = super().get_value(register_value=register_value)
         return self.get_element_by_value(value=value_integer)
 
-    def set_value(self, field_value: EnumerationElement) -> int:
+    def set_value(self, field_value: EnumerationElement) -> int:  # type: ignore[override]
         return super().set_value(field_value=field_value.value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 _base_index={self._base_index},\

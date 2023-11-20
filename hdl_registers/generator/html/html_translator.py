@@ -42,16 +42,17 @@ class HtmlTranslator:
     # Consecutive newlines is a paragraph separator
     _re_paragraph_separator = re.compile(r"\n{2,}")
 
-    def translate(self, text):
+    def translate(self, text: str) -> str:
         """
         Translate the text to have HTML tags where appropriate.
         """
         result = self._translate_angle_brackets(text)
         result = self._annotate(result)
         result = self._insert_line_breaks(result)
+
         return result
 
-    def _annotate(self, text):
+    def _annotate(self, text: str) -> str:
         """
         Replace markdown/rst syntax with HTML tags.
         """
@@ -61,7 +62,7 @@ class HtmlTranslator:
         result = re.sub(self._re_escaped_literal_pattern, r"\g<1>", result)
         return result
 
-    def _insert_line_breaks(self, text):
+    def _insert_line_breaks(self, text: str) -> str:
         """
         Insert HTML line break tag instead of consecutive newlines.
         """
@@ -74,7 +75,7 @@ class HtmlTranslator:
         return result
 
     @staticmethod
-    def _translate_angle_brackets(text):
+    def _translate_angle_brackets(text: str) -> str:
         """
         The HTML may not contain raw angle brackets ("<", ">") since they will be interpreted as
         HTML tags by the web browse.

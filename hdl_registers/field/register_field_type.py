@@ -9,12 +9,13 @@
 
 # Standard libraries
 from abc import ABC, abstractmethod
+from typing import Optional, Union
 
 
 def _from_unsigned_binary(
     bit_width: int,
     unsigned_binary: int,
-    integer_bit_width: int = None,
+    integer_bit_width: Optional[int] = None,
     fraction_bit_width: int = 0,
     is_signed: bool = False,
 ) -> float:
@@ -61,7 +62,7 @@ def _from_unsigned_binary(
 def _to_unsigned_binary(
     bit_width: int,
     value: float,
-    integer_bit_width: int = None,
+    integer_bit_width: Optional[int] = None,
     fraction_bit_width: int = 0,
     is_signed: bool = False,
 ) -> int:
@@ -108,23 +109,25 @@ def _to_unsigned_binary(
 
 class FieldType(ABC):
     @abstractmethod
-    def min_value(self, bit_width: int):
+    def min_value(self, bit_width: int) -> Union[float, int]:
         """
         Minimum representable value for this field type.
 
-        Return type is the native Python representation of the value.
+        Return type is the native Python representation of the value and depends on the child class.
         """
 
     @abstractmethod
-    def max_value(self, bit_width: int):
+    def max_value(self, bit_width: int) -> Union[float, int]:
         """
         Maximum representable value for this field type.
 
-        Return type is the native Python representation of the value.
+        Return type is the native Python representation of the value and depends on the child class.
         """
 
     @abstractmethod
-    def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int):
+    def convert_from_unsigned_binary(
+        self, bit_width: int, unsigned_binary: int
+    ) -> Union[float, int]:
         """
         Convert from the unsigned binary integer representation of a field,
         into the native Python value of the field.
@@ -135,7 +138,7 @@ class FieldType(ABC):
         """
 
     @abstractmethod
-    def convert_to_unsigned_binary(self, bit_width: int, value) -> int:
+    def convert_to_unsigned_binary(self, bit_width: int, value: Union[float, int]) -> int:
         """
         Convert from the native Python value of the field, into the
         unsigned binary integer representation which can be written to a register.
@@ -149,12 +152,12 @@ class FieldType(ABC):
         """
 
     @abstractmethod
-    def __repr__(self):
+    def __repr__(self) -> str:
         pass
 
-    def _check_value_in_range(self, bit_width: int, value):
+    def _check_value_in_range(self, bit_width: int, value: Union[float, int]) -> None:
         """
-        Check that a given field value is valid within the allowed range.
+        Raise an exception if the given field value is not within the allowed range.
 
         Arguments:
             bit_width: Width of the field.
@@ -184,7 +187,7 @@ class Unsigned(FieldType):
         self._check_value_in_range(bit_width, value)
         return round(value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__class__.__name__
 
 
@@ -206,7 +209,7 @@ class Signed(FieldType):
         self._check_value_in_range(bit_width, value)
         return _to_unsigned_binary(bit_width, value, is_signed=True)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__class__.__name__
 
 
@@ -266,7 +269,7 @@ class Fixed(FieldType, ABC):
             is_signed=self.is_signed,
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 max_bit_index={self.max_bit_index},\
 min_bit_index={self.min_bit_index},\

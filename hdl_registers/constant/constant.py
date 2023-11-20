@@ -9,6 +9,7 @@
 
 # Standard libraries
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class Constant(ABC):
@@ -23,7 +24,7 @@ class Constant(ABC):
 
     @property
     @abstractmethod
-    def value(self):
+    def value(self) -> Any:
         """
         The value of the constant. Return type depends on the child class.
         """

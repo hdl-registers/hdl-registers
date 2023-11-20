@@ -88,7 +88,7 @@ class Register:
         self.index = index
         self.mode = mode
         self.description = description
-        self.fields = []
+        self.fields: list["RegisterField"] = []
         self.bit_index = 0
 
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
@@ -180,7 +180,7 @@ class Register:
 
         return integer
 
-    def _append_field(self, field: "RegisterField"):
+    def _append_field(self, field: "RegisterField") -> None:
         self.fields.append(field)
 
         self.bit_index += field.width
@@ -239,7 +239,7 @@ class Register:
         """
         return self.mode in ["w", "r_w", "wpulse", "r_wpulse"]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 index={self.index},\

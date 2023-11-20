@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import TYPE_CHECKING, Iterator, Union
+from typing import TYPE_CHECKING, Iterator, Optional, Union
 
 # First party libraries
 from hdl_registers.register import Register
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.constant.constant import Constant
     from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register_list import RegisterList
 
 
 class RegisterCodeGeneratorHelpers:
@@ -26,10 +27,10 @@ class RegisterCodeGeneratorHelpers:
     """
 
     # Defined in RegisterCodeGenerator, which shall also be inherited wherever this class is used.
-    register_list = None
-    DEFAULT_INDENTATION_LEVEL = None
-    COMMENT_START = None
-    COMMENT_END = None
+    register_list: "RegisterList" = None  # type: ignore[assignment]
+    DEFAULT_INDENTATION_LEVEL = 0
+    COMMENT_START = ""
+    COMMENT_END = ""
 
     def iterate_constants(self) -> Iterator["Constant"]:
         """
@@ -77,7 +78,7 @@ class RegisterCodeGeneratorHelpers:
             if isinstance(register_object, RegisterArray):
                 yield register_object
 
-    def get_indentation(self, indent: int = None) -> str:
+    def get_indentation(self, indent: Optional[int] = None) -> str:
         """
         Get the requested indentation in spaces.
         Will use the default indentation for this generator if not specified.
@@ -85,7 +86,7 @@ class RegisterCodeGeneratorHelpers:
         indent = self.DEFAULT_INDENTATION_LEVEL if indent is None else indent
         return " " * indent
 
-    def get_separator_line(self, indent: int = None) -> str:
+    def get_separator_line(self, indent: Optional[int] = None) -> str:
         """
         Get a separator line, e.g. ``# ---------------------------------``.
         """
@@ -98,14 +99,14 @@ class RegisterCodeGeneratorHelpers:
 
         return result
 
-    def comment(self, comment: str, indent: int = None) -> str:
+    def comment(self, comment: str, indent: Optional[int] = None) -> str:
         """
         Create a one-line comment.
         """
         indentation = self.get_indentation(indent=indent)
         return f"{indentation}{self.COMMENT_START} {comment}{self.COMMENT_END}\n"
 
-    def comment_block(self, text: str, indent: int = None) -> str:
+    def comment_block(self, text: str, indent: Optional[int] = None) -> str:
         """
         Create a comment block from a string with newlines.
         """
@@ -120,7 +121,9 @@ class RegisterCodeGeneratorHelpers:
         return "".join(self.comment(comment=line, indent=indent) for line in text_lines)
 
     @staticmethod
-    def register_description(register: Register, register_array: RegisterArray = None) -> str:
+    def register_description(
+        register: Register, register_array: Optional[RegisterArray] = None
+    ) -> str:
         """
         Get a comment describing the register.
         """
@@ -132,7 +135,10 @@ class RegisterCodeGeneratorHelpers:
         return f"{result} within the '{register_array.name}' register array"
 
     def field_description(
-        self, register: Register, field: "RegisterField", register_array: RegisterArray = None
+        self,
+        register: Register,
+        field: "RegisterField",
+        register_array: Optional[RegisterArray] = None,
     ) -> str:
         """
         Get a comment describing the field.

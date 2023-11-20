@@ -34,9 +34,8 @@ class RegisterCodeGenerator(ABC):
     """
 
     @property
-    @staticmethod
     @abstractmethod
-    def SHORT_DESCRIPTION() -> str:  # pylint: disable=invalid-name
+    def SHORT_DESCRIPTION(self) -> str:  # pylint: disable=invalid-name
         """
         A short description of what this generator produces.
         Will be used when printing status messages.
@@ -51,9 +50,8 @@ class RegisterCodeGenerator(ABC):
         """
 
     @property
-    @staticmethod
     @abstractmethod
-    def COMMENT_START() -> str:  # pylint: disable=invalid-name
+    def COMMENT_START(self) -> str:  # pylint: disable=invalid-name
         """
         The character(s) that start a comment line in the programming language that we are
         generating code for.

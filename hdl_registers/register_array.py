@@ -32,7 +32,7 @@ class RegisterArray:
         self.length = length
         self.description = description
 
-        self.registers = []
+        self.registers: list[Register] = []
 
     def append_register(self, name: str, mode: str, description: str) -> Register:
         """
@@ -93,7 +93,7 @@ class RegisterArray:
 
         return self.base_index + array_index * len(self.registers)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
 base_index={self.base_index},\

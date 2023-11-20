@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import TYPE_CHECKING, Iterator, Union
+from typing import TYPE_CHECKING, Iterator, Optional, Union
 
 # First party libraries
 from hdl_registers.field.bit import Bit
@@ -100,7 +100,9 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
     COMMENT_START = "--"
 
-    def register_name(self, register: "Register", register_array: "RegisterArray" = None) -> str:
+    def register_name(
+        self, register: "Register", register_array: Optional["RegisterArray"] = None
+    ) -> str:
         """
         Get the qualified register name, e.g. "<module name>_<register name>".
         To be used where the scope requires it, i.e. outside of records.
@@ -118,7 +120,10 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return f"{self.name}_{register_array.name}"
 
     def field_name(
-        self, register: "Register", register_array: "RegisterArray", field: "RegisterField"
+        self,
+        register: "Register",
+        field: "RegisterField",
+        register_array: Optional["RegisterArray"] = None,
     ) -> str:
         """
         Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
@@ -168,7 +173,10 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return f"{to_slv}({value})"
 
     def field_type_name(
-        self, register: "Register", field: "RegisterField", register_array: "RegisterArray" = None
+        self,
+        register: "Register",
+        field: "RegisterField",
+        register_array: Optional["RegisterArray"] = None,
     ) -> str:
         """
         Get the native VHDL type name that will represent the value of the supplied field.
