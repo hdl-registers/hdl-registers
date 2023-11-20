@@ -1,7 +1,7 @@
 .. _toml_format:
 
-.toml data file format
-======================
+Working with .toml data files
+=============================
 
 The register TOML parser reads a ``.toml`` file and constructs a :class:`.RegisterList` object.
 It is important that the TOML is formatted correctly and has the necessary properties.
@@ -33,10 +33,12 @@ For example, the human-readable documentation from the data below can be seen in
 the :ref:`generator_html` article.
 
 .. literalinclude:: toml/toml_format.toml
-   :caption: Register TOML format example.
-   :language: toml
-   :linenos:
+  :caption: Register TOML format example.
+  :language: toml
+  :linenos:
 
+
+.. _why_toml:
 
 Why TOML?
 ---------
@@ -54,3 +56,11 @@ following advantages that are relevant when handling FPGA registers:
 
 Furthermore, while readability can be considered subjective, the TOML format is indeed quite
 Obvious and easy to read.
+
+
+Other data file formats
+-----------------------
+
+The TOML format is highly recommended due to the benefits it offers, listed above.
+However, if using another data file format is necessary then that is also possible.
+See this article for details: :ref:`extensions_json`.

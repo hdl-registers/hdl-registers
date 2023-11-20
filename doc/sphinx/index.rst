@@ -14,6 +14,7 @@
 
     rst/user_guide/getting_started
     rst/user_guide/toml_format
+    rst/user_guide/user_guide_python_api
 
 .. toctree::
     :caption: Basic features
@@ -59,6 +60,7 @@
     :hidden:
 
     rst/extensions/extensions_custom_generator
+    rst/extensions/extensions_json
 
 .. toctree::
     :caption: API reference
