@@ -67,6 +67,11 @@ description = "A register with fields that is only 'up'."
 bit.a.default_value = "0"
 bit.b.default_value = "1"
 
+# An 30 bit wide integer that will fill up the whole register (check this manually!).
+integer.c.min_value = -536870912
+integer.c.max_value = 1
+integer.c.default_value = -128
+
 
 ################################################################################
 [register.address]

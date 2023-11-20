@@ -221,13 +221,13 @@ void test_field_setter_on_write_only_register(uint32_t *memory, fpga_regs::Caesa
     caesar->set_address(1337);
     assert(memory[reg_index] == 1337);
 
-    // All other bits should be zero when writing a field in a "write only" register
+    // All other fields should be default value when writing a field in a "write only" register.
 
     caesar->set_address_a(244);
-    assert(memory[reg_index] == 244);
+    assert(memory[reg_index] == 244 + (0b10101010 << 8));
 
     caesar->set_address_b(213);
-    assert(memory[reg_index] == 213 << 8);
+    assert(memory[reg_index] == (213 << 8) + 0b11001100);
 }
 
 void test_field_setter_on_write_pulse_register(uint32_t *memory, fpga_regs::Caesar *caesar)
@@ -237,13 +237,21 @@ void test_field_setter_on_write_pulse_register(uint32_t *memory, fpga_regs::Caes
     caesar->set_command(1337);
     assert(memory[reg_index] == 1337);
 
-    // All other bits should be zero when writing a field in a "write pulse" register
+    // All other fields should be default value when writing a field in a "write pulse" register.
+    // Bit 0 = start = default value 1.
+    // Bit 1 = abort = default value 0.
+
+    caesar->set_command_start(0);
+    assert(memory[reg_index] == 0);
 
     caesar->set_command_start(1);
     assert(memory[reg_index] == 1);
 
     caesar->set_command_abort(1);
-    assert(memory[reg_index] == 1 << 1);
+    assert(memory[reg_index] == 3);
+
+    caesar->set_command_abort(0);
+    assert(memory[reg_index] == 1);
 }
 
 void test_field_setter_on_read_write_pulse_register(uint32_t *memory, fpga_regs::Caesar *caesar)
@@ -253,13 +261,22 @@ void test_field_setter_on_read_write_pulse_register(uint32_t *memory, fpga_regs:
     caesar->set_irq_status(1337);
     assert(memory[reg_index] == 1337);
 
-    // All other bits should be zero when writing a field in a "read, write pulse" register
+    // All other fields should be default value when writing a field in
+    // a "read, write pulse" register.
 
     caesar->set_irq_status_a(1);
-    assert(memory[reg_index] == 1);
+    assert((memory[reg_index] & 0b11) == 1);
 
     caesar->set_irq_status_b(1);
-    assert(memory[reg_index] == 1 << 1);
+    assert((memory[reg_index] & 0b11) == 3);
+}
+
+void test_negative_integer_field_on_top_register_bit(fpga_regs::Caesar *caesar)
+{
+    // Two bit fields on the lowest two bits, the rest is our integer field.
+    auto value = caesar->get_status_c_from_value(0b11111111111111111111111000000011);
+    // Check that the number is interpreted as negative.
+    assert(value == -128);
 }
 
 void test_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
@@ -272,4 +289,5 @@ void test_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
     test_field_setter_on_write_only_register(memory, caesar);
     test_field_setter_on_write_pulse_register(memory, caesar);
     test_field_setter_on_read_write_pulse_register(memory, caesar);
+    test_negative_integer_field_on_top_register_bit(caesar);
 }

@@ -127,10 +127,10 @@ class CppImplementationGenerator(CppGeneratorCommon):
             current_register_value += ")"
         elif register.mode in ["w", "wpulse", "r_wpulse"]:
             cpp_code += self.comment_block(
-                "This register type's currently written value can not be read back.\n"
-                "Hence set all other bits to zero when writing the value."
+                "This register's current value can not be read back due to its mode.\n"
+                "Hence set all bits except for the field to default when writing the value."
             )
-            current_register_value = 0
+            current_register_value = register.default_value
         else:
             raise ValueError(f"Can not handle this register's mode: {register}")
 
