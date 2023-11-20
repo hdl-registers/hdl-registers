@@ -365,23 +365,18 @@ of {array_name}_was_{direction.name_past}_t;
                 field_name = self.field_name(
                     register=register, register_array=register_array, field=field
                 )
+                field_to_slv = self.field_to_slv(
+                    field=field, field_name=field_name, value=f"data.{field.name}"
+                )
+                to_slv += f"    result({field_name}) := {field_to_slv};\n"
 
                 if isinstance(field, Bit):
-                    to_slv += f"    result({field_name}) := data.{field.name};\n"
                     to_record += f"    result.{field.name} := data({field_name});\n"
 
                 elif isinstance(field, BitVector):
-                    to_slv += f"    result({field_name}) := std_logic_vector(data.{field.name});\n"
                     to_record += f"    result.{field.name} := {field_name}_t(data({field_name}));\n"
 
                 elif isinstance(field, (Enumeration, Integer)):
-                    to_slv_function_name = self.field_to_slv_function_name(
-                        field=field, field_name=field_name
-                    )
-                    to_slv += (
-                        f"    result({field_name}) := {to_slv_function_name}(data.{field.name});\n"
-                    )
-
                     to_record += f"    result.{field.name} := to_{field_name}(data);\n"
 
                 else:

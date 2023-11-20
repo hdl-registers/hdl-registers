@@ -117,6 +117,11 @@ end package body;
                     )
                     vhdl += f"{signature};\n\n"
 
+                    signature = self._field_wait_until_equals_signature(
+                        register=register, register_array=register_array, field=field
+                    )
+                    vhdl += f"{signature};\n\n"
+
             if register.is_bus_writeable:
                 signature = self._register_read_write_signature(
                     is_read_not_write=False, register=register, register_array=register_array
@@ -228,6 +233,38 @@ end package body;
   )\
 """
 
+    def _field_wait_until_equals_signature(self, register, register_array, field):
+        """
+        Get signature for a 'wait_until_field_equals' procedure.
+        """
+        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_description = self.field_description(
+            register=register, register_array=register_array, field=field
+        )
+
+        value_type = self.field_type_name(
+            register=register, register_array=register_array, field=field
+        )
+
+        if register_array:
+            array_name = self.register_array_name(register_array=register_array)
+            array_index_port = f"    array_index : in {array_name}_range;\n"
+        else:
+            array_index_port = ""
+
+        return f"""\
+  -- Wait until the {field_description} equals the given 'value'.
+  procedure wait_until_{field_name}_equals(
+    signal net : inout network_t;
+{array_index_port}\
+    value : in {value_type};
+    base_address : in addr_t := (others => '0');
+    bus_handle : in bus_master_t := regs_bus_master;
+    timeout : delay_length := max_timeout;
+    message : string := ""
+  )\
+"""
+
     def _implementations(self):
         """
         Get implementations of all procedures.
@@ -249,6 +286,10 @@ end package body;
 
                 for field in register.fields:
                     vhdl += self._field_read_implementation(
+                        register=register, register_array=register_array, field=field
+                    )
+
+                    vhdl += self._field_wait_until_equals_implementation(
                         register=register, register_array=register_array, field=field
                     )
 
@@ -333,26 +374,51 @@ end package body;
         signature = self._register_wait_until_equals_signature(
             register=register, register_array=register_array
         )
-        reg_index = self._reg_index_constant(register=register, register_array=register_array)
 
         conversion = "to_slv(value)" if register.fields else "value"
 
-        register_description = self.register_description(
-            register=register, register_array=register_array
-        )
+        return f"""\
+{signature} is
+    constant reg_value : reg_t := {conversion};
+{self._get_wait_until_common_constants(register=register, register_array=register_array)}\
+  begin
+    wait_until_read_equals(
+      net=>net,
+      bus_handle=>bus_handle,
+      addr=>std_ulogic_vector(address),
+      value=>reg_value,
+      timeout=>timeout,
+      msg=>timeout_message
+    );
+  end procedure;
+
+"""
+
+    def _get_wait_until_common_constants(self, register, register_array, field=None):
+        """
+        Get constants code that is common for all 'wait_until_*_equals' procedures.
+        """
+        reg_index = self._reg_index_constant(register=register, register_array=register_array)
+
+        if field:
+            description = self.field_description(
+                register=register, register_array=register_array, field=field
+            )
+        else:
+            description = self.register_description(
+                register=register, register_array=register_array
+            )
 
         array_index_message = (
             '      & " - array index: " & to_string(array_index)\n' if register_array else ""
         )
 
         return f"""\
-{signature} is
 {reg_index}\
     constant address : addr_t := base_address or to_unsigned(4 * reg_index, addr_t'length);
-    constant reg_value : reg_t := {conversion};
 
     constant base_timeout_message : string := (
-      "Timeout while waiting for the {register_description} to equal the given value."
+      "Timeout while waiting for the {description} to equal the given value."
       & " value: " & to_string(reg_value)
 {array_index_message}\
       & " - register index: " & to_string(reg_index)
@@ -367,17 +433,6 @@ end package body;
       return base_timeout_message & " - message: " & message;
     end function;
     constant timeout_message : string := get_timeout_message;
-  begin
-    wait_until_read_equals(
-      net=>net,
-      bus_handle=>bus_handle,
-      addr=>std_ulogic_vector(address),
-      value=>reg_value,
-      timeout=>timeout,
-      msg=>timeout_message
-    );
-  end procedure;
-
 """
 
     def _field_read_implementation(self, register, register_array, field):
@@ -404,6 +459,36 @@ end package body;
       bus_handle => bus_handle
     );
     value := reg_value.{field.name};
+  end procedure;
+
+"""
+
+    def _field_wait_until_equals_implementation(self, register, register_array, field):
+        """
+        Get implementation for a 'wait_until_field_equals' procedure.
+        """
+        signature = self._field_wait_until_equals_signature(
+            register=register, register_array=register_array, field=field
+        )
+        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_to_slv = self.field_to_slv(field=field, field_name=field_name, value="value")
+
+        return f"""\
+{signature} is
+    constant reg_value : reg_t := (
+      {field_name} => {field_to_slv},
+      others => '-'
+    );
+{self._get_wait_until_common_constants(register=register, register_array=register_array)}\
+  begin
+    wait_until_read_equals(
+      net=>net,
+      bus_handle=>bus_handle,
+      addr=>std_ulogic_vector(address),
+      value=>reg_value,
+      timeout=>timeout,
+      msg=>timeout_message
+    );
   end procedure;
 
 """

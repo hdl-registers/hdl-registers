@@ -79,7 +79,7 @@ architecture tb of tb_axi_lite_reg_file is
     array_bit_b => '1',
     array_bit_vector => (others => '1'),
     array_enumeration => array_enumeration_element0,
-    array_integer => 0
+    array_integer => 77
   );
 
 begin
@@ -813,7 +813,7 @@ begin
       -- Should only read once.
       reg_was_read_expected(caesar_current_timestamp) := 1;
 
-    elsif run("test_read_plain_register_field") then
+    elsif run("test_read_plain_field") then
       -- Check default value.
       read_caesar_config_plain_bit_a(net=>net, value=>bit_1);
       read_caesar_config_plain_bit_b(net=>net, value=>bit_2);
@@ -837,7 +837,7 @@ begin
       reg_was_read_expected(caesar_config) := 4;
       reg_was_written_expected(caesar_config) := 1;
 
-    elsif run("test_read_array_register_field") then
+    elsif run("test_read_array_field") then
       -- Check default value.
       read_caesar_dummies_first_array_bit_a(net=>net, array_index=>1, value=>bit_1);
       read_caesar_dummies_first_array_bit_b(net=>net, array_index=>1, value=>bit_2);
@@ -860,6 +860,63 @@ begin
 
       reg_was_read_expected(caesar_dummies_first(array_index=>1)) := 4;
       reg_was_written_expected(caesar_dummies_first(array_index=>1)) := 1;
+
+    elsif run("wait_until_plain_field_equals") then
+      start_write_plain_register <= true;
+      wait until rising_edge(clk);
+      start_write_plain_register <= true;
+
+      wait_until_caesar_config_plain_enumeration_equals(
+        net=>net,
+        value=>plain_enumeration_fourth,
+        timeout=>write_register_timeout + 10 * clk_period
+      );
+
+      -- Check that it took roughly the time we expect it to.
+      assert now > write_register_timeout;
+      assert now < write_register_timeout + 10 * clk_period;
+
+      -- This test reads a lot. The exact amount is not relevant.
+      check_register_access_counts := false;
+
+    elsif run("test_wait_until_plain_field_equals_timeout") then
+      -- vunit: .expected_failure
+      -- We never set the register, so it will never assume this value.
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      wait_until_caesar_config_plain_integer_equals(
+        net=>net, value=>-33, timeout=>100 * clk_period
+      );
+
+    elsif run("test_wait_until_array_field_equals") then
+      start_write_array_register <= true;
+      wait until rising_edge(clk);
+      start_write_array_register <= true;
+
+      wait_until_caesar_dummies_first_array_integer_equals(
+        net=>net,
+        array_index => 1,
+        value=>77,
+        timeout=>write_register_timeout + 10 * clk_period
+      );
+
+      -- Check that it took roughly the time we expect it to.
+      assert now > write_register_timeout;
+      assert now < write_register_timeout + 10 * clk_period;
+
+      -- This test reads a lot. The exact amount is not relevant.
+      check_register_access_counts := false;
+
+    elsif run("test_wait_until_array_field_equals_timeout") then
+      -- vunit: .expected_failure
+      -- We never set the register, so it will never assume this value.
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      wait_until_caesar_dummies_first_array_integer_equals(
+        net=>net,
+        array_index => 1,
+        value=>77,
+        timeout=>100 * clk_period,
+        message=>"Extra printout that can be set!"
+      );
 
     end if;
 

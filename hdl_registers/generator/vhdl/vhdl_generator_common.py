@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Iterator, Union
 
 # First party libraries
 from hdl_registers.field.bit import Bit
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
@@ -146,6 +147,25 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
             return "to_slv"
 
         raise TypeError(f"Field {field} does not have a conversion function.")
+
+    def field_to_slv(self, field: "RegisterField", field_name: str, value: str) -> str:
+        """
+        Get a VHDL snippet that converts a value of the given field to SLV.
+        Via e.g. a function call or a cast.
+
+        Arguments:
+            field: A field.
+            field_name: The field's qualified name.
+            value: The name of the variable/constant that holds the field's natively typed value.
+        """
+        if isinstance(field, Bit):
+            return value
+
+        if isinstance(field, BitVector):
+            return f"std_logic_vector({value})"
+
+        to_slv = self.field_to_slv_function_name(field=field, field_name=field_name)
+        return f"{to_slv}({value})"
 
     def field_type_name(
         self, register: "Register", field: "RegisterField", register_array: "RegisterArray" = None
