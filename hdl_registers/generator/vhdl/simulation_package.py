@@ -91,22 +91,22 @@ end package body;
         """
         Get procedure declarations for all procedures.
         """
+        separator = self.get_separator_line(indent=2)
         vhdl = ""
-        separator = self.get_separator_line()
 
         for register, register_array in self.iterate_registers():
-            vhdl += f"  {separator}"
+            declarations = []
 
             if register.is_bus_readable:
                 signature = self._register_read_write_signature(
                     is_read_not_write=True, register=register, register_array=register_array
                 )
-                vhdl += f"{signature};\n\n"
+                declarations.append(f"{signature};\n")
 
                 signature = self._register_wait_until_equals_signature(
                     register=register, register_array=register_array
                 )
-                vhdl += f"{signature};\n\n"
+                declarations.append(f"{signature};\n")
 
                 for field in register.fields:
                     signature = self._field_read_write_signature(
@@ -115,18 +115,23 @@ end package body;
                         register_array=register_array,
                         field=field,
                     )
-                    vhdl += f"{signature};\n\n"
+                    declarations.append(f"{signature};\n")
 
                     signature = self._field_wait_until_equals_signature(
                         register=register, register_array=register_array, field=field
                     )
-                    vhdl += f"{signature};\n\n"
+                    declarations.append(f"{signature};\n")
 
             if register.is_bus_writeable:
                 signature = self._register_read_write_signature(
                     is_read_not_write=False, register=register, register_array=register_array
                 )
-                vhdl += f"{signature};\n\n"
+                declarations.append(f"{signature};\n")
+
+            vhdl += separator
+            vhdl += "\n".join(declarations)
+            vhdl += separator
+            vhdl += "\n"
 
         return vhdl
 
@@ -269,34 +274,49 @@ end package body;
         """
         Get implementations of all procedures.
         """
+        separator = self.get_separator_line(indent=2)
         vhdl = ""
-        separator = self.get_separator_line()
 
         for register, register_array in self.iterate_registers():
-            vhdl += f"  {separator}"
+            implementations = []
 
             if register.is_bus_readable:
-                vhdl += self._register_read_implementation(
-                    register=register, register_array=register_array
+                implementations.append(
+                    self._register_read_implementation(
+                        register=register, register_array=register_array
+                    )
                 )
 
-                vhdl += self._register_wait_until_equals_implementation(
-                    register=register, register_array=register_array
+                implementations.append(
+                    self._register_wait_until_equals_implementation(
+                        register=register, register_array=register_array
+                    )
                 )
 
                 for field in register.fields:
-                    vhdl += self._field_read_implementation(
-                        register=register, register_array=register_array, field=field
+                    implementations.append(
+                        self._field_read_implementation(
+                            register=register, register_array=register_array, field=field
+                        )
                     )
 
-                    vhdl += self._field_wait_until_equals_implementation(
-                        register=register, register_array=register_array, field=field
+                    implementations.append(
+                        self._field_wait_until_equals_implementation(
+                            register=register, register_array=register_array, field=field
+                        )
                     )
 
             if register.is_bus_writeable:
-                vhdl += self._register_write_implementation(
-                    register=register, register_array=register_array
+                implementations.append(
+                    self._register_write_implementation(
+                        register=register, register_array=register_array
+                    )
                 )
+
+            vhdl += separator
+            vhdl += "\n".join(implementations)
+            vhdl += separator
+            vhdl += "\n"
 
         return vhdl
 
@@ -326,7 +346,6 @@ end package body;
     );
     value := {conversion};
   end procedure;
-
 """
 
     def _reg_index_constant(self, register, register_array):
@@ -364,7 +383,6 @@ end package body;
       bus_handle => bus_handle
     );
   end procedure;
-
 """
 
     def _register_wait_until_equals_implementation(self, register, register_array):
@@ -391,7 +409,6 @@ end package body;
       msg=>timeout_message
     );
   end procedure;
-
 """
 
     def _get_wait_until_common_constants(self, register, register_array, field=None):
@@ -460,7 +477,6 @@ end package body;
     );
     value := reg_value.{field.name};
   end procedure;
-
 """
 
     def _field_wait_until_equals_implementation(self, register, register_array, field):
@@ -490,5 +506,4 @@ end package body;
       msg=>timeout_message
     );
   end procedure;
-
 """
