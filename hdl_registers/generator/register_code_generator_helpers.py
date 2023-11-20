@@ -17,6 +17,7 @@ from hdl_registers.register_array import RegisterArray
 if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.constant.constant import Constant
+    from hdl_registers.field.register_field import RegisterField
 
 
 class RegisterCodeGeneratorHelpers:
@@ -129,6 +130,17 @@ class RegisterCodeGeneratorHelpers:
             return result
 
         return f"{result} within the '{register_array.name}' register array"
+
+    def field_description(
+        self, register: Register, field: "RegisterField", register_array: RegisterArray = None
+    ) -> str:
+        """
+        Get a comment describing the field.
+        """
+        register_description = self.register_description(
+            register=register, register_array=register_array
+        )
+        return f"'{field.name}' field within the {register_description}"
 
     @staticmethod
     def to_pascal_case(snake_string: str) -> str:

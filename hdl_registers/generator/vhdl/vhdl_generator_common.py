@@ -11,6 +11,7 @@
 from typing import TYPE_CHECKING, Iterator, Union
 
 # First party libraries
+from hdl_registers.field.bit import Bit
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
@@ -145,6 +146,18 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
             return "to_slv"
 
         raise TypeError(f"Field {field} does not have a conversion function.")
+
+    def field_type_name(
+        self, register: "Register", field: "RegisterField", register_array: "RegisterArray" = None
+    ) -> str:
+        """
+        Get the native VHDL type name that will represent the value of the supplied field.
+        """
+        if isinstance(field, Bit):
+            return "std_ulogic"
+
+        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        return f"{field_name}_t"
 
     def has_any_bus_accessible_register(self, direction: BusAccessDirection) -> bool:
         """

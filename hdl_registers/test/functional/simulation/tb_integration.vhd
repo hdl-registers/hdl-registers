@@ -556,6 +556,7 @@ begin
     variable dummies2_dummy : caesar_dummies2_dummy_t;
 
     variable reg : reg_t := (others => '0');
+    variable bit_1, bit_2 : std_ulogic := '0';
 
     variable check_register_access_counts : boolean := true;
   begin
@@ -811,6 +812,54 @@ begin
 
       -- Should only read once.
       reg_was_read_expected(caesar_current_timestamp) := 1;
+
+    elsif run("test_read_plain_register_field") then
+      -- Check default value.
+      read_caesar_config_plain_bit_a(net=>net, value=>bit_1);
+      read_caesar_config_plain_bit_b(net=>net, value=>bit_2);
+
+      check_equal(bit_1, '0');
+      check_equal(bit_2, '1');
+
+      -- Write a new value.
+      config.plain_bit_a := '1';
+      config.plain_bit_b := '0';
+
+      write_caesar_config(net=>net, value=>config);
+
+      -- Check updated value.
+      read_caesar_config_plain_bit_a(net=>net, value=>bit_1);
+      read_caesar_config_plain_bit_b(net=>net, value=>bit_2);
+
+      check_equal(bit_1, '1');
+      check_equal(bit_2, '0');
+
+      reg_was_read_expected(caesar_config) := 4;
+      reg_was_written_expected(caesar_config) := 1;
+
+    elsif run("test_read_array_register_field") then
+      -- Check default value.
+      read_caesar_dummies_first_array_bit_a(net=>net, array_index=>1, value=>bit_1);
+      read_caesar_dummies_first_array_bit_b(net=>net, array_index=>1, value=>bit_2);
+
+      check_equal(bit_1, '1');
+      check_equal(bit_2, '0');
+
+      -- Write a new value.
+      dummies_first.array_bit_a := '0';
+      dummies_first.array_bit_b := '1';
+
+      write_caesar_dummies_first(net=>net, array_index=>1, value=>dummies_first);
+
+      -- Check updated value.
+      read_caesar_dummies_first_array_bit_a(net=>net, array_index=>1, value=>bit_1);
+      read_caesar_dummies_first_array_bit_b(net=>net, array_index=>1, value=>bit_2);
+
+      check_equal(bit_1, '0');
+      check_equal(bit_2, '1');
+
+      reg_was_read_expected(caesar_dummies_first(array_index=>1)) := 4;
+      reg_was_written_expected(caesar_dummies_first(array_index=>1)) := 1;
 
     end if;
 

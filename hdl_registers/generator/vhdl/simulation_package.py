@@ -92,8 +92,11 @@ end package body;
         Get procedure declarations for all procedures.
         """
         vhdl = ""
+        separator = self.get_separator_line()
 
         for register, register_array in self.iterate_registers():
+            vhdl += f"  {separator}"
+
             if register.is_bus_readable:
                 signature = self._register_read_write_signature(
                     is_read_not_write=True, register=register, register_array=register_array
@@ -104,6 +107,15 @@ end package body;
                     register=register, register_array=register_array
                 )
                 vhdl += f"{signature};\n\n"
+
+                for field in register.fields:
+                    signature = self._field_read_write_signature(
+                        is_read_not_write=True,
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                    )
+                    vhdl += f"{signature};\n\n"
 
             if register.is_bus_writeable:
                 signature = self._register_read_write_signature(
@@ -183,13 +195,49 @@ end package body;
   )\
 """
 
+    def _field_read_write_signature(self, is_read_not_write: bool, register, register_array, field):
+        """
+        Get signature for a 'read_field'/'write_field' procedure.
+        """
+        direction = "read" if is_read_not_write else "write"
+
+        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_description = self.field_description(
+            register=register, field=field, register_array=register_array
+        )
+
+        value_direction = "out" if is_read_not_write else "in"
+        value_type = self.field_type_name(
+            register=register, register_array=register_array, field=field
+        )
+
+        if register_array:
+            array_name = self.register_array_name(register_array=register_array)
+            array_index_port = f"    array_index : in {array_name}_range;\n"
+        else:
+            array_index_port = ""
+
+        return f"""\
+  -- {direction.capitalize()} the {field_description}.
+  procedure {direction}_{field_name}(
+    signal net : inout network_t;
+{array_index_port}\
+    value : {value_direction} {value_type};
+    base_address : in addr_t := (others => '0');
+    bus_handle : in bus_master_t := regs_bus_master
+  )\
+"""
+
     def _implementations(self):
         """
         Get implementations of all procedures.
         """
         vhdl = ""
+        separator = self.get_separator_line()
 
         for register, register_array in self.iterate_registers():
+            vhdl += f"  {separator}"
+
             if register.is_bus_readable:
                 vhdl += self._register_read_implementation(
                     register=register, register_array=register_array
@@ -198,6 +246,11 @@ end package body;
                 vhdl += self._register_wait_until_equals_implementation(
                     register=register, register_array=register_array
                 )
+
+                for field in register.fields:
+                    vhdl += self._field_read_implementation(
+                        register=register, register_array=register_array, field=field
+                    )
 
             if register.is_bus_writeable:
                 vhdl += self._register_write_implementation(
@@ -323,6 +376,34 @@ end package body;
       timeout=>timeout,
       msg=>timeout_message
     );
+  end procedure;
+
+"""
+
+    def _field_read_implementation(self, register, register_array, field):
+        """
+        Get implementation for a 'read_field' procedure.
+        """
+        signature = self._field_read_write_signature(
+            is_read_not_write=True, register=register, register_array=register_array, field=field
+        )
+
+        register_name = self.register_name(register=register, register_array=register_array)
+
+        array_index_association = "      array_index => array_index,\n" if register_array else ""
+
+        return f"""\
+{signature} is
+    variable reg_value : {register_name}_t := {register_name}_init;
+  begin
+    read_{register_name}(
+      net => net,
+{array_index_association}\
+      value => reg_value,
+      base_address => base_address,
+      bus_handle => bus_handle
+    );
+    value := reg_value.{field.name};
   end procedure;
 
 """
