@@ -10,17 +10,26 @@ Added
 * Add generation of register records with natively-typed members for each register
   field to :class:`.VhdlRecordPackageGenerator`.
 
+* Add generation of simulation package using VUnit Verification Components
+  to :class:`.VhdlSimulationPackageGenerator`.
+
+  * Uses the natively typed records from :class:`.VhdlRecordPackageGenerator` for values.
+
+  * Generates the following procedures:
+
+    * Read/write for each register.
+
+    * Wait until register equals.
+
+    * Read each field.
+
+    * Wait until field equals.
+
 * Add generation of a wrapper around :ref:`reg_file.axi_lite_reg_file` to
   :class:`.VhdlAxiLiteWrapperGenerator`.
 
   * Sets correct generics and uses the natively typed records from
     :class:`.VhdlRecordPackageGenerator` for its up/down register values.
-
-* Add generation of simulation package for reading/writing registers via VUnit
-  Verification Components to :class:`.VhdlSimulationPackageGenerator`.
-
-  * Uses the natively typed records from
-    :class:`.VhdlRecordPackageGenerator` for register values.
 
 
 Breaking changes
