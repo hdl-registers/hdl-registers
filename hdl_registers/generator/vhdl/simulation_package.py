@@ -19,10 +19,16 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
     Generate code that simplifies simulation of a register map.
     Uses the VHDL record types for register read/write values.
 
-    * For each readable register, a procedure that reads the register and converts the value to the
-      natively typed record.
-    * For each readable register, a procedure that waits until the register assumes a given
-      natively typed record value.
+    * For each readable register
+
+      * a procedure that reads the register and converts the value to the natively typed record.
+      * a procedure that waits until the register assumes a given natively typed record value.
+
+    * For each field in each readable register
+
+      * a procedure that reads the natively-typed value of the field.
+      * a procedure that waits until the field assumes a given natively typed value.
+
     * For each writeable register, a procedure that writes a given natively typed record value.
 
     Uses VUnit Verification Component calls, via :ref:`reg_file.reg_operations_pkg`
