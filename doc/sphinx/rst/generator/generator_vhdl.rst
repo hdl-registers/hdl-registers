@@ -17,7 +17,7 @@ See the example below for a real-world use case of all these artifacts.
   register file, and exposes register values to application using the natively typed records.
 
 The recommended workflow is to generate the register file wrapper from
-:class:`.VhdlAxiLiteWrapperGenerator` and instantiate it in your design.
+:class:`.VhdlAxiLiteWrapperGenerator` and instantiate it in your VHDL design.
 With this, registers and their field values are available as native VHDL typed values, requiring
 no conversion.
 See the example below for an example of this.
@@ -119,8 +119,8 @@ The VHDL below is the testbench for our VHDL example counter implementation abov
    :class:`.VhdlSimulationPackageGenerator`, which can be seen
    :ref:`below <example_counter_simulation_package>`.
    For example ``write_counter_config``.
-2. The ``wait_until_counter_status_equals`` call will continuously read the ``status`` register
-   until it is exactly equal to the supplied value.
+2. The ``wait_until_counter_status_pulse_count_equals`` call will continuously read the ``status``
+   register until the ``pulse_count`` field is exactly equal to the supplied value.
 3. The type of the ``value`` for each procedure is the native record type for that register.
 
    a. For example, ``read_counter_status`` returns a value of type ``counter_status_t`` which is

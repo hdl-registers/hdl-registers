@@ -85,9 +85,7 @@ begin
     check_equal(status.pulse_count, 0);
 
     -- Wait until a number of pulses have passed.
-    status.enabled := '1';
-    status.pulse_count := 10;
-    wait_until_counter_status_equals(net=>net, value=>status);
+    wait_until_counter_status_pulse_count_equals(net=>net, value=>10);
 
     test_runner_cleanup(runner);
   end process;
@@ -95,9 +93,6 @@ begin
 
   ------------------------------------------------------------------------------
   axi_lite_master_inst : entity bfm.axi_lite_master
-    generic map (
-      bus_handle => regs_bus_master
-    )
     port map (
       clk => clk,
       --
