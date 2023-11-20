@@ -86,10 +86,10 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
                 )
                 init.append(f"{field.name} => {field_name}_init")
 
-                if isinstance(field, Bit):
-                    record += f"    {field.name} : std_ulogic;\n"
-                else:
-                    record += f"    {field.name} : {field_name}_t;\n"
+                field_type_name = self.field_type_name(
+                    register=register, register_array=register_array, field=field
+                )
+                record += f"    {field.name} : {field_type_name};\n"
 
             init_str = "    " + ",\n    ".join(init)
 
