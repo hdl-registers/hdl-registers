@@ -43,7 +43,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
             register_objects: Registers and register arrays to be included.
             constants: Constants to be included.
 
-        Returns:
+        Return:
             str: HTML code.
         """
         title = f"Documentation of {self.name} registers"
@@ -105,7 +105,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
         """
         Get a CSS style for the register pages. Shall be saved to a file called ``regs_style.css``.
 
-        Returns:
+        Return:
             str: CSS code.
         """
         if font_style is None:

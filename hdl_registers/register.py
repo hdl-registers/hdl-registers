@@ -207,7 +207,7 @@ class Register:
         Arguments:
             name: The name of the field.
 
-        Returns:
+        Return:
             The field.
         """
         for field in self.fields:

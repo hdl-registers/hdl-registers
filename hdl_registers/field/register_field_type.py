@@ -41,7 +41,7 @@ def _from_unsigned_binary(
             the field value.
         is_signed: Is the field signed (two's complement)?
 
-    Returns:
+    Return:
         Native Python representation of the field value.
     """
     integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
@@ -89,7 +89,7 @@ def _to_unsigned_binary(
             the field value.
         is_signed: Is the field signed (two's complement)?
 
-    Returns:
+    Return:
         Unsigned binary integer representation of the field.
     """
     integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
@@ -151,7 +151,7 @@ class FieldType(ABC):
             bit_width: Width of the field.
             value: Native Python representation of the field value.
 
-        Returns:
+        Return:
             Unsigned binary integer representation of the field.
         """
 

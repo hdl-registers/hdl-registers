@@ -133,7 +133,7 @@ class Enumeration(RegisterField):
         Arguments:
             name: The name of the element.
 
-        Returns:
+        Return:
             The enumeration element with the provided name.
         """
         for element in self._elements:
@@ -152,7 +152,7 @@ class Enumeration(RegisterField):
         Arguments:
             value: The value of the element.
 
-        Returns:
+        Return:
             The enumeration element with the provided value.
         """
         for element in self._elements:

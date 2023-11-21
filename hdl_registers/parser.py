@@ -48,7 +48,7 @@ def from_toml(
         toml_file: The TOML file path.
         default_registers: List of default registers.
 
-    Returns:
+    Return:
         The resulting register list.
     """
     parser = RegisterParser(
@@ -112,7 +112,7 @@ class RegisterParser:
         Arguments:
             register_data: TOML register data.
 
-        Returns:
+        Return:
             The resulting register list.
         """
         if "constant" in register_data:

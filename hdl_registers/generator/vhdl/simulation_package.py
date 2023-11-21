@@ -57,7 +57,7 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
 
         Arguments:
           register_objects: Registers and register arrays to be included.
-        Returns:
+        Return:
             str: VHDL code.
         """
         package_name = self.output_file.stem

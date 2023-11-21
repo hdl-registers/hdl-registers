@@ -91,7 +91,7 @@ class RegisterField(ABC):
         Arguments:
             register_value: Value of the register that this field belongs to.
 
-        Returns:
+        Return:
             The value of the field.
             If the field has a non-zero number of fractional bits, the type of the result
             will be a ``float``.
@@ -127,7 +127,7 @@ class RegisterField(ABC):
                 Subclasses should convert their argument value to an integer/float and call
                 this super method.
 
-        Returns:
+        Return:
             The register value as an unsigned integer.
         """
         value_unsigned = self.field_type.convert_to_unsigned_binary(self.width, field_value)
