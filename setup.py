@@ -25,8 +25,10 @@ from hdl_registers.about import get_readme_rst, get_short_slogan
 
 # Duplicated from tsfpga/__init__.py since setup.py may not depend on tsfpga
 DEFAULT_FILE_ENCODING = "utf-8"
+
 REQUIREMENTS_TXT = hdl_registers.HDL_REGISTERS_PATH / "requirements.txt"
 REQUIREMENTS_DEVELOP_TXT = hdl_registers.HDL_REGISTERS_PATH / "requirements_develop.txt"
+PY_TYPED = hdl_registers.HDL_REGISTERS_PATH / "py.typed"
 
 
 def main():
@@ -99,7 +101,7 @@ def get_package_data():
     Get all files that shall be include with the release, apart from the package python files
     that are already there.
     """
-    files = [REQUIREMENTS_TXT, REQUIREMENTS_DEVELOP_TXT]
+    files = [REQUIREMENTS_TXT, REQUIREMENTS_DEVELOP_TXT, PY_TYPED]
 
     # Specify path relative to the python package folder
     package_data = [
