@@ -193,7 +193,7 @@ def test_get_value_unsigned():
 
 def test_get_value_signed():
     integer = Integer(
-        name="", base_index=3, min_value=-3, max_value=127, description="", default_value=0
+        name="", base_index=3, min_value=-128, max_value=127, description="", default_value=0
     )
     assert integer.width == 8
 
@@ -202,6 +202,20 @@ def test_get_value_signed():
 
     register_value = int("01010101000", base=2)
     assert integer.get_value(register_value) == 85
+
+
+def test_get_value_should_raise_exception_if_value_out_of_range():
+    integer = Integer(
+        name="apa", base_index=0, min_value=0, max_value=4, description="", default_value=0
+    )
+    assert integer.width == 3
+
+    with pytest.raises(ValueError) as exception_info:
+        integer.get_value(7)
+    assert (
+        str(exception_info.value)
+        == 'Register field value "7" not inside "apa" field\'s legal range: (0, 4).'
+    )
 
 
 def test_set_value_unsigned():
@@ -222,6 +236,16 @@ def test_set_value_signed():
 
     assert integer.set_value(5) == int("010100000", base=2)
     assert integer.set_value(-6) == int("101000000", base=2)
+
+
+def test_set_value_should_raise_exception_if_value_out_of_range():
+    integer = Integer(
+        name="apa", base_index=5, min_value=-1, max_value=7, description="", default_value=0
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        integer.set_value(-8)
+    assert str(exception_info.value) == 'Value "-8" not inside "apa" field\'s legal range: (-1, 7).'
 
 
 def test_default_value_uint():

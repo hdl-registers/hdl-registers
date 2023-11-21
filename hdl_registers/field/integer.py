@@ -12,7 +12,7 @@ from .register_field import RegisterField
 from .register_field_type import FieldType, Signed, Unsigned
 
 
-class Integer(RegisterField):
+class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
 
     """
     Used to represent an integer field in a register.
@@ -179,6 +179,36 @@ class Integer(RegisterField):
 
         # Offset the sign bit.
         return self.default_value + 2**self.width
+
+    def get_value(self, register_value: int) -> int:
+        """
+        See super method for details.
+        Adds sanity checks of the value.
+        """
+        # We know that the return value is an integer and not a float, since this field uses
+        # a field_type with no fractional bits.
+        result: int = super().get_value(register_value=register_value)  # type: ignore
+
+        if self.min_value <= result <= self.max_value:
+            return result
+
+        raise ValueError(
+            f'Register field value "{result}" not inside "{self.name}" field\'s '
+            f"legal range: ({self.min_value}, {self.max_value})."
+        )
+
+    def set_value(self, field_value: int) -> int:  # type: ignore
+        """
+        See super method for details.
+        Adds sanity checks of the value.
+        """
+        if not self.min_value <= field_value <= self.max_value:
+            raise ValueError(
+                f'Value "{field_value}" not inside "{self.name}" field\'s '
+                f"legal range: ({self.min_value}, {self.max_value})."
+            )
+
+        return super().set_value(field_value=field_value)
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
