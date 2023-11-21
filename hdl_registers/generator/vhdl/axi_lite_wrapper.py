@@ -245,7 +245,7 @@ end architecture;
 
     def create(self, **kwargs):
         """
-        Overload the parent method to implement our custom behavior.
+        Overload the super method to implement our custom behavior.
         """
         if not self.register_list.register_objects:
             # If there are no registers, we shall not create a register file wrapper.

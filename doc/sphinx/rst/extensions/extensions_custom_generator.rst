@@ -22,7 +22,7 @@ text file.
    :lines: 10-
 
 The ``COMMENT_START``, ``SHORT_DESCRIPTION`` and ``output_file`` class properties are abstract
-in the parent class, and MUST hence be implemented in the child class.
+in the super class, and MUST hence be implemented in the subclass.
 The same is true, naturally, for the ``get_code`` method which is where all the code
 generation happens.
 

@@ -55,7 +55,7 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         self, register_list: RegisterList, output_folder: Path, file_name: Optional[str] = None
     ):
         """
-        For argument description, please see the parent class.
+        For argument description, please see the super class.
 
         Arguments:
                 file_name: Optionally specify an explicit result file name.

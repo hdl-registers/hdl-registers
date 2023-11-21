@@ -26,5 +26,5 @@ class Constant(ABC):
     @abstractmethod
     def value(self) -> Any:
         """
-        The value of the constant. Return type depends on the child class.
+        The value of the constant. Return type depends on the subclass.
         """

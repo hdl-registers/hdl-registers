@@ -40,7 +40,7 @@ class RegisterCodeGenerator(ABC):
         A short description of what this generator produces.
         Will be used when printing status messages.
 
-        Overload in child class by setting e.g.
+        Overload in subclass by setting e.g.
 
         .. code-block:: python
 
@@ -56,7 +56,7 @@ class RegisterCodeGenerator(ABC):
         The character(s) that start a comment line in the programming language that we are
         generating code for.
 
-        Overload in child class by setting e.g.
+        Overload in subclass by setting e.g.
 
         .. code-block:: python
 
@@ -71,7 +71,7 @@ class RegisterCodeGenerator(ABC):
         """
         Result will be placed in this file.
 
-        Overload in a child class to give the proper name to the code artifact.
+        Overload in a subclass to give the proper name to the code artifact.
         Probably using a combination of ``self.output_folder`` and ``self.name``.
         For example:
 
@@ -87,7 +87,7 @@ class RegisterCodeGenerator(ABC):
         """
         Get the generated code as a string.
 
-        Overload in a child class where the code generation is implemented.
+        Overload in a subclass where the code generation is implemented.
 
         Arguments:
             kwargs: Further optional parameters that can be used.
@@ -95,17 +95,17 @@ class RegisterCodeGenerator(ABC):
                 of any custom generators that inherit this class.
         """
 
-    # Optionally set a non-zero default indentation level, expressed in number of spaces, in a child
-    # class for your code generator.
+    # Optionally set a non-zero default indentation level, expressed in number of spaces, in a
+    # subclass for your code generator.
     # Will be used by e.g. the 'self.comment' method.
     DEFAULT_INDENTATION_LEVEL = 0
 
     # For some languages, comment lines have to be ended with special characters.
-    # Optionally set this to a non-null string in a child class.
+    # Optionally set this to a non-null string in a subclass.
     # For best formatting, leave a space character at the start of this string.
     COMMENT_END = ""
 
-    # For a custom code generator, overload this value in a child class.
+    # For a custom code generator, overload this value in a subclass.
     # This version number of the custom code generator class is added to the file header of
     # generated artifacts.
     # Changing the number will trigger a re-generate of all artifacts when 'create_if_needed'
