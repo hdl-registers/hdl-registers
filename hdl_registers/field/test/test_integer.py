@@ -178,6 +178,52 @@ def test_non_integer_range_should_raise_exception():
     )
 
 
+def test_get_value_unsigned():
+    integer = Integer(
+        name="", base_index=2, min_value=0, max_value=127, description="", default_value=0
+    )
+    assert integer.width == 7
+
+    register_value = int("010101011", base=2)
+    assert integer.get_value(register_value) == 42
+
+    register_value = int("101010100", base=2)
+    assert integer.get_value(register_value) == 85
+
+
+def test_get_value_signed():
+    integer = Integer(
+        name="", base_index=3, min_value=-3, max_value=127, description="", default_value=0
+    )
+    assert integer.width == 8
+
+    register_value = int("10101010111", base=2)
+    assert integer.get_value(register_value) == -86
+
+    register_value = int("01010101000", base=2)
+    assert integer.get_value(register_value) == 85
+
+
+def test_set_value_unsigned():
+    integer = Integer(
+        name="", base_index=5, min_value=0, max_value=7, description="", default_value=0
+    )
+    assert integer.width == 3
+
+    assert integer.set_value(5) == int("10100000", base=2)
+    assert integer.set_value(2) == int("01000000", base=2)
+
+
+def test_set_value_signed():
+    integer = Integer(
+        name="", base_index=5, min_value=-8, max_value=7, description="", default_value=0
+    )
+    assert integer.width == 4
+
+    assert integer.set_value(5) == int("010100000", base=2)
+    assert integer.set_value(-6) == int("101000000", base=2)
+
+
 def test_default_value_uint():
     def _get_default_value_uint(min_value, max_value, default_value):
         return Integer(

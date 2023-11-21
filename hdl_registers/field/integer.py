@@ -9,6 +9,7 @@
 
 # Local folder libraries
 from .register_field import RegisterField
+from .register_field_type import FieldType, Signed, Unsigned
 
 
 class Integer(RegisterField):
@@ -49,6 +50,16 @@ class Integer(RegisterField):
         self._default_value = 0
         # Assign self._default_value via setter
         self.default_value = default_value
+
+        # Determines how bits are to be interpreted in 'set_value' and 'get_value'.
+        self._field_type = Signed() if self.is_signed else Unsigned()
+
+    @property
+    def field_type(self) -> FieldType:
+        """
+        Getter for private member.
+        """
+        return self._field_type
 
     @property
     def is_signed(self) -> bool:

@@ -1,5 +1,7 @@
 Fixes
 
+* Fix bug where :meth:`.RegisterField.get_value` and :meth:`.RegisterField.set_value` would crash
+  for negative-range integer fields.
 * Fix "multiple definition" bug in generated C header for a string constant.
 * Fix C++ field setters on registers of mode ``w``, ``wpulse`` and ``r_wpulse`` not taking into
   account non-zero default values of other fields.
