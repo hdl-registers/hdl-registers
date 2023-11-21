@@ -7,9 +7,6 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-import unittest
-
 # Third party libraries
 import pytest
 from tsfpga.system_utils import read_file
@@ -22,176 +19,21 @@ from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerat
 from hdl_registers.parser import from_toml
 
 
-@pytest.mark.usefixtures("fixture_tmp_path")
-class TestRegisterHtmlGenerator(unittest.TestCase):
-    tmp_path = None
-
-    def setUp(self):
+class HtmlTest:
+    def __init__(self, tmp_path):
+        self.tmp_path = tmp_path
         self.register_list = from_toml(
             module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
         )
 
-    def test_registers(self):
-        """
-        Test that all registers show up in the HTML with correct attributes.
-        """
-        html = self._create_html_page()
-
-        self._check_register(
-            name="config",
-            index=0,
-            address="0x0000",
-            mode="Read, Write",
-            default_value="0x848E",
-            description="A plain <strong>dummy</strong> register.",
-            html=html,
-        )
-
-        self._check_register_array(
-            name="dummies",
-            length=3,
-            iterator_range="i &isin; [0, 2]",
-            description="An <strong>array</strong> with some dummy regs",
-            html=html,
-        )
-
-        self._check_register(
-            name="first",
-            index="7 + i &times; 2",
-            address="0x001C + i &times; 0x0008",
-            mode="Read, Write",
-            default_value="0xB1",
-            description="The first register in the array.",
-            html=html,
-        )
-
-        self._check_register(
-            name="second",
-            index="8 + i &times; 2",
-            address="0x0020 + i &times; 0x0008",
-            mode="Read",
-            default_value="0xC7",
-            description="The second register in the array.",
-            html=html,
-        )
-
-    def test_register_fields(self):
-        """
-        Test that all bits show up in the HTML with correct attributes.
-        """
-        html = self._create_html_page()
-
-        # Fields in plain register
-        self._check_field(
-            name="plain_bit_a",
-            index="0",
-            default_value="0b0",
-            description="Bit A",
-            html=html,
-        )
-        self._check_field(
-            name="plain_bit_b",
-            index="1",
-            default_value="0b1",
-            description="Bit B",
-            html=html,
-        )
-        self._check_field(
-            name="plain_bit_vector",
-            index="5:2",
-            default_value="0b0011",
-            description="Bit <strong>vector</strong>",
-            html=html,
-        )
-        self._check_field(
-            name="plain_enumeration",
-            index="8:6",
-            default_value="third",
-            html=html,
-        )
-        self._check_field(
-            name="plain_integer",
-            index="16:9",
-            default_value="66",
-            html=html,
-        )
-
-        # Fields in register array
-        self._check_field(
-            name="array_bit_a",
-            index="0",
-            default_value="0b1",
-            description="Array register bit A",
-            html=html,
-        )
-        self._check_field(
-            name="array_bit_b",
-            index="1",
-            default_value="0b0",
-            description="Array register bit B",
-            html=html,
-        )
-        self._check_field(
-            name="array_bit_vector",
-            index="6:2",
-            default_value="0b01100",
-            description="Array register bit vector",
-            html=html,
-        )
-
-    def test_registers_and_constants(self):
-        """
-        Test that all constant show up in the HTML with correct attributes.
-        Should only appear if there are actually any constants set.
-        """
-        constants_text = "The following constants are part of the register interface"
-
-        html = self._create_html_page()
-
-        # Check that registers are there
-        assert "Registers" in html, html
-        assert "dummies" in html, html
-
-        # Check that constants are there
-        assert constants_text in html, html
-        self._check_constant(name="data_width", value=24, html=html)
-        self._check_constant(name="decrement", value=-8, html=html)
-        self._check_constant(name="enabled", value="True", html=html)
-        self._check_constant(name="disabled", value="False", html=html)
-        self._check_constant(name="rate", value="3.5", html=html)
-        self._check_constant(name="paragraph", value='"hello there :)"', html=html)
-
-        # Test again with no constants
-        self.register_list.constants = []
-        html = self._create_html_page()
-
-        # Registers should still be there
-        assert "Registers" in html, html
-        assert "dummies" in html, html
-
-        # But no constants
-        assert constants_text not in html, html
-
-    def test_constants_and_no_registers(self):
-        self.register_list.register_objects = []
-
-        html = self._create_html_page()
-
-        assert "This module does not have any registers" in html, html
-        assert "dummies" not in html, html
-
-        assert "<h2>Constants</h2>" in html, html
-        self._check_constant(name="data_width", value=24, html=html)
-        self._check_constant(name="decrement", value=-8, html=html)
-
-    def _create_html_page(self):
+    def create_html_page(self):
         HtmlPageGenerator(self.register_list, self.tmp_path).create()
         html = read_file(self.tmp_path / "caesar_regs.html")
         return html
 
     @staticmethod
     # pylint: disable=too-many-arguments
-    def _check_register(name, index, address, mode, default_value, description, html):
+    def check_register(name, index, address, mode, default_value, description, html):
         expected = f"""
   <tr>
     <td><strong>{name}</strong></td>
@@ -205,7 +47,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert expected in html, f"{expected}\n\n{html}"
 
     @staticmethod
-    def _check_field(name, index, default_value, html, description=None):
+    def check_field(name, index, default_value, html, description=None):
         expected = f"""
   <tr>
     <td>&nbsp;&nbsp;<em>{name}</em></td>
@@ -224,7 +66,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert expected in html, f"{expected}\n\n{html}"
 
     @staticmethod
-    def _check_register_array(name, length, iterator_range, description, html):
+    def check_register_array(name, length, iterator_range, description, html):
         expected = f"""
   <tr>
     <td class="array_header" colspan=5>
@@ -237,7 +79,7 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
         assert expected in html, f"{expected}\n\n{html}"
 
     @staticmethod
-    def _check_constant(name, value, html):
+    def check_constant(name, value, html):
         expected = f"""
   <tr>
     <td><strong>{name}</strong></td>
@@ -245,16 +87,184 @@ class TestRegisterHtmlGenerator(unittest.TestCase):
 """
         assert expected in html, f"{expected}\n\n{html}"
 
-    def test_register_table_is_empty_string_if_no_registers_are_available(self):
-        self.register_list.register_objects = []
 
-        HtmlRegisterTableGenerator(self.register_list, self.tmp_path).create()
-        html = read_file(self.tmp_path / "caesar_register_table.html")
-        assert html == "", html
+@pytest.fixture
+def html_test(tmp_path):
+    return HtmlTest(tmp_path=tmp_path)
 
-    def test_constant_table_is_empty_string_if_no_constants_are_available(self):
-        self.register_list.constants = []
 
-        HtmlConstantTableGenerator(self.register_list, self.tmp_path).create()
-        html = read_file(self.tmp_path / "caesar_constant_table.html")
-        assert html == "", html
+# False positive for pytest fixtures
+# pylint: disable=redefined-outer-name
+
+
+def test_registers(html_test):
+    """
+    Test that all registers show up in the HTML with correct attributes.
+    """
+    html = html_test.create_html_page()
+
+    html_test.check_register(
+        name="config",
+        index=0,
+        address="0x0000",
+        mode="Read, Write",
+        default_value="0x848E",
+        description="A plain <strong>dummy</strong> register.",
+        html=html,
+    )
+
+    html_test.check_register_array(
+        name="dummies",
+        length=3,
+        iterator_range="i &isin; [0, 2]",
+        description="An <strong>array</strong> with some dummy regs",
+        html=html,
+    )
+
+    html_test.check_register(
+        name="first",
+        index="7 + i &times; 2",
+        address="0x001C + i &times; 0x0008",
+        mode="Read, Write",
+        default_value="0xB1",
+        description="The first register in the array.",
+        html=html,
+    )
+
+    html_test.check_register(
+        name="second",
+        index="8 + i &times; 2",
+        address="0x0020 + i &times; 0x0008",
+        mode="Read",
+        default_value="0xC7",
+        description="The second register in the array.",
+        html=html,
+    )
+
+
+def test_register_fields(html_test):
+    """
+    Test that all bits show up in the HTML with correct attributes.
+    """
+    html = html_test.create_html_page()
+
+    # Fields in plain register
+    html_test.check_field(
+        name="plain_bit_a",
+        index="0",
+        default_value="0b0",
+        description="Bit A",
+        html=html,
+    )
+    html_test.check_field(
+        name="plain_bit_b",
+        index="1",
+        default_value="0b1",
+        description="Bit B",
+        html=html,
+    )
+    html_test.check_field(
+        name="plain_bit_vector",
+        index="5:2",
+        default_value="0b0011",
+        description="Bit <strong>vector</strong>",
+        html=html,
+    )
+    html_test.check_field(
+        name="plain_enumeration",
+        index="8:6",
+        default_value="third",
+        html=html,
+    )
+    html_test.check_field(
+        name="plain_integer",
+        index="16:9",
+        default_value="66",
+        html=html,
+    )
+
+    # Fields in register array
+    html_test.check_field(
+        name="array_bit_a",
+        index="0",
+        default_value="0b1",
+        description="Array register bit A",
+        html=html,
+    )
+    html_test.check_field(
+        name="array_bit_b",
+        index="1",
+        default_value="0b0",
+        description="Array register bit B",
+        html=html,
+    )
+    html_test.check_field(
+        name="array_bit_vector",
+        index="6:2",
+        default_value="0b01100",
+        description="Array register bit vector",
+        html=html,
+    )
+
+
+def test_registers_and_constants(html_test):
+    """
+    Test that all constant show up in the HTML with correct attributes.
+    Should only appear if there are actually any constants set.
+    """
+    constants_text = "The following constants are part of the register interface"
+
+    html = html_test.create_html_page()
+
+    # Check that registers are there
+    assert "Registers" in html, html
+    assert "dummies" in html, html
+
+    # Check that constants are there
+    assert constants_text in html, html
+    html_test.check_constant(name="data_width", value=24, html=html)
+    html_test.check_constant(name="decrement", value=-8, html=html)
+    html_test.check_constant(name="enabled", value="True", html=html)
+    html_test.check_constant(name="disabled", value="False", html=html)
+    html_test.check_constant(name="rate", value="3.5", html=html)
+    html_test.check_constant(name="paragraph", value='"hello there :)"', html=html)
+
+    # Test again with no constants
+    html_test.register_list.constants = []
+    html = html_test.create_html_page()
+
+    # Registers should still be there
+    assert "Registers" in html, html
+    assert "dummies" in html, html
+
+    # But no constants
+    assert constants_text not in html, html
+
+
+def test_constants_and_no_registers(html_test):
+    html_test.register_list.register_objects = []
+
+    html = html_test.create_html_page()
+
+    assert "This module does not have any registers" in html, html
+    assert "dummies" not in html, html
+
+    assert "<h2>Constants</h2>" in html, html
+    html_test.check_constant(name="data_width", value=24, html=html)
+    html_test.check_constant(name="decrement", value=-8, html=html)
+
+
+def test_register_table_is_empty_string_if_no_registers_are_available(html_test):
+    html_test.register_list.register_objects = []
+
+    HtmlRegisterTableGenerator(html_test.register_list, html_test.tmp_path).create()
+    html = read_file(html_test.tmp_path / "caesar_register_table.html")
+    assert html == "", html
+
+
+def test_constant_table_is_empty_string_if_no_constants_are_available(html_test):
+    html_test.register_list.constants = []
+
+    HtmlConstantTableGenerator(html_test.register_list, html_test.tmp_path).create()
+    html = read_file(html_test.tmp_path / "caesar_constant_table.html")
+    assert html == "", html
