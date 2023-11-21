@@ -197,8 +197,10 @@ class Enumeration(RegisterField):
     def default_value_uint(self) -> int:
         return self.default_value.value
 
-    def get_value(self, register_value: int) -> EnumerationElement:
-        value_integer = super().get_value(register_value=register_value)
+    def get_value(self, register_value: int) -> EnumerationElement:  # type: ignore[override]
+        # We know that the return value is an integer and not a float, since this field uses
+        # the default value for field_type which is an unsigned with no fractional bits.
+        value_integer: int = super().get_value(register_value=register_value)  # type: ignore
         return self.get_element_by_value(value=value_integer)
 
     def set_value(self, field_value: EnumerationElement) -> int:  # type: ignore[override]

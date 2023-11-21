@@ -96,6 +96,9 @@ class RegisterParser:
         self._default_register_names = []
         if default_registers:
             # Perform deep copy of the mutable register objects.
+            # Ignore a mypy error that seems buggy.
+            # We are assigning list[Register] to list[Register | RegisterArray]
+            # which should be absolutely fine, but mypy warns.
             self._register_list.register_objects = copy.deepcopy(
                 default_registers  # type: ignore[arg-type]
             )

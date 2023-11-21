@@ -109,25 +109,29 @@ def _to_unsigned_binary(
 
 class FieldType(ABC):
     @abstractmethod
-    def min_value(self, bit_width: int) -> Union[float, int]:
+    def min_value(self, bit_width: int) -> Union[int, float]:
         """
         Minimum representable value for this field type.
 
-        Return type is the native Python representation of the value and depends on the child class.
+        Return type is the native Python representation of the value, which depends on the subclass.
+        If the subclass has a non-zero number of fractional bits, the value will be a ``float``.
+        If not, it will be an ``int``.
         """
 
     @abstractmethod
-    def max_value(self, bit_width: int) -> Union[float, int]:
+    def max_value(self, bit_width: int) -> Union[int, float]:
         """
         Maximum representable value for this field type.
 
-        Return type is the native Python representation of the value and depends on the child class.
+        Return type is the native Python representation of the value, which depends on the subclass.
+        If the subclass has a non-zero number of fractional bits, the value will be a ``float``.
+        If not, it will be an ``int``.
         """
 
     @abstractmethod
     def convert_from_unsigned_binary(
         self, bit_width: int, unsigned_binary: int
-    ) -> Union[float, int]:
+    ) -> Union[int, float]:
         """
         Convert from the unsigned binary integer representation of a field,
         into the native Python value of the field.
@@ -138,7 +142,7 @@ class FieldType(ABC):
         """
 
     @abstractmethod
-    def convert_to_unsigned_binary(self, bit_width: int, value: Union[float, int]) -> int:
+    def convert_to_unsigned_binary(self, bit_width: int, value: Union[int, float]) -> int:
         """
         Convert from the native Python value of the field, into the
         unsigned binary integer representation which can be written to a register.
@@ -155,7 +159,7 @@ class FieldType(ABC):
     def __repr__(self) -> str:
         pass
 
-    def _check_value_in_range(self, bit_width: int, value: Union[float, int]):
+    def _check_value_in_range(self, bit_width: int, value: Union[int, float]):
         """
         Raise an exception if the given field value is not within the allowed range.
 

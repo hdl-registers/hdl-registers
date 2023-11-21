@@ -9,7 +9,7 @@
 
 # Standard libraries
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Union
 
 # Local folder libraries
 from .register_field_type import FieldType, Unsigned
@@ -25,13 +25,6 @@ class RegisterField(ABC):
     """
 
     name: str
-
-    # @property
-    # @abstractmethod
-    # def name(self) -> str:
-    #     """
-    #     The name of the field.
-    #     """
 
     @property
     def max_binary_value(self) -> int:
@@ -67,7 +60,6 @@ class RegisterField(ABC):
         """
         Return the width, in number of bits, that this field occupies.
         """
-        raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
@@ -75,7 +67,6 @@ class RegisterField(ABC):
         """
         The index within the register for the lowest bit of this field.
         """
-        raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
@@ -84,7 +75,6 @@ class RegisterField(ABC):
         Return a formatted string of the default value. The way it shall appear
         in documentation.
         """
-        raise NotImplementedError("Must be implemented in child class")
 
     @property
     @abstractmethod
@@ -92,18 +82,24 @@ class RegisterField(ABC):
         """
         Return a the default value as an unsigned int.
         """
-        raise NotImplementedError("Must be implemented in child class")
 
-    def get_value(self, register_value: int) -> Any:
+    def get_value(self, register_value: int) -> Union[int, float]:
         """
         Get the value of this field, given the supplied register value.
-        Child classes might implement sanity checks on the value.
+        Subclasses might implement sanity checks on the value.
 
         Arguments:
             register_value: Value of the register that this field belongs to.
 
         Returns:
-            The value of the field. Type depends on the field.
+            The value of the field.
+            If the field has a non-zero number of fractional bits, the type of the result
+            will be a ``float``.
+            Otherwise it will be an ``int``.
+
+            Note that a subclass might have a different type for the resulting value.
+            Subclasses should call this super method and convert the numeric value to whatever
+            type is applicable for that field.
         """
         shift = self.base_index
 
@@ -115,7 +111,7 @@ class RegisterField(ABC):
 
         return field_value
 
-    def set_value(self, field_value: float) -> int:
+    def set_value(self, field_value: Union[int, float]) -> int:
         """
         Convert the supplied value into the bit-shifted unsigned integer ready
         to be written to the register. The bits of the other fields in the
@@ -123,12 +119,16 @@ class RegisterField(ABC):
 
         Arguments:
             field_value: Desired value to set the field to.
+                If the field has a non-zero number of fractional bits, the type of the value is
+                expected to be a ``float``.
+                Otherwise it should be an ``int``.
+
                 Note that a subclass might have a different type for this argument.
                 Subclasses should convert their argument value to an integer/float and call
                 this super method.
 
         Returns:
-            The register value
+            The register value as an unsigned integer.
         """
         value_unsigned = self.field_type.convert_to_unsigned_binary(self.width, field_value)
         max_value = self.max_binary_value

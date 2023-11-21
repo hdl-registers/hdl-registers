@@ -27,10 +27,10 @@ class RegisterCodeGeneratorHelpers:
     """
 
     # Defined in RegisterCodeGenerator, which shall also be inherited wherever this class is used.
-    register_list: "RegisterList" = None  # type: ignore[assignment]
-    DEFAULT_INDENTATION_LEVEL = 0
-    COMMENT_START = ""
-    COMMENT_END = ""
+    register_list: "RegisterList"
+    DEFAULT_INDENTATION_LEVEL: int
+    COMMENT_START: str
+    COMMENT_END: str
 
     def iterate_constants(self) -> Iterator["Constant"]:
         """
