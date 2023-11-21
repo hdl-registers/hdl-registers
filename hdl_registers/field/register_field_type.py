@@ -155,7 +155,7 @@ class FieldType(ABC):
     def __repr__(self) -> str:
         pass
 
-    def _check_value_in_range(self, bit_width: int, value: Union[float, int]) -> None:
+    def _check_value_in_range(self, bit_width: int, value: Union[float, int]):
         """
         Raise an exception if the given field value is not within the allowed range.
 

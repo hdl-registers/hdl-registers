@@ -180,7 +180,7 @@ class Register:
 
         return integer
 
-    def _append_field(self, field: "RegisterField") -> None:
+    def _append_field(self, field: "RegisterField"):
         self.fields.append(field)
 
         self.bit_index += field.width

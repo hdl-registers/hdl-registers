@@ -171,7 +171,7 @@ class Enumeration(RegisterField):
         """
         return self._default_value
 
-    def set_default_value(self, value: str) -> None:
+    def set_default_value(self, value: str):
         """
         Set the default value for this enumeration field.
 

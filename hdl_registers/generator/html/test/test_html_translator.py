@@ -15,10 +15,10 @@ from hdl_registers.generator.html.html_translator import HtmlTranslator
 
 
 class TestTranslator(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.html_translator = HtmlTranslator()
 
-    def test_markdown_parser_can_handle_annotating_sentences(self) -> None:
+    def test_markdown_parser_can_handle_annotating_sentences(self):
         expected = "This sentence <strong>should have a large portion</strong> in bold face"
         text = r"This sentence **should have a large portion** in bold face"
         assert expected in self.html_translator.translate(text)
@@ -27,7 +27,7 @@ class TestTranslator(unittest.TestCase):
         text = "This sentence *should have a large portion* in italics"
         assert expected in self.html_translator.translate(text)
 
-    def test_markdown_parser_can_handle_escaped_asterisks(self) -> None:
+    def test_markdown_parser_can_handle_escaped_asterisks(self):
         expected = "Part of this sentence **should be surrounded** by double asterisks"
         text = r"Part of this sentence \*\*should be surrounded\*\* by double asterisks"
         assert expected in self.html_translator.translate(text)
@@ -52,7 +52,7 @@ class TestTranslator(unittest.TestCase):
         text = r"Part of this sentence should have an *\** in italics"
         assert expected in self.html_translator.translate(text)
 
-    def test_line_breaks(self) -> None:
+    def test_line_breaks(self):
         expected = "Two empty lines<br />\n<br />\nbetween paragraphs."
         text = "Two empty lines\n\nbetween paragraphs."
         assert expected in self.html_translator.translate(text)
@@ -69,13 +69,13 @@ class TestTranslator(unittest.TestCase):
         text = "One empty line\nmeans same paragraph."
         assert expected in self.html_translator.translate(text)
 
-    def test_literal_underscore_can_be_used(self) -> None:
+    def test_literal_underscore_can_be_used(self):
         # We do not translate underscores, unlike some markdown
         expected = "This sentence <strong>contains_underscores</strong> in some_places"
         text = r"This sentence **contains_underscores** in some_places"
         assert expected in self.html_translator.translate(text)
 
-    def test_angle_brackets_should_be_translated_to_html(self) -> None:
+    def test_angle_brackets_should_be_translated_to_html(self):
         expected = "This string &lt;&lt; contains &gt; brackets &gt;&lt;"
         text = "This string << contains > brackets ><"
         assert expected in self.html_translator.translate(text)

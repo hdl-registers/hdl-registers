@@ -62,7 +62,7 @@ class BitVector(RegisterField):
     def width(self) -> int:
         return self._width
 
-    def _check_width(self, width: int, field_type: FieldType) -> None:
+    def _check_width(self, width: int, field_type: FieldType):
         """
         Sanity checks for the provided width
         """
@@ -97,7 +97,7 @@ class BitVector(RegisterField):
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: str) -> None:
+    def default_value(self, value: str):
         """
         Setter for ``default_value`` that performs sanity checks.
         """

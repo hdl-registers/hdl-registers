@@ -37,7 +37,7 @@ class BooleanConstant(Constant):
         return self._value
 
     @value.setter
-    def value(self, value: bool) -> None:
+    def value(self, value: bool):
         """
         Setter for value that performs sanity checks.
         """

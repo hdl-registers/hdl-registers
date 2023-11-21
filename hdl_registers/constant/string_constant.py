@@ -37,7 +37,7 @@ class StringConstant(Constant):
         return self._value
 
     @value.setter
-    def value(self, value: str) -> None:
+    def value(self, value: str):
         """
         Setter for value that performs sanity checks.
         """

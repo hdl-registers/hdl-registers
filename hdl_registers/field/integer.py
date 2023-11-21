@@ -88,7 +88,7 @@ class Integer(RegisterField):
     def base_index(self) -> int:
         return self._base_index
 
-    def _check_range(self, min_value: int, max_value: int) -> None:
+    def _check_range(self, min_value: int, max_value: int):
         """
         Perform some sanity checks on user-supplied values.
         """
@@ -135,7 +135,7 @@ class Integer(RegisterField):
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: int) -> None:
+    def default_value(self, value: int):
         """
         Setter for default_value that performs sanity checks.
         """

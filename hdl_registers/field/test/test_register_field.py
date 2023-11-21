@@ -11,7 +11,7 @@
 from hdl_registers.field.register_field import RegisterField
 
 
-def test_range_str() -> None:
+def test_range_str():
     class MyField(RegisterField):
         base_index = 3
         width = 1
