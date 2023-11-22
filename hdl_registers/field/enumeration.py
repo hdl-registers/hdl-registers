@@ -164,7 +164,7 @@ class Enumeration(RegisterField):
         )
         raise ValueError(message)
 
-    @property
+    @property  # type: ignore[override]
     def default_value(self) -> EnumerationElement:
         """
         Getter for ``default_value``.

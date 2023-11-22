@@ -89,7 +89,7 @@ class BitVector(RegisterField):
     def base_index(self) -> int:
         return self._base_index
 
-    @property
+    @property  # type: ignore[override]
     def default_value(self) -> str:
         """
         Getter for private member.

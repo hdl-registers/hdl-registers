@@ -138,7 +138,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         """
         return self._max_value
 
-    @property
+    @property  # type: ignore[override]
     def default_value(self) -> int:
         """
         Getter for private member.

@@ -24,7 +24,9 @@ class RegisterField(ABC):
     Lists a few methods that must be implemented.
     """
 
+    # Must set these two as class members in subclasses.
     name: str
+    default_value: Union[str, int]
 
     @property
     def max_binary_value(self) -> int:
