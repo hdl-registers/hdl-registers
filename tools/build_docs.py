@@ -10,7 +10,6 @@
 # Standard libraries
 import argparse
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 from xml.etree import ElementTree
@@ -24,7 +23,7 @@ import tools.tools_pythonpath  # noqa: F401
 
 # Third party libraries
 from pybadges import badge
-from tsfpga.system_utils import create_directory, create_file, delete, read_file
+from tsfpga.system_utils import create_directory, create_file, delete, read_file, run_command
 from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 # First party libraries
@@ -98,7 +97,7 @@ def generate_api_documentation() -> None:
         # exclude pattern
         "**/test/**",
     ]
-    subprocess.check_call(cmd, cwd=hdl_registers.REPO_ROOT)
+    run_command(cmd=cmd, cwd=hdl_registers.REPO_ROOT)
 
 
 def generate_register_code() -> None:
@@ -110,12 +109,12 @@ def generate_register_code() -> None:
             output_folder = GENERATED_SPHINX / "register_code" / folder.name / py_file.stem
 
             command = [sys.executable, str(py_file), str(output_folder)]
-            output = subprocess.check_output(command, cwd=hdl_registers.REPO_ROOT, env=env).decode(
-                "utf-8"
-            )
+            stdout = run_command(
+                cmd=command, cwd=hdl_registers.REPO_ROOT, env=env, capture_output=True
+            ).stdout
 
-            print(output)
-            create_file(file=output_folder / "stdout.txt", contents=output)
+            print(stdout)
+            create_file(file=output_folder / "stdout.txt", contents=stdout)
 
 
 def generate_bibtex() -> None:

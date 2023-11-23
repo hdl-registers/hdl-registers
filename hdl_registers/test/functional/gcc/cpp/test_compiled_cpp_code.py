@@ -75,7 +75,8 @@ int main()
 
         run_command(compile_command)
 
-        return executable
+        # Return the command that runs the executable.
+        return [str(executable)]
 
 
 @pytest.fixture
@@ -98,14 +99,14 @@ class CppTest(BaseCppTest):
         test_code += "\n  ".join([f"{test}(memory, &caesar);" for test in tests])
         source_files = [THIS_DIR / f"{test}.cpp" for test in tests]
 
-        executable = self.compile(
+        cmd = self.compile(
             test_code=test_code,
             include_directories=[THIS_DIR / "include"],
             source_files=source_files,
             includes=includes,
         )
 
-        run_command([executable])
+        run_command(cmd)
 
 
 @pytest.fixture
@@ -132,28 +133,33 @@ def test_setting_cpp_register_array_out_of_bounds_should_crash(base_cpp_test):
   // Index 3 is out of bounds (should be less than 3)
   caesar.set_dummies_first(3, 1337);
 """
-    executable = base_cpp_test.compile(test_code=test_code)
+    cmd = base_cpp_test.compile(test_code=test_code)
 
-    with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
-        stderr = process.communicate()
-    assert "Assertion `array_index < caesar::dummies::array_length' failed" in str(stderr), stderr
+    with pytest.raises(subprocess.CalledProcessError):
+        result = run_command(cmd=cmd, capture_output=True)
+        assert result.stdout == ""
+        assert (
+            "Assertion `array_index < caesar::dummies::array_length' failed" in result.stderr
+        ), result.stderr
 
 
 def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
   caesar.set_config_plain_integer(-1024);
 """
-    executable = base_cpp_test.compile(test_code=test_code)
+    cmd = base_cpp_test.compile(test_code=test_code)
 
-    with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
-        stderr = process.communicate()
-    assert "Assertion `field_value >= -50' failed." in str(stderr), stderr
+    with pytest.raises(subprocess.CalledProcessError):
+        result = run_command(cmd=cmd, capture_output=True)
+        assert result.stdout == ""
+        assert "Assertion `field_value >= -50' failed." in result.stderr, result.stderr
 
     test_code = """\
   caesar.set_config_plain_integer(110);
 """
-    executable = base_cpp_test.compile(test_code=test_code)
+    cmd = base_cpp_test.compile(test_code=test_code)
 
-    with subprocess.Popen([executable], stderr=subprocess.PIPE) as process:
-        stderr = process.communicate()
-    assert "Assertion `field_value <= 100' failed." in str(stderr), stderr
+    with pytest.raises(subprocess.CalledProcessError):
+        result = run_command(cmd=cmd, capture_output=True)
+        assert result.stdout == ""
+        assert "Assertion `field_value <= 100' failed." in result.stderr, result.stderr
