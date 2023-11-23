@@ -36,7 +36,7 @@ GENERATED_SPHINX_HTML = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_html"
 SPHINX_DOC = hdl_registers.HDL_REGISTERS_DOC / "sphinx"
 
 
-def main():
+def main() -> None:
     args = arguments()
 
     rst = generate_release_notes(
@@ -69,7 +69,7 @@ def main():
     copy_python_coverage_to_html_output()
 
 
-def arguments():
+def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         "Build sphinx documentation", formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -82,7 +82,7 @@ def arguments():
     return parser.parse_args()
 
 
-def generate_api_documentation():
+def generate_api_documentation() -> None:
     output_path = delete(GENERATED_SPHINX / "apidoc")
 
     cmd = [
@@ -101,7 +101,7 @@ def generate_api_documentation():
     subprocess.check_call(cmd, cwd=hdl_registers.REPO_ROOT)
 
 
-def generate_register_code():
+def generate_register_code() -> None:
     # Set the path environment variable in the python calls below so they find e.g. tsfpga.
     env = dict(PYTHONPATH=":".join(sys.path))
 
@@ -110,14 +110,15 @@ def generate_register_code():
             output_folder = GENERATED_SPHINX / "register_code" / folder.name / py_file.stem
 
             command = [sys.executable, str(py_file), str(output_folder)]
-            output = subprocess.check_output(command, cwd=hdl_registers.REPO_ROOT, env=env)
-            output = output.decode("utf-8")
+            output = subprocess.check_output(command, cwd=hdl_registers.REPO_ROOT, env=env).decode(
+                "utf-8"
+            )
 
             print(output)
             create_file(file=output_folder / "stdout.txt", contents=output)
 
 
-def generate_bibtex():
+def generate_bibtex() -> None:
     """
     Generate a BibTeX snippet for citing this project.
 
@@ -141,7 +142,7 @@ def generate_bibtex():
     create_file(GENERATED_SPHINX / "bibtex.rst", rst)
 
 
-def generate_sphinx_index():
+def generate_sphinx_index() -> None:
     """
     Generate index.rst for sphinx. Also verify that readme.rst in the project is identical.
 
@@ -161,7 +162,7 @@ def generate_sphinx_index():
     create_file(GENERATED_SPHINX / "index.rst", result)
 
 
-def build_information_badges(output_path):
+def build_information_badges(output_path: Path) -> None:
     badge_svg = badge(left_text="pip install", right_text="hdl-registers", right_color="blue")
     create_file(output_path / "pip_install.svg", badge_svg)
 
@@ -203,7 +204,7 @@ def build_information_badges(output_path):
     create_file(output_path / "gitter.svg", badge_svg)
 
 
-def build_python_coverage_badge(output_path):
+def build_python_coverage_badge(output_path: Path) -> None:
     coverage_xml = hdl_registers.HDL_REGISTERS_GENERATED / "python_coverage.xml"
     assert coverage_xml.exists(), "Run pytest with coverage before building documentation"
 
@@ -224,7 +225,7 @@ def build_python_coverage_badge(output_path):
     create_file(output_path / "python_coverage.svg", badge_svg)
 
 
-def copy_python_coverage_to_html_output():
+def copy_python_coverage_to_html_output() -> None:
     html_output_path = GENERATED_SPHINX_HTML / "python_coverage_html"
     delete(html_output_path)
 

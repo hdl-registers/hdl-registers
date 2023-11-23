@@ -40,7 +40,7 @@ class BusAccessDirection:
         self.name_past = "read" if self.is_read_not_write else "written"
 
     @property
-    def name_adjective(self):
+    def name_adjective(self) -> str:
         """
         Return "readable" or "writeable".
         """
@@ -256,6 +256,17 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         for register, register_array in self.iterate_registers():
             if direction.register_is_accessible(register=register):
                 yield register, register_array
+
+    def iterate_fabric_accessible_plain_registers(
+        self, direction: FabricAccessDirection
+    ) -> Iterator["Register"]:
+        """
+        Iterate all plain registers in the register list that are fabric-accessible in the
+        given direction.
+        """
+        for register in self.iterate_plain_registers():
+            if direction.register_is_accessible(register=register):
+                yield register
 
     def iterate_fabric_accessible_array_registers(
         self, register_array: "RegisterArray", direction: FabricAccessDirection

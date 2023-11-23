@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import Any
 
 # Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
@@ -32,7 +33,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
         """
         return self.output_folder / f"{self.name}.h"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         cpp_code = f"  class {self._class_name} : public I{self._class_name}\n"
         cpp_code += "  {\n"
 
@@ -43,7 +44,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
         cpp_code += f"    {self._constructor_signature()};\n\n"
         cpp_code += f"    virtual ~{self._class_name}() {{}}\n"
 
-        def function(return_type_name, signature):
+        def function(return_type_name: str, signature: str) -> str:
             return f"    virtual {return_type_name} {signature} const override;\n"
 
         for register, register_array in self.iterate_registers():

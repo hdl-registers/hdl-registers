@@ -52,7 +52,7 @@ def test_isort_formatting():
 
 
 def test_mypy():
-    command = [sys.executable, "-m", "mypy", "hdl_registers"]
+    command = [sys.executable, "-m", "mypy", "--package", "hdl_registers", "--package", "tools"]
 
     # Add to PYTHONPATH so that mypy can find everything
     sys.path.append(str(REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"))

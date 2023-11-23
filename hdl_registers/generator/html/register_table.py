@@ -9,7 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
 from hdl_registers.field.enumeration import Enumeration
@@ -22,6 +22,8 @@ from .html_translator import HtmlTranslator
 
 if TYPE_CHECKING:
     # First party libraries
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register_array import RegisterArray
     from hdl_registers.register_list import RegisterList
 
 
@@ -46,7 +48,7 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
 
         self._html_translator = HtmlTranslator()
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         if not self.register_list.register_objects:
             return ""
 
@@ -78,7 +80,7 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
         return html
 
     @staticmethod
-    def _to_hex_string(value, num_nibbles=4):
+    def _to_hex_string(value: int, num_nibbles: int = 4) -> str:
         """
         Convert an integer value to a hexadecimal string. E.g. "0x1000".
         """
@@ -88,7 +90,7 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
         formatting_string = f"0x{{:0{num_nibbles}X}}"
         return formatting_string.format(value)
 
-    def _annotate_register_array(self, register_object):
+    def _annotate_register_array(self, register_object: "RegisterArray") -> str:
         description = self._html_translator.translate(register_object.description)
         html = f"""
   <tr>
@@ -112,11 +114,19 @@ repeated {register_object.length} times.
   </tr>"""
         return html
 
-    def _annotate_register(self, register, register_array_index=None, array_index_increment=None):
+    def _annotate_register(
+        self,
+        register: Register,
+        register_array_index: Optional[int] = None,
+        array_index_increment: Optional[int] = None,
+    ) -> str:
         if register_array_index is None:
             address_readable = self._to_hex_string(register.address)
-            index = register.address // 4
+            index = str(register.address // 4)
         else:
+            # Should also be set.
+            assert array_index_increment is not None
+
             register_address = self._to_hex_string(4 * register_array_index)
             address_increment = self._to_hex_string(4 * array_index_increment)
             address_readable = f"{register_address} + i &times; {address_increment}"
@@ -139,7 +149,7 @@ repeated {register_object.length} times.
 
         return html
 
-    def _annotate_field(self, field):
+    def _annotate_field(self, field: "RegisterField") -> str:
         description = self._html_translator.translate(field.description)
 
         if isinstance(field, Enumeration):

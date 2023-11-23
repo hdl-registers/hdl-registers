@@ -10,6 +10,7 @@
 # Standard libraries
 import pickle
 from pathlib import Path
+from typing import Any
 
 # First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
@@ -40,7 +41,7 @@ class PythonClassGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         self.pickle_file = self.output_folder / f"{self.name}.pickle"
 
-    def create(self, **kwargs):
+    def create(self, **kwargs: Any) -> None:
         """
         Create the binary pickle also, apart from the class file.
 
@@ -52,7 +53,7 @@ class PythonClassGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         with self.pickle_file.open("wb") as file_handle:
             pickle.dump(self.register_list, file_handle)
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Save register list object to binary file (pickle) and create a python class
         that recreates it.
@@ -100,7 +101,7 @@ def get_register_list() -> "RegisterList":
 '''
 
     @property
-    def should_create(self):
+    def should_create(self) -> bool:
         """
         Since this generator creates two files, where on is binary, it is impossible to do the
         version/hash check.

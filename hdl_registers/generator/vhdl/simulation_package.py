@@ -9,9 +9,16 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Optional
 
 # Local folder libraries
 from .vhdl_generator_common import VhdlGeneratorCommon
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
 
 
 class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
@@ -51,7 +58,7 @@ class VhdlSimulationPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_simulation_pkg.vhd"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get a package with methods for reading/writing registers.
 
@@ -95,7 +102,7 @@ end package body;
 
         return vhdl
 
-    def _declarations(self):
+    def _declarations(self) -> str:
         """
         Get procedure declarations for all procedures.
         """
@@ -152,7 +159,12 @@ end package body;
 
         return vhdl
 
-    def _register_read_write_signature(self, is_read_not_write: bool, register, register_array):
+    def _register_read_write_signature(
+        self,
+        is_read_not_write: bool,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+    ) -> str:
         """
         Get signature for a 'read_reg'/'write_reg' procedure.
         """
@@ -183,7 +195,9 @@ end package body;
   )\
 """
 
-    def _register_wait_until_equals_signature(self, register, register_array):
+    def _register_wait_until_equals_signature(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         """
         Get signature for a 'wait_until_reg_equals' procedure.
         """
@@ -222,7 +236,13 @@ end package body;
   )\
 """
 
-    def _field_read_write_signature(self, is_read_not_write: bool, register, register_array, field):
+    def _field_read_write_signature(
+        self,
+        is_read_not_write: bool,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         """
         Get signature for a 'read_field'/'write_field' procedure.
         """
@@ -269,7 +289,12 @@ end package body;
   )\
 """
 
-    def _field_wait_until_equals_signature(self, register, register_array, field):
+    def _field_wait_until_equals_signature(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         """
         Get signature for a 'wait_until_field_equals' procedure.
         """
@@ -301,7 +326,7 @@ end package body;
   )\
 """
 
-    def _implementations(self):
+    def _implementations(self) -> str:
         """
         Get implementations of all procedures.
         """
@@ -358,7 +383,9 @@ end package body;
 
         return vhdl
 
-    def _register_read_implementation(self, register, register_array):
+    def _register_read_implementation(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         """
         Get implementation for a 'read_reg' procedure.
         """
@@ -386,7 +413,9 @@ end package body;
   end procedure;
 """
 
-    def _reg_index_constant(self, register, register_array):
+    def _reg_index_constant(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         """
         Get 'reg_index' constant declaration suitable for implementation of procedures.
         """
@@ -397,7 +426,9 @@ end package body;
 
         return f"    constant reg_index : {self.name}_reg_range := {reg_index};\n"
 
-    def _register_write_implementation(self, register, register_array):
+    def _register_write_implementation(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         """
         Get implementation for a 'write_reg' procedure.
         """
@@ -423,7 +454,9 @@ end package body;
   end procedure;
 """
 
-    def _register_wait_until_equals_implementation(self, register, register_array):
+    def _register_wait_until_equals_implementation(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         """
         Get implementation for a 'wait_until_reg_equals' procedure.
         """
@@ -449,7 +482,12 @@ end package body;
   end procedure;
 """
 
-    def _get_wait_until_common_constants(self, register, register_array, field=None):
+    def _get_wait_until_common_constants(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: Optional["RegisterField"] = None,
+    ) -> str:
         """
         Get constants code that is common for all 'wait_until_*_equals' procedures.
         """
@@ -490,7 +528,12 @@ end package body;
     constant timeout_message : string := get_timeout_message;
 """
 
-    def _field_read_implementation(self, register, register_array, field):
+    def _field_read_implementation(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         """
         Get implementation for a 'read_field' procedure.
         """
@@ -517,7 +560,12 @@ end package body;
   end procedure;
 """
 
-    def _field_wait_until_equals_implementation(self, register, register_array, field):
+    def _field_wait_until_equals_implementation(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         """
         Get implementation for a 'wait_until_field_equals' procedure.
         """
@@ -546,7 +594,12 @@ end package body;
   end procedure;
 """
 
-    def _field_write_implementation(self, register, register_array, field):
+    def _field_write_implementation(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         """
         Get implementation for a 'write_field' procedure.
         """
@@ -588,7 +641,7 @@ end package body;
 """
 
     @staticmethod
-    def _can_read_modify_write_register(register):
+    def _can_read_modify_write_register(register: "Register") -> bool:
         """
         Return true if the register is of a writeable type where the bus can also read back
         a previously-written value.

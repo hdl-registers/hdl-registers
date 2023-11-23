@@ -99,9 +99,10 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
     def base_index(self) -> int:
         return self._base_index
 
-    def _check_range(self, min_value: int, max_value: int):
+    def _check_range(self, min_value: int, max_value: int) -> None:
         """
         Perform some sanity checks on user-supplied values.
+        Will raise exception if something is wrong,.
         """
         if not isinstance(min_value, int):
             message = (
@@ -146,7 +147,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: int):
+    def default_value(self, value: int) -> None:
         """
         Setter for default_value that performs sanity checks.
         """
@@ -178,7 +179,9 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         assert self.is_signed, "Should not end up here unless signed."
 
         # Offset the sign bit.
-        return self.default_value + 2**self.width
+        result: int = self.default_value + 2**self.width
+
+        return result
 
     def get_value(self, register_value: int) -> int:
         """

@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import Any, Optional
 
 # First party libraries
 from hdl_registers.register import REGISTER_MODES
@@ -35,7 +36,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_regs.html"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get a complete HTML page with register and constant information.
 
@@ -101,7 +102,9 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
         return html
 
     @staticmethod
-    def get_page_style(table_style=None, font_style=None, extra_style=""):
+    def get_page_style(
+        table_style: Optional[str] = None, font_style: Optional[str] = None, extra_style: str = ""
+    ) -> str:
         """
         Get a CSS style for the register pages. Shall be saved to a file called ``regs_style.css``.
 
@@ -151,7 +154,7 @@ th {
         return style
 
     @staticmethod
-    def _get_mode_descriptions():
+    def _get_mode_descriptions() -> str:
         html = """
 <table>
 <thead>

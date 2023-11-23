@@ -48,7 +48,7 @@ class FloatConstant(Constant):
         return self._value
 
     @value.setter
-    def value(self, value: float):
+    def value(self, value: float) -> None:
         """
         Setter for value that performs sanity checks.
         """

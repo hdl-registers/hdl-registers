@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -20,7 +21,6 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.field.register_field import RegisterField
 from hdl_registers.field.register_field_type import (
     Signed,
     SignedFixedPoint,
@@ -28,6 +28,10 @@ from hdl_registers.field.register_field_type import (
     UnsignedFixedPoint,
 )
 from hdl_registers.register import Register
+
+if TYPE_CHECKING:
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register_array import RegisterArray
 
 # Local folder libraries
 from .vhdl_generator_common import VhdlGeneratorCommon
@@ -58,7 +62,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_regs_pkg.vhd"
 
-    def _constants(self):
+    def _constants(self) -> str:
         """
         A set of VHDL constants, corresponding to the provided register constants.
         """
@@ -105,13 +109,13 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
         return vhdl
 
     @property
-    def _register_range_type_name(self):
+    def _register_range_type_name(self) -> str:
         """
         Name of the type which is the legal index range of registers.
         """
         return f"{self.name}_reg_range"
 
-    def _register_range(self):
+    def _register_range(self) -> str:
         """
         A VHDL type that defines the legal range of register indexes.
         """
@@ -124,7 +128,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
 """
         return vhdl
 
-    def _array_constants(self):
+    def _array_constants(self) -> str:
         """
         A list of constants defining how many times each register array is repeated.
         """
@@ -142,7 +146,9 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
 
         return vhdl
 
-    def _array_register_index_function_signature(self, register, register_array):
+    def _array_register_index_function_signature(
+        self, register: Register, register_array: "RegisterArray"
+    ) -> str:
         """
         Signature for the function that returns a register index for the specified index in a
         register array.
@@ -154,7 +160,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
   ) return {self._register_range_type_name}"""
         return vhdl
 
-    def _register_indexes(self):
+    def _register_indexes(self) -> str:
         """
         A set of named constants for the register index of each register.
         """
@@ -174,7 +180,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
 
         return vhdl
 
-    def _register_map_head(self):
+    def _register_map_head(self) -> str:
         """
         Get constants mapping the register indexes to register modes.
         """
@@ -201,7 +207,7 @@ std_ulogic_vector({self._register_range_type_name});
 
         return vhdl
 
-    def _field_declarations(self):
+    def _field_declarations(self) -> str:
         """
         For every field in every register (plain or in array):
 
@@ -255,7 +261,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         return vhdl
 
-    def _field_type_declaration(self, field: RegisterField, field_name: str):
+    def _field_type_declaration(self, field: "RegisterField", field_name: str) -> str:
         """
         Get a type declaration for the native VHDL type that corresponds to the field's type.
 
@@ -306,7 +312,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         raise TypeError(f'Got unexpected type for field: "{field}".')
 
-    def _field_init_value(self, field: RegisterField, field_name: str):
+    def _field_init_value(self, field: "RegisterField", field_name: str) -> str:
         """
         Get an init value constant for the field.
         Uses the native VHDL type that corresponds to the field's type.
@@ -331,7 +337,9 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         raise TypeError(f'Got unexpected type for field: "{field}".')
 
-    def _field_conversion_function_declarations(self, field: RegisterField, field_name: str):
+    def _field_conversion_function_declarations(
+        self, field: "RegisterField", field_name: str
+    ) -> str:
         """
         Function declarations for functions that convert the field's native VHDL representation
         to/from SLV.
@@ -357,7 +365,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         raise TypeError(f'Got unexpected type for field: "{field}".')
 
-    def _array_index_function_implementations(self):
+    def _array_index_function_implementations(self) -> str:
         """
         Implementation for the functions that return a register index for the specified index in a
         register array.
@@ -376,7 +384,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         return vhdl
 
-    def _register_map_body(self):
+    def _register_map_body(self) -> str:
         """
         Get the body of the register map definition constants.
         """
@@ -425,7 +433,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         return vhdl
 
-    def _field_conversion_implementations(self):
+    def _field_conversion_implementations(self) -> str:
         """
         Implementation of functions that convert a register field's native VHDL representation
         to/from SLV.
@@ -484,7 +492,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         return vhdl
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get a complete VHDL package with register and constant information.
         """

@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
 from hdl_registers.field.enumeration import Enumeration
@@ -16,6 +17,12 @@ from hdl_registers.field.integer import Integer
 
 # Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
 
 
 class CppImplementationGenerator(CppGeneratorCommon):
@@ -36,7 +43,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         """
         return self.output_folder / f"{self.name}.cpp"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get a complete C++ class implementation with all methods.
         """
@@ -80,7 +87,9 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return cpp_code_top + self._with_namespace(cpp_code)
 
-    def _register_setter_function(self, register, register_array):
+    def _register_setter_function(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         signature = self._register_setter_function_signature(
             register=register, register_array=register_array, indent=2
         )
@@ -102,7 +111,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += "  }\n\n"
         return cpp_code
 
-    def _field_setter_function(self, register, register_array, field):
+    def _field_setter_function(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         signature = self._field_setter_function_signature(
             register=register,
             register_array=register_array,
@@ -125,12 +139,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
             if register_array:
                 current_register_value += "array_index"
             current_register_value += ")"
+
         elif register.mode in ["w", "wpulse", "r_wpulse"]:
             cpp_code += self.comment_block(
                 "This register's current value can not be read back due to its mode.\n"
                 "Hence set all bits except for the field to default when writing the value."
             )
-            current_register_value = register.default_value
+            current_register_value = str(register.default_value)
+
         else:
             raise ValueError(f"Can not handle this register's mode: {register}")
 
@@ -156,7 +172,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return cpp_code
 
-    def _field_setter_function_from_value(self, register, register_array, field):
+    def _field_setter_function_from_value(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         signature = self._field_setter_function_signature(
             register=register, register_array=register_array, field=field, from_value=True, indent=2
         )
@@ -187,7 +208,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _get_shift_and_mask(field):
+    def _get_shift_and_mask(field: "RegisterField") -> str:
         cpp_code = f"    const uint32_t shift = {field.base_index}uL;\n"
         cpp_code += f'    const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
         cpp_code += "    const uint32_t mask_shifted = mask_at_base << shift;\n"
@@ -195,7 +216,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _get_checker(field):
+    def _get_checker(field: "RegisterField") -> str:
         if isinstance(field, Integer):
             cpp_code = "    // Check that provided value is within the legal range of this field.\n"
             cpp_code += f"    assert(field_value >= {field.min_value});\n"
@@ -205,7 +226,9 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return ""
 
-    def _register_getter_function(self, register, register_array):
+    def _register_getter_function(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         signature = self._register_getter_function_signature(
             register=register, register_array=register_array, indent=2
         )
@@ -228,7 +251,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += "  }\n\n"
         return cpp_code
 
-    def _field_getter_function(self, register, register_array, field):
+    def _field_getter_function(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         signature = self._field_getter_function_signature(
             register=register,
             register_array=register_array,
@@ -266,7 +294,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return cpp_code
 
-    def _field_getter_function_from_value(self, register, register_array, field):
+    def _field_getter_function_from_value(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         signature = self._field_getter_function_signature(
             register=register, register_array=register_array, field=field, from_value=True, indent=2
         )

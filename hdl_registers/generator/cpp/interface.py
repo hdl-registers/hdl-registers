@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -24,6 +25,12 @@ from hdl_registers.register import REGISTER_MODES
 
 # Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
 
 
 class CppInterfaceGenerator(CppGeneratorCommon):
@@ -44,7 +51,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         """
         return self.output_folder / f"i_{self.name}.h"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         cpp_code = ""
 
         for register, register_array in self.iterate_registers():
@@ -116,7 +123,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 """
         return cpp_code_top + self._with_namespace(cpp_code)
 
-    def _constants(self):
+    def _constants(self) -> str:
         cpp_code = ""
 
         for constant in self.iterate_constants():
@@ -153,7 +160,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         return cpp_code
 
-    def _num_registers(self):
+    def _num_registers(self) -> str:
         # It is possible that we have constants but no registers
         num_registers = 0
         if self.register_list.register_objects:
@@ -164,15 +171,19 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _field_description(register, register_array, field):
+    def _field_description(
+        register: "Register", register_array: Optional["RegisterArray"], field: "RegisterField"
+    ) -> str:
         result = f'the "{field.name}" field in the "{register.name}" register'
         if register_array is not None:
             result += f' within the "{register_array.name}" register array'
 
         return result
 
-    def _field_interface(self, register, register_array):
-        def function(return_type_name, signature):
+    def _field_interface(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
+        def function(return_type_name: str, signature: str) -> str:
             return f"    virtual {return_type_name} {signature} const = 0;\n"
 
         cpp_code = ""
@@ -251,7 +262,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _get_default_value(field):
+    def _get_default_value(field: "RegisterField") -> str:
         """
         Get the field's default value formatted in a way suitable for C++ code.
         """
@@ -262,11 +273,16 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             return f"Enumeration::{field.default_value.name}"
 
         if isinstance(field, Integer):
-            return field.default_value
+            return str(field.default_value)
 
         raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
 
-    def _field_attributes(self, register, register_array, field):
+    def _field_attributes(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         field_description = self._field_description(
             register=register, register_array=register_array, field=field
         )
@@ -296,7 +312,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         return cpp_code
 
-    def _register_array_attributes(self, register_array):
+    def _register_array_attributes(self, register_array: "RegisterArray") -> str:
         return f"""\
   // Attributes for the "{register_array.name}" register array.
   namespace {self.name}::{register_array.name}

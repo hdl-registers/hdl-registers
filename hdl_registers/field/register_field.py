@@ -26,6 +26,7 @@ class RegisterField(ABC):
 
     # Must set these two as class members in subclasses.
     name: str
+    description: str
     default_value: Union[str, int]
 
     @property
@@ -34,7 +35,8 @@ class RegisterField(ABC):
         Get the maximum value, represented as a positive integer, that this
         field can hold given its width.
         """
-        return 2**self.width - 1
+        result: int = 2**self.width - 1
+        return result
 
     @property
     def range_str(self) -> str:

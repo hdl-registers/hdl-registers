@@ -21,7 +21,7 @@ sys.path.insert(0, str(REPO_ROOT))
 import tools.tools_pythonpath  # noqa: F401
 
 # Third party libraries
-from git import Repo
+from git.repo import Repo
 from tsfpga.system_utils import create_file
 from tsfpga.tools.version_number_handler import (
     UNRELEASED_EMPTY,
@@ -35,7 +35,7 @@ from tsfpga.tools.version_number_handler import (
 from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_PATH
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Make release commits and tag")
     parser.add_argument(
         "release_version", type=str, help="release version number MAJOR.MINOR.PATCH"
@@ -63,7 +63,7 @@ def main():
     make_commit(repo=repo, commit_message="Set pre-release version number")
 
 
-def move_release_notes(repo, version):
+def move_release_notes(repo: Repo, version: str) -> None:
     unreleased_rst = HDL_REGISTERS_DOC / "release_notes" / "unreleased.rst"
     version_rst = HDL_REGISTERS_DOC / "release_notes" / f"{version}.rst"
 

@@ -53,7 +53,7 @@ class BitVectorConstant(Constant):
         return self._value
 
     @value.setter
-    def value(self, value: str):
+    def value(self, value: str) -> None:
         """
         Setter for ``value`` that performs sanity checks.
         """

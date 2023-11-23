@@ -15,7 +15,8 @@ from .field.bit import Bit
 from .field.bit_vector import BitVector
 from .field.enumeration import Enumeration
 from .field.integer import Integer
-from .field.register_field import DEFAULT_FIELD_TYPE, FieldType
+from .field.register_field import DEFAULT_FIELD_TYPE
+from .field.register_field_type import FieldType
 
 if TYPE_CHECKING:
     # Local folder libraries
@@ -180,7 +181,7 @@ class Register:
 
         return integer
 
-    def _append_field(self, field: "RegisterField"):
+    def _append_field(self, field: "RegisterField") -> None:
         self.fields.append(field)
 
         self.bit_index += field.width

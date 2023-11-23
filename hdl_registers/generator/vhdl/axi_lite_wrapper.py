@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import Any
 
 # Third party libraries
 from tsfpga.system_utils import delete
@@ -61,7 +62,7 @@ src/axi_lite_reg_file.vhd
         """
         return self.output_folder / f"{self.name}_reg_file.vhd"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get VHDL code for a wrapper around the generic AXi_lite register file from hdl_modules:
         """
@@ -213,7 +214,7 @@ end architecture;
 
         return vhdl
 
-    def _get_was_accessed_ports(self):
+    def _get_was_accessed_ports(self) -> tuple[str, str]:
         has_any_read = self.has_any_bus_accessible_register(direction=BUS_ACCESS_DIRECTIONS["read"])
         has_any_write = self.has_any_bus_accessible_register(
             direction=BUS_ACCESS_DIRECTIONS["write"]
@@ -243,7 +244,7 @@ end architecture;
 
         return was_read, was_written
 
-    def create(self, **kwargs):
+    def create(self, **kwargs: Any) -> None:
         """
         Overload the super method to implement our custom behavior.
         """

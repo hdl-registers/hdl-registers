@@ -9,7 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -24,6 +24,7 @@ from .html_translator import HtmlTranslator
 
 if TYPE_CHECKING:
     # First party libraries
+    from hdl_registers.constant.constant import Constant
     from hdl_registers.register_list import RegisterList
 
 
@@ -48,7 +49,7 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
 
         self._html_translator = HtmlTranslator()
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         if not self.register_list.constants:
             return ""
 
@@ -78,7 +79,7 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
 </table>"""
         return html
 
-    def _format_constant_value(self, constant):
+    def _format_constant_value(self, constant: "Constant") -> str:
         if isinstance(constant, UnsignedVectorConstant):
             return f"{constant.prefix}{constant.value}"
 

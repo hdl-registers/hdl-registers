@@ -12,7 +12,7 @@ import datetime
 import re
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Union
 
 # Third party libraries
 from tsfpga.git_utils import get_git_commit, git_commands_are_available
@@ -83,7 +83,7 @@ class RegisterCodeGenerator(ABC):
         """
 
     @abstractmethod
-    def get_code(self, **kwargs) -> str:  # pylint: disable=unused-argument
+    def get_code(self, **kwargs: Any) -> str:  # pylint: disable=unused-argument
         """
         Get the generated code as a string.
 
@@ -124,7 +124,7 @@ class RegisterCodeGenerator(ABC):
 
         self.name = register_list.name
 
-    def create(self, **kwargs):
+    def create(self, **kwargs: Any) -> None:
         """
         Generate the result artifact.
         I.e. create the :meth:`.output_file` containing the result from :meth:`.get_code` method.
@@ -141,7 +141,7 @@ class RegisterCodeGenerator(ABC):
         # Will create the containing folder unless it already exists.
         create_file(file=self.output_file, contents=code)
 
-    def create_if_needed(self, **kwargs) -> bool:
+    def create_if_needed(self, **kwargs: Any) -> bool:
         """
         Generate the result file if needed.
         I.e. call :meth:`.create` if :meth:`.should_create` is ``True``.

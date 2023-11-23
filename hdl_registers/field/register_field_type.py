@@ -18,7 +18,7 @@ def _from_unsigned_binary(
     integer_bit_width: Optional[int] = None,
     fraction_bit_width: int = 0,
     is_signed: bool = False,
-) -> float:
+) -> Union[int, float]:
     """
     Convert from an unsigned binary to one of:
     - unsigned integer
@@ -43,13 +43,15 @@ def _from_unsigned_binary(
 
     Return:
         Native Python representation of the field value.
+        Will be a ``float`` if ``fraction_bit_width`` is non-zero, otherwise it will be an ``int``.
     """
     integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
 
     if integer_bit_width + fraction_bit_width != bit_width:
         raise ValueError("Inconsistent bit width")
 
-    value = unsigned_binary * 2**-fraction_bit_width
+    value: Union[int, float] = unsigned_binary * 2**-fraction_bit_width
+
     if is_signed:
         sign_bit = unsigned_binary & (1 << (bit_width - 1))
         if sign_bit != 0:
@@ -61,7 +63,7 @@ def _from_unsigned_binary(
 
 def _to_unsigned_binary(
     bit_width: int,
-    value: float,
+    value: Union[int, float],
     integer_bit_width: Optional[int] = None,
     fraction_bit_width: int = 0,
     is_signed: bool = False,
@@ -83,6 +85,8 @@ def _to_unsigned_binary(
     Arguments:
         bit_width: Width of the field.
         value: Native Python representation of the field value.
+           If ``fraction_bit_width`` is non-zero the value is expected to be a ``float``, otherwise
+           an ``int`` is expected.
         integer_bit_width: If fixed point, the number of bits assigned to the integer part of the
             field value.
         fraction_bit_width: If fixed point, the number of bits assigned to the fractional part of
@@ -97,7 +101,7 @@ def _to_unsigned_binary(
     if integer_bit_width + fraction_bit_width != bit_width:
         raise ValueError("Inconsistent bit width")
 
-    binary_value = round(value * 2**fraction_bit_width)
+    binary_value: int = round(value * 2**fraction_bit_width)
     if value < 0:
         if is_signed:
             binary_value += 1 << bit_width
@@ -159,7 +163,7 @@ class FieldType(ABC):
     def __repr__(self) -> str:
         pass
 
-    def _check_value_in_range(self, bit_width: int, value: Union[int, float]):
+    def _check_value_in_range(self, bit_width: int, value: Union[int, float]) -> None:
         """
         Raise an exception if the given field value is not within the allowed range.
 
@@ -182,7 +186,8 @@ class Unsigned(FieldType):
         return 0
 
     def max_value(self, bit_width: int) -> int:
-        return 2**bit_width - 1
+        result: int = 2**bit_width - 1
+        return result
 
     def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> int:
         return unsigned_binary
@@ -201,10 +206,12 @@ class Signed(FieldType):
     """
 
     def min_value(self, bit_width: int) -> int:
-        return -(2 ** (bit_width - 1))
+        result: int = -(2 ** (bit_width - 1))
+        return result
 
     def max_value(self, bit_width: int) -> int:
-        return 2 ** (bit_width - 1) - 1
+        result: int = 2 ** (bit_width - 1) - 1
+        return result
 
     def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> int:
         return int(_from_unsigned_binary(bit_width, unsigned_binary, is_signed=True))

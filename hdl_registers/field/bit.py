@@ -47,7 +47,7 @@ class Bit(RegisterField):
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: str):
+    def default_value(self, value: str) -> None:
         """
         Setter for ``default_value`` that performs sanity checks.
         """

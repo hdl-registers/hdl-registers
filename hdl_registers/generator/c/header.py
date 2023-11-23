@@ -9,7 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -22,6 +22,10 @@ from hdl_registers.generator.register_code_generator import RegisterCodeGenerato
 from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register import REGISTER_MODES, Register
 from hdl_registers.register_list import RegisterList
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.register_array import RegisterArray
 
 
 class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
@@ -65,7 +69,7 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         self._file_name = f"{self.name}_regs.h" if file_name is None else file_name
 
-    def get_code(self, **kwargs):
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get a complete C header with all constants and all registers.
         """
@@ -84,7 +88,7 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return c_code
 
-    def _register_struct(self):
+    def _register_struct(self) -> str:
         array_structs = ""
 
         register_struct_type = f"{self.name}_regs_t"
@@ -123,7 +127,7 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return array_structs + register_struct
 
-    def _number_of_registers(self):
+    def _number_of_registers(self) -> str:
         # It is possible that we have constants but no registers
         num_regs = 0
         if self.register_list.register_objects:
@@ -134,7 +138,7 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return c_code
 
-    def _register_defines(self):
+    def _register_defines(self) -> str:
         c_code = ""
         for register, register_array in self.iterate_registers():
             c_code += self._addr_define(register, register_array)
@@ -143,7 +147,7 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return c_code
 
-    def _addr_define(self, register, register_array):
+    def _addr_define(self, register: Register, register_array: Optional["RegisterArray"]) -> str:
         name = self._register_define_name(register, register_array)
 
         comment = f'Address of the "{register.name}" register'
@@ -168,7 +172,9 @@ class CHeaderGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return c_code
 
-    def _field_definitions(self, register, register_array):
+    def _field_definitions(
+        self, register: Register, register_array: Optional["RegisterArray"]
+    ) -> str:
         register_name = self._register_define_name(register, register_array)
         register_string = f'"{register.name}" register'
         if register_array is not None:
@@ -204,14 +210,16 @@ enum {self.to_pascal_case(field_name)}
 
         return c_code
 
-    def _register_define_name(self, register, register_array):
+    def _register_define_name(
+        self, register: Register, register_array: Optional["RegisterArray"]
+    ) -> str:
         if register_array is None:
             name = f"{self.name}_{register.name}"
         else:
             name = f"{self.name}_{register_array.name}_{register.name}"
         return name.upper()
 
-    def _constants(self):
+    def _constants(self) -> str:
         c_code = ""
         for constant in self.iterate_constants():
             constant_name = f"{self.name.upper()}_{constant.name.upper()}"

@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
 from hdl_registers.field.bit import Bit
@@ -22,6 +23,14 @@ from .vhdl_generator_common import (
     FABRIC_ACCESS_DIRECTIONS,
     VhdlGeneratorCommon,
 )
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
+
+    # Local folder libraries
+    from .vhdl_generator_common import BusAccessDirection, FabricAccessDirection
 
 
 class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
@@ -54,7 +63,7 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_record_pkg.vhd"
 
-    def _register_field_records(self):
+    def _register_field_records(self) -> str:
         """
         For every register (plain or in array) that has at least one field:
 
@@ -111,7 +120,7 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
 
         return vhdl
 
-    def _register_records(self):
+    def _register_records(self) -> str:
         """
         Get two records,
         * One with all the registers that are in the 'up' direction.
@@ -151,7 +160,7 @@ return {self.name}_regs_{direction.name}_t;
 
         return vhdl
 
-    def _array_field_records(self, direction):
+    def _array_field_records(self, direction: "FabricAccessDirection") -> str:
         """
         For every register array that has at least one register in the specified direction:
 
@@ -209,7 +218,7 @@ the '{direction.name}' direction.
 
         return f"{heading}{vhdl}"
 
-    def _get_register_record(self, direction):
+    def _get_register_record(self, direction: "FabricAccessDirection") -> str:
         """
         Get the record that contains all registers and arrays in the specified direction.
         Also default value constant for this record.
@@ -222,13 +231,13 @@ the '{direction.name}' direction.
   type {self.name}_regs_{direction.name}_t is record
 """
 
-        for array in self.iterate_bus_accessible_register_arrays(direction=direction):
+        for array in self.iterate_fabric_accessible_register_arrays(direction=direction):
             array_name = self.register_array_name(register_array=array)
 
             vhdl += f"    {array.name} : {array_name}_{direction.name}_vec_t;\n"
             record_init.append(f"{array.name} => (others => {array_name}_{direction.name}_init)")
 
-        for register in self.iterate_bus_accessible_plain_registers(direction=direction):
+        for register in self.iterate_fabric_accessible_plain_registers(direction=direction):
             vhdl += self._record_member_declaration_for_register(register=register)
 
             if register.fields:
@@ -249,7 +258,9 @@ the '{direction.name}' direction.
   );
 """
 
-    def _record_member_declaration_for_register(self, register, register_array=None):
+    def _record_member_declaration_for_register(
+        self, register: "Register", register_array: Optional["RegisterArray"] = None
+    ) -> str:
         """
         Get the record member declaration line for a register that shall be part of the record.
         """
@@ -260,7 +271,7 @@ the '{direction.name}' direction.
 
         return f"    {register.name} : reg_t;\n"
 
-    def _register_was_accessed(self):
+    def _register_was_accessed(self) -> str:
         """
         Get record for 'reg_was_read' and 'reg_was_written' ports.
         Should include only the registers that are actually readable/writeable.
@@ -273,7 +284,7 @@ the '{direction.name}' direction.
 
         return vhdl
 
-    def _register_was_accessed_record(self, direction):
+    def _register_was_accessed_record(self, direction: "BusAccessDirection") -> str:
         """
         Get the record for 'reg_was_read' or 'reg_was_written'.
         """
@@ -348,14 +359,14 @@ of {array_name}_was_{direction.name_past}_t;
 
         return vhdl
 
-    def _register_field_record_conversion_implementations(self):
+    def _register_field_record_conversion_implementations(self) -> str:
         """
         Implementation of functions that convert a register record with native field types
         to/from SLV.
         """
         vhdl = ""
 
-        def _get_functions(register, register_array=None):
+        def _get_functions(register: "Register", register_array: Optional["RegisterArray"]) -> str:
             register_name = self.register_name(register=register, register_array=register_array)
 
             to_slv = ""
@@ -407,7 +418,7 @@ of {array_name}_was_{direction.name_past}_t;
 
         return vhdl
 
-    def _register_record_conversion_implementations(self):
+    def _register_record_conversion_implementations(self) -> str:
         """
         Conversion function implementations to/from SLV for the records containing all
         registers and arrays in 'up'/'down' direction.
@@ -422,7 +433,7 @@ of {array_name}_was_{direction.name_past}_t;
 
         return vhdl
 
-    def _register_record_up_to_slv(self):
+    def _register_record_up_to_slv(self) -> str:
         """
         Conversion function implementation for converting a record of all the 'up' registers
         to a register SLV list.
@@ -465,7 +476,7 @@ of {array_name}_was_{direction.name_past}_t;
 
 """
 
-    def _get_registers_down_to_record_function(self):
+    def _get_registers_down_to_record_function(self) -> str:
         """
         Conversion function implementation for converting all the 'down' registers
         in a register SLV list to record.
@@ -509,7 +520,7 @@ of {array_name}_was_{direction.name_past}_t;
 
 """
 
-    def _register_was_accessed_conversion_implementations(self):
+    def _register_was_accessed_conversion_implementations(self) -> str:
         """
         Get conversion functions from SLV 'reg_was_read'/'reg_was_written' to record types.
         """
@@ -521,7 +532,9 @@ of {array_name}_was_{direction.name_past}_t;
 
         return vhdl
 
-    def _register_was_accessed_conversion_implementation(self, direction):
+    def _register_was_accessed_conversion_implementation(
+        self, direction: "BusAccessDirection"
+    ) -> str:
         """
         Get a conversion function  from SLV 'reg_was_read'/'reg_was_written' to record type.
         """
@@ -557,7 +570,7 @@ of {array_name}_was_{direction.name_past}_t;
 
 """
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(self, **kwargs: Any) -> str:
         """
         Get a complete VHDL package with register record types.
         """

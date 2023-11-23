@@ -129,7 +129,7 @@ class RegisterParser:
 
         return self._register_list
 
-    def _parse_constant(self, name, items):
+    def _parse_constant(self, name: str, items: dict[str, Any]) -> None:
         if "value" not in items:
             message = (
                 f'Constant "{name}" in {self._source_definition_file} does not have '
@@ -168,7 +168,7 @@ class RegisterParser:
 
         self._register_list.add_constant(name=name, value=value, description=description)
 
-    def _parse_plain_register(self, name, items):
+    def _parse_plain_register(self, name: str, items: dict[str, Any]) -> None:
         for item_name in items.keys():
             if item_name not in self.recognized_register_items:
                 message = (
@@ -217,7 +217,7 @@ class RegisterParser:
         if "integer" in items:
             self._parse_integers(register=register, field_configurations=items["integer"])
 
-    def _parse_register_array(self, name, items):
+    def _parse_register_array(self, name: str, items: dict[str, Any]) -> None:
         for required_attribute in ["array_length", "register"]:
             if required_attribute not in items:
                 message = (
@@ -286,10 +286,13 @@ class RegisterParser:
         self,
         register_name: str,
         field_name: str,
-        field_items: dict,
-        recognized_items: set,
-        required_items: list,
-    ):
+        field_items: dict[str, Any],
+        recognized_items: set[str],
+        required_items: list[str],
+    ) -> None:
+        """
+        Will raise exception if anything is wrong.
+        """
         for item_name in required_items:
             if item_name not in field_items:
                 message = (
@@ -308,7 +311,7 @@ class RegisterParser:
                 )
                 raise ValueError(message)
 
-    def _parse_bits(self, register: "Register", field_configurations: dict):
+    def _parse_bits(self, register: "Register", field_configurations: dict[str, Any]) -> None:
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,
@@ -325,7 +328,9 @@ class RegisterParser:
                 name=field_name, description=description, default_value=default_value
             )
 
-    def _parse_bit_vectors(self, register: "Register", field_configurations: dict):
+    def _parse_bit_vectors(
+        self, register: "Register", field_configurations: dict[str, Any]
+    ) -> None:
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,
@@ -344,7 +349,9 @@ class RegisterParser:
                 name=field_name, description=description, width=width, default_value=default_value
             )
 
-    def _parse_enumerations(self, register: "Register", field_configurations: dict):
+    def _parse_enumerations(
+        self, register: "Register", field_configurations: dict[str, Any]
+    ) -> None:
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,
@@ -374,7 +381,7 @@ class RegisterParser:
                 default_value=default_value,
             )
 
-    def _parse_integers(self, register: "Register", field_configurations: dict):
+    def _parse_integers(self, register: "Register", field_configurations: dict[str, Any]) -> None:
         for field_name, field_items in field_configurations.items():
             self._check_field_items(
                 register_name=register.name,

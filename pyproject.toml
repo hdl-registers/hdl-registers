@@ -22,3 +22,10 @@ import_heading_localfolder = "Local folder libraries"
 # third party import.
 known_tools_pythonpath = "tools.tools_pythonpath"
 sections = "FUTURE,STDLIB,TOOLS_PYTHONPATH,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+
+
+[tool.mypy]
+exclude = ['/test_.*\.py$']
+
+# Use strict as a base, and explicitly remove the checks that we do not want.
+strict = true

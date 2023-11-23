@@ -7,13 +7,16 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from pathlib import Path
+
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
 from hdl_registers.parser import from_toml
 
 
 class CompileAndRunTest:
-    def __init__(self, tmp_path):
+    def __init__(self, tmp_path: Path) -> None:
         self.working_dir = tmp_path
         self.include_dir = self.working_dir / "include"
 

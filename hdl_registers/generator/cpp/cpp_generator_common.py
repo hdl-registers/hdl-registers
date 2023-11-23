@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import TYPE_CHECKING, Optional
 
 # First party libraries
 from hdl_registers.field.enumeration import Enumeration
@@ -16,6 +17,12 @@ from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register_list import RegisterList
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.field.register_field import RegisterField
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
 
 
 class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
@@ -31,23 +38,30 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         self._class_name = self.to_pascal_case(snake_string=self.name)
 
     @staticmethod
-    def _with_namespace(cpp_code_body):
+    def _with_namespace(cpp_code_body: str) -> str:
         cpp_code = "namespace fpga_regs\n"
         cpp_code += "{\n\n"
         cpp_code += f"{cpp_code_body}"
         cpp_code += "} /* namespace fpga_regs */\n"
         return cpp_code
 
-    def _constructor_signature(self):
+    def _constructor_signature(self) -> str:
         return f"{self._class_name}(volatile uint8_t *base_address)"
 
-    def _get_methods_description(self, register, register_array):
+    def _get_methods_description(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         register_description = self.register_description(
             register=register, register_array=register_array
         )
         return f"Methods for the {register_description}."
 
-    def _field_value_type_name(self, register, register_array, field):
+    def _field_value_type_name(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+    ) -> str:
         """
         The name of the type used to represent the field.
         """
@@ -68,7 +82,9 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return "uint32_t"
 
     @staticmethod
-    def _register_getter_function_name(register, register_array):
+    def _register_getter_function_name(
+        register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         result = "get"
 
         if register_array:
@@ -78,7 +94,12 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return result
 
-    def _register_getter_function_signature(self, register, register_array, indent=None):
+    def _register_getter_function_signature(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        indent: Optional[int] = None,
+    ) -> str:
         function_name = self._register_getter_function_name(
             register=register, register_array=register_array
         )
@@ -93,7 +114,12 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return result
 
     @staticmethod
-    def _field_getter_function_name(register, register_array, field, from_value):
+    def _field_getter_function_name(
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+        from_value: bool,
+    ) -> str:
         result = "get"
 
         if register_array:
@@ -107,8 +133,13 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return result
 
     def _field_getter_function_signature(
-        self, register, register_array, field, from_value, indent=None
-    ):
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+        from_value: bool,
+        indent: Optional[int] = None,
+    ) -> str:
         indentation = self.get_indentation(indent=indent)
 
         function_name = self._field_getter_function_name(
@@ -129,7 +160,9 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return result
 
     @staticmethod
-    def _register_setter_function_name(register, register_array):
+    def _register_setter_function_name(
+        register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
         result = "set"
 
         if register_array:
@@ -139,7 +172,12 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
         return result
 
-    def _register_setter_function_signature(self, register, register_array, indent=None):
+    def _register_setter_function_signature(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        indent: Optional[int] = None,
+    ) -> str:
         indentation = self.get_indentation(indent=indent)
 
         function_name = self._register_setter_function_name(
@@ -155,7 +193,12 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return result
 
     @staticmethod
-    def _field_setter_function_name(register, register_array, field, from_value):
+    def _field_setter_function_name(
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+        from_value: bool,
+    ) -> str:
         result = "set"
 
         if register_array:
@@ -169,8 +212,13 @@ class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         return result
 
     def _field_setter_function_signature(
-        self, register, register_array, field, from_value, indent=None
-    ):
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: "RegisterField",
+        from_value: bool,
+        indent: Optional[int] = None,
+    ) -> str:
         indentation = self.get_indentation(indent=indent)
 
         function_name = self._field_setter_function_name(
