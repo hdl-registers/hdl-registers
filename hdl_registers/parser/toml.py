@@ -25,13 +25,13 @@ if TYPE_CHECKING:
 
 
 def from_toml(
-    module_name: str, toml_file: Path, default_registers: Optional[list["Register"]] = None
+    name: str, toml_file: Path, default_registers: Optional[list["Register"]] = None
 ) -> "RegisterList":
     """
     Parse a TOML file with register data.
 
     Arguments:
-        module_name: The name of the module that these registers belong to.
+        name: The name of the register list.
         toml_file: The TOML file path.
         default_registers: List of default registers.
 
@@ -39,9 +39,7 @@ def from_toml(
         The resulting register list.
     """
     parser = RegisterParser(
-        module_name=module_name,
-        source_definition_file=toml_file,
-        default_registers=default_registers,
+        name=name, source_definition_file=toml_file, default_registers=default_registers
     )
     toml_data = _load_toml_file(file_path=toml_file)
 

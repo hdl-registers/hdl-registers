@@ -30,8 +30,8 @@ from hdl_registers.register_list import RegisterList
 
 
 class RegisterConfiguration:
-    def __init__(self, module_name, source_toml_file):
-        self.register_list = from_toml(module_name=module_name, toml_file=source_toml_file)
+    def __init__(self, name, source_toml_file):
+        self.register_list = from_toml(name=name, toml_file=source_toml_file)
 
         self.register_list.add_constant(name="boolean_constant", value=True, description="")
         self.register_list.add_constant(name="integer_constant", value=3, description="")

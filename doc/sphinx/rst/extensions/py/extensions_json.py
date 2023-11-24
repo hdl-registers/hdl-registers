@@ -29,7 +29,7 @@ def parse_json() -> RegisterList:
     with open(json_path, encoding="utf-8") as file_handle:
         json_data = json.load(file_handle)
 
-    parser = RegisterParser(module_name="caesar", source_definition_file=json_path)
+    parser = RegisterParser(name="caesar", source_definition_file=json_path)
 
     return parser.parse(register_data=json_data)
 

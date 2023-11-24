@@ -21,5 +21,5 @@ class CompileAndRunTest:
         self.include_dir = self.working_dir / "include"
 
         self.register_list = from_toml(
-            module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
+            name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
         )

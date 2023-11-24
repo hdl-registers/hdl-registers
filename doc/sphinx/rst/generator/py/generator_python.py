@@ -23,7 +23,7 @@ def main(output_folder: Path):
     Create register Python artifacts from the TOML example file.
     """
     register_list = from_toml(
-        module_name="example",
+        name="example",
         toml_file=THIS_DIR.parent.parent / "user_guide" / "toml" / "toml_format.toml",
     )
 

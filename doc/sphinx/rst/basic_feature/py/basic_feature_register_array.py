@@ -28,7 +28,7 @@ def parse_toml() -> RegisterList:
     Create the register list by parsing a TOML data file.
     """
     return from_toml(
-        module_name="caesar",
+        name="caesar",
         toml_file=THIS_DIR.parent / "toml" / "basic_feature_register_array.toml",
     )
 

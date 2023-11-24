@@ -44,13 +44,19 @@ class RegisterParser:
 
     def __init__(
         self,
-        module_name: str,
+        name: str,
         source_definition_file: Path,
         default_registers: Optional[list["Register"]] = None,
     ):
-        self._register_list = RegisterList(
-            name=module_name, source_definition_file=source_definition_file
-        )
+        """
+        Arguments:
+            name: The name of the register list.
+            source_definition_file: The source file that defined this register list.
+                Will be displayed in generated source code and documentation
+                for traceability.
+            default_registers: List of default registers.
+        """
+        self._register_list = RegisterList(name=name, source_definition_file=source_definition_file)
         self._source_definition_file = source_definition_file
 
         self._default_register_names = []

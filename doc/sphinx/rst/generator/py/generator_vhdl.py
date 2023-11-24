@@ -26,7 +26,7 @@ def main(output_folder: Path):
     Create register VHDL artifacts from the "counter" example module.
     """
     register_list = from_toml(
-        module_name="counter", toml_file=THIS_DIR.parent / "sim" / "regs_counter.toml"
+        name="counter", toml_file=THIS_DIR.parent / "sim" / "regs_counter.toml"
     )
 
     VhdlRegisterPackageGenerator(

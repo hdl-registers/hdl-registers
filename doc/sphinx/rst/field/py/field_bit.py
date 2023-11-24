@@ -27,7 +27,7 @@ def parse_toml() -> RegisterList:
     """
     Create the register list by parsing a TOML data file.
     """
-    return from_toml(module_name="caesar", toml_file=THIS_DIR.parent / "toml" / "field_bit.toml")
+    return from_toml(name="caesar", toml_file=THIS_DIR.parent / "toml" / "field_bit.toml")
 
 
 def create_from_api() -> RegisterList:

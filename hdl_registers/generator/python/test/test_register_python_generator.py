@@ -17,7 +17,7 @@ from hdl_registers.parser.toml import from_toml
 
 
 def test_recreating_register_list_object(tmp_path):
-    register_list = from_toml(module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml")
+    register_list = from_toml(name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml")
     PythonClassGenerator(register_list, tmp_path).create()
 
     test_recreated = load_python_module(tmp_path / "caesar.py").Caesar()

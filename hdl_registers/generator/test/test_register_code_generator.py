@@ -52,7 +52,7 @@ description = "My register"
 """
 
         return from_toml(
-            module_name="sensor", toml_file=create_file(tmp_path / "sensor_regs.toml", toml_data)
+            name="sensor", toml_file=create_file(tmp_path / "sensor_regs.toml", toml_data)
         )
 
     return get

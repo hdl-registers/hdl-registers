@@ -35,13 +35,13 @@ from hdl_registers.parser.toml import from_toml
 # Test with all the example TOML files that we have available
 REGISTER_LISTS = [
     from_toml(
-        module_name="ddr_buffer",
+        name="ddr_buffer",
         toml_file=tsfpga.TSFPGA_EXAMPLE_MODULES / "ddr_buffer" / "regs_ddr_buffer.toml",
         default_registers=get_default_registers(),
     ),
-    from_toml(module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
+    from_toml(name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
     from_toml(
-        module_name="example",
+        name="example",
         toml_file=HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "toml" / "toml_format.toml",
     ),
 ]

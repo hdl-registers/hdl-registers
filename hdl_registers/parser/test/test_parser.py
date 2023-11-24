@@ -21,7 +21,7 @@ from hdl_registers.register import Register
 def test_load_nonexistent_toml_file_should_raise_exception(tmp_path):
     toml_path = tmp_path / "apa.toml"
     with pytest.raises(FileNotFoundError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == f"Requested TOML file does not exist: {toml_path}"
 
 
@@ -31,11 +31,11 @@ a = 1
 b = "c"
 """
     toml_path = create_file(tmp_path / "apa.toml", toml)
-    from_toml(module_name="", toml_file=toml_path)
+    from_toml(name="", toml_file=toml_path)
 
     toml_path = create_file(tmp_path / "hest.toml", toml + "garbage")
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value).startswith(
         f"Error while parsing TOML file {toml_path}:\nExpected '=' after a key"
     )
@@ -55,7 +55,7 @@ mode = "w"
 """,
     )
     register_list = from_toml(
-        module_name="",
+        name="",
         toml_file=toml_path,
         default_registers=[
             Register(name="config", index=0, mode="r_w", description=""),
@@ -81,7 +81,7 @@ description = "apa"
 """,
     )
     register_list = from_toml(
-        module_name="",
+        name="",
         toml_file=toml_path,
         default_registers=[Register(name="config", index=0, mode="r_w", description="")],
     )
@@ -101,7 +101,7 @@ mode = "w"
 
     with pytest.raises(ValueError) as exception_info:
         from_toml(
-            module_name="",
+            name="",
             toml_file=toml_path,
             default_registers=[Register(name="config", index=0, mode="r_w", description="")],
         )
@@ -122,7 +122,7 @@ description = "w"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert (
         str(exception_info.value)
         == f'Register "apa" in {toml_path} does not have the required "mode" property.'
@@ -144,7 +144,7 @@ mode = "w"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     expected = (
         f"Error while parsing TOML file {toml_path}:\n"
         "Cannot declare ('register', 'status') twice"
@@ -164,7 +164,7 @@ dummy = 3
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert (
         str(exception_info.value)
         == f'Error while parsing register "test_reg" in {toml_path}: Unknown key "dummy".'
@@ -182,7 +182,7 @@ array_length = 2
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Register array "dummy_array" in {toml_path} does not have '
         'the required "register" property.'
@@ -202,7 +202,7 @@ mode = "r_w"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Register array "apa" in {toml_path} does not have '
         'the required "array_length" property.'
@@ -225,7 +225,7 @@ mode = "r"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert (
         str(exception_info.value)
         == f'Error while parsing register array "test_array" in {toml_path}: '
@@ -248,7 +248,7 @@ description = "nothing"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Register "hest" within array "apa" in {toml_path} does not have '
         'the required "mode" property.'
@@ -271,7 +271,7 @@ dummy = 3
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert (
         str(exception_info.value)
         == f'Error while parsing register "hest" in array "test_array" in {toml_path}: '
@@ -291,7 +291,7 @@ array_length = 4
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing register "apa" in {toml_path}: ' 'Unknown key "array_length".'
     )
@@ -316,7 +316,7 @@ description = "Declaration 2"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     expected = (
         f"Error while parsing TOML file {toml_path}:\n"
         "Cannot declare ('register', 'test_reg', 'bit', 'test_bit') twice"
@@ -340,7 +340,7 @@ height = 3
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing field "dummy_bit" in register "dummy_reg" in {toml_path}: '
         'Unknown key "height".'
@@ -365,7 +365,7 @@ height = 4
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing field "dummy_bit_vector" in register "dummy_reg" in '
         f'{toml_path}: Unknown key "height".'
@@ -384,7 +384,7 @@ bit_vector.test_bit_vector.default_value = "0"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Field "test_bit_vector" in register "test_reg" in {toml_path} does not have '
         'the required "width" property.'
@@ -403,7 +403,7 @@ enumeration.test.description = ""
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Field "test" in register "test_reg" in {toml_path} does not have the required '
         '"element" property.'
@@ -422,7 +422,7 @@ integer.test_integer.min_value = 3
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Field "test_integer" in register "test_reg" in {toml_path} does not have '
         'the required "max_value" property.'
@@ -463,7 +463,7 @@ data_type = "unsigned"
 """,
     )
 
-    register_list = from_toml(module_name="", toml_file=toml_path)
+    register_list = from_toml(name="", toml_file=toml_path)
     assert len(register_list.constants) == 6
 
     assert register_list.constants[0].name == "data_width"
@@ -500,7 +500,7 @@ description = "the width"
 """,
     )
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Constant "data_width" in {toml_path} does not have the required "value" property.'
     )
@@ -518,7 +518,7 @@ default_value = 0xf
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing constant "data_width" in {toml_path}: Unknown key "default_value".'
     )
@@ -536,7 +536,7 @@ data_type = "unsigned"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing constant "data_width" in {toml_path}: '
         'May not set "data_type" for non-string constant.'
@@ -555,7 +555,7 @@ data_type = "signed"
     )
 
     with pytest.raises(ValueError) as exception_info:
-        from_toml(module_name="", toml_file=toml_path)
+        from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing constant "data_width" in {toml_path}: Invalid data type "signed".'
     )
@@ -653,7 +653,7 @@ default_value="0000000000000011"
 """
     toml_file = create_file(file=tmp_path / "sensor_regs.toml", contents=toml_data)
 
-    registers = from_toml(module_name="sensor", toml_file=toml_file).register_objects
+    registers = from_toml(name="sensor", toml_file=toml_file).register_objects
 
     assert registers[0].name == "data"
     assert registers[0].mode == "w"

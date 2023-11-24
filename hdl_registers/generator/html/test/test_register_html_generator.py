@@ -23,7 +23,7 @@ class HtmlTest:
     def __init__(self, tmp_path):
         self.tmp_path = tmp_path
         self.register_list = from_toml(
-            module_name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
+            name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
         )
 
     def create_html_page(self):
