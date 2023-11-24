@@ -30,7 +30,7 @@ from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGene
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackageGenerator
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 
 # Test with all the example TOML files that we have available
 REGISTER_LISTS = [

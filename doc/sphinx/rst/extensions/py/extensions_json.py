@@ -14,7 +14,7 @@ from pathlib import Path
 
 # First party libraries
 from hdl_registers.generator.html.page import HtmlPageGenerator
-from hdl_registers.parser import RegisterParser
+from hdl_registers.parser.parser import RegisterParser
 from hdl_registers.register_list import RegisterList
 
 THIS_DIR = Path(__file__).parent

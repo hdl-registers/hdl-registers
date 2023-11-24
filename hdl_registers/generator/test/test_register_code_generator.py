@@ -18,7 +18,7 @@ from tsfpga.system_utils import create_file
 # First party libraries
 from hdl_registers import __version__ as hdl_registers_version
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
 
 

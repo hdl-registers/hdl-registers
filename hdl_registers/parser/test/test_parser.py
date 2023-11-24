@@ -14,7 +14,7 @@ from tsfpga.system_utils import create_file
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.string_constant import StringConstant
-from hdl_registers.parser import from_toml, load_toml_file
+from hdl_registers.parser.toml import from_toml, load_toml_file
 from hdl_registers.register import Register
 
 

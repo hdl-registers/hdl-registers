@@ -40,7 +40,7 @@ from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackag
 from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
     generate_strange_register_maps,
 )
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 
 THIS_FOLDER = Path(__file__).parent.resolve()
 

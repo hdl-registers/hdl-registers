@@ -13,7 +13,7 @@ from pathlib import Path
 
 # First party libraries
 from hdl_registers.generator.c.header import CHeaderGenerator
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 
 THIS_DIR = Path(__file__).parent
 

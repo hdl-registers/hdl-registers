@@ -12,7 +12,7 @@ from pathlib import Path
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 
 
 class CompileAndRunTest:

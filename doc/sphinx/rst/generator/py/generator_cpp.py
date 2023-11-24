@@ -15,7 +15,7 @@ from pathlib import Path
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 
 THIS_DIR = Path(__file__).parent
 

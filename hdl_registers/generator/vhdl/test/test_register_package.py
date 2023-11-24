@@ -25,7 +25,7 @@ from hdl_registers.field.register_field_type import (
     UnsignedFixedPoint,
 )
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
 
 

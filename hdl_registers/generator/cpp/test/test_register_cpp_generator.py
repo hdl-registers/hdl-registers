@@ -19,7 +19,7 @@ from tsfpga.system_utils import read_file
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TEST
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
-from hdl_registers.parser import from_toml
+from hdl_registers.parser.toml import from_toml
 
 
 @pytest.fixture
