@@ -7,5 +7,7 @@
 # https://gitlab.com/hdl_registers/hdl_registers
 # --------------------------------------------------------------------------------------------------
 
+# Import so that all tests have access to tsfpga functions.
+
 # Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
 import tools.tools_pythonpath  # noqa: F401
