@@ -41,7 +41,7 @@ def create_from_api() -> RegisterList:
     register_list.add_constant(
         name="base_address",
         value=UnsignedVector("0xA_0000_0000"),
-        description="The base address on the register bus for this module.",
+        description="Base address for this module on the register bus.",
     )
 
     register_list.add_constant(

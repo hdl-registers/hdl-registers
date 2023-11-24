@@ -63,8 +63,8 @@ invoke it.
 Integration in tsfpga
 ---------------------
 
-The tsfpga project (https://tsfpga.com, https://gitlab.com/tsfpga/tsfpga), which is a
-sister project of hdl_registers, integrates register code generation in an elegant way.
+The `tsfpga <https://tsfpga.com>`__ project, which is a sister project of hdl_registers,
+integrates register code generation in an elegant way.
 If a file named ``regs_<name>.toml`` is placed in the root of a module, and ``<name>`` matches the
 name of the module, it will be parsed and used as that module's register map.
 In the simulation and build scripts there is then a call to :class:`.VhdlRegisterPackageGenerator`

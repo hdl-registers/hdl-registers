@@ -12,7 +12,7 @@ data_type = "unsigned"
 
 # The "description" property is optional for a constant. Will default to "" if not specified.
 # The value specified must be a string.
-description = "The base address on the register bus for this module."
+description = "Base address for this module on the register bus."
 
 
 [constant.data_mask]

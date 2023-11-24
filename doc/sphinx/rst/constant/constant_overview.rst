@@ -12,5 +12,6 @@ See the menu sidebar for details about the different types and how to use them.
 Adding a constant to a register list in Python is done by running
 :meth:`.RegisterList.add_constant` on a :class:`.RegisterList` object.
 Or in a TOML data file e.g. :ref:`like this <constant_integer_toml>`.
-See the page for each constant type for more details about both Python API and TOML format.
+See the menubar to the left for an article about each constant type.
+They contain more details about both Python API and TOML format.
 
