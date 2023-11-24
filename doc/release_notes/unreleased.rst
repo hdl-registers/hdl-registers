@@ -38,6 +38,9 @@ Added
 
 Breaking changes
 
+* Move :class:`.RegisterParser` to sub-package ``hdl_registers.parser``.
+  Break out :func:`.from_toml` to separate Python module :mod:`hdl_registers.parser.toml`.
+* Rename ``module_name`` argument of :class:`.RegisterParser` and :func:`.from_toml` to ``name``.
 * Rename VHDL field conversion function for enumerations from ``to_<field name>_slv`` to ``to_slv``.
 * Remove C++ interface header constant ``<register array name>_array_length``.
   Information is instead available as an
