@@ -14,14 +14,14 @@ from tsfpga.system_utils import create_file
 # First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.string_constant import StringConstant
-from hdl_registers.parser.toml import from_toml, load_toml_file
+from hdl_registers.parser.toml import from_toml
 from hdl_registers.register import Register
 
 
 def test_load_nonexistent_toml_file_should_raise_exception(tmp_path):
     toml_path = tmp_path / "apa.toml"
     with pytest.raises(FileNotFoundError) as exception_info:
-        load_toml_file(toml_file=toml_path)
+        from_toml(module_name="", toml_file=toml_path)
     assert str(exception_info.value) == f"Requested TOML file does not exist: {toml_path}"
 
 
@@ -31,11 +31,11 @@ a = 1
 b = "c"
 """
     toml_path = create_file(tmp_path / "apa.toml", toml)
-    load_toml_file(toml_path)
+    from_toml(module_name="", toml_file=toml_path)
 
     toml_path = create_file(tmp_path / "hest.toml", toml + "garbage")
     with pytest.raises(ValueError) as exception_info:
-        load_toml_file(toml_path)
+        from_toml(module_name="", toml_file=toml_path)
     assert str(exception_info.value).startswith(
         f"Error while parsing TOML file {toml_path}:\nExpected '=' after a key"
     )

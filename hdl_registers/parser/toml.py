@@ -24,23 +24,11 @@ if TYPE_CHECKING:
     from hdl_registers.register_list import RegisterList
 
 
-def load_toml_file(toml_file: Path) -> dict[str, Any]:
-    if not toml_file.exists():
-        raise FileNotFoundError(f"Requested TOML file does not exist: {toml_file}")
-
-    raw_toml = read_file(toml_file)
-    try:
-        return tomli.loads(raw_toml)
-    except Exception as exception_info:
-        message = f"Error while parsing TOML file {toml_file}:\n{exception_info}"
-        raise ValueError(message) from exception_info
-
-
 def from_toml(
     module_name: str, toml_file: Path, default_registers: Optional[list["Register"]] = None
 ) -> "RegisterList":
     """
-    Parse a register TOML file.
+    Parse a TOML file with register data.
 
     Arguments:
         module_name: The name of the module that these registers belong to.
@@ -55,6 +43,21 @@ def from_toml(
         source_definition_file=toml_file,
         default_registers=default_registers,
     )
-    toml_data = load_toml_file(toml_file)
+    toml_data = _load_toml_file(file_path=toml_file)
 
     return parser.parse(register_data=toml_data)
+
+
+def _load_toml_file(file_path: Path) -> dict[str, Any]:
+    """
+    Load and parse the TOML data into a dictionary. Raise exceptions if things dont work.
+    """
+    if not file_path.exists():
+        raise FileNotFoundError(f"Requested TOML file does not exist: {file_path}")
+
+    raw_toml = read_file(file_path)
+    try:
+        return tomli.loads(raw_toml)
+    except Exception as exception_info:
+        message = f"Error while parsing TOML file {file_path}:\n{exception_info}"
+        raise ValueError(message) from exception_info
