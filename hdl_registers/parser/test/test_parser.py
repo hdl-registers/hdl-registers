@@ -37,7 +37,8 @@ b = "c"
     with pytest.raises(ValueError) as exception_info:
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value).startswith(
-        f"Error while parsing TOML file {toml_path}:\nExpected '=' after a key"
+        f"Error while parsing TOML file {toml_path}:\n"
+        "expected an equals, found eof at line 4 column 8"
     )
 
 
@@ -147,7 +148,7 @@ mode = "w"
         from_toml(name="", toml_file=toml_path)
     expected = (
         f"Error while parsing TOML file {toml_path}:\n"
-        "Cannot declare ('register', 'status') twice"
+        "redefinition of table `register.status` for key `register.status` at line 6 column 1"
     )
     assert str(exception_info.value).startswith(expected)
 
@@ -319,7 +320,8 @@ description = "Declaration 2"
         from_toml(name="", toml_file=toml_path)
     expected = (
         f"Error while parsing TOML file {toml_path}:\n"
-        "Cannot declare ('register', 'test_reg', 'bit', 'test_bit') twice"
+        "redefinition of table `register.test_reg.bit.test_bit` for key "
+        "`register.test_reg.bit.test_bit` at line 10 column 1"
     )
     assert str(exception_info.value).startswith(expected)
 

@@ -12,8 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 # Third party libraries
-import tomli
-from tsfpga.system_utils import read_file
+import rtoml
 
 # Local folder libraries
 from .parser import RegisterParser
@@ -53,9 +52,8 @@ def _load_toml_file(file_path: Path) -> dict[str, Any]:
     if not file_path.exists():
         raise FileNotFoundError(f"Requested TOML file does not exist: {file_path}")
 
-    raw_toml = read_file(file_path)
     try:
-        return tomli.loads(raw_toml)
+        return rtoml.load(file_path)
     except Exception as exception_info:
         message = f"Error while parsing TOML file {file_path}:\n{exception_info}"
         raise ValueError(message) from exception_info

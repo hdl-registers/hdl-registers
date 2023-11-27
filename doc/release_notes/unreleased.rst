@@ -7,6 +7,8 @@ Fixes
   account non-zero default values of other fields.
 * Decrease :class:`.RegisterList` hash calculation time by 40%.
   Improves performance of :meth:`.RegisterCodeGenerator.should_create`.
+* Improve TOML parsing performance by a factor of ~8 by switching to ``rtoml`` instead of
+  ``tomli`` package.
 
 
 Added
