@@ -26,6 +26,27 @@ You can also access it in your scripts by adding the repo path to the ``PYTHONPA
 variable, or by modifying ``sys.path`` in your script.
 
 
+
+Scope
+-----
+
+This project handles the registers for individual modules or IP on a register bus.
+I.e. individual register banks.
+
+Usually an FPGA/ASIC project consists of multiple modules/IP/banks that have to be allocated base
+addresses and connected on a register bus.
+This task is outside the scope of this project and is left to the user.
+
+The authors believe that the greatest benefit of a register code generator is
+for the module-level information.
+The top-level architecture is very often unique to every project, and it is hard to make an
+automated tool that solves every situation in a clean and elegant way that actually adds value.
+
+With this said, there are some very convenient tools in the sister project
+:ref:`hdl_modules <module_reg_file>` to achieve these things.
+
+
+
 .. _usage:
 
 Usage
