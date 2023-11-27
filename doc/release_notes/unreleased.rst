@@ -35,6 +35,9 @@ Added
   * Sets correct generics and uses the natively typed records from
     :class:`.VhdlRecordPackageGenerator` for its up/down register values.
 
+* Add checks to :meth:`.Integer.get_value` and :meth:`.Integer.set_value` that values are within
+  the configured range of the field.
+
 
 Breaking changes
 
