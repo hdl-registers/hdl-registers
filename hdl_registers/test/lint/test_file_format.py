@@ -37,9 +37,7 @@ def test_all_checked_in_files_end_with_newline():
     Otherwise UNIX doesn't consider them actual text files.
     """
     # VSCode JSON auto formatter removes newline.
-    excludes = [
-        HDL_REGISTERS_DOC / "sphinx" / "rst" / "extensions" / "json" / "extensions_json.json"
-    ]
+    excludes = [HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "json" / "toml_format.json"]
 
     test_ok = True
     for file_path in files_to_test(excludes=excludes):

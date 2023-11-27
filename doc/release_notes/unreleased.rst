@@ -11,6 +11,8 @@ Fixes
 
 Added
 
+* Add support for parsing a JSON data file, see :ref:`here <toml_format>`.
+
 * Add generation of register records with natively-typed members for each register
   field to :class:`.VhdlRecordPackageGenerator`.
 

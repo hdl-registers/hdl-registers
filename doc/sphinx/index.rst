@@ -60,7 +60,7 @@
     :hidden:
 
     rst/extensions/extensions_custom_generator
-    rst/extensions/extensions_json
+    rst/extensions/extensions_yaml
 
 .. toctree::
     :caption: API reference

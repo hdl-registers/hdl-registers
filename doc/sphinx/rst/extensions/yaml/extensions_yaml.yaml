@@ -1,0 +1,21 @@
+register:
+  configuration:
+    mode: r_w
+    description: Configuration register.
+    bit:
+      enable:
+        default_value: '1'
+        description: Enable data passthrough.
+
+  status:
+    mode: r
+    description: General status register.
+
+constant:
+  clk_frequency_hz:
+    value: 156250000.0
+    description: The system clock frequency in Hertz.
+
+  data_width:
+    value: 64
+    description: The width of the AXI port used by the module.

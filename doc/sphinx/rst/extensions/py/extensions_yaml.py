@@ -8,9 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-import json
 import sys
 from pathlib import Path
+
+# Third party libraries
+import yaml
 
 # First party libraries
 from hdl_registers.generator.html.page import HtmlPageGenerator
@@ -20,25 +22,25 @@ from hdl_registers.register_list import RegisterList
 THIS_DIR = Path(__file__).parent
 
 
-def parse_json() -> RegisterList:
+def parse_yaml() -> RegisterList:
     """
-    Create a register list by manually parsing a JSON data file.
+    Create a register list by manually parsing a YAML data file.
     """
-    json_path = THIS_DIR.parent / "json" / "extensions_json.json"
+    yaml_path = THIS_DIR.parent / "yaml" / "extensions_yaml.yaml"
 
-    with open(json_path, encoding="utf-8") as file_handle:
-        json_data = json.load(file_handle)
+    with open(yaml_path, encoding="utf-8") as file_handle:
+        yaml_data = yaml.safe_load(file_handle)
 
-    parser = RegisterParser(name="caesar", source_definition_file=json_path)
+    parser = RegisterParser(name="caesar", source_definition_file=yaml_path)
 
-    return parser.parse(register_data=json_data)
+    return parser.parse(register_data=yaml_data)
 
 
 def main(output_folder: Path):
     """
-    Create a register list from JSON and create some artifacts.
+    Create a register list from YAML and create some artifacts.
     """
-    register_list = parse_json()
+    register_list = parse_yaml()
 
     HtmlPageGenerator(register_list=register_list, output_folder=output_folder).create()
 

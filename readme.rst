@@ -53,7 +53,7 @@ The following features are supported:
 * `Register constants <https://hdl-registers.com/rst/constant/constant_overview.html>`_.
 
 Registers can be defined using
-a `data file <https://hdl-registers.com/rst/user_guide/toml_format.html>`_
+a `TOML/JSON data file <https://hdl-registers.com/rst/user_guide/toml_format.html>`_
 or the `Python API <https://hdl-registers.com/rst/user_guide/user_guide_python_api.html>`_.
 The following code can be generated:
 
