@@ -73,7 +73,7 @@ class RegisterParser:
 
     def parse(self, register_data: dict[str, Any]) -> RegisterList:
         """
-        Parse the TOML data.
+        Parse the register data.
 
         Arguments:
             register_data: TOML register data.
