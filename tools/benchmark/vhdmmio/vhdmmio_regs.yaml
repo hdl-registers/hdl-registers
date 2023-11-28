@@ -1,0 +1,267 @@
+metadata:
+  name: basic
+
+fields:
+
+- address: 0
+  name: ctrl
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_1
+
+  - bitrange: 8..1
+    name: dummy_field_2
+
+  - bitrange: 17..9
+    name: dummy_field_3
+
+- address: 4
+  name: stat
+  behavior: status
+
+- address: 8
+  name: dummy1
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_4
+
+  - bitrange: 8..1
+    name: dummy_field_5
+
+  - bitrange: 17..9
+    name: dummy_field_6
+
+- address: 12
+  name: dummy2
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_7
+
+  - bitrange: 8..1
+    name: dummy_field_8
+
+  - bitrange: 17..9
+    name: dummy_field_9
+
+- address: 16
+  name: dummy3
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_10
+
+  - bitrange: 8..1
+    name: dummy_field_11
+
+  - bitrange: 17..9
+    name: dummy_field_12
+
+- address: 20
+  name: dummy4
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_13
+
+  - bitrange: 8..1
+    name: dummy_field_14
+
+  - bitrange: 17..9
+    name: dummy_field_15
+
+- address: 24
+  name: dummy5
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_16
+
+  - bitrange: 8..1
+    name: dummy_field_17
+
+  - bitrange: 17..9
+    name: dummy_field_18
+
+- address: 28
+  name: dummy6
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_19
+
+  - bitrange: 8..1
+    name: dummy_field_20
+
+  - bitrange: 17..9
+    name: dummy_field_21
+
+- address: 32
+  name: dummy7
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_22
+
+  - bitrange: 8..1
+    name: dummy_field_23
+
+  - bitrange: 17..9
+    name: dummy_field_24
+
+
+- address: 36
+  name: dummy8
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_25
+
+  - bitrange: 8..1
+    name: dummy_field_26
+
+  - bitrange: 17..9
+    name: dummy_field_27
+
+
+- address: 40
+  name: dummy9
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_28
+
+  - bitrange: 8..1
+    name: dummy_field_29
+
+  - bitrange: 17..9
+    name: dummy_field_30
+
+
+- address: 44
+  name: dummy10
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_31
+
+  - bitrange: 8..1
+    name: dummy_field_32
+
+  - bitrange: 17..9
+    name: dummy_field_33
+
+
+- address: 48
+  name: dummy11
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_34
+
+  - bitrange: 8..1
+    name: dummy_field_35
+
+  - bitrange: 17..9
+    name: dummy_field_36
+
+
+- address: 52
+  name: dummy12
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_37
+
+  - bitrange: 8..1
+    name: dummy_field_38
+
+  - bitrange: 17..9
+    name: dummy_field_39
+
+
+- address: 56
+  name: dummy13
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_40
+
+  - bitrange: 8..1
+    name: dummy_field_41
+
+  - bitrange: 17..9
+    name: dummy_field_42
+
+
+- address: 60
+  name: dummy14
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_43
+
+  - bitrange: 8..1
+    name: dummy_field_44
+
+  - bitrange: 17..9
+    name: dummy_field_45
+
+
+- address: 64
+  name: dummy15
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_46
+
+  - bitrange: 8..1
+    name: dummy_field_47
+
+  - bitrange: 17..9
+    name: dummy_field_48
+
+
+- address: 68
+  name: dummy16
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_49
+
+  - bitrange: 8..1
+    name: dummy_field_50
+
+  - bitrange: 17..9
+    name: dummy_field_51
+
+
+- address: 72
+  name: dummy17
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_52
+
+  - bitrange: 8..1
+    name: dummy_field_53
+
+  - bitrange: 17..9
+    name: dummy_field_54
+
+
+- address: 76
+  name: dummy18
+  behavior: control
+  subfields:
+  - bitrange: 0
+    name: dummy_field_55
+
+  - bitrange: 8..1
+    name: dummy_field_56
+
+- address: 80
+  name: dummy19
+  behavior: control

@@ -34,6 +34,7 @@ The hdl_registers project is an open-source HDL register code generator fast eno
 real time.
 It makes FPGA/ASIC development more fun by automating a lot of time-consuming manual work.
 It also minimizes the risk of bugs by removing the need for duplicate information.
+`Read more <https://hdl-registers.com/rst/about/about.html>`_
 
 **See documentation on the website**: https://hdl-registers.com
 

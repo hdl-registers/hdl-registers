@@ -1,0 +1,297 @@
+memory-map:
+  bus: axi4-lite-32
+  name: counter
+  description: A simple example of a counter
+  children:
+  - reg:
+      name: control
+      comment: Counter control
+      description: This register controls the counter activity.
+      width: 32
+      access: rw
+      children:
+      - field:
+          name: enable
+          comment: Set to enable the counter
+          description: >
+            If the bit is set, the counter is running.
+          range: 0
+
+      - field:
+          name: dummy2
+          comment: Dummy field
+          range: 18-1
+
+      - field:
+          name: dummy3
+          comment: Dummy field
+          range: 31-20
+
+  - reg:
+      name: value
+      description: Maximum value of the counter
+      width: 32
+      access: rw
+      children:
+      - field:
+          name: dummy0
+          comment: Dummy field
+          range: 0
+
+      - field:
+          name: dummy1
+          comment: Dummy field
+          range: 1
+
+      - field:
+          name: dummy2
+          comment: Dummy field
+          range: 2
+
+      - field:
+          name: dummy3
+          comment: Dummy field
+          range: 3
+
+      - field:
+          name: dummy4
+          comment: Dummy field
+          range: 4
+
+      - field:
+          name: dummy5
+          comment: Dummy field
+          range: 5
+
+      - field:
+          name: dummy6
+          comment: Dummy field
+          range: 6
+
+      - field:
+          name: dummy7
+          comment: Dummy field
+          range: 7
+
+      - field:
+          name: dummy8
+          comment: Dummy field
+          range: 8
+
+      - field:
+          name: dummy9
+          comment: Dummy field
+          range: 9
+
+      - field:
+          name: dummy10
+          comment: Dummy field
+          range: 10
+
+      - field:
+          name: dummy11
+          comment: Dummy field
+          range: 11
+
+      - field:
+          name: dummy12
+          comment: Dummy field
+          range: 12
+
+      - field:
+          name: dummy13
+          comment: Dummy field
+          range: 13
+
+      - field:
+          name: dummy14
+          comment: Dummy field
+          range: 14
+
+      - field:
+          name: dummy15
+          comment: Dummy field
+          range: 15
+
+      - field:
+          name: dummy16
+          comment: Dummy field
+          range: 16
+
+      - field:
+          name: dummy17
+          comment: Dummy field
+          range: 17
+
+      - field:
+          name: dummy18
+          comment: Dummy field
+          range: 18
+
+      - field:
+          name: dummy19
+          comment: Dummy field
+          range: 19
+
+      - field:
+          name: dummy20
+          comment: Dummy field
+          range: 20
+
+      - field:
+          name: dummy21
+          comment: Dummy field
+          range: 21
+
+  - reg:
+      name: counter
+      description: Current value of the counter
+      width: 32
+      access: ro
+
+  - reg:
+      name: dummy
+      description: Dummy register
+      width: 32
+      access: rw
+      children:
+      - field:
+          name: dummy
+          comment: Dummy field
+          range: 0
+
+      - field:
+          name: dummy2
+          comment: Dummy field
+          range: 18-1
+
+      - field:
+          name: dummy3
+          comment: Dummy field
+          range: 31-20
+
+  - repeat:
+      name: arr1
+      count: 3
+      align: False
+      children:
+      - reg:
+          name: control
+          comment: Counter control
+          description: This register controls the counter activity.
+          width: 32
+          access: rw
+          children:
+          - field:
+              name: enable
+              comment: Set to enable the counter
+              description: >
+                If the bit is set, the counter is running.
+              range: 0
+
+      - reg:
+          name: value
+          description: Maximum value of the counter
+          width: 32
+          access: rw
+          children:
+          - field:
+              name: dummy
+              comment: Dummy field
+              range: 0
+
+          - field:
+              name: dummy2
+              comment: Dummy field
+              range: 18-1
+
+          - field:
+              name: dummy3
+              comment: Dummy field
+              range: 31-20
+
+      - reg:
+          name: counter
+          description: Current value of the counter
+          width: 32
+          access: ro
+
+  - repeat:
+      name: arr2
+      count: 2
+      align: False
+      children:
+      - reg:
+          name: control
+          comment: Counter control
+          description: This register controls the counter activity.
+          width: 32
+          access: rw
+          children:
+          - field:
+              name: enable
+              comment: Set to enable the counter
+              description: >
+                If the bit is set, the counter is running.
+              range: 0
+
+      - reg:
+          name: value
+          description: Maximum value of the counter
+          width: 32
+          access: rw
+          children:
+          - field:
+              name: dummy
+              comment: Dummy field
+              range: 0
+
+          - field:
+              name: dummy2
+              comment: Dummy field
+              range: 18-1
+
+          - field:
+              name: dummy3
+              comment: Dummy field
+              range: 31-20
+
+  - repeat:
+      name: arr3
+      count: 2
+      align: False
+      children:
+      - reg:
+          name: control
+          comment: Counter control
+          description: This register controls the counter activity.
+          width: 32
+          access: rw
+          children:
+          - field:
+              name: enable
+              comment: Set to enable the counter
+              description: >
+                If the bit is set, the counter is running.
+              range: 0
+
+      - reg:
+          name: value
+          description: Maximum value of the counter
+          width: 32
+          access: rw
+          children:
+          - field:
+              name: dummy
+              comment: Dummy field
+              range: 0
+
+          - field:
+              name: dummy2
+              comment: Dummy field
+              range: 18-1
+
+          - field:
+              name: dummy3
+              comment: Dummy field
+              range: 31-20

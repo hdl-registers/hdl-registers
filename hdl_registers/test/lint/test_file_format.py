@@ -19,7 +19,7 @@ from tsfpga.test.lint.test_file_format import (
 )
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TEST, REPO_ROOT
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TEST, HDL_REGISTERS_TOOLS, REPO_ROOT
 
 
 def test_all_checked_in_files_are_properly_encoded():
@@ -37,7 +37,10 @@ def test_all_checked_in_files_end_with_newline():
     Otherwise UNIX doesn't consider them actual text files.
     """
     # VSCode JSON auto formatter removes newline.
-    excludes = [HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "json" / "toml_format.json"]
+    excludes = [
+        HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "json" / "toml_format.json",
+        HDL_REGISTERS_TOOLS / "benchmark" / "corsair" / "corsair_regs.json",
+    ]
 
     test_ok = True
     for file_path in files_to_test(excludes=excludes):

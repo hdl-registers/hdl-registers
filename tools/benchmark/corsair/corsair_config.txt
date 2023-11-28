@@ -1,0 +1,15 @@
+[globcfg]
+base_address = 0
+data_width = 32
+address_width = 16
+register_reset = sync_pos
+address_increment = none
+address_alignment = data_width
+force_name_case = none
+regmap_path = regs.json
+
+[vhdl_module]
+path = hw/regs.vhd
+read_filler = 0
+interface = axil
+generator = Vhdl
