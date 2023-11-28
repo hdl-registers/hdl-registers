@@ -108,7 +108,7 @@ def run_profiling(verbose: bool) -> None:
         (profile_parse_json, "parse_json"),
         (profile_parse_toml, "parse_toml"),
     ]:
-        output_folder = create_directory(HDL_REGISTERS_GENERATED / "benchmark" / name, empty=False)
+        output_folder = create_directory(OUTPUT_FOLDER / name, empty=False)
 
         profiler = test_function(output_folder=output_folder / "files")
 
