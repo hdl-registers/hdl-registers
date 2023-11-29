@@ -6,7 +6,7 @@ Getting started
 Installation
 ------------
 
-The latest release version of hdl_registers can be installed from
+The latest release version of hdl-registers can be installed from
 `PyPI <https://pypi.org/project/hdl-registers/>`__ with the command
 
 .. code-block:: shell
@@ -64,7 +64,7 @@ invoke it.
 Integration in tsfpga
 ---------------------
 
-The `tsfpga <https://tsfpga.com>`__ project, which is a sister project of hdl_registers,
+The `tsfpga <https://tsfpga.com>`__ project, which is a sister project of hdl-registers,
 integrates register code generation in an elegant way.
 If a file named ``regs_<name>.toml`` is placed in the root of a module, and ``<name>`` matches the
 name of the module, it will be parsed and used as that module's register map.
@@ -72,4 +72,4 @@ In the simulation and build scripts there is then a call to :class:`.VhdlRegiste
 for each module that has registers before each run.
 This makes sure that an up-to-date register definition is always used.
 
-This is a good example of how hdl_registers can be used in an effective way.
+This is a good example of how hdl-registers can be used in an effective way.

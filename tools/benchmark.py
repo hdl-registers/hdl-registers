@@ -51,7 +51,7 @@ def main():
     relative_baseline = None
 
     for name, test_function in [
-        ("hdl_registers", benchmark_hdl_registers),
+        ("hdl-registers", benchmark_hdl_registers),
         ("cheby", benchmark_cheby),
         ("corsair", benchmark_corsair),
         ("rggen", benchmark_rggen),

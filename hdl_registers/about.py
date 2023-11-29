@@ -56,7 +56,7 @@ def get_readme_rst(
         # The others do not need this initial heading, it just makes the github/pypi page
         # more clunky.
         readme_rst = """\
-About hdl_registers
+About hdl-registers
 ===================
 
 """
@@ -110,7 +110,7 @@ To check out the source code go to the
 
 |pic_website| |pic_repository| |pic_chat| |pic_pip_install| |pic_license| |pic_python_line_coverage|
 
-The hdl_registers project is an open-source HDL register code generator fast enough to run in
+The hdl-registers project is an open-source HDL register code generator fast enough to run in
 real time.
 It makes FPGA/ASIC development more fun by automating a lot of time-consuming manual work.
 It also minimizes the risk of bugs by removing the need for duplicate information.

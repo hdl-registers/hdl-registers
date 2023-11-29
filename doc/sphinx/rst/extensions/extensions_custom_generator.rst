@@ -3,7 +3,7 @@
 Writing a custom code generator
 ===============================
 
-The register code generator API in hdl_registers is carefully designed to be very extensible.
+The register code generator API in hdl-registers is carefully designed to be very extensible.
 Writing and using your own custom code generator is very simple.
 
 The key is to inherit the :class:`.RegisterCodeGenerator` class, as seen in the example below.
@@ -28,7 +28,7 @@ generation happens.
 
 The generator class inheriting from :class:`.RegisterCodeGenerator` means that it has the public
 methods :meth:`.RegisterCodeGenerator.create`, :meth:`.RegisterCodeGenerator.create_if_needed`
-and :meth:`.RegisterCodeGenerator.header` just like the standard hdl_registers generators.
+and :meth:`.RegisterCodeGenerator.header` just like the standard hdl-registers generators.
 
 If the custom generator also inherits from :class:`.RegisterCodeGeneratorHelpers`,
 it has access to some useful functions for constructing the generated code.
@@ -59,7 +59,7 @@ Contributions
 -------------
 
 If you write a high-quality code generator you are more than welcome to contribute it to the
-hdl_registers project.
+hdl-registers project.
 Please open an `issue <https://github.com/hdl-registers/hdl-registers/issues>`__
 or a `pull request <https://github.com/hdl-registers/hdl-registers/pulls>`__.
 
