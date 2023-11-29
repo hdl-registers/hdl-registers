@@ -1,4 +1,4 @@
-name: main
+name: ci
 
 on:
   push:
@@ -34,6 +34,8 @@ jobs:
     - name: Install system packages (with cache)
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
+        # The graphical libraries are needed by sphinx which is not needed in most jobs.
+        # However this call uses a cache and is very fast (<1 second).
         packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
         version: 1.0
 
@@ -82,6 +84,8 @@ jobs:
     - name: Install system packages (with cache)
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
+        # The graphical libraries are needed by sphinx which is not needed in most jobs.
+        # However this call uses a cache and is very fast (<1 second).
         packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
         version: 1.0
 
@@ -117,6 +121,8 @@ jobs:
     - name: Install system packages (with cache)
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
+        # The graphical libraries are needed by sphinx which is not needed in most jobs.
+        # However this call uses a cache and is very fast (<1 second).
         packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
         version: 1.0
 
@@ -148,7 +154,7 @@ jobs:
 
   deploy_pages:
     name: Deploy website to pages
-    if: ${{ github.ref == 'refs/heads/master' }}
+    # if: ${{ github.ref == 'refs/heads/main' }}
     needs: build_doc
     environment:
       name: github-pages
