@@ -60,8 +60,8 @@ Contributions
 
 If you write a high-quality code generator you are more than welcome to contribute it to the
 hdl_registers project.
-Please open an `issue <https://gitlab.com/hdl_registers/hdl_registers/-/issues>`__
-or a `merge request <https://gitlab.com/hdl_registers/hdl_registers/-/merge_requests>`__.
+Please open an `issue <https://github.com/hdl-registers/hdl-registers/issues>`__
+or a `pull request <https://github.com/hdl-registers/hdl-registers/pulls>`__.
 
 
 Performance

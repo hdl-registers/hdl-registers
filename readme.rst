@@ -10,7 +10,7 @@
 
 .. |pic_repository| image:: https://hdl-registers.com/badges/repository.svg
   :alt: Repository
-  :target: https://gitlab.com/hdl_registers/hdl_registers
+  :target: https://https://github.com/hdl-registers/hdl-registers
 
 .. |pic_chat| image:: https://hdl-registers.com/badges/chat.svg
   :alt: Chat
