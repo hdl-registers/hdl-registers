@@ -143,6 +143,7 @@ jobs:
         python3 tools/build_docs.py
 
     - name: Upload HTML artifacts
+      if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-artifact@v3
       with:
         name: sphinx_html
@@ -153,7 +154,7 @@ jobs:
 
   deploy_pages:
     name: Deploy website to pages
-    # if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: build_doc
     environment:
       name: github-pages
