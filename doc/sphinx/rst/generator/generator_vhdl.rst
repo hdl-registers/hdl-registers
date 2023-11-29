@@ -248,8 +248,8 @@ This means that accidental multiple drivers of a signal will result in an error 
 or synthesizing the design.
 
 Since e.g. ``std_logic`` is a sub-type of ``std_ulogic`` in VHDL-2008, it is no problem if
-hdl_registers components are integrated in a code base that still uses the resolved types.
-I.e. a ``std_logic`` signal can be assigned to a hdl_registers signal of type ``std_ulogic``,
+hdl-registers components are integrated in a code base that still uses the resolved types.
+I.e. a ``std_logic`` signal can be assigned to a hdl-registers signal of type ``std_ulogic``,
 and vice versa, without problem.
 
 

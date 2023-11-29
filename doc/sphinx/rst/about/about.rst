@@ -1,11 +1,11 @@
-About hdl_registers
-===================
+What is hdl-registers?
+======================
 
-hdl_registers is a register interface code generator for FPGA/ASIC projects that is
+hdl-registers is a register interface code generator for FPGA/ASIC projects that is
 fast, feature-rich, robust and easy to use.
 Traditionally, register information is duplicated in HDL code, software code and documentation.
 Furthermore, this information is usually written by hand at great discomfort to the developer.
-hdl_registers aims to solve this situation, which is unacceptable in a modern
+hdl-registers aims to solve this situation, which is unacceptable in a modern
 development environment.
 
 The project started in late 2017.
@@ -49,7 +49,7 @@ and 50 fields each.
   --------------------------------------------------------------------------
                          Tool | Execution time | Relative (lower is better)
   ----------------------------+----------------+----------------------------
-   hdl_registers (4.1.1-dev2) |        15.8 ms | 1x (baseline)
+   hdl-registers (4.1.1-dev2) |        15.8 ms | 1x (baseline)
              cheby (1.6.dev0) |        1.81  s | 115x
               corsair (1.0.4) |        2.59  s | 164x
                  rggen (0.31) |        9.82  s | 623x
@@ -89,7 +89,7 @@ With this said, there are some very convenient tools in the sister project
 Similar tools
 -------------
 
-If you want a register code generator, but hdl_registers is not really right for you,
+If you want a register code generator, but hdl-registers is not really right for you,
 feel free to check out one of the other available tools listed below.
 
 
