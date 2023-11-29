@@ -26,7 +26,7 @@ jobs:
       - name: Create HTML file
         run: |
           mkdir website
-          echo hej > website/index.tml
+          echo hej > website/index.html
           ls
           ls website
           cat website/index.html
