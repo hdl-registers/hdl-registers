@@ -1,10 +1,10 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the hdl_registers project, a HDL register generator fast enough to run
+# This file is part of the hdl-registers project, an HDL register generator fast enough to run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/hdl_registers/hdl_registers
+# https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
@@ -58,13 +58,13 @@ def main():
         long_description_content_type="text/x-rst",
         license="BSD 3-Clause License",
         author="Lukas Vik",
-        author_email="2767848-LukasVik@users.noreply.gitlab.com",
+        author_email="10241915+LukasVik@users.noreply.github.com",
         url="https://hdl-registers.com",
         project_urls={
             "Documentation": "https://hdl-registers.com/",
             "Changelog": "https://hdl-registers.com/rst/about/release_notes.html",
-            "Source": "https://gitlab.com/hdl_registers/hdl_registers",
-            "Issues": "https://gitlab.com/hdl_registers/hdl_registers/-/issues",
+            "Source": "https://github.com/hdl-registers/hdl-registers",
+            "Issues": "https://github.com/hdl-registers/hdl-registers/issues",
         },
         python_requires=">=3.9",
         install_requires=read_requirements_file(REQUIREMENTS_TXT),

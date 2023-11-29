@@ -1,10 +1,10 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the hdl_registers project, a HDL register generator fast enough to run
+# This file is part of the hdl-registers project, an HDL register generator fast enough to run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/hdl_registers/hdl_registers
+# https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
@@ -145,10 +145,10 @@ def generate_sphinx_index() -> None:
     """
     Generate index.rst for sphinx. Also verify that readme.rst in the project is identical.
 
-    Rst file inclusion in readme.rst does not work on gitlab unfortunately, hence this
+    Rst file inclusion in readme.rst does not work on github unfortunately, hence this
     cumbersome handling of syncing documentation.
     """
-    rst_to_verify = get_readme_rst(include_extra_for_gitlab=True)
+    rst_to_verify = get_readme_rst(include_extra_for_github=True)
     if read_file(hdl_registers.REPO_ROOT / "readme.rst") != rst_to_verify:
         file_path = create_file(
             hdl_registers.HDL_REGISTERS_GENERATED / "sphinx" / "readme.rst", rst_to_verify

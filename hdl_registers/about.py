@@ -1,10 +1,10 @@
 # --------------------------------------------------------------------------------------------------
 # Copyright (c) Lukas Vik. All rights reserved.
 #
-# This file is part of the hdl_registers project, a HDL register generator fast enough to run
+# This file is part of the hdl-registers project, an HDL register generator fast enough to run
 # in real time.
 # https://hdl-registers.com
-# https://gitlab.com/hdl_registers/hdl_registers
+# https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
 
@@ -22,27 +22,27 @@ def get_short_slogan() -> str:
 
 
 def get_readme_rst(
-    include_extra_for_gitlab: bool = False,
+    include_extra_for_github: bool = False,
     include_extra_for_website: bool = False,
     include_extra_for_pypi: bool = False,
 ) -> str:
     """
     Get the complete README.rst (to be used on website and in PyPI release).
-    RST file inclusion in README.rst does not work on gitlab unfortunately, hence this
+    RST file inclusion in README.rst does not work on github unfortunately, hence this
     cumbersome handling where the README is duplicated in two places.
 
     The arguments control some extra text that is included. This is mainly links to the
-    other places where you can find information on the project (website, gitlab, PyPI).
+    other places where you can find information on the project (website, github, PyPI).
 
     Arguments:
-        include_extra_for_gitlab (bool): Include the extra text that shall be included in the
-            gitlab README.
+        include_extra_for_github (bool): Include the extra text that shall be included in the
+            github README.
         include_extra_for_website (bool): Include the extra text that shall be included in the
             website main page.
         include_extra_for_pypi (bool): Include the extra text that shall be included in the
             PyPI release README.
     """
-    if include_extra_for_gitlab:
+    if include_extra_for_github:
         readme_rst = ""
         extra_rst = """\
 **See documentation on the website**: https://hdl-registers.com
@@ -53,7 +53,7 @@ def get_readme_rst(
     elif include_extra_for_website:
         # The website needs the initial heading, in order for the landing page to get
         # the correct title.
-        # The others do not need this initial heading, it just makes the gitlab/pypi page
+        # The others do not need this initial heading, it just makes the github/pypi page
         # more clunky.
         readme_rst = """\
 About hdl_registers
@@ -63,14 +63,14 @@ About hdl_registers
         extra_rst = """\
 To install the Python package, see :ref:`installation`.
 To check out the source code go to the
-`gitlab page <https://gitlab.com/hdl_registers/hdl_registers>`__. \
+`github page <https://github.com/hdl-registers/hdl-registers>`__. \
 """
     elif include_extra_for_pypi:
         readme_rst = ""
         extra_rst = """\
 **See documentation on the website**: https://hdl-registers.com
 
-**Check out the source code on gitlab**: https://gitlab.com/hdl_registers/hdl_registers
+**Check out the source code on github**: https://github.com/hdl-registers/hdl-registers
 
 """
     else:
@@ -90,7 +90,7 @@ To check out the source code go to the
 
 .. |pic_repository| image:: https://hdl-registers.com/badges/repository.svg
   :alt: Repository
-  :target: https://gitlab.com/hdl_registers/hdl_registers
+  :target: https://github.com/hdl-registers/hdl-registers
 
 .. |pic_chat| image:: https://hdl-registers.com/badges/chat.svg
   :alt: Chat

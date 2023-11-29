@@ -59,7 +59,7 @@ Clearly, only one of these tools is fast enough to run in real time without impa
 
 Disclaimer:
 We have tried to be as fair as possible in this comparison, see
-`the script <https://gitlab.com/hdl_registers/hdl_registers/-/blob/main/tools/benchmark.py>`_
+`the script <https://github.com/hdl-registers/hdl-registers/blob/main/tools/benchmark.py>`_
 for details.
 We do not mean to bash anyone.
 We encourage and applaud all open-source contributions.

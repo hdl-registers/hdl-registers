@@ -13,7 +13,7 @@ The latest release version of hdl_registers can be installed from
 
   python3 -m pip install hdl-registers
 
-Alternatively, you can clone the `git repository <https://gitlab.com/hdl_registers/hdl_registers>`__
+Alternatively, you can clone the `git repository <https://github.com/hdl-registers/hdl-registers>`__
 if you want to use a development version.
 From the repo checkout you can install the Python package by running
 
