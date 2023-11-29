@@ -11,25 +11,30 @@ jobs:
 
   deploy_pages:
     name: Deploy website to pages
-    if: ${{ github.ref == 'refs/heads/main' }}
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    if: github.ref == 'refs/heads/main'
     permissions:
       pages: write
       id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup Pages
         uses: actions/configure-pages@v3
 
       - name: Create HTML file
-        run: echo hej > index.tml
+        run: |
+          mkdir website
+          echo hej > website/index.tml
+          ls
+          ls website
+          cat website/index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: '.'
+          path: './website'
 
       - name: Deploy to GitHub Pages
         id: deployment
