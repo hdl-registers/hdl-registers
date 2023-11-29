@@ -38,6 +38,12 @@ SPHINX_DOC = hdl_registers.HDL_REGISTERS_DOC / "sphinx"
 def main() -> None:
     args = arguments()
 
+    logos_path = create_directory(GENERATED_SPHINX_HTML / "logos")
+    shutil.copy2(hdl_registers.HDL_REGISTERS_DOC / "logos" / "banner.png", logos_path)
+
+    badges_path = create_directory(GENERATED_SPHINX_HTML / "badges")
+    build_information_badges(badges_path)
+
     rst = generate_release_notes(
         repo_root=hdl_registers.REPO_ROOT,
         release_notes_directory=hdl_registers.HDL_REGISTERS_DOC / "release_notes",
@@ -47,19 +53,13 @@ def main() -> None:
 
     generate_api_documentation()
 
-    generate_register_code()
-
     generate_bibtex()
+
+    generate_register_code()
 
     generate_sphinx_index()
 
-    logos_path = create_directory(GENERATED_SPHINX_HTML / "logos")
-    shutil.copy2(hdl_registers.HDL_REGISTERS_DOC / "logos" / "banner.png", logos_path)
-
     build_sphinx(build_path=SPHINX_DOC, output_path=GENERATED_SPHINX_HTML)
-
-    badges_path = create_directory(GENERATED_SPHINX_HTML / "badges")
-    build_information_badges(badges_path)
 
     if args.skip_coverage:
         return
@@ -162,45 +162,38 @@ def generate_sphinx_index() -> None:
 
 
 def build_information_badges(output_path: Path) -> None:
-    badge_svg = badge(left_text="pip install", right_text="hdl-registers", right_color="blue")
+    badge_svg = badge(
+        left_text="pip install",
+        right_text="hdl-registers",
+        right_color="green",
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "python.svg"),
+        embed_logo=True,
+    )
     create_file(output_path / "pip_install.svg", badge_svg)
 
-    badge_svg = badge(left_text="license", right_text="BSD 3-Clause", right_color="blue")
+    badge_svg = badge(left_text="license", right_text="BSD 3-Clause", right_color="green")
     create_file(output_path / "license.svg", badge_svg)
 
     badge_svg = badge(
-        left_text="",
+        left_text="github",
         right_text="hdl_registers/hdl_registers",
-        left_color="grey",
-        right_color="grey",
-        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "gitlab.svg"),
+        right_color="green",
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "github.svg"),
         embed_logo=True,
     )
     create_file(output_path / "repository.svg", badge_svg)
-    # Legacy file name, but PyPI readme still uses it.
-    # This can be removed once a new release is made.
-    create_file(output_path / "gitlab.svg", badge_svg)
 
     badge_svg = badge(
         left_text="",
         right_text="hdl-registers.com",
-        left_color="grey",
-        right_color="grey",
+        right_color="green",
         logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "firefox.svg"),
         embed_logo=True,
     )
     create_file(output_path / "website.svg", badge_svg)
 
-    badge_svg = badge(
-        left_text="chat",
-        right_text="on gitter",
-        left_color="#5a5a5a",
-        right_color="#41ab8b",
-    )
+    badge_svg = badge(left_text="chat", right_text="on gitter", right_color="green")
     create_file(output_path / "chat.svg", badge_svg)
-    # Legacy file name, but PyPI readme still uses it.
-    # This can be removed once a new release is made.
-    create_file(output_path / "gitter.svg", badge_svg)
 
 
 def build_python_coverage_badge(output_path: Path) -> None:
@@ -216,9 +209,7 @@ def build_python_coverage_badge(output_path: Path) -> None:
         left_text="line coverage",
         right_text=f"{line_coverage}%",
         right_color=color,
-        logo=str(
-            hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "Python-logo-notext.svg"
-        ),
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "python.svg"),
         embed_logo=True,
     )
     create_file(output_path / "python_coverage.svg", badge_svg)
