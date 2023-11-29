@@ -5,9 +5,9 @@
     :hidden:
 
     rst/about/about
-    rst/about/license_information
-    rst/about/contributing
     rst/about/release_notes
+    rst/about/contributing
+    rst/about/license_information
 
 .. toctree::
     :caption: User guide
