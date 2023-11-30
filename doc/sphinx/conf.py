@@ -22,7 +22,7 @@ sys.path.insert(0, str(REPO_ROOT))
 # Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
 import tools.tools_pythonpath  # noqa: F401
 
-project = "hdl_registers"
+project = "hdl-registers"
 copyright = "Lukas Vik"
 author = "Lukas Vik"
 
