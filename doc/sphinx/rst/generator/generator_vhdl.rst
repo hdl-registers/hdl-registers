@@ -230,8 +230,8 @@ Dependencies
 The :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator` packages
 depend on :ref:`reg_file.reg_file_pkg`
 from the :ref:`reg_file <module_reg_file>` module of `hdl_modules <https://hdl-modules.com>`__.
-Can be downloaded from gitlab here:
-https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/src/reg_file_pkg.vhd
+Can be downloaded from github here:
+https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
 The :class:`.VhdlSimulationPackageGenerator` package
 furthermore depends on :ref:`reg_file.reg_operations_pkg` and :ref:`common.addr_pkg`.

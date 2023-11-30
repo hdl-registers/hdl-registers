@@ -27,8 +27,8 @@ class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
     Generate a wrapper around generic AXI-Lite register files with correct generics and ports.
 
     * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
-    * https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/\
-src/axi_lite_reg_file.vhd
+    * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/\
+axi_lite_reg_file.vhd
 
     The wrapper will set the correct generics and will use record types for ``regs_up`` and
     ``regs_down``.
@@ -150,8 +150,7 @@ are present.
 --
 -- Is a wrapper around the generic AXI-Lite register file from hdl_modules:
 -- * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
--- * https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/\
-src/axi_lite_reg_file.vhd
+-- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/axi_lite_reg_file.vhd
 --
 -- Sets correct generics, and performs conversion to the easy-to-use register record types.
 -- -----------------------------------------------------------------------------
@@ -185,8 +184,8 @@ begin
   ------------------------------------------------------------------------------
   -- Instantiate the generic AXI-Lite register file from
   -- * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
-  -- * https://gitlab.com/hdl_modules/hdl_modules/-/blob/main/modules/reg_file/\
-src/axi_lite_reg_file.vhd
+  -- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/\
+axi_lite_reg_file.vhd
   axi_lite_reg_file_inst : entity reg_file.axi_lite_reg_file
     generic map (
       regs => {self.name}_reg_map,
