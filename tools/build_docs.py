@@ -194,7 +194,7 @@ def build_information_badges(output_path: Path) -> None:
     create_file(output_path / "repository.svg", badge_svg)
 
     badge_svg = badge(
-        left_text="",
+        left_text="website",
         right_text="hdl-registers.com",
         left_color=BADGE_COLOR_LEFT,
         right_color=BADGE_COLOR_RIGHT,
