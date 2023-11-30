@@ -30,18 +30,11 @@ jobs:
         cache: pip
         cache-dependency-path: hdl_registers/requirements_develop.txt
 
-    - name: Install system packages (with cache)
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        # The graphical libraries are needed by sphinx which is not needed in most jobs.
-        # However this call uses a cache and is very fast (<1 second).
-        packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
-        version: 1.0
-
-    - name: Install Python packages (with cache)
+    - name: Install Python packages
       run: |
-        # Note that this will install a lot, but it uses a cache. The call takes ~17 seconds.
-        pip install --requirement hdl_registers/requirements_develop.txt
+        python3 -m pip install \
+          pytest \
+          rtoml
 
     - name: Clone dependency repos
       run: |
@@ -57,7 +50,6 @@ jobs:
       run: |
         python3 -m pytest \
           --verbose \
-          --numprocesses 2 \
           hdl_registers
 
     # On one Python version however, we run ALL the Python-based tests, which requires a few more
@@ -66,16 +58,22 @@ jobs:
       if: matrix.py == '3.9'
       uses: ghdl/setup-ghdl-ci@nightly
 
-    - name: Install system packages (with cache)
+    - name: Install further Python packages
       if: matrix.py == '3.9'
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        # The graphical libraries are needed by sphinx which is not needed in most jobs.
-        # However this call uses a cache and is very fast (<1 second).
-        packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
-        version: 1.0
+      run: |
+        python3 -m pip install \
+          black \
+          flake8 \
+          GitPython \
+          mypy \
+          pybadges \
+          pylint \
+          pytest-cov \
+          pytest-xdist \
+          vunit-hdl
 
     # Run ALL tests, including unit, lint and functional ones.
+    # The execution time goes from 1:13 -> 0:50 when two threads are used.
     - name: Run all tests
       if: matrix.py == '3.9'
       run: |
@@ -115,18 +113,23 @@ jobs:
         cache: pip
         cache-dependency-path: hdl_registers/requirements_develop.txt
 
-    - name: Install system packages (with cache)
+    - name: Install system packages
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        # The graphical libraries are needed by sphinx which is not needed in most jobs.
-        # However this call uses a cache and is very fast (<1 second).
-        packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
+        packages: git
         version: 1.0
 
-    - name: Install Python packages (with cache)
+    - name: Install Python packages
       run: |
-        # Note that this will install a lot, but it uses a cache. The call takes ~17 seconds.
-        pip install --requirement hdl_registers/requirements_develop.txt
+        pip install \
+          GitPython \
+          pybadges \
+          PyYAML \
+          rtoml \
+          sphinx \
+          sphinx-rtd-theme \
+          sphinx_sitemap \
+          sphinx-toolbox
 
     - name: Clone dependency repos
       run: |
