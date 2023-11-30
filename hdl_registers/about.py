@@ -104,11 +104,17 @@ To check out the source code go to the
   :alt: License
   :target: https://hdl-registers.com/license_information.html
 
+.. |pic_ci_status| image:: https://github.com/hdl-registers/hdl-registers/actions/workflows/ci.yml/\
+badge.svg?branch=main
+  :alt: CI status
+  :target: https://github.com/hdl-registers/hdl-registers/actions/workflows/ci.yml
+
 .. |pic_python_line_coverage| image:: https://hdl-registers.com/badges/python_coverage.svg
   :alt: Python line coverage
   :target: https://hdl-registers.com/python_coverage_html
 
-|pic_website| |pic_repository| |pic_chat| |pic_pip_install| |pic_license| |pic_python_line_coverage|
+|pic_website| |pic_repository| |pic_chat| |pic_pip_install| |pic_license| |pic_ci_status|
+|pic_python_line_coverage|
 
 The hdl-registers project is an open-source HDL register code generator fast enough to run in
 real time.
