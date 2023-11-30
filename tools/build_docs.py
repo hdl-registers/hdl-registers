@@ -130,9 +130,9 @@ def generate_bibtex() -> None:
     rst_before = """\
 .. code-block:: tex
 
-  @misc{hdl_registers,
+  @misc{hdl-registers,
     author = {Vik, Lukas},
-    title  = {{hdl\\_registers: """
+    title  = {{hdl-registers: """
 
     rst_after = """}},
     url    = {https://hdl-registers.com},
