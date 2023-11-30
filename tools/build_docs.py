@@ -50,7 +50,7 @@ def main() -> None:
     rst = generate_release_notes(
         repo_root=hdl_registers.REPO_ROOT,
         release_notes_directory=hdl_registers.HDL_REGISTERS_DOC / "release_notes",
-        project_name="hdl_registers",
+        project_name="hdl-registers",
     )
     create_file(GENERATED_SPHINX / "release_notes.rst", rst)
 
