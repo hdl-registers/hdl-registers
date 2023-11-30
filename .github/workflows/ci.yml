@@ -47,7 +47,7 @@ jobs:
         git clone --depth 1 --single-branch --branch main \
           https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
         git clone --depth 1 --single-branch --branch main \
-          https://gitlab.com/hdl_modules/hdl_modules.git ../../hdl_modules/hdl_modules
+          https://github.com/hdl-modules/hdl-modules.git ../../hdl-modules/hdl-modules
 
     # Run only the UNIT tests on most Python versions in the matrix.
     # This is very fast (2-3 s).
