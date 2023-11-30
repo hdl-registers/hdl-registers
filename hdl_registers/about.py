@@ -70,7 +70,7 @@ To check out the source code go to the
         extra_rst = """\
 **See documentation on the website**: https://hdl-registers.com
 
-**Check out the source code on github**: https://github.com/hdl-registers/hdl-registers
+**Check out the source code on GitHub**: https://github.com/hdl-registers/hdl-registers
 
 """
     else:
