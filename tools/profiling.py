@@ -25,7 +25,7 @@ import tools.tools_pythonpath  # noqa: F401
 from tsfpga.system_utils import create_directory, run_command
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
@@ -36,7 +36,7 @@ from hdl_registers.parser.toml import _load_toml_file, from_toml
 NUM_ITERATIONS = 10_000
 
 OUTPUT_FOLDER = create_directory(HDL_REGISTERS_GENERATED / "profiling", empty=False)
-TOML_FILE = HDL_REGISTERS_TEST / "regs_test.toml"
+TOML_FILE = HDL_REGISTERS_TESTS / "regs_test.toml"
 JSON_FILE = OUTPUT_FOLDER / "data.json"
 
 

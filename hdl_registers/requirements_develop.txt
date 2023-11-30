@@ -15,6 +15,7 @@ PyGObject
 pylint
 pytest
 pytest-cov
+pytest-xdist
 rtoml
 sphinx
 sphinx_sitemap

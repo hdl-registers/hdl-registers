@@ -17,7 +17,7 @@ import tsfpga
 from tsfpga.examples.example_env import get_default_registers
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TESTS
 from hdl_registers.generator.c.header import CHeaderGenerator
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
@@ -39,7 +39,7 @@ REGISTER_LISTS = [
         toml_file=tsfpga.TSFPGA_EXAMPLE_MODULES / "ddr_buffer" / "regs_ddr_buffer.toml",
         default_registers=get_default_registers(),
     ),
-    from_toml(name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"),
+    from_toml(name="caesar", toml_file=HDL_REGISTERS_TESTS / "regs_test.toml"),
     from_toml(
         name="example",
         toml_file=HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "toml" / "toml_format.toml",

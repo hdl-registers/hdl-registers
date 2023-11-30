@@ -16,7 +16,7 @@ from tsfpga.system_utils import create_file, run_command
 
 # First party libraries
 from hdl_registers.generator.c.header import CHeaderGenerator
-from hdl_registers.test.functional.gcc.compile_and_run_test import CompileAndRunTest
+from tests.functional.gcc.compile_and_run_test import CompileAndRunTest
 
 THIS_DIR = Path(__file__).parent.resolve()
 

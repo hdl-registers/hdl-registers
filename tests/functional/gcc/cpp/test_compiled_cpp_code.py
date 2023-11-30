@@ -19,7 +19,7 @@ from tsfpga.system_utils import create_file, run_command
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
-from hdl_registers.test.functional.gcc.compile_and_run_test import CompileAndRunTest
+from tests.functional.gcc.compile_and_run_test import CompileAndRunTest
 
 THIS_DIR = Path(__file__).parent.resolve()
 

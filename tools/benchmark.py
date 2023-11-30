@@ -88,7 +88,7 @@ def main():
 
 def benchmark_hdl_registers() -> tuple[float, int, str]:
     # First party libraries
-    from hdl_registers import HDL_REGISTERS_TEST, __version__
+    from hdl_registers import HDL_REGISTERS_TESTS, __version__
     from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
     from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
     from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
@@ -104,7 +104,7 @@ def benchmark_hdl_registers() -> tuple[float, int, str]:
         # * 56 fields, of 4 different types.
         #   Some of these are from repetitions from register arrays.
         # * 8 register constants, of 5 different types.
-        register_list = from_toml(name="test", toml_file=HDL_REGISTERS_TEST / "regs_test.toml")
+        register_list = from_toml(name="test", toml_file=HDL_REGISTERS_TESTS / "regs_test.toml")
 
         VhdlRegisterPackageGenerator(
             register_list=register_list, output_folder=output_folder

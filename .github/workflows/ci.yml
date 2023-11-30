@@ -10,10 +10,10 @@ on:
 jobs:
 
   # ------------------------------------------------------------------------------
-  # Run unit tests on multiple versions to show that core functionality works.
+  # Run all Python-based tests.
 
   pytest:
-    name: Python unit/lint tests
+    name: Run Python tests
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -38,50 +38,36 @@ jobs:
         packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
         version: 1.0
 
-    - name: Run job
+    - name: Install Python packages (with cache)
       run: |
         # Note that this will install a lot, but it uses a cache. The call takes ~17 seconds.
         pip install --requirement hdl_registers/requirements_develop.txt
+
+    - name: Clone dependency repos
+      run: |
         git clone --depth 1 --single-branch --branch main \
           https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
         git clone --depth 1 --single-branch --branch main \
           https://gitlab.com/hdl_modules/hdl_modules.git ../../hdl_modules/hdl_modules
-        python3 -m pytest --verbose --ignore hdl_registers/test/functional \
-          --cov hdl_registers \
-          --cov-report xml:generated/python_coverage.xml \
-          --cov-report html:generated/python_coverage_html
 
-    - name: Upload coverage artifacts
-      if: matrix.py == '3.9'
-      uses: actions/upload-artifact@v3
-      with:
-        name: coverage
-        path: generated/python_coverage*
+    # Run only the UNIT tests on most Python versions in the matrix.
+    # This is very fast (2-3 s).
+    - name: Run unit tests
+      if: matrix.py != '3.9'
+      run: |
+        python3 -m pytest \
+          --verbose \
+          --numprocesses 2 \
+          hdl_registers
 
-
-  # ------------------------------------------------------------------------------
-  # Do not need to run on multiple Python versions.
-  # Hence separated from the unit tests above.
-
-  pytest_functional:
-    name: Python functional tests
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.12
-        cache: pip
-        cache-dependency-path: hdl_registers/requirements_develop.txt
-
+    # On one Python version however, we run ALL the Python-based tests, which requires a few more
+    # dependencies, and then we collect coverage from this run.
     - name: Setup GHDL
+      if: matrix.py == '3.9'
       uses: ghdl/setup-ghdl-ci@nightly
 
     - name: Install system packages (with cache)
+      if: matrix.py == '3.9'
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
         # The graphical libraries are needed by sphinx which is not needed in most jobs.
@@ -89,15 +75,25 @@ jobs:
         packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
         version: 1.0
 
-    - name: Run job
+    # Run ALL tests, including unit, lint and functional ones.
+    - name: Run all tests
+      if: matrix.py == '3.9'
       run: |
-        # Note that this will install a lot, but it uses a cache. The call takes ~17 seconds.
-        pip install --requirement hdl_registers/requirements_develop.txt
-        git clone --depth 1 --single-branch --branch main \
-          https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
-        git clone --depth 1 --single-branch --branch main \
-          https://gitlab.com/hdl_modules/hdl_modules.git ../../hdl_modules/hdl_modules
-        python3 -m pytest --verbose hdl_registers/test/functional
+        python3 -m pytest \
+          --verbose \
+          --numprocesses 2 \
+          --cov hdl_registers \
+          --cov-report xml:generated/python_coverage.xml \
+          --cov-report html:generated/python_coverage_html \
+          hdl_registers \
+          tests
+
+    - name: Upload coverage artifacts
+      if: matrix.py == '3.9'
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage
+        path: generated/python_coverage*
 
 
   # ------------------------------------------------------------------------------
@@ -127,6 +123,16 @@ jobs:
         packages: git gir1.2-gtk-3.0 graphviz libgirepository1.0-dev libcairo2-dev
         version: 1.0
 
+    - name: Install Python packages (with cache)
+      run: |
+        # Note that this will install a lot, but it uses a cache. The call takes ~17 seconds.
+        pip install --requirement hdl_registers/requirements_develop.txt
+
+    - name: Clone dependency repos
+      run: |
+        git clone --depth 1 --single-branch --branch main \
+          https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
+
     - name: Download coverage artifacts
       uses: actions/download-artifact@v3
       with:
@@ -138,10 +144,6 @@ jobs:
         # Without tags, 'build_docs.py' can not find all git tags fo release history.
         # Note that 'fetch-tags: true' on the checkout actions did not work (2023-11-29).
         git fetch --all --tags
-        # Note that this will install a lot, but it uses a cache. The call takes ~17 seconds.
-        pip install --requirement hdl_registers/requirements_develop.txt
-        git clone --depth 1 --single-branch --branch main \
-          https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
         python3 tools/build_docs.py
 
     - name: Configure Pages
@@ -183,6 +185,7 @@ jobs:
     name: Build PyPI release
     runs-on: ubuntu-latest
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 

@@ -11,13 +11,13 @@
 from tsfpga.system_utils import load_python_module
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.python.python_class_generator import PythonClassGenerator
 from hdl_registers.parser.toml import from_toml
 
 
 def test_recreating_register_list_object(tmp_path):
-    register_list = from_toml(name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml")
+    register_list = from_toml(name="caesar", toml_file=HDL_REGISTERS_TESTS / "regs_test.toml")
     PythonClassGenerator(register_list, tmp_path).create()
 
     test_recreated = load_python_module(tmp_path / "caesar.py").Caesar()

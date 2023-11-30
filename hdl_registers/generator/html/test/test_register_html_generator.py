@@ -12,7 +12,7 @@ import pytest
 from tsfpga.system_utils import read_file
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
@@ -23,7 +23,7 @@ class HtmlTest:
     def __init__(self, tmp_path):
         self.tmp_path = tmp_path
         self.register_list = from_toml(
-            name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
+            name="caesar", toml_file=HDL_REGISTERS_TESTS / "regs_test.toml"
         )
 
     def create_html_page(self):

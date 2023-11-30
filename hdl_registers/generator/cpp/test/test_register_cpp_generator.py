@@ -17,14 +17,14 @@ import pytest
 from tsfpga.system_utils import read_file
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.parser.toml import from_toml
 
 
 @pytest.fixture
 def cpp_test_toml_code(tmp_path):
-    registers = from_toml("test", HDL_REGISTERS_TEST / "regs_test.toml")
+    registers = from_toml("test", HDL_REGISTERS_TESTS / "regs_test.toml")
 
     CppInterfaceGenerator(register_list=registers, output_folder=tmp_path).create()
     return read_file(tmp_path / "i_test.h")

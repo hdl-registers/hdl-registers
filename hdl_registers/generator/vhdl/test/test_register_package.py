@@ -17,7 +17,7 @@ import pytest
 from tsfpga.system_utils import read_file
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.field.register_field_type import (
     Signed,
     SignedFixedPoint,
@@ -69,7 +69,7 @@ class RegisterConfiguration:
 
 @pytest.fixture
 def register_configuration():
-    return RegisterConfiguration("test", HDL_REGISTERS_TEST / "regs_test.toml")
+    return RegisterConfiguration("test", HDL_REGISTERS_TESTS / "regs_test.toml")
 
 
 # False positive for pytest fixtures

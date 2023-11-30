@@ -11,14 +11,12 @@
 import sys
 from pathlib import Path
 
+THIS_DIR = Path(__file__).parent.resolve()
+REPO_ROOT = THIS_DIR.parent.parent.parent.resolve()
+sys.path.append(str(REPO_ROOT))
+
 # Add path for default location of tsfpga to PYTHONPATH.
-sys.path.append(
-    str(
-        (
-            Path(__file__).parent.parent.parent.parent.parent.parent.parent / "tsfpga" / "tsfpga"
-        ).resolve()
-    ),
-)
+sys.path.append(str((REPO_ROOT.parent.parent / "tsfpga" / "tsfpga").resolve()))
 
 # Third party libraries
 from tsfpga.examples.example_env import get_hdl_modules
@@ -26,7 +24,7 @@ from tsfpga.system_utils import create_directory
 from vunit import VUnit
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED, HDL_REGISTERS_PATH
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
 from hdl_registers.field.register_field_type import (
     Signed,
     SignedFixedPoint,
@@ -41,8 +39,6 @@ from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
     generate_strange_register_maps,
 )
 from hdl_registers.parser.toml import from_toml
-
-THIS_FOLDER = Path(__file__).parent.resolve()
 
 DOC_SIM_FOLDER = HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "sim"
 
@@ -69,7 +65,7 @@ def test_running_simulation(tmp_path):
 
         library = vunit_proj.add_library(library_name="example")
 
-        for vhd_file in THIS_FOLDER.glob("*.vhd"):
+        for vhd_file in THIS_DIR.glob("*.vhd"):
             library.add_source_file(vhd_file)
 
         for vhd_file in DOC_SIM_FOLDER.glob("*.vhd"):
@@ -102,7 +98,7 @@ def test_running_simulation(tmp_path):
 def generate_toml_registers(output_path):
     register_list = from_toml(
         name="caesar",
-        toml_file=HDL_REGISTERS_PATH / "test" / "regs_test.toml",
+        toml_file=HDL_REGISTERS_TESTS / "regs_test.toml",
     )
 
     # Add some bit vector fields with types.

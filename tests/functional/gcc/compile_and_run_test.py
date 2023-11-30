@@ -11,7 +11,7 @@
 from pathlib import Path
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_TEST
+from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.parser.toml import from_toml
 
 
@@ -21,5 +21,5 @@ class CompileAndRunTest:
         self.include_dir = self.working_dir / "include"
 
         self.register_list = from_toml(
-            name="caesar", toml_file=HDL_REGISTERS_TEST / "regs_test.toml"
+            name="caesar", toml_file=HDL_REGISTERS_TESTS / "regs_test.toml"
         )

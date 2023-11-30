@@ -19,7 +19,7 @@ from tsfpga.test.lint.test_file_format import (
 )
 
 # First party libraries
-from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TEST, HDL_REGISTERS_TOOLS, REPO_ROOT
+from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TESTS, HDL_REGISTERS_TOOLS, REPO_ROOT
 
 
 def test_all_checked_in_files_are_properly_encoded():
@@ -117,8 +117,8 @@ def test_no_checked_in_files_have_too_long_lines():
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "generator_vhdl.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "getting_started.rst",
         HDL_REGISTERS_DOC / "sphinx" / "rst" / "user_guide" / "user_guide_python_api.rst",
-        HDL_REGISTERS_TEST / "functional" / "gcc" / "c" / "test_registers.c",
-        HDL_REGISTERS_TEST / "functional" / "gcc" / "cpp" / "test_registers.cpp",
+        HDL_REGISTERS_TESTS / "functional" / "gcc" / "c" / "test_registers.c",
+        HDL_REGISTERS_TESTS / "functional" / "gcc" / "cpp" / "test_registers.cpp",
     ]
     for file_path in files_to_test(excludes=excludes):
         test_ok &= check_file_for_line_length(file_path=file_path)
