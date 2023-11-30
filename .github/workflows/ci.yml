@@ -1,10 +1,16 @@
 name: ci
 
 on:
+  # Run when a pull request is opened or updated.
   pull_request:
+  # Add possiblity of running manually from webpage.
   workflow_dispatch:
-  schedule:
+  # Run from main when a pull request is merged.
+  push:
+    branches:
+      - main
   # Run nightly at 20:45 UTC.
+  schedule:
   - cron: 45 20 * * *
 
 jobs:
