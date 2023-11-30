@@ -9,7 +9,7 @@
 
 # Third party libraries
 from tsfpga.git_utils import find_git_files
-from tsfpga.test.lint.test_copyright import CopyrightHeader
+from tsfpga.test.lint.copyright_lint import CopyrightHeader
 
 # First party libraries
 from hdl_registers import REPO_ROOT

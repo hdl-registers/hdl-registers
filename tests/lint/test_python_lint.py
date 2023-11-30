@@ -14,7 +14,7 @@ from pathlib import Path
 # Third party libraries
 from tsfpga.git_utils import find_git_files
 from tsfpga.system_utils import create_file, run_command
-from tsfpga.test.lint.test_python_lint import run_black, run_flake8_lint, run_isort, run_pylint
+from tsfpga.test.lint.python_lint import run_black, run_flake8_lint, run_isort, run_pylint
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, REPO_ROOT

@@ -9,7 +9,7 @@
 
 # Third party libraries
 from tsfpga.git_utils import find_git_files
-from tsfpga.test.lint.test_file_format import (
+from tsfpga.test.lint.file_format_lint import (
     check_file_ends_with_newline,
     check_file_for_carriage_return,
     check_file_for_line_length,

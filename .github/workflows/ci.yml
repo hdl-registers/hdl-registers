@@ -45,7 +45,7 @@ jobs:
     - name: Clone dependency repos
       run: |
         git clone --depth 1 --single-branch --branch main \
-          https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
+          https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
         git clone --depth 1 --single-branch --branch main \
           https://gitlab.com/hdl_modules/hdl_modules.git ../../hdl_modules/hdl_modules
 
@@ -140,7 +140,7 @@ jobs:
     - name: Clone dependency repos
       run: |
         git clone --depth 1 --single-branch --branch main \
-          https://gitlab.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
+          https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
 
     - name: Download coverage artifacts
       uses: actions/download-artifact@v3
