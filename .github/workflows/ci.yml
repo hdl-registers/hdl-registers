@@ -119,12 +119,6 @@ jobs:
         cache: pip
         cache-dependency-path: hdl_registers/requirements_develop.txt
 
-    - name: Install system packages
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: git
-        version: 1.0
-
     - name: Install Python packages
       run: |
         pip install \
