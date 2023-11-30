@@ -176,7 +176,7 @@ def build_information_badges(output_path: Path) -> None:
 
     badge_svg = badge(
         left_text="github",
-        right_text="hdl_registers/hdl_registers",
+        right_text="hdl-registers/hdl-registers",
         right_color="green",
         logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "github.svg"),
         embed_logo=True,
