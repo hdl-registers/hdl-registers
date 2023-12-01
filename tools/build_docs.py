@@ -180,6 +180,8 @@ def build_information_badges(output_path: Path) -> None:
         right_text="BSD 3-Clause",
         left_color=BADGE_COLOR_LEFT,
         right_color=BADGE_COLOR_RIGHT,
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "law.svg"),
+        embed_logo=True,
     )
     create_file(output_path / "license.svg", badge_svg)
 
@@ -205,9 +207,11 @@ def build_information_badges(output_path: Path) -> None:
 
     badge_svg = badge(
         left_text="chat",
-        right_text="on gitter",
+        right_text="GitHub Discussions",
         left_color=BADGE_COLOR_LEFT,
         right_color=BADGE_COLOR_RIGHT,
+        logo=str(hdl_registers.HDL_REGISTERS_DOC / "logos" / "third_party" / "discussions.svg"),
+        embed_logo=True,
     )
     create_file(output_path / "chat.svg", badge_svg)
 
