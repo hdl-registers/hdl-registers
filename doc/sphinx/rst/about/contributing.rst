@@ -1,7 +1,7 @@
 Contribution guide
 ==================
 
-Information on how to make contributions to the ``hdl_registers`` project.
+Information on how to make contributions to the ``hdl-registers`` project.
 
 
 
@@ -90,7 +90,7 @@ Run the script
     python3 tools/tag_release.py X.Y.Z
 
 where X.Y.Z is your new version number.
-The script will bump the ``hdl_registers`` version number and copy release notes to a new file.
+The script will bump the ``hdl-registers`` version number and copy release notes to a new file.
 The changes will be committed and then tagged.
 
 

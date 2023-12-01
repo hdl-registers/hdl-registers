@@ -81,7 +81,7 @@ The top-level architecture is very often unique to every project, and it is hard
 automated tool that solves every situation in a clean and elegant way that actually adds value.
 
 With this said, there are some very convenient tools in the sister project
-:ref:`hdl_modules <module_reg_file>` to achieve these things.
+:ref:`hdl-modules <module_reg_file>` to achieve these things.
 
 
 .. _similar_tools:

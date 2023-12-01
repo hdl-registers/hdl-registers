@@ -229,7 +229,7 @@ Dependencies
 
 The :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator` packages
 depend on :ref:`reg_file.reg_file_pkg`
-from the :ref:`reg_file <module_reg_file>` module of `hdl_modules <https://hdl-modules.com>`__.
+from the :ref:`reg_file <module_reg_file>` module of `hdl-modules <https://hdl-modules.com>`__.
 Can be downloaded from github here:
 https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
@@ -257,7 +257,7 @@ Further tools for simplifying register handling
 -----------------------------------------------
 
 There is a large eco-system of register-related components in the
-`hdl_modules <https://hdl-modules.com>`__ project.
+`hdl-modules <https://hdl-modules.com>`__ project.
 Firstly there are wrappers in the :ref:`bfm library <module_bfm>` for easier working with VUnit
 verification components.
 Furthermore there is a large number of synthesizable AXI components available that enable the
