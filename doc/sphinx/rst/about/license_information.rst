@@ -1,8 +1,8 @@
 License
 =======
 
-The ``hdl_registers`` project is released under the terms of the BSD 3-Clause License.
-This is a very permissive license, which means that ``hdl_registers`` components can be incorporated
+The ``hdl-registers`` project is released under the terms of the BSD 3-Clause License.
+This is a very permissive license, which means that ``hdl-registers`` components can be incorporated
 in commercial products.
 See the license text below for details:
 

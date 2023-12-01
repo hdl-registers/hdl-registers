@@ -95,7 +95,7 @@ def benchmark_hdl_registers() -> tuple[float, int, str]:
     from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackageGenerator
     from hdl_registers.parser.toml import from_toml
 
-    output_folder = OUTPUT_FOLDER / "hdl_registers"
+    output_folder = OUTPUT_FOLDER / "hdl-registers"
 
     def run_test():
         # Note that this TOML file has, at the time of writing (2023-11-28):

@@ -20,7 +20,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 
 # Paths e.g.
-# repo/hdl_registers/hdl_registers
+# repo/hdl-registers/hdl-registers
 # repo/tsfpga/tsfpga
 PATH_TO_TSFPGA = REPO_ROOT.parent.parent.resolve() / "tsfpga" / "tsfpga"
 sys.path.insert(0, str(PATH_TO_TSFPGA))

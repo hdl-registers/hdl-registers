@@ -64,7 +64,7 @@ axi_lite_reg_file.vhd
 
     def get_code(self, **kwargs: Any) -> str:
         """
-        Get VHDL code for a wrapper around the generic AXi_lite register file from hdl_modules:
+        Get VHDL code for a wrapper around the generic AXi_lite register file from hdl-modules:
         """
         entity_name = self.output_file.stem
 
@@ -148,7 +148,7 @@ are present.
 -- -----------------------------------------------------------------------------
 -- AXI-Lite register file for the '{self.name}' module registers.
 --
--- Is a wrapper around the generic AXI-Lite register file from hdl_modules:
+-- Is a wrapper around the generic AXI-Lite register file from hdl-modules:
 -- * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
 -- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/axi_lite_reg_file.vhd
 --
