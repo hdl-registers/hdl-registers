@@ -10,8 +10,10 @@ assignees: ''
 **Description**
 A clear and concise description of what the issue is about.
 
+
 **Expected behavior**
 What you expected to happen, and what is happening instead.
+
 
 **How to reproduce?**
 Tell us how to reproduce this issue. Please provide a Minimal Working Example (MWE) that triggers the issue. With sample code it's easier to reproduce the bug and it's much faster to fix. 
@@ -28,7 +30,7 @@ integer.increment.max_value = 100
 
 ```vhd
 architecture a of ent_name is
-  signal slv : std_ulogic_vector(6 downto 0) := (others => '0';
+  signal slv : std_ulogic_vector(6 downto 0) := (others => '0');
 begin
   slv <= to_slv(regs_down.config.increment);
 end architecture;
@@ -43,7 +45,10 @@ Please provide the following information:
 - hdl-registers origin:
   - [ ] Released package.
   - [ ] Git repository.
-- hdl-registers version [e.g. 4.1.0, or git commit SHA]:
+- hdl-registers version: [e.g. 4.1.0, or git commit SHA]
+- Any other relevant tool version(s): 
+  - [e.g. compiler, FPGA build tool, simulator, etc.]
+
 
 **Additional context**
 Add any other context about the problem here. If applicable, add screenshots to help explain your problem.
