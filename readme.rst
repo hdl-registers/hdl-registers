@@ -22,7 +22,7 @@
 
 .. |pic_license| image:: https://hdl-registers.com/badges/license.svg
   :alt: License
-  :target: https://hdl-registers.com/license_information.html
+  :target: https://hdl-registers.com/rst/about/license_information.html
 
 .. |pic_ci_status| image:: https://github.com/hdl-registers/hdl-registers/actions/workflows/ci.yml/badge.svg?branch=main
   :alt: CI status
