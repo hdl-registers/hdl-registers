@@ -1,5 +1,5 @@
 ################################################################################
-[register.configuration]
+[register.config]
 
 # The "mode" property MUST be present for a register.
 # The value specified must be a valid shorthand mode name. Either of:
@@ -19,12 +19,12 @@ This is the description of my register.
 Rudimentary RST formatting can be used, such as **boldface** and *italics*.
 """
 
-[register.configuration.bit.enable]
+[register.config.bit.enable]
 
 description = "Enable operation."
 default_value = "1"
 
-[register.configuration.enumeration.direction]
+[register.config.enumeration.direction]
 
 description = "Set the data direction."
 default_value = "high_z"
@@ -59,7 +59,7 @@ description = "Read address for DMA data."
 
 
 # ------------------------------------------------------------------------------
-[register_array.channels.register.configuration]
+[register_array.channels.register.config]
 
 mode = "w"
 description = "Configuration of channel settings."

@@ -59,7 +59,7 @@ def create_from_api() -> RegisterList:
     )
 
     register_list.append_register(
-        name="configuration", mode="r_w", description="Generic configuration register."
+        name="config", mode="r_w", description="Generic configuration register."
     )
 
     register_list.append_register(name="status", mode="r", description="Generic status register.")

@@ -16,6 +16,7 @@ from hdl_registers.generator.c.header import CHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
+from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
@@ -37,7 +38,7 @@ def create_from_api() -> RegisterList:
     register_list = RegisterList(name="caesar")
 
     register = register_list.append_register(
-        name="configuration", mode="r_w", description="Configuration register."
+        name="config", mode="r_w", description="Configuration register."
     )
 
     register.append_bit(
@@ -67,6 +68,7 @@ def generate(register_list: RegisterList, output_folder: Path):
     HtmlPageGenerator(register_list=register_list, output_folder=output_folder).create()
 
     VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_folder).create()
+    VhdlRecordPackageGenerator(register_list=register_list, output_folder=output_folder).create()
 
 
 def main(output_folder: Path):
