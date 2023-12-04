@@ -48,7 +48,7 @@ Please provide the following information:
   - [ ] Released package.
   - [ ] Git repository.
 - hdl-registers version: [e.g. 4.1.0, or git commit SHA]
-- Any other relevant tool version(s):
+- Any other relevant tool versions:
   - [e.g. compiler, FPGA build tool, simulator, etc.]
 
 
