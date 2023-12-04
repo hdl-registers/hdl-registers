@@ -1,3 +1,4 @@
-rtoml
 GitPython
+PyYAML
+rtoml
 tsfpga

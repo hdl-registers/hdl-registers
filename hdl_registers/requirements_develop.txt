@@ -16,6 +16,7 @@ pylint
 pytest
 pytest-cov
 pytest-xdist
+PyYAML
 rtoml
 sphinx
 sphinx_sitemap
@@ -24,4 +25,5 @@ sphinx-toolbox
 sphinxcontrib-wavedrom
 symbolator @ git+https://github.com/hdl/symbolator
 twine
+types-PyYAML
 vunit_hdl

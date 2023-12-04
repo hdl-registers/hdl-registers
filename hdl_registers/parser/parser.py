@@ -76,7 +76,7 @@ class RegisterParser:
         Parse the register data.
 
         Arguments:
-            register_data: TOML register data.
+            register_data: Register data as a dictionary.
 
         Return:
             The resulting register list.

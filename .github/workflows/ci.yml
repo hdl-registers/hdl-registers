@@ -40,6 +40,7 @@ jobs:
       run: |
         python3 -m pip install \
           pytest \
+          PyYAML \
           rtoml
 
     - name: Clone dependency repos
@@ -76,6 +77,7 @@ jobs:
           pylint \
           pytest-cov \
           pytest-xdist \
+          types-PyYAML \
           vunit-hdl
 
     # Run ALL tests, including unit, lint and functional ones.

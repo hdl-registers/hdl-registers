@@ -9,7 +9,7 @@ The register parser will warn if there are any errors in the data, such as missi
 unknown properties, wrong data type for properties, etc.
 
 The register parser is implemented in the :class:`.RegisterParser` class.
-It can be called with the :func:`.from_toml` and :func:`.from_json` functions.
+It can be called with the :func:`.from_toml`, :func:`.from_json` and :func:`.from_yaml` functions.
 
 
 .. _why_toml:
@@ -26,7 +26,7 @@ following advantages that are relevant when handling FPGA registers:
 * Supports comments in file.
 * Supports hexadecimal and binary integer values, with optional underscore separator.
 * Clear and readable handling of multiline strings.
-* Duplicate ley is an error.
+* Duplicate key is an error.
 * Fewer control characters compared to XML and JSON.
 * Very fast Python parser available.
 
@@ -84,9 +84,40 @@ Below is an example JSON snippet that sets up some register data:
 
 
 
+Using YAML data file
+--------------------
+
+The TOML format is highly recommended due to the benefits it offers, listed above.
+Also all the examples on this website are using TOML.
+However, the tool also supports using YAML data files if that is desired.
+
+In this case you need to construct your YAML data on the exact format as the
+:ref:`TOML format <toml_formatting>` above and then parse it with a call to :func:`.from_yaml`.
+
+Below is an example YAML snippet that sets up some register data:
+
+.. literalinclude:: yaml/toml_format.yaml
+  :caption: Register YAML format example.
+  :language: yaml
+  :linenos:
+
+
+
 Other data file formats
 -----------------------
 
 The TOML format is highly recommended due to the benefits it offers, listed above.
-However, if using another data file format is necessary then that is also possible.
-See this article for details: :ref:`extensions_json`.
+We also officially support parsing JSON and YAML, see above.
+However, if you want to parse some other exotic data file format then that is also possible.
+
+The parser functions, e.g. :func:`.from_toml`, are just very thin wrappers around the
+:class:`.RegisterParser` class.
+The :class:`.RegisterParser` class takes register data as a Python dictionary and returns the
+high-level object :class:`.RegisterList`.
+So in order to implement your own parser, simply read or construct the data as Python dictionary
+in the exact format as described :ref:`above <toml_formatting>` and pass it
+to :class:`.RegisterParser`.
+
+If you write a parser that you think others might have use for, please consider contributing to
+this project by creating an `issue <https://github.com/hdl-registers/hdl-registers/issues>`__
+or a `pull request <https://github.com/hdl-registers/hdl-registers/pulls>`__.
