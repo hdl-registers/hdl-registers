@@ -1,10 +1,10 @@
-[register.configuration]
+[register.config]
 
 mode = "r_w"
 description = "Configuration register."
 
-# This will allocate an enumeration field named "severity_level" in the "configuration" register.
-[register.configuration.enumeration.severity_level]
+# This will allocate an enumeration field named "severity_level" in the "config" register.
+[register.config.enumeration.severity_level]
 
 # The "description" property is optional for an enumeration field.
 # Will default to "" if not specified.
@@ -24,9 +24,10 @@ element.error = "Error message. Is considered an error."
 element.failure = "Failure message. Is considered an error."
 
 
-[register.configuration.enumeration.packet_source]
+[register.config.enumeration.packet_source]
 
 description = "Set input mux."
 
 element.streaming = "Process incoming streaming data."
 element.dma = "Read packets from DMA."
+element.none = "Don't send anything."

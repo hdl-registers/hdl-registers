@@ -56,7 +56,7 @@ def main(output_folder: Path):
     """
     register_list = RegisterList(name="caesar")
 
-    register_list.append_register(name="configuration", mode="r_w", description="")
+    register_list.append_register(name="config", mode="r_w", description="")
     register_list.append_register(name="status", mode="r", description="")
     register_list.append_register(name="command", mode="wpulse", description="")
 

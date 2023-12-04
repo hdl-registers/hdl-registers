@@ -72,6 +72,10 @@ The VHDL code below is produced by the ``generate()`` call in the Python example
 Click the button to expand and view the code.
 See :ref:`generator_vhdl` for instructions on how it can be used in your VHDL project.
 
+
+Base register package
+~~~~~~~~~~~~~~~~~~~~~
+
 Note how the register indexes are functions here, as opposed to constants as they usually are
 for plain registers.
 The argument to the function decides which array index to use.
@@ -81,7 +85,35 @@ array is repeated.
 .. collapse:: Click to expand/collapse code.
 
   .. literalinclude:: ../../../../generated/sphinx_rst/register_code/basic_feature/basic_feature_register_array/api/caesar_regs_pkg.vhd
-     :caption: Generated VHDL code.
+     :caption: Generated VHDL register package.
+     :language: VHDL
+     :linenos:
+
+|
+
+
+Record package
+~~~~~~~~~~~~~~
+
+The record package is quite hard to understand in this example, but lets try:
+
+* The ``caesar_regs_down_t`` type is a record with a member ``base_addresses``, which is the name
+  of the register array.
+* The type of this member is a ranged array of another record with two members: ``read_address``
+  and ``write_address``, which are the names of the registers in the array.
+* Both of these are of a record type that contain the ``address`` bit vector field set up in
+  this example.
+
+So in our VHDL code we can access a field value for example like this:
+
+.. code-block:: vhdl
+
+  job.address <= regs_down.base_addresses[1].read_address.address;
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/basic_feature/basic_feature_register_array/api/caesar_register_record_pkg.vhd
+     :caption: Generated VHDL record package.
      :language: VHDL
      :linenos:
 

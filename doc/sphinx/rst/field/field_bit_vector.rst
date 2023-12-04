@@ -75,6 +75,10 @@ The VHDL code below is produced by the ``generate()`` call in the Python example
 Click the button to expand and view the code.
 See :ref:`generator_vhdl` for instructions on how it can be used in your VHDL project.
 
+
+Base register package
+~~~~~~~~~~~~~~~~~~~~~
+
 Some interesting things to notice:
 
 1. There is only one register, at index 0.
@@ -90,9 +94,34 @@ Some interesting things to notice:
 .. collapse:: Click to expand/collapse code.
 
  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_bit_vector/api/caesar_regs_pkg.vhd
-    :caption: Generated VHDL code.
+    :caption: Generated VHDL register package.
     :language: VHDL
     :linenos:
+
+|
+
+
+Record package
+~~~~~~~~~~~~~~
+
+The ``caesar_regs_down_t`` type is a record with a member ``config``, the only register in
+this example.
+The type of the ``config`` member is another record with the two bit vectors set up in
+our example: ``tuser`` and ``tid``.
+These are of unsigned vector types defined in the base register package above.
+
+In our VHDL code we can access a field value for example like this:
+
+.. code-block:: vhdl
+
+  result_tuser <= regs_down.config.tuser;
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_bit_vector/api/caesar_register_record_pkg.vhd
+     :caption: Generated VHDL record package.
+     :language: VHDL
+     :linenos:
 
 |
 

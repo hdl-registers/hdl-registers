@@ -1,4 +1,4 @@
-[register.configuration]
+[register.config]
 
 mode = "r_w"
 description = "Generic configuration register."
