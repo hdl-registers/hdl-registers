@@ -139,7 +139,7 @@ It also minimizes the risk of bugs by removing the need for duplicate informatio
 * `Register constants <https://hdl-registers.com/rst/constant/constant_overview.html>`_.
 
 Registers can be defined using
-a `TOML/JSON data file <https://hdl-registers.com/rst/user_guide/toml_format.html>`_
+a `TOML/JSON/YAML data file <https://hdl-registers.com/rst/user_guide/toml_format.html>`_
 or the `Python API <https://hdl-registers.com/rst/user_guide/user_guide_python_api.html>`_.
 The following code can be generated:
 

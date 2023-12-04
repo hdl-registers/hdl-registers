@@ -12,70 +12,59 @@ import pytest
 from tsfpga.system_utils import create_file
 
 # First party libraries
-from hdl_registers.parser.json import from_json
+from hdl_registers.parser.yaml import from_yaml
 from hdl_registers.register import Register
 
 
-def test_load_nonexistent_json_file_should_raise_exception(tmp_path):
-    json_path = tmp_path / "apa.json"
+def test_load_nonexistent_yaml_file_should_raise_exception(tmp_path):
+    yaml_path = tmp_path / "apa.yaml"
     with pytest.raises(FileNotFoundError) as exception_info:
-        from_json(name="", json_file=json_path)
-    assert str(exception_info.value) == f"Requested JSON file does not exist: {json_path}"
+        from_yaml(name="", yaml_file=yaml_path)
+    assert str(exception_info.value) == f"Requested YAML file does not exist: {yaml_path}"
 
 
-def test_load_dirty_json_file_should_raise_exception(tmp_path):
-    json = """
-{
-    "register": {
-        "configuration": {
-            "mode": "r_w"
-        }
-    }
-}
+def test_load_dirty_yaml_file_should_raise_exception(tmp_path):
+    yaml = """
+register:
+  apa:
+    mode: r_w
+
 """
-    json_path = create_file(tmp_path / "apa.json", json)
-    from_json(name="", json_file=json_path)
+    yaml_path = create_file(tmp_path / "apa.yaml", yaml)
+    from_yaml(name="", yaml_file=yaml_path)
 
-    json_path = create_file(tmp_path / "hest.json", json + "garbage")
+    yaml_path = create_file(tmp_path / "hest.yaml", yaml + "garbage")
     with pytest.raises(ValueError) as exception_info:
-        from_json(name="", json_file=json_path)
+        from_yaml(name="", yaml_file=yaml_path)
     assert str(exception_info.value).startswith(
-        f"Error while parsing JSON file {json_path}:\nExtra data: "
+        f"Error while parsing YAML file {yaml_path}:\nwhile scanning a simple key\n"
     )
 
 
 def test_default_registers(tmp_path):
-    json_path = create_file(
-        file=tmp_path / "regs.json",
+    yaml_path = create_file(
+        file=tmp_path / "regs.yaml",
         contents="""
-{
-    "register": {
-        "apa": {
-            "mode": "r_w",
-            "description": "Apa.",
-            "bit": {
-                "enable": {
-                    "description": "Enable.",
-                    "default_value": "1"
-                }
-            }
-        },
-        "hest": {
-            "mode": "r",
-            "description": "Hest.",
-            "bit": {
-                "disable": {
-                    "description": "Disable."
-                }
-            }
-        }
-    }
-}
+register:
+  apa:
+    mode: r_w
+    description: Apa.
+    bit:
+      enable:
+        default_value: '1'
+        description: Enable.
+
+  hest:
+    mode: r
+    description: Hest.
+    bit:
+      disable:
+        description: Disable.
 """,
     )
-    register_list = from_json(
+    register_list = from_yaml(
         name="",
-        json_file=json_path,
+        yaml_file=yaml_path,
         default_registers=[
             Register(name="config", index=0, mode="r_w", description=""),
             Register(name="status", index=1, mode="r", description=""),
@@ -86,7 +75,7 @@ def test_default_registers(tmp_path):
     assert register_list.get_register("config").index == 0
     assert register_list.get_register("status").index == 1
 
-    # json registers.
+    # yaml registers.
     assert register_list.get_register("apa").index == 2
     assert register_list.get_register("apa").mode == "r_w"
     assert register_list.get_register("apa").description == "Apa."
@@ -105,24 +94,22 @@ def test_default_registers(tmp_path):
 
 
 def test_two_registers_with_same_name_does_not_raise_exception(tmp_path):
-    # Limitation in the JSON file format, unlike TOML.
+    # Limitation in the YAML Python parser: https://github.com/yaml/pyyaml/issues/165
+    # This is not a problem for TOML.
     # We would highly prefer if this raised exception.
-    json_path = create_file(
-        file=tmp_path / "regs.json",
+    yaml_path = create_file(
+        file=tmp_path / "regs.yaml",
         contents="""
-{
-    "register": {
-        "apa": {
-            "mode": "r"
-        },
-        "apa": {
-            "mode": "r_w"
-        }
-    }
-}
+register:
+  apa:
+    mode: r_w
+
+register:
+  apa:
+    mode: r
 """,
     )
 
-    register_list = from_json(name="", json_file=json_path)
+    register_list = from_yaml(name="", yaml_file=yaml_path)
     assert len(register_list.register_objects) == 1
-    assert register_list.register_objects[0].mode == "r_w"
+    assert register_list.register_objects[0].mode == "r"
