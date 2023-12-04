@@ -95,7 +95,9 @@ jobs:
           tests
 
     - name: Upload coverage artifacts
+      # Save time in pull request CI by not uploading artifact (takes 4-5 sec).
       if: matrix.py == '3.9'
+      # && github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v3
       with:
         name: coverage
@@ -105,9 +107,8 @@ jobs:
   # ------------------------------------------------------------------------------
   # Build HTML documentation for website.
 
-  build_doc:
+  build_website:
     name: Build HTML documentation
-    needs: pytest
     runs-on: ubuntu-latest
     steps:
 
@@ -125,7 +126,6 @@ jobs:
       run: |
         pip install \
           GitPython \
-          pybadges \
           PyYAML \
           rtoml \
           sphinx \
@@ -138,38 +138,30 @@ jobs:
         git clone --depth 1 --single-branch --branch main \
           https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
 
-    - name: Download coverage artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: coverage
-        path: generated
-
     - name: Run job
       run: |
-        # Without tags, 'build_docs.py' can not find all git tags fo release history.
+        # Without tags, 'build_website.py' can not find all git tags fo release history.
         # Note that 'fetch-tags: true' on the checkout actions did not work (2023-11-29).
         git fetch --all --tags
-        python3 tools/build_docs.py
+        python3 tools/build_website.py
 
-    - name: Configure Pages
-      if: github.ref == 'refs/heads/main'
-      uses: actions/configure-pages@v3
-
-    - name: Upload Pages Artifact
-      if: github.ref == 'refs/heads/main'
-      uses: actions/upload-pages-artifact@v1
+    - name: Upload Sphinx HTML artifacts
+      # Save time in pull request CI by not uploading artifact (takes ~7 sec).
+      # if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v3
       with:
+        name: sphinx_html
         path: generated/sphinx_html
 
 
   # ------------------------------------------------------------------------------
-  # Deploy the previously built HTML to GitHub Pages.
+  # Deploy the HTML to GitHub Pages.
 
   deploy_pages:
     name: Deploy website to pages
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
     # Only do deployment if everything else has passed.
-    needs: [pytest, build_doc, build_pypi]
+    needs: [pytest, build_website, build_pypi]
     permissions:
       pages: write
       id-token: write
@@ -178,6 +170,54 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+          cache: pip
+          cache-dependency-path: hdl_registers/requirements_develop.txt
+
+      - name: Install Python packages
+        run: |
+          pip install \
+            pybadges
+
+      - name: Clone dependency repos
+        run: |
+          git clone --depth 1 --single-branch --branch main \
+            https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
+
+      - name: Download Sphinx artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: sphinx_html
+          path: generated
+
+      - name: Download coverage artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: coverage
+          path: generated
+
+      - run: "ls && ls generated && ls generated/sphinx_html"
+
+      - name: Build badges
+        run: |
+          python3 tools/build_badges_for_website.py
+
+      - name: Configure Pages
+        if: github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@v3
+
+      - name: Upload Pages Artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: generated/sphinx_html
 
       - name: Deploy to GitHub Pages
         id: deployment
