@@ -9,7 +9,6 @@
 
 # Standard libraries
 from copy import copy
-from pathlib import Path
 
 # Third party libraries
 import pytest
@@ -29,10 +28,10 @@ def test_constant():
 
 def test_invalid_data_type():
     with pytest.raises(ValueError) as exception_info:
-        FloatConstant(name="apa", value=Path())
+        FloatConstant(name="apa", value=True)
     assert (
         str(exception_info.value)
-        == 'Constant "apa" has invalid data type "<class \'pathlib.PosixPath\'>". Value: ".".'
+        == 'Constant "apa" has invalid data type "<class \'bool\'>". Value: "True".'
     )
 
 
