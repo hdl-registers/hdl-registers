@@ -613,3 +613,22 @@ end package body;
 """
 
         return vhdl
+
+    def create(self, **kwargs: Any) -> None:
+        """
+        See super class for API details.
+
+        Overloaded here because this package file shall only be created if the register list
+        actually has any registers.
+        If not, if for example the user has a register list with only constants, we do not want
+        to flood the file system with unnecessary files.
+        The package would be empty anyway.
+
+        If the artifact file exists from a previous run, we delete it since we do not want stray
+        files laying around and we do not want to give the false impression that this file is being
+        actively generated.
+        """
+        if self.register_list.register_objects:
+            super().create(**kwargs)
+        else:
+            self._delete_output_file_if_exists()

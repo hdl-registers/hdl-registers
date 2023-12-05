@@ -50,12 +50,8 @@ use work.plain_only_down_register_record_pkg.all;
 use work.plain_only_down_register_simulation_pkg.all;
 
 use work.only_constants_regs_pkg.all;
-use work.only_constants_register_record_pkg.all;
-use work.only_constants_register_simulation_pkg.all;
 
 use work.empty_regs_pkg.all;
-use work.empty_register_record_pkg.all;
-use work.empty_register_simulation_pkg.all;
 
 
 entity tb_instantiate_strange_register_maps is

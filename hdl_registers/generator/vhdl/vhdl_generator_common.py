@@ -294,3 +294,12 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
             )
             if accessible_registers:
                 yield register_array
+
+    def _delete_output_file_if_exists(self) -> None:
+        """
+        Delete the output file of this generator if it exists.
+        """
+        if self.output_file.exists():
+            # Will not work if it is a directory, but if it is then that is a major user error
+            # and we kinda want to back out.
+            self.output_file.unlink()
