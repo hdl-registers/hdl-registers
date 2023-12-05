@@ -11,9 +11,6 @@
 from pathlib import Path
 from typing import Any
 
-# Third party libraries
-from tsfpga.system_utils import delete
-
 # Local folder libraries
 from .vhdl_generator_common import (
     BUS_ACCESS_DIRECTIONS,
@@ -245,14 +242,19 @@ end architecture;
 
     def create(self, **kwargs: Any) -> None:
         """
-        Overload the super method to implement our custom behavior.
-        """
-        if not self.register_list.register_objects:
-            # If there are no registers, we shall not create a register file wrapper.
-            # In fact, any existing file shall be deleted, so the user doesn't use an old file
-            # by mistake.
-            delete(self.output_file)
+        See super class for API details.
 
-        else:
-            # Otherwise, if there are registers, create as usual.
+        Overloaded here because this package file shall only be created if the register list
+        actually has any registers.
+        If not, if for example the user has a register list with only constants, we do not want
+        to flood the file system with unnecessary files.
+        The package would be empty anyway.
+
+        If the artifact file exists from a previous run, we delete it since we do not want stray
+        files laying around and we do not want to give the false impression that this file is being
+        actively generated.
+        """
+        if self.register_list.register_objects:
             super().create(**kwargs)
+        else:
+            self._delete_output_file_if_exists()

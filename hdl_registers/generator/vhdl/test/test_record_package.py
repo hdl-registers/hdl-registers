@@ -13,32 +13,32 @@ Note that the generated VHDL code is also simulated in a functional test.
 """
 
 # First party libraries
-from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
+from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.register_list import RegisterList
 
 
-def test_file_is_not_generated_without_registers(tmp_path):
+def test_package_is_not_generated_without_registers(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
 
-    VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_reg_file.vhd").exists()
+    VhdlRecordPackageGenerator(register_list, tmp_path).create()
+    assert not (tmp_path / "test_register_record_pkg.vhd").exists()
 
     register_list.add_constant(name="apa", value=True, description="")
-    VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_reg_file.vhd").exists()
+    VhdlRecordPackageGenerator(register_list, tmp_path).create()
+    assert not (tmp_path / "test_register_record_pkg.vhd").exists()
 
     register_list.append_register(name="hest", mode="r_w", description="")
-    VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
-    assert (tmp_path / "test_reg_file.vhd").exists()
+    VhdlRecordPackageGenerator(register_list, tmp_path).create()
+    assert (tmp_path / "test_register_record_pkg.vhd").exists()
 
 
-def test_re_generating_file_without_registers_should_delete_old_file(tmp_path):
+def test_re_generating_package_without_registers_should_delete_old_file(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
     register_list.append_register(name="apa", mode="r_w", description="")
 
-    VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
-    assert (tmp_path / "test_reg_file.vhd").exists()
+    VhdlRecordPackageGenerator(register_list, tmp_path).create()
+    assert (tmp_path / "test_register_record_pkg.vhd").exists()
 
     register_list.register_objects = []
-    VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_reg_file.vhd").exists()
+    VhdlRecordPackageGenerator(register_list, tmp_path).create()
+    assert not (tmp_path / "test_register_record_pkg.vhd").exists()
