@@ -20,10 +20,11 @@ jobs:
 
   pytest:
     name: Run Python tests
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: ['ubuntu-latest', 'windows-latest']
         py: ['3.9', '3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
     steps:
 
     - name: Checkout
@@ -38,35 +39,28 @@ jobs:
 
     - name: Install Python packages
       run: |
-        python3 -m pip install \
-          pytest \
-          PyYAML \
-          rtoml
+        python3 -m pip install pytest PyYAML rtoml
 
     - name: Clone dependency repos
       run: |
-        git clone --depth 1 --single-branch --branch main \
-          https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
-        git clone --depth 1 --single-branch --branch main \
-          https://github.com/hdl-modules/hdl-modules.git ../../hdl-modules/hdl-modules
+        git clone --depth 1 --single-branch --branch main https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
+        git clone --depth 1 --single-branch --branch main https://github.com/hdl-modules/hdl-modules.git ../../hdl-modules/hdl-modules
 
     # Run only the UNIT tests on most Python versions in the matrix.
     # This is very fast (2-3 s).
     - name: Run unit tests
-      if: matrix.py != '3.9'
+      if: matrix.os != 'ubuntu-latest' || matrix.py != '3.9'
       run: |
-        python3 -m pytest \
-          --verbose \
-          hdl_registers
+        python3 -m pytest --verbose hdl_registers
 
     # On one Python version however, we run ALL the Python-based tests, which requires a few more
     # dependencies, and then we collect coverage from this run.
     - name: Setup GHDL
-      if: matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
       uses: ghdl/setup-ghdl-ci@nightly
 
     - name: Install further Python packages
-      if: matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
       run: |
         python3 -m pip install \
           black \
@@ -83,7 +77,7 @@ jobs:
     # Run ALL tests, including unit, lint and functional ones.
     # The execution time goes from 1:13 -> 0:50 when two threads are used.
     - name: Run all tests
-      if: matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
       run: |
         python3 -m pytest \
           --verbose \
@@ -95,7 +89,7 @@ jobs:
           tests
 
     - name: Upload coverage artifacts
-      if: matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
       uses: actions/upload-artifact@v3
       with:
         name: coverage
