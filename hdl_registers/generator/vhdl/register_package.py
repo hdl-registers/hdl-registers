@@ -476,12 +476,14 @@ range {field.width + field.base_index - 1} downto {field.base_index};
                     raise TypeError(f'Got unexpected field type: "{field}".')
 
                 vhdl += f"""\
+  -- Cast a '{field.name}' field value to SLV.
   function {to_slv_name}(data : {name}_t) return {name}_slv_t is
 {to_slv}\
   begin
     return result;
   end function;
 
+  -- Get a '{field.name}' field value from a register value.
   function to_{name}(data : reg_t) return {name}_t is
 {from_slv}\
   begin
