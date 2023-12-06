@@ -29,7 +29,12 @@ from hdl_registers.generator.python.python_class_generator import PythonClassGen
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackageGenerator
+from hdl_registers.generator.vhdl.simulation.read_write_package import (
+    VhdlSimulationReadWritePackageGenerator,
+)
+from hdl_registers.generator.vhdl.simulation.wait_until_package import (
+    VhdlSimulationWaitUntilPackageGenerator,
+)
 from hdl_registers.parser.toml import from_toml
 
 # Test with all the example TOML files that we have available
@@ -55,8 +60,11 @@ def test_can_generate_vhdl_without_error(tmp_path, register_list):
     VhdlRecordPackageGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}_register_record_pkg.vhd").exists()
 
-    VhdlSimulationPackageGenerator(register_list, tmp_path).create()
-    assert (tmp_path / f"{register_list.name}_register_simulation_pkg.vhd").exists()
+    VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()
+    assert (tmp_path / f"{register_list.name}_register_read_write_pkg.vhd").exists()
+
+    VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create()
+    assert (tmp_path / f"{register_list.name}_register_wait_until_pkg.vhd").exists()
 
     VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}_reg_file.vhd").exists()
