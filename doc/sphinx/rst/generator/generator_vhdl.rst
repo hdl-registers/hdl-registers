@@ -7,12 +7,14 @@ A large ecosystem of VHDL artifacts can be generated that support both implement
 and simulation in your project.
 See the example below for a real-world use case of all these artifacts.
 
-* :class:`.VhdlRegisterPackageGenerator` generates a VHDL package with register indexes,
+* :class:`.VhdlRegisterPackageGenerator` generates a VHDL package with register indexes and modes,
   field indexes, field types, and field conversion functions.
 * :class:`.VhdlRecordPackageGenerator` generates a VHDL package with register records
   that use native VHDL types for all fields, along with conversion functions for these.
-* :class:`.VhdlSimulationPackageGenerator` generates a VHDL package with procedures for
-  reading/writing register values.
+* :class:`.VhdlSimulationReadWritePackageGenerator` generates a VHDL simulation support package with
+  procedures for reading/writing register or field values.
+* :class:`.VhdlSimulationWaitUntilPackageGenerator` generates a VHDL simulation support package with
+  procedures for waiting until a readable register or field assumes a given value.
 * :class:`.VhdlAxiLiteWrapperGenerator` generates a VHDL entity that wraps an AXI-Lite general
   register file, and exposes register values to application using the natively typed records.
 
@@ -68,6 +70,8 @@ we need for our VHDL implementation and testbench.
 |
 
 
+.. _example_counter_vhdl:
+
 VHDL example implementation
 ___________________________
 
@@ -110,17 +114,25 @@ Once again, the application is a bit silly, but it does showcase a lot of intere
 
 
 
+.. _example_tb_counter:
+
 VHDL example testbench
 ___________________________
 
 The VHDL below is the testbench for our VHDL example counter implementation above.
 
 1. The testbench uses register read/write procedures from the package produced by
-   :class:`.VhdlSimulationPackageGenerator`, which can be seen
-   :ref:`below <example_counter_simulation_package>`.
+   :class:`.VhdlSimulationReadWritePackageGenerator`, which can be seen
+   :ref:`below <example_counter_simulation_read_write_package>`.
    For example ``write_counter_config``.
-2. The ``wait_until_counter_status_pulse_count_equals`` call will continuously read the ``status``
-   register until the ``pulse_count`` field is exactly equal to the supplied value.
+2. The testbench uses register wait until procedures from the package produced by
+   :class:`.VhdlSimulationWaitUntilPackageGenerator`, which can be seen
+   :ref:`below <example_counter_simulation_wait_until_package>`.
+
+   a. For example ``wait_until_counter_status_pulse_count_equals``, which will continuously read
+      the ``status`` register until the ``pulse_count`` field is exactly equal to the
+      supplied value.
+
 3. The type of the ``value`` for each procedure is the native record type for that register.
 
    a. For example, ``read_counter_status`` returns a value of type ``counter_status_t`` which is
@@ -148,6 +160,8 @@ _______________________________
 
 Below is the generated register package, created from the TOML file above via the
 :class:`.VhdlRegisterPackageGenerator` class.
+This is used by the :ref:`example_counter_record_package` and
+the :ref:`example_counter_axi_lite_wrapper`.
 
 .. collapse:: Click to expand/collapse code.
 
@@ -164,8 +178,10 @@ Below is the generated register package, created from the TOML file above via th
 Generated VHDL record package
 _____________________________
 
-Below is the generated register package, created from the TOML file above via the
+Below is the generated record package, created from the TOML file above via the
 :class:`.VhdlRecordPackageGenerator` class.
+This is used by the :ref:`example_counter_axi_lite_wrapper` as well as the
+:ref:`example_counter_vhdl` and the :ref:`example_tb_counter`.
 
 .. collapse:: Click to expand/collapse code.
 
@@ -177,18 +193,38 @@ Below is the generated register package, created from the TOML file above via th
 |
 
 
-.. _example_counter_simulation_package:
+.. _example_counter_simulation_read_write_package:
 
-Generated VHDL simulation package
-_________________________________
+Generated VHDL simulation read/write package
+____________________________________________
 
-Below is the generated register simulation package, created from the TOML file above via the
-:class:`.VhdlSimulationPackageGenerator` class.
+Below is the generated register read/write simulation package, created from the TOML file above via
+the :class:`.VhdlSimulationReadWritePackageGenerator` class.
+It is used by the :ref:`example_tb_counter` to read/write registers in a compact way.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_simulation_pkg.vhd
-    :caption: Example register simulation package.
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_read_write_pkg.vhd
+    :caption: Example register simulation read/write package.
+    :language: VHDL
+    :linenos:
+
+|
+
+
+.. _example_counter_simulation_wait_until_package:
+
+Generated VHDL simulation wait until package
+____________________________________________
+
+Below is the generated register simulation wait until package, created from the TOML file above via
+the :class:`.VhdlSimulationWaitUntilPackageGenerator` class.
+It is used by the :ref:`example_tb_counter` to wait for registers to assume a give value.
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_wait_until_pkg.vhd
+    :caption: Example register simulation wait until package.
     :language: VHDL
     :linenos:
 
@@ -202,6 +238,8 @@ _____________________________________________
 
 Below is the generated AXI-Lite register file wrapper, created from the TOML file above via the
 :class:`.VhdlAxiLiteWrapperGenerator` class.
+This is instantiated in the :ref:`example_counter_vhdl` to get register values of native type
+without any manual casting.
 
 .. collapse:: Click to expand/collapse code.
 
@@ -223,6 +261,8 @@ register definitions, and will only generate the VHDL file when necessary.
 Hence it is recommended to call this function as opposed to :meth:`.RegisterCodeGenerator.create`
 which will waste time by always re-creating, even when it is not necessary.
 
+See :ref:`here <performance>` for a comparison with the performance of other tools.
+
 
 Dependencies
 ------------
@@ -233,8 +273,9 @@ from the :ref:`reg_file <module_reg_file>` module of `hdl-modules <https://hdl-m
 Can be downloaded from github here:
 https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
-The :class:`.VhdlSimulationPackageGenerator` package
-furthermore depends on :ref:`reg_file.reg_operations_pkg` and :ref:`common.addr_pkg`.
+The :class:`.VhdlSimulationReadWritePackageGenerator` and
+:class:`.VhdlSimulationWaitUntilPackageGenerator` packages
+furthermore depend on :ref:`reg_file.reg_operations_pkg` and :ref:`common.addr_pkg`.
 
 The :class:`.VhdlAxiLiteWrapperGenerator` package also depends on :ref:`axi.axi_lite_pkg`.
 

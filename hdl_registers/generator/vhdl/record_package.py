@@ -581,7 +581,6 @@ of {array_name}_was_{direction.name_past}_t;
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
-use ieee.fixed_pkg.all;
 
 library reg_file;
 use reg_file.reg_file_pkg.all;

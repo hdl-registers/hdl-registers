@@ -29,7 +29,8 @@ use reg_file.reg_operations_pkg.all;
 
 use work.caesar_regs_pkg.all;
 use work.caesar_register_record_pkg.all;
-use work.caesar_register_simulation_pkg.all;
+use work.caesar_register_read_write_pkg.all;
+use work.caesar_register_wait_until_pkg.all;
 
 
 entity tb_axi_lite_reg_file is

@@ -29,7 +29,12 @@ from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-from hdl_registers.generator.vhdl.simulation_package import VhdlSimulationPackageGenerator
+from hdl_registers.generator.vhdl.simulation.read_write_package import (
+    VhdlSimulationReadWritePackageGenerator,
+)
+from hdl_registers.generator.vhdl.simulation.wait_until_package import (
+    VhdlSimulationWaitUntilPackageGenerator,
+)
 from hdl_registers.parser.json import from_json
 from hdl_registers.parser.toml import _load_toml_file, from_toml
 
@@ -90,7 +95,11 @@ def profile_generate(output_folder: Path) -> cProfile.Profile:
             register_list=register_list, output_folder=output_folder
         ).create_if_needed()
 
-        VhdlSimulationPackageGenerator(
+        VhdlSimulationReadWritePackageGenerator(
+            register_list=register_list, output_folder=output_folder
+        ).create_if_needed()
+
+        VhdlSimulationWaitUntilPackageGenerator(
             register_list=register_list, output_folder=output_folder
         ).create_if_needed()
 

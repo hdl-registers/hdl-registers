@@ -13,13 +13,14 @@ Fixes
 
 Added
 
-* Add support for parsing a JSON data file, see :ref:`here <toml_format>`.
+* Add support for parsing JSON and YAML data files, see :ref:`here <toml_format>`.
 
 * Add generation of register records with natively-typed members for each register
   field to :class:`.VhdlRecordPackageGenerator`.
 
-* Add generation of simulation package using VUnit Verification Components
-  to :class:`.VhdlSimulationPackageGenerator`.
+* Add generation of simulation support package to :class:`.VhdlSimulationReadWritePackageGenerator`.
+
+  * Uses VUnit Verification Components for bus operations.
 
   * Uses the natively typed records from :class:`.VhdlRecordPackageGenerator` for values.
 
@@ -27,11 +28,19 @@ Added
 
     * Read/write for each register.
 
-    * Wait until register equals.
-
     * Read/write for each field.
 
-    * Wait until field equals.
+* Add generation of simulation support package to :class:`.VhdlSimulationWaitUntilPackageGenerator`.
+
+  * Uses VUnit Verification Components for bus operations.
+
+  * Uses the natively typed records from :class:`.VhdlRecordPackageGenerator` for values.
+
+  * Generates the following procedures:
+
+    * Wait until register equals for each register.
+
+    * Wait until field equals for each register.
 
 * Add generation of a wrapper around :ref:`reg_file.axi_lite_reg_file` to
   :class:`.VhdlAxiLiteWrapperGenerator`.

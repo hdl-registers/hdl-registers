@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import TYPE_CHECKING, Iterator, Optional, Union
+from typing import TYPE_CHECKING, Iterator, Optional
 
 # First party libraries
 from hdl_registers.field.bit import Bit
@@ -187,6 +187,20 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
         field_name = self.field_name(register=register, register_array=register_array, field=field)
         return f"{field_name}_t"
 
+    def reg_index_constant(
+        self, register: "Register", register_array: Optional["RegisterArray"]
+    ) -> str:
+        """
+        Get a 'reg_index' constant declaration suitable for implementation of register/field
+        access procedures.
+        """
+        register_name = self.register_name(register=register, register_array=register_array)
+        reg_index = (
+            f"{register_name}(array_index=>array_index)" if register_array else register_name
+        )
+
+        return f"    constant reg_index : {self.name}_reg_range := {reg_index};\n"
+
     def has_any_bus_accessible_register(self, direction: BusAccessDirection) -> bool:
         """
         Return True if the register list contains any register, plain or in array, that is
@@ -197,6 +211,17 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
                 return True
 
         return False
+
+    def iterate_bus_accessible_registers(
+        self, direction: BusAccessDirection
+    ) -> Iterator[tuple["Register", Optional["RegisterArray"]]]:
+        """
+        Iterate all registers in the register list, plain or in array, that are bus-accessible in
+        the given direction.
+        """
+        for register, register_array in self.iterate_registers():
+            if direction.register_is_accessible(register=register):
+                yield register, register_array
 
     def iterate_bus_accessible_plain_registers(
         self, direction: BusAccessDirection
@@ -248,7 +273,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
 
     def iterate_fabric_accessible_registers(
         self, direction: FabricAccessDirection
-    ) -> Iterator[tuple["Register", Union[None, "RegisterArray"]]]:
+    ) -> Iterator[tuple["Register", Optional["RegisterArray"]]]:
         """
         Iterate all registers in the register list, plain or in array, that are fabric-accessible in
         the given direction.
