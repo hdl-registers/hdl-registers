@@ -15,6 +15,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
+from hdl_registers.field.register_field_type import Fixed, Signed, Unsigned
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 
@@ -167,7 +168,13 @@ class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
             return value
 
         if isinstance(field, BitVector):
-            return f"std_logic_vector({value})"
+            if isinstance(field.field_type, (Signed, Unsigned)):
+                return f"std_logic_vector({value})"
+
+            if isinstance(field.field_type, Fixed):
+                return f"to_slv({value})"
+
+            raise ValueError(f"Unknown bit vector field: {field}")
 
         to_slv = self.field_to_slv_function_name(field=field, field_name=field_name)
         return f"{to_slv}({value})"

@@ -579,6 +579,7 @@ of {array_name}_was_{direction.name_past}_t;
         vhdl = f"""\
 {self.header}
 library ieee;
+use ieee.fixed_pkg.all;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
