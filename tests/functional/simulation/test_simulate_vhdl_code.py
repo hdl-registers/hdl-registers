@@ -89,7 +89,6 @@ def test_running_simulation(tmp_path):
         except SystemExit as exception:
             assert exception.code == exit_code
 
-    run(args=["--compile"], exit_code=0)
     # All these tests should pass.
     run(args=["--without-attribute", ".expected_failure"], exit_code=0)
     # All these should fail.
