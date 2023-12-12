@@ -43,8 +43,6 @@ It also minimizes the risk of bugs by removing the need for duplicate informatio
 
 **See documentation on the website**: https://hdl-registers.com
 
-**See PyPI for installation details**: https://pypi.org/project/hdl-registers/
-
 The following features are supported:
 
 * Register fields
