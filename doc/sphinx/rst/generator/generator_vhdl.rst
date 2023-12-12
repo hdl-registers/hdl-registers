@@ -7,8 +7,8 @@ A large ecosystem of VHDL artifacts can be generated that support both implement
 and simulation in your project.
 See the example below for a real-world use case of all these artifacts.
 
-* :class:`.VhdlRegisterPackageGenerator` generates a VHDL package with register indexes and modes,
-  field indexes, field types, and field conversion functions.
+* :class:`.VhdlRegisterPackageGenerator` generates the base VHDL package with register indexes and
+  modes, field indexes, field types, and field conversion functions.
 * :class:`.VhdlRecordPackageGenerator` generates a VHDL package with register records
   that use native VHDL types for all fields, along with conversion functions for these.
 * :class:`.VhdlSimulationReadWritePackageGenerator` generates a VHDL simulation support package with
@@ -119,7 +119,7 @@ Once again, the application is a bit silly, but it does showcase a lot of intere
 VHDL example testbench
 ___________________________
 
-The VHDL below is the testbench for our VHDL example counter implementation above.
+The VHDL below is the testbench for our example counter implementation above.
 
 1. The testbench uses register read/write procedures from the package produced by
    :class:`.VhdlSimulationReadWritePackageGenerator`, which can be seen
@@ -140,7 +140,7 @@ The VHDL below is the testbench for our VHDL example counter implementation abov
 
 4. The testbench instantiates :ref:`bfm.axi_lite_master` which creates AXI-Lite transactions
    based on the VUnit bus master verification component interface commands created by the
-   generated simulation package.
+   :ref:`example_counter_simulation_read_write_package`.
 
 .. collapse:: Click to expand/collapse code.
 
@@ -198,7 +198,7 @@ This is used by the :ref:`example_counter_axi_lite_wrapper` as well as the
 Generated VHDL simulation read/write package
 ____________________________________________
 
-Below is the generated register read/write simulation package, created from the TOML file above via
+Below is the generated register simulation read/write package, created from the TOML file above via
 the :class:`.VhdlSimulationReadWritePackageGenerator` class.
 It is used by the :ref:`example_tb_counter` to read/write registers in a compact way.
 

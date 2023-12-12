@@ -39,16 +39,18 @@ from .vhdl_generator_common import VhdlGeneratorCommon
 
 class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
     """
-    Generate a VHDL package with register information.
+    Generate a VHDL package with basic register information.
 
     * For each register constant, the value as a native VHDL constant.
     * For each register, the index within the register map.
-    * A register map constant, mapping indexes to modes.
     * For each field in each register
 
       * Register bit index range definitions.
       * Native VHDL type corresponding to the field type.
       * Conversion of a field value to/from SLV.
+
+    Also produces a register map constant, mapping indexes to modes, suitable for use with
+    :ref:`reg_file.axi_lite_reg_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
     """
 
     __version__ = "1.0.0"

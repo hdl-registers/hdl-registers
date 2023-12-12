@@ -26,8 +26,7 @@ The chosen mode will highly affect the generated code.
 For example a register of mode "Read" will only have getters in its
 generated :ref:`C++ code <generator_cpp>`, whereas mode "Write" will have only setters.
 
-The generated :ref:`VHDL package <generator_vhdl>` used with :ref:`reg_file.axi_lite_reg_file` will
+The generated :ref:`VHDL package and AXI-Lite register file <generator_vhdl>` will
 implement the correct FPGA behavior for all the different modes.
 It will detect illegal operations and will e.g. respond with an ``RRESP`` of ``SLVERR`` if a read
 is attempted of a "Write" register.
-
