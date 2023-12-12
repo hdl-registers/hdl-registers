@@ -239,8 +239,8 @@ class RegisterCodeGenerator(ABC):
     @property
     def header(self) -> str:
         """
-        Get file header informing the user that the file is automatically generated,
-        The information from :meth:`.generated_source_info` formatted as a comment block.
+        Get file header informing the user that the file is automatically generated.
+        Basically the information from :meth:`.generated_source_info` formatted as a comment block.
         """
         result = ""
         for line in self.generated_source_info:
@@ -251,7 +251,7 @@ class RegisterCodeGenerator(ABC):
     @property
     def generated_source_info(self) -> list[str]:
         """
-        Return lines informing the user that the file is automatically generated,
+        Return lines informing the user that the file is automatically generated.
         Containing info about the source of the generated register information.
         """
         # Default: Get git SHA from the user's current working directory.

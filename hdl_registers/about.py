@@ -143,14 +143,13 @@ The following code can be generated:
 
 * `VHDL <https://hdl-registers.com/rst/generator/generator_vhdl.html>`_
 
-  * AXI-Lite register file wrapper using native VHDL types for register fields.
-  * Simulation support package.
+  * AXI-Lite register file wrapper using records and native VHDL types for values.
+  * Simulation support packages.
 
 * `C++ <https://hdl-registers.com/rst/generator/generator_cpp.html>`_
 
-  * Abstract interface header for unit test mocking.
-  * Class header.
-  * Class implementation with setters and getters for registers and fields.
+  * Complete class with setters and getters for registers and fields.
+  * Includes an abstract interface header for unit test mocking.
 
 * `C header <https://hdl-registers.com/rst/generator/generator_c.html>`_
   with register addresses and field information.
