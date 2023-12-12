@@ -135,3 +135,9 @@ feel free to check out one of the other available tools listed below.
 
   Documentation: https://abs-tudelft.github.io/vhdmmio
 
+* **airhdl**
+
+  Website: https://airhdl.com
+
+  Commercial tool, closed source.
+  Web-based workflow, no possibility to run locally.
