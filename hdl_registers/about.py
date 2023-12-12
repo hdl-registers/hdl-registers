@@ -47,8 +47,6 @@ def get_readme_rst(
         extra_rst = """\
 **See documentation on the website**: https://hdl-registers.com
 
-**See PyPI for installation details**: https://pypi.org/project/hdl-registers/
-
 """
     elif include_extra_for_website:
         # The website needs the initial heading, in order for the landing page to get
