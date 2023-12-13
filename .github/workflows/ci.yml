@@ -122,6 +122,7 @@ jobs:
           pybadges \
           PyYAML \
           rtoml \
+          setuptools \
           sphinx \
           sphinx-rtd-theme \
           sphinx_sitemap \

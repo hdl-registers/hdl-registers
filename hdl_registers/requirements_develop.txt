@@ -18,6 +18,7 @@ pytest-cov
 pytest-xdist
 PyYAML
 rtoml
+setuptools
 sphinx
 sphinx_sitemap
 sphinx-rtd-theme
