@@ -1,10 +1,10 @@
-[register.configuration]
+[register.config]
 
 mode = "r_w"
 description = "Configuration register."
 
-# This will allocate an integer field named "burst_length_bytes" in the "configuration" register.
-[register.configuration.integer.burst_length_bytes]
+# This will allocate an integer field named "burst_length_bytes" in the "config" register.
+[register.config.integer.burst_length_bytes]
 
 # The "min_value" property is optional for an integer field.
 # Will default to 0 if not specified.
@@ -24,7 +24,7 @@ description = "The number of bytes to request."
 default_value = 64
 
 
-[register.configuration.integer.increment]
+[register.config.integer.increment]
 
 description = "Offset that will be added to data."
 min_value = -4
@@ -32,7 +32,7 @@ max_value = 3
 default_value = 0
 
 
-[register.configuration.integer.retry_count]
+[register.config.integer.retry_count]
 
 description = "Number of retry attempts before giving up."
 max_value = 5

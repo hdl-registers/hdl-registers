@@ -60,10 +60,10 @@ def generate_strange_register_maps(output_path):
             register = data.append_register(name=f"{name}_{mode}", mode=mode, description="")
 
             register.append_integer(
-                name="int", description="", min_value=-10, max_value=10, default_value=3
+                name="integer", description="", min_value=-10, max_value=10, default_value=3
             )
             register.append_enumeration(
-                name="enum", description="", elements=dict(a="", b=""), default_value="b"
+                name="enumeration", description="", elements=dict(a="", b=""), default_value="b"
             )
 
         def append_registers(data):

@@ -17,7 +17,6 @@ from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.field.register_field_type import Fixed, Signed, Unsigned
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 
 if TYPE_CHECKING:
     # First party libraries
@@ -94,7 +93,7 @@ FABRIC_ACCESS_DIRECTIONS = dict(
 )
 
 
-class VhdlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
+class VhdlGeneratorCommon(RegisterCodeGenerator):
     """
     Common methods for generation of VHDL code.
     """

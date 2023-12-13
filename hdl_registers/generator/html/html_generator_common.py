@@ -9,10 +9,9 @@
 
 # First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 
 
-class HtmlGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
+class HtmlGeneratorCommon(RegisterCodeGenerator):
     """
     Common for HTML code generators.
     """

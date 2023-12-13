@@ -39,7 +39,7 @@ Nothing else, its a stupid generator.
 
 
 @pytest.fixture
-def register_list_from_toml(tmp_path):
+def generator_from_toml(tmp_path):
     def get(toml_extras=""):
         toml_data = f"""\
 ################################################################################
@@ -51,9 +51,11 @@ description = "My register"
 {toml_extras}
 """
 
-        return from_toml(
+        register_list = from_toml(
             name="sensor", toml_file=create_file(tmp_path / "sensor_regs.toml", toml_data)
         )
+
+        return CustomGenerator(register_list=register_list, output_folder=tmp_path)
 
     return get
 
@@ -62,38 +64,38 @@ description = "My register"
 # pylint: disable=redefined-outer-name
 
 
-def test_create_should_not_run_if_nothing_has_changed(register_list_from_toml, tmp_path):
-    register_list = register_list_from_toml()
-    register_list.add_constant(name="apa", value=3, description="")
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_not_run_if_nothing_has_changed(generator_from_toml):
+    generator = generator_from_toml()
+    generator.register_list.add_constant(name="apa", value=3, description="")
+    generator.create_if_needed()
 
-    register_list = register_list_from_toml()
-    register_list.add_constant(name="apa", value=3, description="")
+    generator = generator_from_toml()
+    generator.register_list.add_constant(name="apa", value=3, description="")
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_not_called()
 
 
-def test_create_should_run_if_hash_or_version_can_not_be_read(register_list_from_toml, tmp_path):
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_run_if_hash_or_version_can_not_be_read(generator_from_toml):
+    generator = generator_from_toml()
+    generator.create_if_needed()
 
     # Overwrite the generated file, without a valid header
-    file_path = tmp_path / "sensor.x"
+    file_path = generator.output_folder / "sensor.x"
     assert file_path.exists()
     create_file(file_path, contents="# Mumbo jumbo\n")
 
-    register_list = register_list_from_toml()
+    generator = generator_from_toml()
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_called_once()
 
 
-def test_create_should_run_again_if_toml_file_has_changed(register_list_from_toml, tmp_path):
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_run_again_if_toml_file_has_changed(generator_from_toml):
+    generator = generator_from_toml()
+    generator.create_if_needed()
 
-    register_list = register_list_from_toml(
+    generator = generator_from_toml(
         """
 [constant.apa]
 
@@ -101,78 +103,72 @@ value = 3
 """
     )
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_called_once()
 
 
-def test_create_should_not_run_again_if_toml_file_has_only_cosmetic_change(
-    register_list_from_toml, tmp_path
-):
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_not_run_again_if_toml_file_has_only_cosmetic_change(generator_from_toml):
+    generator = generator_from_toml()
+    generator.create_if_needed()
 
-    register_list = register_list_from_toml(
+    generator = generator_from_toml(
         """
 ################################################################################
 # A comment.
 """
     )
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_not_called()
 
 
-def test_create_should_run_again_if_register_list_is_modified(register_list_from_toml, tmp_path):
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_run_again_if_register_list_is_modified(generator_from_toml):
+    generator = generator_from_toml()
+    generator.create_if_needed()
 
-    register_list = register_list_from_toml()
-    register_list.add_constant(name="apa", value=3, description="")
+    generator = generator_from_toml()
+    generator.register_list.add_constant(name="apa", value=3, description="")
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_called_once()
 
 
-def test_create_should_run_again_if_package_version_is_changed(register_list_from_toml, tmp_path):
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_run_again_if_package_version_is_changed(generator_from_toml):
+    generator = generator_from_toml()
+    generator.create_if_needed()
 
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create, patch(
         "hdl_registers.generator.register_code_generator.hdl_registers_version", autospec=True
     ) as _:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_called_once()
 
 
-def test_create_should_run_again_if_generator_version_is_changed(register_list_from_toml, tmp_path):
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+def test_create_should_run_again_if_generator_version_is_changed(generator_from_toml):
+    generator = generator_from_toml()
+    generator.create_if_needed()
 
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create, patch(
         f"{__name__}.CustomGenerator.__version__", new_callable=PropertyMock
     ) as mocked_generator_version:
         mocked_generator_version.return_value = "4.0.0"
 
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed()
+        generator.create_if_needed()
         mocked_create.assert_called_once()
 
 
-def test_version_header_is_detected_even_if_not_on_first_line(register_list_from_toml, tmp_path):
+def test_version_header_is_detected_even_if_not_on_first_line(generator_from_toml):
     before_header = """
 # #########################
 # Another header
 # #########################
 """
-    register_list = register_list_from_toml()
-    CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed(
-        before_header=before_header
-    )
+    generator = generator_from_toml()
+    generator.create_if_needed(before_header=before_header)
 
-    register_list = register_list_from_toml()
+    generator = generator_from_toml()
     with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        CustomGenerator(register_list=register_list, output_folder=tmp_path).create_if_needed(
-            before_header=before_header
-        )
+        generator.create_if_needed(before_header=before_header)
         mocked_create.assert_not_called()
 
 
@@ -229,3 +225,94 @@ def test_generated_source_info(
     assert "from file" not in got[2]
     assert " at revision REVISION." in got[2]
     assert got[3] == "Register hash REGISTER_SHA."
+
+
+def test_constant_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[constant.for]
+value = 3
+"""
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == 'Error for constant "for": Name is a reserved keyword.'
+
+
+def test_plain_register_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[register.for]
+mode = "r_w"
+"""
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == 'Error for register "for": Name is a reserved keyword.'
+
+
+def test_plain_register_field_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[register.test]
+mode = "r_w"
+bit.for.description = ""
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == 'Error for field "for": Name is a reserved keyword.'
+
+
+def test_register_array_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[register_array.for]
+array_length = 3
+register.data.mode = "r_w"
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert (
+        str(exception_info.value) == 'Error for register array "for": Name is a reserved keyword.'
+    )
+
+
+def test_array_register_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[register_array.test]
+array_length = 3
+register.for.mode = "r_w"
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == 'Error for register "for": Name is a reserved keyword.'
+
+
+def test_array_register_field_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[register_array.test]
+array_length = 3
+register.data.mode = "r_w"
+register.data.bit.for.description = ""
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == 'Error for field "for": Name is a reserved keyword.'
+
+
+def test_reserved_name_check_works_even_with_strange_case(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[register.FoR]
+mode = "r_w"
+"""
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == 'Error for register "FoR": Name is a reserved keyword.'
