@@ -22,15 +22,23 @@ from tsfpga.system_utils import create_file, read_file
 # First party libraries
 from hdl_registers import __version__ as hdl_registers_version
 
+# Local folder libraries
+from .register_code_generator_helpers import RegisterCodeGeneratorHelpers
+from .reserved_keywords import RESERVED_KEYWORDS
+
 if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.register_list import RegisterList
 
 
-class RegisterCodeGenerator(ABC):
+class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
     """
     Abstract interface and common functions for generating register code.
+    Should be inherited by all custom code generators.
+
+    Note that this base class also inherits from :class:`.RegisterCodeGeneratorHelpers`,
+    meaning some useful methods are available in subclasses.
     """
 
     @property
@@ -50,7 +58,7 @@ class RegisterCodeGenerator(ABC):
         """
 
     @property
-    @abstractmethod
+    @abstractmethod  # type: ignore[override]
     def COMMENT_START(self) -> str:  # pylint: disable=invalid-name
         """
         The character(s) that start a comment line in the programming language that we are
@@ -135,6 +143,8 @@ class RegisterCodeGenerator(ABC):
                 See :meth:`.get_code` for details.
         """
         print(f"Creating {self.SHORT_DESCRIPTION} file: {self.output_file}")
+
+        self._check_reserved_keywords()
 
         code = self.get_code(**kwargs)
 
@@ -235,6 +245,45 @@ class RegisterCodeGenerator(ABC):
             result_hash = hash_match.group(1)
 
         return result_package_version, result_generator_version, result_hash
+
+    def _check_reserved_keywords(self) -> None:
+        """
+        Do a basic check that no name matches a reserved keyword in any of the targeted
+        generator languages.
+
+        In general, the user will know if they use a reserved keyword when the generated code is
+        compiled/used since it will probably crash.
+        But it is better to warn early, rather than the user finding when compiling headers after
+        a 1 hour FPGA build.
+
+        We run this check at creation time, always and for every single generator.
+        Hence the user will hopefully get warned when they generate e.g. a VHDL package at the start
+        of the FPGA build that a register uses a reserved C++ name.
+        This check takes roughly 42 us on a decent computer with a typical register list.
+        Hence it is not a big deal that it might be run more than once for each register list.
+
+        It is better to have it here in the generator rather than in the parser:
+        1. Here it runs only when necessary, not adding time to parsing which is often done in
+           real time.
+        2. We also catch things that were added with the Python API.
+        """
+
+        def check(name: str, description: str) -> None:
+            if name.lower() in RESERVED_KEYWORDS:
+                message = f'Error for {description} "{name}": Name is a reserved keyword.'
+                raise ValueError(message)
+
+        for constant in self.register_list.constants:
+            check(name=constant.name, description="constant")
+
+        for register, _ in self.iterate_registers():
+            check(name=register.name, description="register")
+
+            for field in register.fields:
+                check(name=field.name, description="field")
+
+        for register_array in self.iterate_register_arrays():
+            check(name=register_array.name, description="register array")
 
     @property
     def header(self) -> str:

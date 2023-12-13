@@ -30,8 +30,8 @@ The generator class inheriting from :class:`.RegisterCodeGenerator` means that i
 methods :meth:`.RegisterCodeGenerator.create`, :meth:`.RegisterCodeGenerator.create_if_needed`
 and :meth:`.RegisterCodeGenerator.header` just like the standard hdl-registers generators.
 
-If the custom generator also inherits from :class:`.RegisterCodeGeneratorHelpers`,
-it has access to some useful functions for constructing the generated code.
+It also, by extension, inherits from the :class:`.RegisterCodeGeneratorHelpers` class.
+Meaning it has access to some useful functions for constructing the generated code.
 Used in the example above is :meth:`.RegisterCodeGeneratorHelpers.iterate_registers`.
 
 Running the example script above will yield the following result file:

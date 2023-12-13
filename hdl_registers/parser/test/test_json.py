@@ -27,7 +27,7 @@ def test_load_dirty_json_file_should_raise_exception(tmp_path):
     json = """
 {
     "register": {
-        "configuration": {
+        "config": {
             "mode": "r_w"
         }
     }

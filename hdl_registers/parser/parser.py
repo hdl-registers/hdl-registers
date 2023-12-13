@@ -147,8 +147,8 @@ class RegisterParser:
 
         if name in self._default_register_names:
             # Default registers can be "updated" in the sense that the user can use a custom
-            # description and add whatever bits they use in the current module. They can not however
-            # change the mode.
+            # description and add whatever fields they want in the current module.
+            # They may not, however, change the mode.
             if "mode" in items:
                 message = (
                     f'Overloading register "{name}" in {self._source_definition_file}, '

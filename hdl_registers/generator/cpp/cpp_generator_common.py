@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Optional
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register_list import RegisterList
 
 if TYPE_CHECKING:
@@ -25,7 +24,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_array import RegisterArray
 
 
-class CppGeneratorCommon(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
+class CppGeneratorCommon(RegisterCodeGenerator):
     """
     Class with common methods for generating C++ code.
     """

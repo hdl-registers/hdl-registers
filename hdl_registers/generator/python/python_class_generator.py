@@ -14,11 +14,10 @@ from typing import Any
 
 # First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register_list import RegisterList
 
 
-class PythonClassGenerator(RegisterCodeGenerator, RegisterCodeGeneratorHelpers):
+class PythonClassGenerator(RegisterCodeGenerator):
     """
     Generate a Python class with register definitions.
     """
