@@ -23,6 +23,7 @@ if TYPE_CHECKING:
 
 class RegisterParser:
     recognized_constant_items = {"value", "description", "data_type"}
+    required_constant_items = ["value"]
 
     recognized_register_items = {
         # Attributes of the register.
@@ -36,11 +37,19 @@ class RegisterParser:
     }
 
     recognized_register_array_items = {"array_length", "description", "register"}
+    required_register_array_items = ["array_length", "register"]
 
     recognized_bit_items = {"description", "default_value"}
+    required_bit_items: list[str] = []
+
     recognized_bit_vector_items = {"description", "width", "default_value"}
+    required_bit_vector_items = ["width"]
+
     recognized_enumeration_items = {"description", "default_value", "element"}
+    required_enumeration_items = ["element"]
+
     recognized_integer_items = {"description", "min_value", "max_value", "default_value"}
+    required_integer_items = ["max_value"]
 
     def __init__(
         self,
@@ -96,12 +105,13 @@ class RegisterParser:
         return self._register_list
 
     def _parse_constant(self, name: str, items: dict[str, Any]) -> None:
-        if "value" not in items:
-            message = (
-                f'Constant "{name}" in {self._source_definition_file} does not have '
-                'the required "value" property.'
-            )
-            raise ValueError(message)
+        for item_name in self.required_constant_items:
+            if item_name not in items:
+                message = (
+                    f'Constant "{name}" in {self._source_definition_file} does not have '
+                    f'the required "{item_name}" property.'
+                )
+                raise ValueError(message)
 
         for item_name in items.keys():
             if item_name not in self.recognized_constant_items:
@@ -184,7 +194,7 @@ class RegisterParser:
             self._parse_integers(register=register, field_configurations=items["integer"])
 
     def _parse_register_array(self, name: str, items: dict[str, Any]) -> None:
-        for required_attribute in ["array_length", "register"]:
+        for required_attribute in self.required_register_array_items:
             if required_attribute not in items:
                 message = (
                     f'Register array "{name}" in {self._source_definition_file} does not have '
@@ -284,7 +294,7 @@ class RegisterParser:
                 field_name=field_name,
                 field_items=field_items,
                 recognized_items=self.recognized_bit_items,
-                required_items=[],
+                required_items=self.required_bit_items,
             )
 
             description = field_items.get("description", "")
@@ -303,7 +313,7 @@ class RegisterParser:
                 field_name=field_name,
                 field_items=field_items,
                 recognized_items=self.recognized_bit_vector_items,
-                required_items=["width"],
+                required_items=self.required_bit_vector_items,
             )
 
             width = field_items["width"]
@@ -324,12 +334,13 @@ class RegisterParser:
                 field_name=field_name,
                 field_items=field_items,
                 recognized_items=self.recognized_enumeration_items,
+                # Check that we have at least one element.
                 # This is checked also in the Enumeration class, which is needed if the user
                 # is working directly with the Python API.
                 # That is where we usually sanity check, to avoid duplication.
                 # However, this particular check is needed here also since the logic for default
                 # value below does not work if there are no elements.
-                required_items=["element"],
+                required_items=self.required_enumeration_items,
             )
 
             description = field_items.get("description", "")
@@ -354,7 +365,7 @@ class RegisterParser:
                 field_name=field_name,
                 field_items=field_items,
                 recognized_items=self.recognized_integer_items,
-                required_items=["max_value"],
+                required_items=self.required_integer_items,
             )
 
             max_value = field_items["max_value"]
