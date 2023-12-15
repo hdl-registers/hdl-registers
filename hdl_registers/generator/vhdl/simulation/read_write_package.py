@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 
 class VhdlSimulationReadWritePackageGenerator(VhdlGeneratorCommon):
     """
-    Generate code with register read/write procedures that simplify simulation.
+    Generate VHDL code with register read/write procedures that simplify simulation.
 
     * For each readable register, a procedure that reads the register and converts the value to the
       natively-typed record.
@@ -58,11 +58,6 @@ class VhdlSimulationReadWritePackageGenerator(VhdlGeneratorCommon):
     def get_code(self, **kwargs: Any) -> str:
         """
         Get a package with methods for reading/writing registers.
-
-        Arguments:
-          register_objects: Registers and register arrays to be included.
-        Return:
-            str: VHDL code.
         """
         package_name = self.output_file.stem
 

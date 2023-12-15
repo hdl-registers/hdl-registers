@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 class HtmlConstantTableGenerator(HtmlGeneratorCommon):
     """
     Generate HTML code with register constant information in a table.
+    See the :ref:`generator_html` article for usage details.
     """
 
     __version__ = "1.0.0"
@@ -50,6 +51,9 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
         self._html_translator = HtmlTranslator()
 
     def get_code(self, **kwargs: Any) -> str:
+        """
+        Get a HTML table with information about register constants.
+        """
         if not self.register_list.constants:
             return ""
 

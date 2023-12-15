@@ -20,6 +20,7 @@ from hdl_registers.register_list import RegisterList
 class PythonClassGenerator(RegisterCodeGenerator):
     """
     Generate a Python class with register definitions.
+    See the :ref:`generator_python` article for usage details.
     """
 
     __version__ = "1.0.0"
@@ -56,10 +57,6 @@ class PythonClassGenerator(RegisterCodeGenerator):
         """
         Save register list object to binary file (pickle) and create a python class
         that recreates it.
-
-        Arguments:
-            register_list (RegisterList): This register list object will be saved.
-            output_folder (pathlib.Path): The pickle and python files will be saved here.
         """
         class_name = self.to_pascal_case(self.name)
 

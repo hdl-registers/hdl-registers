@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 class VhdlSimulationWaitUntilPackageGenerator(VhdlGeneratorCommon):
     """
-    Generate code with ``wait_until_X_equals`` procedures that simplify simulation.
+    Generate VHDL code with ``wait_until_X_equals`` procedures that simplify simulation.
 
     * For each readable register, a procedure that waits until the register assumes a
       given natively-typed record value.
@@ -55,11 +55,6 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlGeneratorCommon):
     def get_code(self, **kwargs: Any) -> str:
         """
         Get a package with ``wait_until_X_equals`` methods for registers/fields.
-
-        Arguments:
-          register_objects: Registers and register arrays to be included.
-        Return:
-            str: VHDL code.
         """
         package_name = self.output_file.stem
 

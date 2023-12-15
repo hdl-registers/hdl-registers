@@ -7,10 +7,12 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-"""
-Some limited unit tests that check the generated code.
-Note that the generated C++ code is also simulated in a functional test.
-"""
+# Some limited unit tests that check the generated code.
+# Note that the generated C++ code is also functionally tested in the
+# file 'test_compiled_cpp_code.py'.
+# That test generates C++ code from an example register set, compiles it and performs some
+# run-time assertions in a C program.
+# That test is considered more meaningful and exhaustive than a unit test would be.
 
 # Third party libraries
 import pytest
