@@ -8,7 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import TYPE_CHECKING, Iterator, Optional
+from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 # First party libraries
 from hdl_registers.field.bit import Bit
@@ -326,11 +326,21 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
             if accessible_registers:
                 yield register_array
 
-    def _delete_output_file_if_exists(self) -> None:
+    def _create_if_there_are_registers_otherwise_delete_file(self, **kwargs: Any) -> None:
         """
-        Delete the output file of this generator if it exists.
+        Create the code artifact only if the register list actually has any registers.
+        Used in cases where the generated file would be an empty shell in that case.
+        If, for example, the user has a register list with only constants we do not want
+        to flood the file system with unnecessary files.
+
+        If the artifact file exists from a previous run, we delete it since we do not want stray
+        files laying around and we do not want to give the false impression that this file is being
+        actively generated.
         """
-        if self.output_file.exists():
-            # Will not work if it is a directory, but if it is then that is a major user error
-            # and we kinda want to back out.
-            self.output_file.unlink()
+        if self.register_list.register_objects:
+            super().create(**kwargs)
+        else:
+            if self.output_file.exists():
+                # Will not work if it is a directory, but if it is then that is a major user error
+                # and we kinda want to back out.
+                self.output_file.unlink()

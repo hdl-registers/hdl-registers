@@ -63,6 +63,59 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_record_pkg.vhd"
 
+    def create(self, **kwargs: Any) -> None:
+        """
+        See super class for API details.
+
+        Overloaded here because this package file shall only be created if the register list
+        actually has any registers.
+        """
+        self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
+
+    def get_code(self, **kwargs: Any) -> str:
+        """
+        Get a complete VHDL package with register record types.
+        """
+        package_name = self.output_file.stem
+
+        vhdl = f"""\
+{self.header}
+library ieee;
+use ieee.fixed_pkg.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+library reg_file;
+use reg_file.reg_file_pkg.all;
+
+use work.{self.name}_regs_pkg.all;
+
+
+package {package_name} is
+
+"""
+
+        if self.register_list.register_objects:
+            vhdl += f"""\
+{self._register_field_records()}\
+{self._register_records()}\
+{self._register_was_accessed()}\
+"""
+
+        vhdl += "end package;\n"
+
+        if self.register_list.register_objects:
+            vhdl += f"""
+package body {package_name} is
+
+{self._register_field_record_conversion_implementations()}\
+{self._register_record_conversion_implementations()}\
+{self._register_was_accessed_conversion_implementations()}\
+end package body;
+"""
+
+        return vhdl
+
     def _register_field_records(self) -> str:
         """
         For every register (plain or in array) that has at least one field:
@@ -569,66 +622,3 @@ of {array_name}_was_{direction.name_past}_t;
   end function;
 
 """
-
-    def get_code(self, **kwargs: Any) -> str:
-        """
-        Get a complete VHDL package with register record types.
-        """
-        package_name = self.output_file.stem
-
-        vhdl = f"""\
-{self.header}
-library ieee;
-use ieee.fixed_pkg.all;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-
-library reg_file;
-use reg_file.reg_file_pkg.all;
-
-use work.{self.name}_regs_pkg.all;
-
-
-package {package_name} is
-
-"""
-
-        if self.register_list.register_objects:
-            vhdl += f"""\
-{self._register_field_records()}\
-{self._register_records()}\
-{self._register_was_accessed()}\
-"""
-
-        vhdl += "end package;\n"
-
-        if self.register_list.register_objects:
-            vhdl += f"""
-package body {package_name} is
-
-{self._register_field_record_conversion_implementations()}\
-{self._register_record_conversion_implementations()}\
-{self._register_was_accessed_conversion_implementations()}\
-end package body;
-"""
-
-        return vhdl
-
-    def create(self, **kwargs: Any) -> None:
-        """
-        See super class for API details.
-
-        Overloaded here because this package file shall only be created if the register list
-        actually has any registers.
-        If not, if for example the user has a register list with only constants, we do not want
-        to flood the file system with unnecessary files.
-        The package would be empty anyway.
-
-        If the artifact file exists from a previous run, we delete it since we do not want stray
-        files laying around and we do not want to give the false impression that this file is being
-        actively generated.
-        """
-        if self.register_list.register_objects:
-            super().create(**kwargs)
-        else:
-            self._delete_output_file_if_exists()

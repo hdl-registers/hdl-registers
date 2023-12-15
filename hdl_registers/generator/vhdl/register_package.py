@@ -64,6 +64,52 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_regs_pkg.vhd"
 
+    def get_code(self, **kwargs: Any) -> str:
+        """
+        Get a complete VHDL package with register and constant information.
+        """
+        pkg_name = f"{self.name}_regs_pkg"
+
+        vhdl = f"""\
+{self.header}
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.fixed_pkg.all;
+
+library reg_file;
+use reg_file.reg_file_pkg.all;
+
+
+package {pkg_name} is
+
+"""
+        if self.register_list.constants:
+            vhdl += self._constants()
+
+        if self.register_list.register_objects:
+            vhdl += f"""\
+{self._register_range()}\
+{self._array_constants()}\
+{self._register_indexes()}\
+{self._register_map_head()}\
+{self._field_declarations()}\
+"""
+
+        vhdl += "end package;\n"
+
+        if self.register_list.register_objects:
+            vhdl += f"""
+package body {pkg_name} is
+
+{self._array_index_function_implementations()}\
+{self._register_map_body()}\
+{self._field_conversion_implementations()}\
+end package body;
+"""
+
+        return vhdl
+
     def _constants(self) -> str:
         """
         A set of VHDL constants, corresponding to the provided register constants.
@@ -492,52 +538,6 @@ range {field.width + field.base_index - 1} downto {field.base_index};
     return result;
   end function;
 
-"""
-
-        return vhdl
-
-    def get_code(self, **kwargs: Any) -> str:
-        """
-        Get a complete VHDL package with register and constant information.
-        """
-        pkg_name = f"{self.name}_regs_pkg"
-
-        vhdl = f"""\
-{self.header}
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
-use ieee.fixed_pkg.all;
-
-library reg_file;
-use reg_file.reg_file_pkg.all;
-
-
-package {pkg_name} is
-
-"""
-        if self.register_list.constants:
-            vhdl += self._constants()
-
-        if self.register_list.register_objects:
-            vhdl += f"""\
-{self._register_range()}\
-{self._array_constants()}\
-{self._register_indexes()}\
-{self._register_map_head()}\
-{self._field_declarations()}\
-"""
-
-        vhdl += "end package;\n"
-
-        if self.register_list.register_objects:
-            vhdl += f"""
-package body {pkg_name} is
-
-{self._array_index_function_implementations()}\
-{self._register_map_body()}\
-{self._field_conversion_implementations()}\
-end package body;
 """
 
         return vhdl

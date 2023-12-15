@@ -59,6 +59,15 @@ axi_lite_reg_file.vhd
         """
         return self.output_folder / f"{self.name}_reg_file.vhd"
 
+    def create(self, **kwargs: Any) -> None:
+        """
+        See super class for API details.
+
+        Overloaded here because this file shall only be created if the register list
+        actually has any registers.
+        """
+        self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
+
     def get_code(self, **kwargs: Any) -> str:
         """
         Get VHDL code for a wrapper around the generic AXi_lite register file from hdl-modules:
@@ -239,22 +248,3 @@ end architecture;
             was_read += ";\n" if was_written else "\n"
 
         return was_read, was_written
-
-    def create(self, **kwargs: Any) -> None:
-        """
-        See super class for API details.
-
-        Overloaded here because this package file shall only be created if the register list
-        actually has any registers.
-        If not, if for example the user has a register list with only constants, we do not want
-        to flood the file system with unnecessary files.
-        The package would be empty anyway.
-
-        If the artifact file exists from a previous run, we delete it since we do not want stray
-        files laying around and we do not want to give the false impression that this file is being
-        actively generated.
-        """
-        if self.register_list.register_objects:
-            super().create(**kwargs)
-        else:
-            self._delete_output_file_if_exists()
