@@ -76,7 +76,8 @@ class Register:
                 start of the array. I.e. the index is zero for the first register in the array.
                 If the register is a plain register, the index shall be relative to the start of
                 the register list.
-            mode: A valid register mode. Should be a key in the ``REGISTER_MODES`` dictionary.
+            mode: A valid register mode.
+                Should be a key in the ``REGISTER_MODES`` dictionary.
                 I.e. the shorthand name for the mode, e.g. ``"r_w"``.
                 See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
                 for more information.
