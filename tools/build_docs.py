@@ -112,12 +112,15 @@ def generate_register_code() -> None:
             output_folder = GENERATED_SPHINX / "register_code" / folder.name / py_file.stem
 
             command = [sys.executable, str(py_file), str(output_folder)]
-            stdout = run_command(
+            status = run_command(
                 cmd=command, cwd=hdl_registers.REPO_ROOT, env=env, capture_output=True
-            ).stdout
+            )
 
-            print(stdout)
-            create_file(file=output_folder / "stdout.txt", contents=stdout)
+            print(status.stdout)
+            create_file(file=output_folder / "stdout.txt", contents=status.stdout)
+
+            if status.stderr:
+                print(status.stderr)
 
 
 def generate_bibtex() -> None:
