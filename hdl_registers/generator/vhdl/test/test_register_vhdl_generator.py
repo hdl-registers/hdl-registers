@@ -12,6 +12,9 @@ Some limited unit tests that check the generated code.
 Note that the generated VHDL code is also simulated in a functional test.
 """
 
+# Standard libraries
+from pathlib import Path
+
 # Third party libraries
 from tsfpga.system_utils import read_file
 
@@ -19,6 +22,9 @@ from tsfpga.system_utils import read_file
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
+from hdl_registers.generator.vhdl.simulation.checker_package import (
+    VhdlSimulationCheckerPackageGenerator,
+)
 from hdl_registers.generator.vhdl.simulation.read_write_package import (
     VhdlSimulationReadWritePackageGenerator,
 )
@@ -28,29 +34,36 @@ from hdl_registers.generator.vhdl.simulation.wait_until_package import (
 from hdl_registers.register_list import RegisterList
 
 
+def generate_all_vhdl_artifacts(register_list: RegisterList, output_folder: Path) -> None:
+    VhdlRegisterPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlRecordPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlAxiLiteWrapperGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlSimulationReadWritePackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlSimulationCheckerPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+    VhdlSimulationWaitUntilPackageGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
+
 def generate_strange_register_maps(output_path):
     """
     Generate register VHDL artifacts for some strange niche cases.
     """
-
-    def generate_vhdl(register_list):
-        VhdlRegisterPackageGenerator(
-            register_list=register_list, output_folder=output_path
-        ).create()
-
-        VhdlRecordPackageGenerator(
-            register_list=register_list, output_folder=output_path
-        ).create_if_needed()
-
-        VhdlSimulationReadWritePackageGenerator(
-            register_list=register_list, output_folder=output_path
-        ).create_if_needed()
-
-        VhdlSimulationWaitUntilPackageGenerator(
-            register_list=register_list, output_folder=output_path
-        ).create_if_needed()
-
-        VhdlAxiLiteWrapperGenerator(register_list=register_list, output_folder=output_path).create()
 
     def create_packages(direction, mode):
         def append_register(data, name):
@@ -76,7 +89,7 @@ def generate_strange_register_maps(output_path):
         # Some plain registers, in one direction only.
         register_list = RegisterList(name=f"plain_only_{direction}")
         append_registers(data=register_list)
-        generate_vhdl(register_list=register_list)
+        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
         # Some register arrays, in one direction only.
         register_list = RegisterList(name=f"array_only_{direction}")
@@ -84,7 +97,7 @@ def generate_strange_register_maps(output_path):
         append_registers(data=register_array)
         register_array = register_list.append_register_array(name="hest", length=10, description="")
         append_registers(data=register_array)
-        generate_vhdl(register_list=register_list)
+        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
         # Plain registers and some register arrays, in one direction only.
         register_list = RegisterList(name=f"plain_and_array_only_{direction}")
@@ -93,7 +106,7 @@ def generate_strange_register_maps(output_path):
         append_registers(data=register_array)
         register_array = register_list.append_register_array(name="hest", length=10, description="")
         append_registers(data=register_array)
-        generate_vhdl(register_list=register_list)
+        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
     # Mode 'Read only' should give registers only in the 'up' direction'
     create_packages(direction="up", mode="r")
@@ -103,10 +116,10 @@ def generate_strange_register_maps(output_path):
     register_list = RegisterList(name="only_constants")
     register_list.add_constant(name="first", value=123, description="")
     register_list.add_constant(name="second", value=True, description="")
-    generate_vhdl(register_list=register_list)
+    generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
     register_list = RegisterList(name="empty")
-    generate_vhdl(register_list=register_list)
+    generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
 
 def _get_register_arrays_record_string(direction):
