@@ -12,10 +12,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
-from hdl_registers.generator.vhdl.vhdl_generator_common import (
-    BUS_ACCESS_DIRECTIONS,
-    VhdlGeneratorCommon,
-)
+from hdl_registers.generator.vhdl.vhdl_generator_common import BUS_ACCESS_DIRECTIONS
+
+# Local folder libraries
+from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
     # First party libraries
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_array import RegisterArray
 
 
-class VhdlSimulationWaitUntilPackageGenerator(VhdlGeneratorCommon):
+class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
     """
     Generate VHDL code with ``wait_until_X_equals`` procedures that simplify simulation.
     See the :ref:`generator_vhdl` article for usage details.
@@ -153,18 +153,12 @@ end package body;
                 "  -- used to check for equality.\n"
             )
 
-        if register_array:
-            array_name = self.register_array_name(register_array=register_array)
-            array_index_port = f"    array_index : in {array_name}_range;\n"
-        else:
-            array_index_port = ""
-
         return f"""\
   -- Wait until the {register_description} equals the given 'value'.
 {slv_comment}\
   procedure wait_until_{register_name}_equals(
     signal net : inout network_t;
-{array_index_port}\
+{self.get_array_index_port(register_array=register_array)}\
     value : in {value_type};
     base_address : in addr_t := (others => '0');
     bus_handle : in bus_master_t := regs_bus_master;
@@ -191,17 +185,11 @@ end package body;
             register=register, register_array=register_array, field=field
         )
 
-        if register_array:
-            array_name = self.register_array_name(register_array=register_array)
-            array_index_port = f"    array_index : in {array_name}_range;\n"
-        else:
-            array_index_port = ""
-
         return f"""\
   -- Wait until the {field_description} equals the given 'value'.
   procedure wait_until_{field_name}_equals(
     signal net : inout network_t;
-{array_index_port}\
+{self.get_array_index_port(register_array=register_array)}\
     value : in {value_type};
     base_address : in addr_t := (others => '0');
     bus_handle : in bus_master_t := regs_bus_master;
