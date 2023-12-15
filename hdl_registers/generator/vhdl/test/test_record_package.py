@@ -20,25 +20,20 @@ from hdl_registers.register_list import RegisterList
 def test_package_is_not_generated_without_registers(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
 
-    VhdlRecordPackageGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_register_record_pkg.vhd").exists()
+    assert not (VhdlRecordPackageGenerator(register_list, tmp_path).create()).exists()
 
     register_list.add_constant(name="apa", value=True, description="")
-    VhdlRecordPackageGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_register_record_pkg.vhd").exists()
+    assert not (VhdlRecordPackageGenerator(register_list, tmp_path).create()).exists()
 
     register_list.append_register(name="hest", mode="r_w", description="")
-    VhdlRecordPackageGenerator(register_list, tmp_path).create()
-    assert (tmp_path / "test_register_record_pkg.vhd").exists()
+    assert (VhdlRecordPackageGenerator(register_list, tmp_path).create()).exists()
 
 
 def test_re_generating_package_without_registers_should_delete_old_file(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
     register_list.append_register(name="apa", mode="r_w", description="")
 
-    VhdlRecordPackageGenerator(register_list, tmp_path).create()
-    assert (tmp_path / "test_register_record_pkg.vhd").exists()
+    assert (VhdlRecordPackageGenerator(register_list, tmp_path).create()).exists()
 
     register_list.register_objects = []
-    VhdlRecordPackageGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_register_record_pkg.vhd").exists()
+    assert not (VhdlRecordPackageGenerator(register_list, tmp_path).create()).exists()

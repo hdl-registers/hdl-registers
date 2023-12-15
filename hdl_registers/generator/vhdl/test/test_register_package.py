@@ -39,8 +39,7 @@ class RegisterConfiguration:
         self.register_list.add_constant(name="string_constant", value="apa", description="")
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
-        VhdlRegisterPackageGenerator(self.register_list, output_path).create()
-        vhdl = read_file(output_path / "test_regs_pkg.vhd")
+        vhdl = read_file(VhdlRegisterPackageGenerator(self.register_list, output_path).create())
 
         if test_registers:
             assert "constant test_reg_map : " in vhdl, vhdl
@@ -96,8 +95,7 @@ def test_vhdl_package_with_only_one_register(tmp_path):
     """
     register_list = RegisterList(name="apa", source_definition_file=None)
     register_list.append_register(name="hest", mode="r", description="a single register")
-    VhdlRegisterPackageGenerator(register_list, tmp_path).create()
-    vhdl = read_file(tmp_path / "apa_regs_pkg.vhd")
+    vhdl = read_file(VhdlRegisterPackageGenerator(register_list, tmp_path).create())
 
     expected = """
   constant apa_reg_map : reg_definition_vec_t(apa_reg_range) := (
@@ -157,8 +155,7 @@ def test_vhdl_typedef(tmp_path):
         name="integer0", description="", min_value=1, max_value=3, default_value=2
     )
 
-    VhdlRegisterPackageGenerator(register_list, tmp_path).create()
-    vhdl = read_file(tmp_path / "test_regs_pkg.vhd")
+    vhdl = read_file(VhdlRegisterPackageGenerator(register_list, tmp_path).create())
 
     assert "subtype test_number_u0_t is u_unsigned(1 downto 0);" in vhdl, vhdl
 
