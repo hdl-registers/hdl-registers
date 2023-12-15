@@ -87,6 +87,10 @@ class RegisterList:
         Arguments:
             name: The name of the register.
             mode: A valid register mode.
+                Should be a key in the ``REGISTER_MODES`` dictionary.
+                I.e. the shorthand name for the mode, e.g. ``"r_w"``.
+                See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
+                for more information.
             description: Textual register description.
         Return:
             The register object that was created.
