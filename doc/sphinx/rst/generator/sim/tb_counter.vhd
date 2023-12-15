@@ -22,10 +22,11 @@ library bfm;
 library reg_file;
 use reg_file.reg_operations_pkg.all;
 
-use work.counter_regs_pkg.all;
 use work.counter_register_record_pkg.all;
+use work.counter_register_checker_pkg.all;
 use work.counter_register_read_write_pkg.all;
 use work.counter_register_wait_until_pkg.all;
+use work.counter_regs_pkg.all;
 
 
 entity tb_counter is
@@ -52,14 +53,12 @@ begin
   ------------------------------------------------------------------------------
   main : process
     variable config : counter_config_t := counter_config_init;
-    variable status : counter_status_t := counter_status_init;
   begin
     test_runner_setup(runner, runner_cfg);
 
     -- Check initial state.
-    read_counter_status(net=>net, value=>status);
-    check_equal(status.enabled, '0');
-    check_equal(status.pulse_count, 0);
+    check_counter_status_enabled_equal(net=>net, expected=>'0');
+    check_counter_status_pulse_count_equal(net=>net, expected=>0);
 
     if run("test_count_clock_cycles") then
       config.mode := mode_clock_cycles;
@@ -79,12 +78,17 @@ begin
     write_counter_command_start(net=>net, value=>'1');
 
     -- Check updated status.
-    read_counter_status(net=>net, value=>status);
-    check_equal(status.enabled, '1');
-    check_equal(status.pulse_count, 0);
+    check_counter_status_enabled_equal(net=>net, expected=>'1');
+    check_counter_status_pulse_count_equal(net=>net, expected=>0);
 
     -- Wait until a number of pulses have passed.
     wait_until_counter_status_pulse_count_equals(net=>net, value=>10);
+
+    -- Stop the operation.
+    write_counter_command_stop(net=>net, value=>'1');
+
+    -- Make sure that status is updated.
+    check_counter_status_enabled_equal(net=>net, expected=>'0');
 
     test_runner_cleanup(runner);
   end process;

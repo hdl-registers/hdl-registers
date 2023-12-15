@@ -31,16 +31,8 @@ from hdl_registers.field.register_field_type import (
     Unsigned,
     UnsignedFixedPoint,
 )
-from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
-from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
-from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-from hdl_registers.generator.vhdl.simulation.read_write_package import (
-    VhdlSimulationReadWritePackageGenerator,
-)
-from hdl_registers.generator.vhdl.simulation.wait_until_package import (
-    VhdlSimulationWaitUntilPackageGenerator,
-)
 from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+    generate_all_vhdl_artifacts,
     generate_strange_register_maps,
 )
 from hdl_registers.parser.toml import from_toml
@@ -130,49 +122,13 @@ def generate_toml_registers(output_path):
         field_type=SignedFixedPoint(2, -3),
     )
 
-    VhdlRegisterPackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlRecordPackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlSimulationReadWritePackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlSimulationWaitUntilPackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlAxiLiteWrapperGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
+    generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
 
 def generate_doc_registers(output_path):
     register_list = from_toml(name="counter", toml_file=DOC_SIM_FOLDER / "regs_counter.toml")
 
-    VhdlRegisterPackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlRecordPackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlSimulationReadWritePackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlSimulationWaitUntilPackageGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
-
-    VhdlAxiLiteWrapperGenerator(
-        register_list=register_list, output_folder=output_path
-    ).create_if_needed()
+    generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
 
 if __name__ == "__main__":

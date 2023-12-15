@@ -5,18 +5,20 @@ VHDL code generator
 
 A large ecosystem of VHDL artifacts can be generated that support both implementation
 and simulation in your project.
-See the example below for a real-world use case of all these artifacts.
+See the :ref:`vhdl_register_example` below for a real-world use case of all these artifacts.
 
 * :class:`.VhdlRegisterPackageGenerator` generates the base VHDL package with register indexes and
   modes, field indexes, field types, and field conversion functions.
 * :class:`.VhdlRecordPackageGenerator` generates a VHDL package with register records
   that use native VHDL types for all fields, along with conversion functions for these.
-* :class:`.VhdlSimulationReadWritePackageGenerator` generates a VHDL simulation support package with
-  procedures for reading/writing register or field values.
-* :class:`.VhdlSimulationWaitUntilPackageGenerator` generates a VHDL simulation support package with
-  procedures for waiting until a readable register or field assumes a given value.
 * :class:`.VhdlAxiLiteWrapperGenerator` generates a VHDL entity that wraps an AXI-Lite general
   register file, and exposes register values to application using the natively typed records.
+* :class:`.VhdlSimulationReadWritePackageGenerator` generates a VHDL simulation support package with
+  procedures for reading/writing register or field values.
+* :class:`.VhdlSimulationCheckerPackageGenerator` generates a VHDL simulation support package with
+  procedures for checking current register and field values against a given expected value.
+* :class:`.VhdlSimulationWaitUntilPackageGenerator` generates a VHDL simulation support package with
+  procedures for waiting until a readable register or field assumes a given value.
 
 The recommended workflow is to generate the register file wrapper from
 :class:`.VhdlAxiLiteWrapperGenerator` and instantiate it in your VHDL design.
@@ -24,6 +26,8 @@ With this, registers and their field values are available as native VHDL typed v
 no conversion.
 See the example below for an example of this.
 
+
+.. _vhdl_register_example:
 
 Example
 -------
@@ -113,7 +117,6 @@ Once again, the application is a bit silly, but it does showcase a lot of intere
 |
 
 
-
 .. _example_tb_counter:
 
 VHDL example testbench
@@ -138,7 +141,12 @@ The VHDL below is the testbench for our example counter implementation above.
    a. For example, ``read_counter_status`` returns a value of type ``counter_status_t`` which is
       a record that contains a bit ``enabled`` and an integer ``pulse_count``.
 
-4. The testbench instantiates :ref:`bfm.axi_lite_master` which creates AXI-Lite transactions
+4. The testbench uses register field check procedures from the package produced by
+   :class:`.VhdlSimulationCheckerPackageGenerator`, which can be seen
+   :ref:`below <example_counter_simulation_checker_package>`.
+   For example ``check_counter_status_enabled_equal``.
+
+5. The testbench instantiates :ref:`bfm.axi_lite_master` which creates AXI-Lite transactions
    based on the VUnit bus master verification component interface commands created by the
    :ref:`example_counter_simulation_read_write_package`.
 
@@ -193,6 +201,26 @@ This is used by the :ref:`example_counter_axi_lite_wrapper` as well as the
 |
 
 
+.. _example_counter_axi_lite_wrapper:
+
+Generated VHDL AXI-Lite register file wrapper
+_____________________________________________
+
+Below is the generated AXI-Lite register file wrapper, created from the TOML file above via the
+:class:`.VhdlAxiLiteWrapperGenerator` class.
+This is instantiated in the :ref:`example_counter_vhdl` to get register values of native type
+without any manual casting.
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_reg_file.vhd
+    :caption: Example AXI-Lite register file wrapper.
+    :language: VHDL
+    :linenos:
+
+|
+
+
 .. _example_counter_simulation_read_write_package:
 
 Generated VHDL simulation read/write package
@@ -212,6 +240,26 @@ It is used by the :ref:`example_tb_counter` to read/write registers in a compact
 |
 
 
+.. _example_counter_simulation_checker_package:
+
+Generated VHDL simulation checker package
+_________________________________________
+
+Below is the generated register simulation checker package, created from the TOML file above via
+the :class:`.VhdlSimulationCheckerPackageGenerator` class.
+It is used by the :ref:`example_tb_counter` to check that the ``status`` register has the
+expected value.
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_checker_pkg.vhd
+    :caption: Example register simulation checker package.
+    :language: VHDL
+    :linenos:
+
+|
+
+
 .. _example_counter_simulation_wait_until_package:
 
 Generated VHDL simulation wait until package
@@ -225,26 +273,6 @@ It is used by the :ref:`example_tb_counter` to wait for registers to assume a gi
 
   .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_wait_until_pkg.vhd
     :caption: Example register simulation wait until package.
-    :language: VHDL
-    :linenos:
-
-|
-
-
-.. _example_counter_axi_lite_wrapper:
-
-Generated VHDL AXI-Lite register file wrapper
-_____________________________________________
-
-Below is the generated AXI-Lite register file wrapper, created from the TOML file above via the
-:class:`.VhdlAxiLiteWrapperGenerator` class.
-This is instantiated in the :ref:`example_counter_vhdl` to get register values of native type
-without any manual casting.
-
-.. collapse:: Click to expand/collapse code.
-
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_reg_file.vhd
-    :caption: Example AXI-Lite register file wrapper.
     :language: VHDL
     :linenos:
 
