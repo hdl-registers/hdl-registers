@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 class VhdlSimulationReadWritePackageGenerator(VhdlGeneratorCommon):
     """
     Generate VHDL code with register read/write procedures that simplify simulation.
+    See the :ref:`generator_vhdl` article for usage details.
 
     * For each readable register, a procedure that reads the register and converts the value to the
       natively-typed record.

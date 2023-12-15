@@ -22,16 +22,19 @@ from .vhdl_generator_common import (
 class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
     """
     Generate a VHDL wrapper around a generic AXI-Lite register file with correct generics and ports.
-
-    * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
-    * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/\
-axi_lite_reg_file.vhd
+    See the :ref:`generator_vhdl` article for usage details.
 
     The wrapper will set the correct generics and will use record types for ``regs_up`` and
     ``regs_down``.
     This makes it very easy-to-use and saves a lot of manual conversion.
 
-    The generated VHDL file needs also the generated packages from
+    It wraps the following VHDL file:
+
+    * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
+    * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/\
+axi_lite_reg_file.vhd
+
+    It also requires the generated packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
 
     Note that the ``regs_up`` port is only available if there are any registers of a type where

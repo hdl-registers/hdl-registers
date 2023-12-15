@@ -37,6 +37,7 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
     """
     Generate a VHDL package with register record types containing natively-typed members for
     each register field.
+    See the :ref:`generator_vhdl` article for usage details.
 
     * For each register, plain or in array, a record with natively-typed members for each
       register field.

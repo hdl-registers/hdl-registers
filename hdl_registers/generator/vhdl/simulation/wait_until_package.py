@@ -27,6 +27,7 @@ if TYPE_CHECKING:
 class VhdlSimulationWaitUntilPackageGenerator(VhdlGeneratorCommon):
     """
     Generate VHDL code with ``wait_until_X_equals`` procedures that simplify simulation.
+    See the :ref:`generator_vhdl` article for usage details.
 
     * For each readable register, a procedure that waits until the register assumes a
       given natively-typed record value.
