@@ -77,6 +77,7 @@ use ieee.numeric_std.all;
 
 library vunit_lib;
 context vunit_lib.vc_context;
+context vunit_lib.vunit_context;
 
 library common;
 use common.addr_pkg.all;
@@ -245,7 +246,7 @@ end package body;
         return f"""\
 {signature} is
     constant reg_value : reg_t := {conversion};
-{self._get_wait_until_common_constants(register=register, register_array=register_array)}\
+{self._get_common_constants(register=register, register_array=register_array, field=None)}\
   begin
     wait_until_read_equals(
       net=>net,
@@ -253,16 +254,16 @@ end package body;
       addr=>std_ulogic_vector(address),
       value=>reg_value,
       timeout=>timeout,
-      msg=>timeout_message
+      msg=>get_message
     );
   end procedure;
 """
 
-    def _get_wait_until_common_constants(
+    def _get_common_constants(
         self,
         register: "Register",
         register_array: Optional["RegisterArray"],
-        field: Optional["RegisterField"] = None,
+        field: Optional["RegisterField"],
     ) -> str:
         """
         Get constants code that is common for all 'wait_until_*_equals' procedures.
@@ -270,38 +271,26 @@ end package body;
         reg_index = self.reg_index_constant(register=register, register_array=register_array)
 
         if field:
-            description = self.field_description(
-                register=register, register_array=register_array, field=field
-            )
+            field_description = f" the '{field.name}' field in"
         else:
-            description = self.register_description(
-                register=register, register_array=register_array
-            )
-
-        array_index_message = (
-            '      & " - array index: " & to_string(array_index)\n' if register_array else ""
-        )
+            field_description = ""
 
         return f"""\
 {reg_index}\
     constant address : addr_t := base_address or to_unsigned(4 * reg_index, addr_t'length);
 
-    constant base_timeout_message : string := (
-      "Timeout while waiting for the {description} to equal the given value."
-      & " value: " & to_string(reg_value)
-{array_index_message}\
-      & " - register index: " & to_string(reg_index)
-      & " - base address: " & to_string(base_address)
+{self.get_register_array_and_base_address_message(register_array=register_array)}\
+    constant base_message : string := (
+      "Timeout while waiting for{field_description} the '{register.name}' register"
+      & register_array_message
+      & base_address_message
+      & " to equal the given value: "
+      & to_string(reg_value)
+      & "."
     );
-    function get_timeout_message return string is
-    begin
-      if message = "" then
-        return base_timeout_message;
-      end if;
+{self.get_message()}\
 
-      return base_timeout_message & " - message: " & message;
-    end function;
-    constant timeout_message : string := get_timeout_message;
+
 """
 
     def _field_wait_until_equals_implementation(
@@ -325,7 +314,7 @@ end package body;
       {field_name} => {field_to_slv},
       others => '-'
     );
-{self._get_wait_until_common_constants(register=register, register_array=register_array)}\
+{self._get_common_constants(register=register, register_array=register_array, field=field)}\
   begin
     wait_until_read_equals(
       net=>net,
@@ -333,7 +322,7 @@ end package body;
       addr=>std_ulogic_vector(address),
       value=>reg_value,
       timeout=>timeout,
-      msg=>timeout_message
+      msg=>get_message
     );
   end procedure;
 """
