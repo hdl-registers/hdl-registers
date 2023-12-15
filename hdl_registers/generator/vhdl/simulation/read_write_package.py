@@ -14,7 +14,9 @@ from typing import TYPE_CHECKING, Any, Optional
 # First party libraries
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.register_field_type import Signed, Unsigned
-from hdl_registers.generator.vhdl.vhdl_generator_common import VhdlGeneratorCommon
+
+# Local folder libraries
+from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
     # First party libraries
@@ -23,7 +25,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_array import RegisterArray
 
 
-class VhdlSimulationReadWritePackageGenerator(VhdlGeneratorCommon):
+class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
     """
     Generate VHDL code with register read/write procedures that simplify simulation.
     See the :ref:`generator_vhdl` article for usage details.
@@ -257,17 +259,11 @@ end package body;
             else ""
         )
 
-        if register_array:
-            array_name = self.register_array_name(register_array=register_array)
-            array_index_port = f"    array_index : in {array_name}_range;\n"
-        else:
-            array_index_port = ""
-
         return f"""\
   -- {direction.capitalize()} the {register_description}{type_comment}.
   procedure {direction}_{register_name}(
     signal net : inout network_t;
-{array_index_port}\
+{self.get_array_index_port(register_array=register_array)}\
     value : {value_direction} {value_type};
     base_address : in addr_t := (others => '0');
     bus_handle : in bus_master_t := regs_bus_master
@@ -310,18 +306,12 @@ end package body;
 
         value_direction = "out" if is_read_not_write else "in"
 
-        if register_array:
-            array_name = self.register_array_name(register_array=register_array)
-            array_index_port = f"    array_index : in {array_name}_range;\n"
-        else:
-            array_index_port = ""
-
         return f"""\
   -- {direction.capitalize()} the {field_description}{type_comment}.
 {comment}\
   procedure {direction}_{field_name}(
     signal net : inout network_t;
-{array_index_port}\
+{self.get_array_index_port(register_array=register_array)}\
     value : {value_direction} {value_type};
     base_address : in addr_t := (others => '0');
     bus_handle : in bus_master_t := regs_bus_master
@@ -558,15 +548,13 @@ end package body;
 
         register_name = self.register_name(register=register, register_array=register_array)
 
-        array_index_association = "      array_index => array_index,\n" if register_array else ""
-
         return f"""\
 {signature} is
     variable reg_value : {register_name}_t := {register_name}_init;
   begin
     read_{register_name}(
       net => net,
-{array_index_association}\
+{self.get_array_index_association(register_array=register_array)}\
       value => reg_value,
       base_address => base_address,
       bus_handle => bus_handle
@@ -594,13 +582,11 @@ end package body;
         )
         register_name = self.register_name(register=register, register_array=register_array)
 
-        array_index_association = "      array_index => array_index,\n" if register_array else ""
-
         if self._can_read_modify_write_register(register=register):
             set_base_value = f"""\
     read_{register_name}(
       net => net,
-{array_index_association}\
+{self.get_array_index_association(register_array=register_array)}\
       value => reg_value,
       base_address => base_address,
       bus_handle => bus_handle
@@ -633,7 +619,7 @@ end package body;
 
     write_{register_name}(
       net => net,
-{array_index_association}\
+{self.get_array_index_association(register_array=register_array)}\
       value => reg_value,
       base_address => base_address,
       bus_handle => bus_handle
