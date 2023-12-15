@@ -53,14 +53,14 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_wait_until_pkg.vhd"
 
-    def create(self, **kwargs: Any) -> None:
+    def create(self, **kwargs: Any) -> Path:
         """
         See super class for API details.
 
         Overloaded here because this package file shall only be created if the register list
         actually has any registers.
         """
-        self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
+        return self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
 
     def get_code(self, **kwargs: Any) -> str:
         """

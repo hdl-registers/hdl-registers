@@ -28,8 +28,9 @@ from hdl_registers.parser.toml import from_toml
 def cpp_test_toml_code(tmp_path):
     registers = from_toml("test", HDL_REGISTERS_TESTS / "regs_test.toml")
 
-    CppInterfaceGenerator(register_list=registers, output_folder=tmp_path).create()
-    return read_file(tmp_path / "i_test.h")
+    return read_file(
+        CppInterfaceGenerator(register_list=registers, output_folder=tmp_path).create()
+    )
 
 
 # False positive for pytest fixtures

@@ -27,8 +27,7 @@ class HtmlTest:
         )
 
     def create_html_page(self):
-        HtmlPageGenerator(self.register_list, self.tmp_path).create()
-        html = read_file(self.tmp_path / "caesar_regs.html")
+        html = read_file(HtmlPageGenerator(self.register_list, self.tmp_path).create())
         return html
 
     @staticmethod
@@ -257,14 +256,16 @@ def test_constants_and_no_registers(html_test):
 def test_register_table_is_empty_string_if_no_registers_are_available(html_test):
     html_test.register_list.register_objects = []
 
-    HtmlRegisterTableGenerator(html_test.register_list, html_test.tmp_path).create()
-    html = read_file(html_test.tmp_path / "caesar_register_table.html")
+    html = read_file(
+        HtmlRegisterTableGenerator(html_test.register_list, html_test.tmp_path).create()
+    )
     assert html == "", html
 
 
 def test_constant_table_is_empty_string_if_no_constants_are_available(html_test):
     html_test.register_list.constants = []
 
-    HtmlConstantTableGenerator(html_test.register_list, html_test.tmp_path).create()
-    html = read_file(html_test.tmp_path / "caesar_constant_table.html")
+    html = read_file(
+        HtmlConstantTableGenerator(html_test.register_list, html_test.tmp_path).create()
+    )
     assert html == "", html

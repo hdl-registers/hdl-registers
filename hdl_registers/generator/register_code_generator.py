@@ -132,7 +132,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         self.name = register_list.name
 
-    def create(self, **kwargs: Any) -> None:
+    def create(self, **kwargs: Any) -> Path:
         """
         Generate the result artifact.
         I.e. create the :meth:`.output_file` containing the result from :meth:`.get_code` method.
@@ -141,17 +141,23 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
             kwargs: Further optional parameters that will be sent on to the
                 :meth:`.get_code` method.
                 See :meth:`.get_code` for details.
-        """
-        print(f"Creating {self.SHORT_DESCRIPTION} file: {self.output_file}")
 
+        Return:
+            The path to the created file, i.e. :meth:`.output_file`.
+        """
+        output_file = self.output_file
+
+        print(f"Creating {self.SHORT_DESCRIPTION} file: {output_file}")
         self._check_reserved_keywords()
 
         code = self.get_code(**kwargs)
 
         # Will create the containing folder unless it already exists.
-        create_file(file=self.output_file, contents=code)
+        create_file(file=output_file, contents=code)
 
-    def create_if_needed(self, **kwargs: Any) -> bool:
+        return output_file
+
+    def create_if_needed(self, **kwargs: Any) -> tuple[bool, Path]:
         """
         Generate the result file if needed.
         I.e. call :meth:`.create` if :meth:`.should_create` is ``True``.
@@ -169,13 +175,19 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
                 See :meth:`.get_code` for details.
 
         Return:
-            True if artifacts where created, False otherwise.
+            Tuple, where first element is a boolean status, and second element is the path to the
+            artifact that may or may not have been created.
+
+            The boolean is the return value of :meth:`.should_create`.
+
+            The path is the :meth:`.output_file` and is set always, even if the file was
+            not created.
         """
         if self.should_create:
-            self.create(**kwargs)
-            return True
+            create_path = self.create(**kwargs)
+            return True, create_path
 
-        return False
+        return False, self.output_file
 
     @property
     def should_create(self) -> bool:

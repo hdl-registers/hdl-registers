@@ -31,28 +31,23 @@ from hdl_registers.register_list import RegisterList
 def test_package_is_not_generated_without_registers(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
 
-    VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_register_read_write_pkg.vhd").exists()
+    assert not (VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()).exists()
 
     register_list.add_constant(name="apa", value=True, description="")
-    VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_register_read_write_pkg.vhd").exists()
+    assert not (VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()).exists()
 
     register_list.append_register(name="hest", mode="r_w", description="")
-    VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()
-    assert (tmp_path / "test_register_read_write_pkg.vhd").exists()
+    assert (VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()).exists()
 
 
 def test_re_generating_package_without_registers_should_delete_old_file(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
     register_list.append_register(name="apa", mode="r_w", description="")
 
-    VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()
-    assert (tmp_path / "test_register_read_write_pkg.vhd").exists()
+    assert (VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()).exists()
 
     register_list.register_objects = []
-    VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()
-    assert not (tmp_path / "test_register_read_write_pkg.vhd").exists()
+    assert not (VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create()).exists()
 
 
 def test_read_write_as_integer(tmp_path):
@@ -100,9 +95,7 @@ def test_read_write_as_integer(tmp_path):
         field_type=UnsignedFixedPoint(1, -2),
     )
 
-    generator = VhdlSimulationReadWritePackageGenerator(register_list, tmp_path)
-    generator.create()
-    vhdl = read_file(generator.output_file)
+    vhdl = read_file(VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create())
 
     def check_access_as_integer(direction: str, name: str) -> None:
         assert direction in ["read", "write"]

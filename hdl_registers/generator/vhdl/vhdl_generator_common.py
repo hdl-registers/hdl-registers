@@ -8,6 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 # First party libraries
@@ -326,7 +327,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
             if accessible_registers:
                 yield register_array
 
-    def _create_if_there_are_registers_otherwise_delete_file(self, **kwargs: Any) -> None:
+    def _create_if_there_are_registers_otherwise_delete_file(self, **kwargs: Any) -> Path:
         """
         Create the code artifact only if the register list actually has any registers.
         Used in cases where the generated file would be an empty shell in that case.
@@ -338,9 +339,13 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         actively generated.
         """
         if self.register_list.register_objects:
-            super().create(**kwargs)
-        else:
-            if self.output_file.exists():
-                # Will not work if it is a directory, but if it is then that is a major user error
-                # and we kinda want to back out.
-                self.output_file.unlink()
+            return super().create(**kwargs)
+
+        if self.output_file.exists():
+            # Will not work if it is a directory, but if it is then that is a major user error
+            # and we kinda want to back out.
+            self.output_file.unlink()
+
+        # Return the path to the output file, which at this point does not exist.
+        # But do it anyway just to be consistent with the other generators.
+        return self.output_file

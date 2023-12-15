@@ -12,6 +12,9 @@ import pickle
 from pathlib import Path
 from typing import Any
 
+# Third party libraries
+from tsfpga.system_utils import create_directory
+
 # First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.register_list import RegisterList
@@ -41,17 +44,20 @@ class PythonClassGenerator(RegisterCodeGenerator):
 
         self.pickle_file = self.output_folder / f"{self.name}.pickle"
 
-    def create(self, **kwargs: Any) -> None:
+    def create(self, **kwargs: Any) -> Path:
         """
         Create the binary pickle also, apart from the class file.
 
         Note that this is a little bit hacky, preferably each generator should produce only
         one file.
         """
-        super().create(**kwargs)
+        # Create directory if it does not exist, but do not delete anything if it does.
+        create_directory(self.output_folder, empty=False)
 
         with self.pickle_file.open("wb") as file_handle:
             pickle.dump(self.register_list, file_handle)
+
+        return super().create(**kwargs)
 
     def get_code(self, **kwargs: Any) -> str:
         """
