@@ -23,6 +23,8 @@ library reg_file;
 use reg_file.reg_file_pkg.all;
 use reg_file.reg_operations_pkg.all;
 
+use work.caesar_simulation_test_pkg.all;
+
 use work.caesar_regs_pkg.all;
 use work.caesar_register_record_pkg.all;
 use work.caesar_register_read_write_pkg.all;
@@ -48,20 +50,6 @@ architecture tb of tb_wait_until_equals is
 
   constant write_register_timeout : time := 500 * clk_period;
   signal start_write_plain_register, start_write_array_register : boolean := false;
-  constant write_config_timeout_value : caesar_config_t := (
-    plain_bit_a => '1',
-    plain_bit_b => '1',
-    plain_bit_vector => (others => '1'),
-    plain_enumeration => plain_enumeration_fourth,
-    plain_integer => 0
-  );
-  constant write_dummies_first_timeout_value : caesar_dummies_first_t := (
-    array_bit_a => '1',
-    array_bit_b => '1',
-    array_bit_vector => (others => '1'),
-    array_enumeration => array_enumeration_element0,
-    array_integer => 77
-  );
 
 begin
 
@@ -82,7 +70,7 @@ begin
 
       wait_until_caesar_config_equals(
         net=>net,
-        value=>write_config_timeout_value,
+        value=>caesar_config_non_init,
         timeout=>write_register_timeout + 10 * clk_period
       );
 
@@ -95,7 +83,7 @@ begin
       -- We never set the register, so it will never assume this value.
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
       wait_until_caesar_config_equals(
-        net=>net, value=>write_config_timeout_value, timeout=>100 * clk_period
+        net=>net, value=>caesar_config_non_init, timeout=>100 * clk_period
       );
 
     elsif run("test_wait_until_array_register_equals") then
@@ -106,7 +94,7 @@ begin
       wait_until_caesar_dummies_first_equals(
         net=>net,
         array_index => 1,
-        value=>write_dummies_first_timeout_value,
+        value=>caesar_dummies_first_non_init,
         timeout=>write_register_timeout + 10 * clk_period
       );
 
@@ -121,7 +109,7 @@ begin
       wait_until_caesar_dummies_first_equals(
         net=>net,
         array_index => 1,
-        value=>write_dummies_first_timeout_value,
+        value=>caesar_dummies_first_non_init,
         timeout=>100 * clk_period,
         message=>"Extra printout that can be set!"
       );
@@ -129,11 +117,11 @@ begin
     elsif run("test_wait_until_reg_equals_works_even_when_there_is_junk_in_unused_bits") then
       -- The fields of the register currently occupy bits 14:0.
       -- Write junk to some other bits of the register.
-      reg := to_slv(write_config_timeout_value);
+      reg := to_slv(caesar_config_non_init);
       reg(31 downto 20) := "101010101010";
       write_reg(net=>net, reg_index=>caesar_config, value=>reg);
 
-      wait_until_caesar_config_equals(net=>net, value=>write_config_timeout_value);
+      wait_until_caesar_config_equals(net=>net, value=>caesar_config_non_init);
 
     elsif run("test_using_wildcard_in_slv_register_value_is_possible") then
       -- Use "don't care" as a wildcard. The wait should end after the very first write.
@@ -146,7 +134,7 @@ begin
 
       wait_until_caesar_config_plain_enumeration_equals(
         net=>net,
-        value=>plain_enumeration_fourth,
+        value=>caesar_config_non_init.plain_enumeration,
         timeout=>write_register_timeout + 10 * clk_period
       );
 
@@ -159,7 +147,17 @@ begin
       -- We never set the register, so it will never assume this value.
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
       wait_until_caesar_config_plain_integer_equals(
-        net=>net, value=>-33, timeout=>100 * clk_period
+        net=>net, value=>caesar_config_non_init.plain_integer, timeout=>100 * clk_period
+      );
+
+    elsif run("test_wait_until_plain_field_equals_timeout_with_message") then
+      -- vunit: .expected_failure
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      wait_until_caesar_config_plain_integer_equals(
+        net=>net,
+        value=>caesar_config_non_init.plain_integer,
+        timeout=>100 * clk_period,
+        message=>"Extra printout that can be set!"
       );
 
     elsif run("test_wait_until_array_field_equals") then
@@ -170,7 +168,7 @@ begin
       wait_until_caesar_dummies_first_array_integer_equals(
         net=>net,
         array_index => 1,
-        value=>77,
+        value=>caesar_dummies_first_non_init.array_integer,
         timeout=>write_register_timeout + 10 * clk_period
       );
 
@@ -185,8 +183,20 @@ begin
       wait_until_caesar_dummies_first_array_integer_equals(
         net=>net,
         array_index => 1,
-        value=>77,
+        value=>caesar_dummies_first_non_init.array_integer,
         timeout=>100 * clk_period,
+        message=>"Extra printout that can be set!"
+      );
+
+    elsif run("test_wait_until_array_field_equals_timeout_with_base_address") then
+      -- vunit: .expected_failure
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      wait_until_caesar_dummies_first_array_integer_equals(
+        net=>net,
+        array_index => 1,
+        value=>caesar_dummies_first_non_init.array_integer,
+        timeout=>100 * clk_period,
+        base_address=>x"00050000",
         message=>"Extra printout that can be set!"
       );
 
@@ -203,7 +213,7 @@ begin
 
     wait for write_register_timeout;
 
-    write_caesar_config(net=>net, value=>write_config_timeout_value);
+    write_caesar_config(net=>net, value=>caesar_config_non_init);
   end process;
 
 
@@ -213,12 +223,12 @@ begin
     wait until start_write_array_register and rising_edge(clk);
 
     -- Write the two array indexes that are not affected straight away.
-    write_caesar_dummies_first(net=>net, array_index=>0, value=>write_dummies_first_timeout_value);
-    write_caesar_dummies_first(net=>net, array_index=>2, value=>write_dummies_first_timeout_value);
+    write_caesar_dummies_first(net=>net, array_index=>0, value=>caesar_dummies_first_non_init);
+    write_caesar_dummies_first(net=>net, array_index=>2, value=>caesar_dummies_first_non_init);
 
     wait for write_register_timeout;
 
-    write_caesar_dummies_first(net=>net, array_index=>1, value=>write_dummies_first_timeout_value);
+    write_caesar_dummies_first(net=>net, array_index=>1, value=>caesar_dummies_first_non_init);
   end process;
 
 
