@@ -44,3 +44,40 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
             return "      array_index => array_index,\n"
 
         return ""
+
+    @staticmethod
+    def get_register_array_and_base_address_message(
+        register_array: Optional["RegisterArray"],
+    ) -> str:
+        if register_array:
+            register_array_message = (
+                f" within the '{register_array.name}["
+                '" & to_string(array_index) & "]\' register array'
+            )
+        else:
+            register_array_message = ""
+
+        return f"""\
+    constant register_array_message : string := "{register_array_message}";
+    function base_address_message return string is
+    begin
+      if base_address /= 0 then
+        return " (at base address " & hex_image(std_logic_vector(base_address)) & ")";
+      end if;
+
+      return "";
+    end function;
+"""
+
+    @staticmethod
+    def get_message() -> str:
+        return """\
+    function get_message return string is
+    begin
+      if message = "" then
+        return base_message;
+      end if;
+
+      return base_message & " " & message & ".";
+    end function;
+"""

@@ -146,7 +146,7 @@ class RegisterCodeGeneratorHelpers:
         register_description = self.register_description(
             register=register, register_array=register_array
         )
-        return f"'{field.name}' field within the {register_description}"
+        return f"'{field.name}' field in the {register_description}"
 
     @staticmethod
     def to_pascal_case(snake_string: str) -> str:
