@@ -52,6 +52,15 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_wait_until_pkg.vhd"
 
+    def create(self, **kwargs: Any) -> None:
+        """
+        See super class for API details.
+
+        Overloaded here because this package file shall only be created if the register list
+        actually has any registers.
+        """
+        self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
+
     def get_code(self, **kwargs: Any) -> str:
         """
         Get a package with ``wait_until_X_equals`` methods for registers/fields.
@@ -339,22 +348,3 @@ end package body;
     );
   end procedure;
 """
-
-    def create(self, **kwargs: Any) -> None:
-        """
-        See super class for API details.
-
-        Overloaded here because this package file shall only be created if the register list
-        actually has any registers.
-        If not, if for example the user has a register list with only constants, we do not want
-        to flood the file system with unnecessary files.
-        The package would be empty anyway.
-
-        If the artifact file exists from a previous run, we delete it since we do not want stray
-        files laying around and we do not want to give the false impression that this file is being
-        actively generated.
-        """
-        if self.register_list.register_objects:
-            super().create(**kwargs)
-        else:
-            self._delete_output_file_if_exists()
