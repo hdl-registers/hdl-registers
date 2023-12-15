@@ -30,6 +30,7 @@ if TYPE_CHECKING:
 class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
     """
     Generate HTML code with register information in a table.
+    See the :ref:`generator_html` article for usage details.
     """
 
     __version__ = "1.0.0"

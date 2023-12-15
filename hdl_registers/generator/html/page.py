@@ -23,6 +23,7 @@ from .register_table import HtmlRegisterTableGenerator
 class HtmlPageGenerator(HtmlGeneratorCommon):
     """
     Generate a HTML page with register and constant information.
+    See the :ref:`generator_html` article for usage details.
     """
 
     __version__ = "1.0.0"
@@ -39,13 +40,6 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
     def get_code(self, **kwargs: Any) -> str:
         """
         Get a complete HTML page with register and constant information.
-
-        Arguments:
-            register_objects: Registers and register arrays to be included.
-            constants: Constants to be included.
-
-        Return:
-            str: HTML code.
         """
         title = f"Documentation of {self.name} registers"
         html = f"""\

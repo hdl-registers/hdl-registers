@@ -27,7 +27,19 @@ if TYPE_CHECKING:
 
 class CppImplementationGenerator(CppGeneratorCommon):
     """
-    Class to generate a C++ implementation.
+    Generate a C++ class implementation.
+    See the :ref:`generator_cpp` article for usage details.
+
+    The class implementation will contain:
+
+    * for each register, implementation of getter and setter methods for reading/writing the
+      register as an ``uint``.
+
+    * for each field in each register, implementation of getter and setter methods for
+      reading/writing the field as its native type (enumeration, positive/negative int, etc.).
+
+      * The setter will read-modify-write the register to update only the specified field,
+        depending on the mode of the register.
     """
 
     __version__ = "1.0.0"

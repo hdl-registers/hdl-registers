@@ -21,7 +21,7 @@ from .vhdl_generator_common import (
 
 class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
     """
-    Generate a wrapper around a generic AXI-Lite register file with correct generics and ports.
+    Generate a VHDL wrapper around a generic AXI-Lite register file with correct generics and ports.
 
     * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
     * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/\

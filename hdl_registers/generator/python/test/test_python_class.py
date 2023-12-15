@@ -12,7 +12,7 @@ from tsfpga.system_utils import load_python_module
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
-from hdl_registers.generator.python.python_class_generator import PythonClassGenerator
+from hdl_registers.generator.python.python_class import PythonClassGenerator
 from hdl_registers.parser.toml import from_toml
 
 

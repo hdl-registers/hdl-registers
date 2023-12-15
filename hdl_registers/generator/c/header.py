@@ -26,15 +26,29 @@ if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.register_array import RegisterArray
 
+# There is no unit test of this class that checks the generated code. It is instead functionally
+# tested in the file 'test_compiled_c_code.py'. That test generates C code from an example
+# register set, compiles it and performs some run-time assertions in a C program.
+# That test is considered more meaningful and exhaustive than a unit test would be.
+
 
 class CHeaderGenerator(RegisterCodeGenerator):
     """
-    Generate a C code header with register information.
+    Generate a C header.
+    See the :ref:`generator_c` article for usage details.
 
-    There is no unit test of this class that checks the generated code. It is instead functionally
-    tested in the file test_register_compilation.py. That test generates C code from an example
-    register set, compiles it and performs some run-time assertions in a C program.
-    That test is considered more meaningful and exhaustive than a unit test would be.
+    The header will contain:
+
+    * Constant values for all :ref:`register constants <constant_overview>`.
+
+    * Enumeration types for all :ref:`field_enumeration`.
+
+    * A ``struct`` type with all registers as members, which can be memory mapped directly.
+
+    * For each register, ``#define`` constants with the index and address of the register.
+
+    * For each field in each register, ``#define`` constants with the bit shift, bit mask and
+      inverse bit mask of the field.
     """
 
     __version__ = "1.0.0"
@@ -61,8 +75,8 @@ class CHeaderGenerator(RegisterCodeGenerator):
         For argument description, please see the super class.
 
         Arguments:
-                file_name: Optionally specify an explicit result file name.
-                    If not specified, the name will be derived from the name of the register list.
+            file_name: Optionally specify an explicit result file name.
+                If not specified, the name will be derived from the name of the register list.
         """
         super().__init__(register_list=register_list, output_folder=output_folder)
 

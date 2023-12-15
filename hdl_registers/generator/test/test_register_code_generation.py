@@ -25,7 +25,7 @@ from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
-from hdl_registers.generator.python.python_class_generator import PythonClassGenerator
+from hdl_registers.generator.python.python_class import PythonClassGenerator
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator

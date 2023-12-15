@@ -35,7 +35,25 @@ if TYPE_CHECKING:
 
 class CppInterfaceGenerator(CppGeneratorCommon):
     """
-    Class to generate a C++ interface header.
+    Generate a C++ interface header, suitable for mocking in a unit test environment.
+    See the :ref:`generator_cpp` article for usage details.
+
+    The interface header will contain:
+
+    * Attribute constants for each register and field, such as width, default value, etc.
+
+    * Enumeration types for all :ref:`field_enumeration`.
+
+    * Constant values for all :ref:`register constants <constant_overview>`.
+
+    * for each register, signature of getter and setter methods for reading/writing the register as
+      an ``uint``.
+
+    * for each field in each register, signature of getter and setter methods for reading/writing
+      the field as its native type (enumeration, positive/negative int, etc.).
+
+      * The setter will read-modify-write the register to update only the specified field,
+        depending on the mode of the register.
     """
 
     __version__ = "1.0.0"
@@ -52,6 +70,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         return self.output_folder / f"i_{self.name}.h"
 
     def get_code(self, **kwargs: Any) -> str:
+        """
+        Get a complete C++ interface header with constants, types, attributes and methods for
+        accessing registers and fields.
+        """
         cpp_code = ""
 
         for register, register_array in self.iterate_registers():
