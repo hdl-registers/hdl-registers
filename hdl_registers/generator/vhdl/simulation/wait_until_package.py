@@ -139,7 +139,9 @@ end package body;
         """
         Get signature for a 'wait_until_reg_equals' procedure.
         """
-        register_name = self.register_name(register=register, register_array=register_array)
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
         register_description = self.register_description(
             register=register, register_array=register_array
         )
@@ -177,7 +179,9 @@ end package body;
         """
         Get signature for a 'wait_until_field_equals' procedure.
         """
-        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_name = self.qualified_field_name(
+            register=register, register_array=register_array, field=field
+        )
         field_description = self.field_description(
             register=register, register_array=register_array, field=field
         )
@@ -305,7 +309,9 @@ end package body;
         signature = self._field_wait_until_equals_signature(
             register=register, register_array=register_array, field=field
         )
-        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_name = self.qualified_field_name(
+            register=register, register_array=register_array, field=field
+        )
         field_to_slv = self.field_to_slv(field=field, field_name=field_name, value="value")
 
         return f"""\

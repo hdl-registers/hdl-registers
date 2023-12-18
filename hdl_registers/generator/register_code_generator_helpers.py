@@ -28,6 +28,7 @@ class RegisterCodeGeneratorHelpers:
 
     # Defined in RegisterCodeGenerator, which shall also be inherited wherever this class is used.
     register_list: "RegisterList"
+    name: str
     DEFAULT_INDENTATION_LEVEL: int
     COMMENT_START: str
     COMMENT_END: str
@@ -77,6 +78,40 @@ class RegisterCodeGeneratorHelpers:
         for register_object in self.iterate_register_objects():
             if isinstance(register_object, RegisterArray):
                 yield register_object
+
+    def qualified_register_name(
+        self, register: "Register", register_array: Optional["RegisterArray"] = None
+    ) -> str:
+        """
+        Get the qualified register name, e.g. "<module name>_<register name>".
+        To be used where the scope requires it, i.e. outside of records.
+        """
+        if register_array is None:
+            return f"{self.name}_{register.name}"
+
+        return f"{self.name}_{register_array.name}_{register.name}"
+
+    def qualified_register_array_name(self, register_array: "RegisterArray") -> str:
+        """
+        Get the qualified register array name, e.g. "<module name>_<register array name>".
+        To be used where the scope requires it, i.e. outside of records.
+        """
+        return f"{self.name}_{register_array.name}"
+
+    def qualified_field_name(
+        self,
+        register: "Register",
+        field: "RegisterField",
+        register_array: Optional["RegisterArray"] = None,
+    ) -> str:
+        """
+        Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
+        To be used where the scope requires it, i.e. outside of records.
+        """
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
+        return f"{register_name}_{field.name}"
 
     def get_indentation(self, indent: Optional[int] = None) -> str:
         """

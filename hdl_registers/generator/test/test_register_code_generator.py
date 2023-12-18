@@ -236,7 +236,10 @@ value = 3
     )
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
-    assert str(exception_info.value) == 'Error for constant "for": Name is a reserved keyword.'
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "sensor": Constant name "for" is a reserved keyword.'
+    )
 
 
 def test_plain_register_with_reserved_name_should_raise_exception(generator_from_toml):
@@ -248,7 +251,10 @@ mode = "r_w"
     )
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
-    assert str(exception_info.value) == 'Error for register "for": Name is a reserved keyword.'
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "sensor": Register name "for" is a reserved keyword.'
+    )
 
 
 def test_plain_register_field_with_reserved_name_should_raise_exception(generator_from_toml):
@@ -261,7 +267,10 @@ bit.for.description = ""
     )
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
-    assert str(exception_info.value) == 'Error for field "for": Name is a reserved keyword.'
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "sensor": Field name "for" is a reserved keyword.'
+    )
 
 
 def test_register_array_with_reserved_name_should_raise_exception(generator_from_toml):
@@ -275,7 +284,8 @@ register.data.mode = "r_w"
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
     assert (
-        str(exception_info.value) == 'Error for register array "for": Name is a reserved keyword.'
+        str(exception_info.value)
+        == 'Error in register list "sensor": Register array name "for" is a reserved keyword.'
     )
 
 
@@ -289,7 +299,10 @@ register.for.mode = "r_w"
     )
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
-    assert str(exception_info.value) == 'Error for register "for": Name is a reserved keyword.'
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "sensor": Register name "for" is a reserved keyword.'
+    )
 
 
 def test_array_register_field_with_reserved_name_should_raise_exception(generator_from_toml):
@@ -303,7 +316,10 @@ register.data.bit.for.description = ""
     )
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
-    assert str(exception_info.value) == 'Error for field "for": Name is a reserved keyword.'
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "sensor": Field name "for" is a reserved keyword.'
+    )
 
 
 def test_reserved_name_check_works_even_with_strange_case(generator_from_toml):
@@ -315,4 +331,145 @@ mode = "r_w"
     )
     with pytest.raises(ValueError) as exception_info:
         generator.create_if_needed()
-    assert str(exception_info.value) == 'Error for register "FoR": Name is a reserved keyword.'
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "sensor": Register name "FoR" is a reserved keyword.'
+    )
+
+
+def test_two_constants_with_the_same_name_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.add_constant(name="apa", value=3, description="")
+    register_list.add_constant(name="apa", value=True, description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert (
+        str(exception_info.value) == 'Error in register list "test": Duplicate constant name "apa".'
+    )
+
+
+def test_two_registers_with_the_same_name_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.append_register(name="apa", mode="r_w", description="")
+    register_list.append_register(name="apa", mode="w", description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "test": Duplicate plain register name "apa".'
+    )
+
+
+def test_register_with_the_same_name_as_register_array_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.append_register(name="apa", mode="r_w", description="")
+    register_list.append_register_array(name="apa", length=2, description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "test": Register array "apa" may not have same name as register.'
+    )
+
+
+def test_two_plain_fields_with_the_same_name_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register = register_list.append_register(name="apa", mode="r_w", description="")
+    register.append_bit(name="hest", description="", default_value="0")
+    register.append_bit(name="hest", description="", default_value="0")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "test": Duplicate field name "hest" in register "apa".'
+    )
+
+
+def test_two_array_fields_with_the_same_name_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    array = register_list.append_register_array(name="apa", length=2, description="")
+    register = array.append_register(name="hest", mode="r_w", description="")
+    register.append_bit(name="zebra", description="", default_value="0")
+    register.append_bit(name="zebra", description="", default_value="0")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "test": Duplicate field name "zebra" in register "apa.hest".'
+    )
+
+
+def test_two_register_arrays_with_the_same_name_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.append_register_array(name="apa", length=2, description="")
+    register_list.append_register_array(name="apa", length=3, description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert (
+        str(exception_info.value)
+        == 'Error in register list "test": Duplicate register array name "apa".'
+    )
+
+
+def test_array_register_with_same_qualified_name_as_plain_register_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.append_register(name="apa_hest", mode="r_w", description="")
+    register_array = register_list.append_register_array(name="apa", length=3, description="")
+    register_array.append_register(name="hest", mode="r_w", description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert str(exception_info.value) == (
+        'Error in register list "test": Qualified name of register "apa.hest" '
+        '("test_apa_hest") clashes with another item.'
+    )
+
+
+def test_plain_field_with_same_qualified_name_as_plain_register_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.append_register(name="apa_hest", mode="r_w", description="")
+    register = register_list.append_register(name="apa", mode="r_w", description="")
+    register.append_bit(name="hest", description="", default_value="0")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert str(exception_info.value) == (
+        'Error in register list "test": Qualified name of field "apa.hest" '
+        '("test_apa_hest") clashes with another item.'
+    )
+
+
+def test_plain_field_with_same_qualified_name_as_array_register_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register = register_list.append_register(name="apa", mode="r_w", description="")
+    register.append_bit(name="hest_zebra", description="", default_value="0")
+    array = register_list.append_register_array(name="apa_hest", length=2, description="")
+    array.append_register(name="zebra", mode="r_w", description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert str(exception_info.value) == (
+        'Error in register list "test": Qualified name of register "apa_hest.zebra" '
+        '("test_apa_hest_zebra") clashes with another item.'
+    )
+
+
+def test_array_field_with_same_qualified_name_as_plain_register_should_raise_exception(tmp_path):
+    register_list = RegisterList(name="test")
+    register_list.append_register(name="apa_hest_zebra", mode="r_w", description="")
+    array = register_list.append_register_array(name="apa", length=3, description="")
+    register = array.append_register(name="hest", mode="r_w", description="")
+    register.append_bit(name="zebra", description="", default_value="0")
+
+    with pytest.raises(ValueError) as exception_info:
+        CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
+    assert str(exception_info.value) == (
+        'Error in register list "test": Qualified name of field "apa.hest.zebra" '
+        '("test_apa_hest_zebra") clashes with another item.'
+    )

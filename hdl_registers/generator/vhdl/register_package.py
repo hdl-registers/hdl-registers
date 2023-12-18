@@ -183,7 +183,7 @@ end package body;
         """
         vhdl = ""
         for register_array in self.iterate_register_arrays():
-            array_name = self.register_array_name(register_array=register_array)
+            array_name = self.qualified_register_array_name(register_array=register_array)
 
             vhdl += f"""\
   -- Number of times the '{register_array.name}' register array is repeated.
@@ -202,9 +202,9 @@ end package body;
         Signature for the function that returns a register index for the specified index in a
         register array.
         """
-        array_name = self.register_array_name(register_array=register_array)
+        array_name = self.qualified_register_array_name(register_array=register_array)
         vhdl = f"""\
-  function {self.register_name(register, register_array)}(
+  function {self.qualified_register_name(register, register_array)}(
     array_index : {array_name}_range
   ) return {self._register_range_type_name}"""
         return vhdl
@@ -218,7 +218,8 @@ end package body;
         for register, register_array in self.iterate_registers():
             if register_array is None:
                 vhdl += (
-                    f"  constant {self.register_name(register)} : natural := {register.index};\n"
+                    f"  constant {self.qualified_register_name(register)} : "
+                    f"natural := {register.index};\n"
                 )
             else:
                 vhdl += (
@@ -281,7 +282,7 @@ std_ulogic_vector({self._register_range_type_name});
 """
 
             for field in register.fields:
-                field_name = self.field_name(
+                field_name = self.qualified_field_name(
                     register=register, register_array=register_array, field=field
                 )
                 field_is_bit = isinstance(field, Bit)
@@ -445,7 +446,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
         vhdl_array_index = 0
         for register_object in self.iterate_register_objects():
             if isinstance(register_object, Register):
-                idx = self.register_name(register_object)
+                idx = self.qualified_register_name(register_object)
                 opening = f"{vhdl_array_index} => "
 
                 register_definitions.append(
@@ -458,7 +459,8 @@ range {field.width + field.base_index - 1} downto {field.base_index};
             else:
                 for array_index in range(register_object.length):
                     for register in register_object.registers:
-                        idx = f"{self.register_name(register, register_object)}({array_index})"
+                        regiser_name = self.qualified_register_name(register, register_object)
+                        idx = f"{regiser_name}({array_index})"
                         opening = f"{vhdl_array_index} => "
 
                         register_definitions.append(
@@ -496,7 +498,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
                     # be implemented.
                     continue
 
-                name = self.field_name(
+                name = self.qualified_field_name(
                     register=register, register_array=register_array, field=field
                 )
                 to_slv_name = self.field_to_slv_function_name(field=field, field_name=name)

@@ -161,7 +161,9 @@ class CHeaderGenerator(RegisterCodeGenerator):
         return c_code
 
     def _addr_define(self, register: Register, register_array: Optional["RegisterArray"]) -> str:
-        name = self._register_define_name(register, register_array)
+        name = self.qualified_register_name(
+            register=register, register_array=register_array
+        ).upper()
 
         comment = f'Address of the "{register.name}" register'
         if register_array:
@@ -188,7 +190,6 @@ class CHeaderGenerator(RegisterCodeGenerator):
     def _field_definitions(
         self, register: Register, register_array: Optional["RegisterArray"]
     ) -> str:
-        register_name = self._register_define_name(register, register_array)
         register_string = f'"{register.name}" register'
         if register_array is not None:
             register_string += f' within the "{register_array.name}" register array'
@@ -199,38 +200,31 @@ class CHeaderGenerator(RegisterCodeGenerator):
                 f'Attributes for the "{field.name}" field in the {register_string}.'
             )
 
-            field_name = f"{register_name}_{field.name.upper()}"
-            c_code += f"#define {field_name}_SHIFT ({field.base_index}u)\n"
-            c_code += f'#define {field_name}_MASK (0b{"1" * field.width}u << {field.base_index}u)\n'
-            c_code += f"#define {field_name}_MASK_INVERSE (~{field_name}_MASK)\n"
+            name = self.qualified_field_name(
+                register=register, field=field, register_array=register_array
+            ).upper()
+            c_code += f"#define {name}_SHIFT ({field.base_index}u)\n"
+            c_code += f'#define {name}_MASK (0b{"1" * field.width}u << {field.base_index}u)\n'
+            c_code += f"#define {name}_MASK_INVERSE (~{name}_MASK)\n"
 
             if isinstance(field, Enumeration):
                 # Enums in C export their enumerators to the surrounding scope, causing huge risk of
                 # name clashes.
                 # Hence we give the enumerators long names qualified with the register name, etc.
                 name_value_pairs = [
-                    f"{field_name}_{element.name.upper()} = {element.value},"
+                    f"{name}_{element.name.upper()} = {element.value},"
                     for element in field.elements
                 ]
                 separator = "\n  "
 
                 c_code += f"""\
-enum {self.to_pascal_case(field_name)}
+enum {self.to_pascal_case(name)}
 {{
   {separator.join(name_value_pairs)}
 }};
 """
 
         return c_code
-
-    def _register_define_name(
-        self, register: Register, register_array: Optional["RegisterArray"]
-    ) -> str:
-        if register_array is None:
-            name = f"{self.name}_{register.name}"
-        else:
-            name = f"{self.name}_{register_array.name}_{register.name}"
-        return name.upper()
 
     def _constants(self) -> str:
         c_code = ""

@@ -148,7 +148,8 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         output_file = self.output_file
 
         print(f"Creating {self.SHORT_DESCRIPTION} file: {output_file}")
-        self._check_reserved_keywords()
+
+        self._sanity_check()
 
         code = self.get_code(**kwargs)
 
@@ -258,45 +259,6 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         return result_package_version, result_generator_version, result_hash
 
-    def _check_reserved_keywords(self) -> None:
-        """
-        Do a basic check that no name matches a reserved keyword in any of the targeted
-        generator languages.
-
-        In general, the user will know if they use a reserved keyword when the generated code is
-        compiled/used since it will probably crash.
-        But it is better to warn early, rather than the user finding when compiling headers after
-        a 1 hour FPGA build.
-
-        We run this check at creation time, always and for every single generator.
-        Hence the user will hopefully get warned when they generate e.g. a VHDL package at the start
-        of the FPGA build that a register uses a reserved C++ name.
-        This check takes roughly 42 us on a decent computer with a typical register list.
-        Hence it is not a big deal that it might be run more than once for each register list.
-
-        It is better to have it here in the generator rather than in the parser:
-        1. Here it runs only when necessary, not adding time to parsing which is often done in
-           real time.
-        2. We also catch things that were added with the Python API.
-        """
-
-        def check(name: str, description: str) -> None:
-            if name.lower() in RESERVED_KEYWORDS:
-                message = f'Error for {description} "{name}": Name is a reserved keyword.'
-                raise ValueError(message)
-
-        for constant in self.register_list.constants:
-            check(name=constant.name, description="constant")
-
-        for register, _ in self.iterate_registers():
-            check(name=register.name, description="register")
-
-            for field in register.fields:
-                check(name=field.name, description="field")
-
-        for register_array in self.iterate_register_arrays():
-            check(name=register_array.name, description="register array")
-
     @property
     def header(self) -> str:
         """
@@ -343,3 +305,181 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
             info,
             f"Register hash {self.register_list.object_hash}.",
         ]
+
+    def _sanity_check(self) -> None:
+        """
+        Do some basic checks that no naming errors are present.
+        Will raise exception if there is any error.
+
+        In general, the user will know if these errors are present when the generated code is
+        compiled/used since it will probably crash.
+        But it is better to warn early, rather than the user finding when compiling headers after
+        a 1 hour FPGA build.
+
+        We run this check at creation time, always and for every single generator.
+        Hence the user will hopefully get warned when they generate e.g. a VHDL package at the start
+        of the FPGA build that a register uses a reserved C++ name.
+        This check takes roughly 42 us on a decent computer with a typical register list.
+        Hence it is not a big deal that it might be run more than once for each register list.
+
+        It is better to have it here in the generator rather than in the parser:
+        1. Here it runs only when necessary, not adding time to parsing which is often done in
+           real time.
+        2. We also catch things that were added with the Python API.
+        """
+        self._check_reserved_keywords()
+        self._check_for_name_clashes()
+
+    def _check_reserved_keywords(self) -> None:
+        """
+        Check that no item in the register list matches a reserved keyword in any of the targeted
+        generator languages.
+        To minimize the risk that a generated artifact does not compile.
+        """
+
+        def check(name: str, description: str) -> None:
+            if name.lower() in RESERVED_KEYWORDS:
+                message = (
+                    f'Error in register list "{self.name}": '
+                    f'{description} name "{name}" is a reserved keyword.'
+                )
+                raise ValueError(message)
+
+        for constant in self.register_list.constants:
+            check(name=constant.name, description="Constant")
+
+        for register, _ in self.iterate_registers():
+            check(name=register.name, description="Register")
+
+            for field in register.fields:
+                check(name=field.name, description="Field")
+
+        for register_array in self.iterate_register_arrays():
+            check(name=register_array.name, description="Register array")
+
+    def _check_for_name_clashes(self) -> None:
+        """
+        Check that there are no name clashes between items in the register list.
+        To minimize the risk that a generated artifact does not compile.
+        """
+        self._check_for_constant_name_clashes()
+        self._check_for_top_level_name_clashes()
+        self._check_for_field_name_clashes()
+        self._check_for_qualified_name_clashes()
+
+    def _check_for_constant_name_clashes(self) -> None:
+        """
+        Check that there are no constants with the same name.
+        """
+        constant_names = set()
+        for constant in self.register_list.constants:
+            if constant.name in constant_names:
+                message = (
+                    f'Error in register list "{self.name}": '
+                    f'Duplicate constant name "{constant.name}".'
+                )
+                raise ValueError(message)
+
+            constant_names.add(constant.name)
+
+    def _check_for_top_level_name_clashes(self) -> None:
+        """
+        Check that there are no
+        * duplicate register names,
+        * duplicate register array names,
+        * register array names that clash with register names.
+        """
+        plain_register_names = set()
+        for register in self.iterate_plain_registers():
+            if register.name in plain_register_names:
+                message = (
+                    f'Error in register list "{self.name}": '
+                    f'Duplicate plain register name "{register.name}".'
+                )
+                raise ValueError(message)
+
+            plain_register_names.add(register.name)
+
+        register_array_names = set()
+        for register_array in self.iterate_register_arrays():
+            if register_array.name in register_array_names:
+                message = (
+                    f'Error in register list "{self.name}": '
+                    f'Duplicate register array name "{register_array.name}".'
+                )
+                raise ValueError(message)
+
+            if register_array.name in plain_register_names:
+                message = (
+                    f'Error in register list "{self.name}": '
+                    f'Register array "{register_array.name}" may not have same name as register.'
+                )
+                raise ValueError(message)
+
+            register_array_names.add(register_array.name)
+
+    def _check_for_field_name_clashes(self) -> None:
+        """
+        Check that no register contains fields with the same name.
+        """
+        for register, register_array in self.iterate_registers():
+            field_names = set()
+
+            for field in register.fields:
+                if field.name in field_names:
+                    register_description = (
+                        f"{register_array.name}.{register.name}"
+                        if register_array
+                        else register.name
+                    )
+                    message = (
+                        f'Error in register list "{self.name}": '
+                        f'Duplicate field name "{field.name}" in register "{register_description}".'
+                    )
+                    raise ValueError(message)
+
+                field_names.add(field.name)
+
+    def _check_for_qualified_name_clashes(self) -> None:
+        """
+        Check that there are no name clashes when names of registers and fields are qualified.
+
+        The register 'apa_hest' will give a conflict with the field 'apa.hest' since both will get
+        e.g. a VHDL simulation method 'read_apa_hest'.
+        Hence we need to check for these conflicts.
+        """
+        qualified_names = set()
+
+        for register, register_array in self.iterate_registers():
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
+            register_description = (
+                f"{register_array.name}.{register.name}" if register_array else register.name
+            )
+
+            if register_name in qualified_names:
+                message = (
+                    f'Error in register list "{self.name}": '
+                    f'Qualified name of register "{register_description}" '
+                    f'("{register_name}") clashes with another item.'
+                )
+                raise ValueError(message)
+
+            qualified_names.add(register_name)
+
+            for field in register.fields:
+                field_name = self.qualified_field_name(
+                    register=register, register_array=register_array, field=field
+                )
+
+                if field_name in qualified_names:
+                    field_description = f"{register_description}.{field.name}"
+                    message = (
+                        f'Error in register list "{self.name}": '
+                        f'Qualified name of field "{field_description}" '
+                        f'("{field_name}") clashes with another item.'
+                    )
+                    raise ValueError(message)
+
+                qualified_names.add(field_name)

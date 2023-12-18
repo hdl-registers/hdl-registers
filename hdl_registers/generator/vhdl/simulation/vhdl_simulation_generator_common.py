@@ -29,7 +29,7 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
         Suitable for VHDL procedure/function signatures that can read registers in arrays.
         """
         if register_array:
-            array_name = self.register_array_name(register_array=register_array)
+            array_name = self.qualified_register_array_name(register_array=register_array)
             return f"    array_index : in {array_name}_range;\n"
 
         return ""
