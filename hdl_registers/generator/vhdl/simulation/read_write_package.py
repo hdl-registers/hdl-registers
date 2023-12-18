@@ -114,7 +114,9 @@ end package body;
         vhdl = ""
 
         for register, register_array in self.iterate_registers():
-            register_name = self.register_name(register=register, register_array=register_array)
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
             declarations = []
 
             if register.is_bus_readable:
@@ -245,7 +247,9 @@ end package body;
         direction = "read" if is_read_not_write else "write"
         value_direction = "out" if is_read_not_write else "in"
 
-        register_name = self.register_name(register=register, register_array=register_array)
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
         register_description = self.register_description(
             register=register, register_array=register_array
         )
@@ -283,7 +287,9 @@ end package body;
         """
         direction = "read" if is_read_not_write else "write"
 
-        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_name = self.qualified_field_name(
+            register=register, register_array=register_array, field=field
+        )
         field_description = self.field_description(
             register=register, field=field, register_array=register_array
         )
@@ -334,7 +340,9 @@ end package body;
         vhdl = ""
 
         for register, register_array in self.iterate_registers():
-            register_name = self.register_name(register=register, register_array=register_array)
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
             implementations = []
 
             if register.is_bus_readable:
@@ -546,7 +554,9 @@ end package body;
             value_type=value_type,
         )
 
-        register_name = self.register_name(register=register, register_array=register_array)
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
 
         return f"""\
 {signature} is
@@ -580,7 +590,9 @@ end package body;
             field=field,
             value_type=value_type,
         )
-        register_name = self.register_name(register=register, register_array=register_array)
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
 
         if self._can_read_modify_write_register(register=register):
             set_base_value = f"""\
@@ -596,7 +608,7 @@ end package body;
             set_base_value = ""
 
         if value_type == "integer":
-            field_name = self.field_name(
+            field_name = self.qualified_field_name(
                 register=register, register_array=register_array, field=field
             )
             field_width = f"{field_name}_width"

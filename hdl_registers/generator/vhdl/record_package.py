@@ -135,7 +135,9 @@ end package body;
             if not register.fields:
                 continue
 
-            register_name = self.register_name(register=register, register_array=register_array)
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
             register_description = self.register_description(
                 register=register, register_array=register_array
             )
@@ -144,7 +146,7 @@ end package body;
             init = []
 
             for field in register.fields:
-                field_name = self.field_name(
+                field_name = self.qualified_field_name(
                     register=register, register_array=register_array, field=field
                 )
                 init.append(f"{field.name} => {field_name}_init")
@@ -227,7 +229,7 @@ return {self.name}_regs_{direction.name}_t;
         vhdl = ""
 
         for array in self.iterate_fabric_accessible_register_arrays(direction=direction):
-            array_name = self.register_array_name(register_array=array)
+            array_name = self.qualified_register_array_name(register_array=array)
             vhdl += f"""\
   -- Registers of the '{array.name}' array that are in the '{direction.name}' direction.
   type {array_name}_{direction.name}_t is record
@@ -241,7 +243,9 @@ return {self.name}_regs_{direction.name}_t;
                     register=register, register_array=array
                 )
 
-                register_name = self.register_name(register=register, register_array=array)
+                register_name = self.qualified_register_name(
+                    register=register, register_array=array
+                )
                 init = f"{register_name}_init" if register.fields else "(others => '0')"
                 vhdl_array_init.append(f"{register.name} => {init}")
 
@@ -286,7 +290,7 @@ the '{direction.name}' direction.
 """
 
         for array in self.iterate_fabric_accessible_register_arrays(direction=direction):
-            array_name = self.register_array_name(register_array=array)
+            array_name = self.qualified_register_array_name(register_array=array)
 
             vhdl += f"    {array.name} : {array_name}_{direction.name}_vec_t;\n"
             record_init.append(f"{array.name} => (others => {array_name}_{direction.name}_init)")
@@ -295,7 +299,7 @@ the '{direction.name}' direction.
             vhdl += self._record_member_declaration_for_register(register=register)
 
             if register.fields:
-                register_name = self.register_name(register=register)
+                register_name = self.qualified_register_name(register=register)
                 record_init.append(f"{register.name} => {register_name}_init")
             else:
                 record_init.append(f"{register.name} => (others => '0')")
@@ -318,7 +322,9 @@ the '{direction.name}' direction.
         """
         Get the record member declaration line for a register that shall be part of the record.
         """
-        register_name = self.register_name(register=register, register_array=register_array)
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
 
         if register.fields:
             return f"    {register.name} : {register_name}_t;\n"
@@ -350,7 +356,7 @@ register map.
 """
 
         for array in self.iterate_bus_accessible_register_arrays(direction=direction):
-            array_name = self.register_array_name(register_array=array)
+            array_name = self.qualified_register_array_name(register_array=array)
             vhdl += f"""\
   -- One status bit for each {direction.name_adjective} register in the '{array.name}' \
 register array.
@@ -381,7 +387,7 @@ of {array_name}_was_{direction.name_past}_t;
 
         array_init = []
         for array in self.iterate_bus_accessible_register_arrays(direction=direction):
-            array_name = self.register_array_name(register_array=array)
+            array_name = self.qualified_register_array_name(register_array=array)
 
             vhdl += f"    {array.name} : {array_name}_was_{direction.name_past}_vec_t;\n"
             array_init.append(
@@ -421,13 +427,15 @@ of {array_name}_was_{direction.name_past}_t;
         vhdl = ""
 
         def _get_functions(register: "Register", register_array: Optional["RegisterArray"]) -> str:
-            register_name = self.register_name(register=register, register_array=register_array)
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
 
             to_slv = ""
             to_record = ""
 
             for field in register.fields:
-                field_name = self.field_name(
+                field_name = self.qualified_field_name(
                     register=register, register_array=register_array, field=field
                 )
                 field_to_slv = self.field_to_slv(
@@ -499,7 +507,9 @@ of {array_name}_was_{direction.name_past}_t;
         for register, register_array in self.iterate_fabric_accessible_registers(
             direction=FABRIC_ACCESS_DIRECTIONS["up"]
         ):
-            register_name = self.register_name(register=register, register_array=register_array)
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
 
             if register_array is None:
                 result = f"    result({register_name})"
@@ -542,7 +552,9 @@ of {array_name}_was_{direction.name_past}_t;
         for register, register_array in self.iterate_fabric_accessible_registers(
             direction=FABRIC_ACCESS_DIRECTIONS["down"]
         ):
-            register_name = self.register_name(register=register, register_array=register_array)
+            register_name = self.qualified_register_name(
+                register=register, register_array=register_array
+            )
 
             if register_array is None:
                 result = f"    result.{register.name}"
@@ -602,14 +614,16 @@ of {array_name}_was_{direction.name_past}_t;
 """
 
         for register in self.iterate_bus_accessible_plain_registers(direction=direction):
-            register_name = self.register_name(register=register)
+            register_name = self.qualified_register_name(register=register)
             vhdl += f"    result.{register.name} := data({register_name});\n"
 
         for array in self.iterate_register_arrays():
             for register in self.iterate_bus_accessible_array_registers(
                 register_array=array, direction=direction
             ):
-                register_name = self.register_name(register=register, register_array=array)
+                register_name = self.qualified_register_name(
+                    register=register, register_array=array
+                )
 
                 for array_index in range(array.length):
                     vhdl += (

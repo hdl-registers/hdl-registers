@@ -101,38 +101,6 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     COMMENT_START = "--"
 
-    def register_name(
-        self, register: "Register", register_array: Optional["RegisterArray"] = None
-    ) -> str:
-        """
-        Get the qualified register name, e.g. "<module name>_<register name>".
-        To be used where the scope requires it, i.e. outside of records.
-        """
-        if register_array is None:
-            return f"{self.name}_{register.name}"
-
-        return f"{self.name}_{register_array.name}_{register.name}"
-
-    def register_array_name(self, register_array: "RegisterArray") -> str:
-        """
-        Get the qualified register array name.
-        To be used where the scope requires it, i.e. outside of records.
-        """
-        return f"{self.name}_{register_array.name}"
-
-    def field_name(
-        self,
-        register: "Register",
-        field: "RegisterField",
-        register_array: Optional["RegisterArray"] = None,
-    ) -> str:
-        """
-        Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
-        To be used where the scope requires it, i.e. outside of records.
-        """
-        register_name = self.register_name(register=register, register_array=register_array)
-        return f"{register_name}_{field.name}"
-
     @staticmethod
     def field_to_slv_function_name(field: "RegisterField", field_name: str) -> str:
         """
@@ -191,7 +159,9 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         if isinstance(field, Bit):
             return "std_ulogic"
 
-        field_name = self.field_name(register=register, register_array=register_array, field=field)
+        field_name = self.qualified_field_name(
+            register=register, register_array=register_array, field=field
+        )
         return f"{field_name}_t"
 
     def reg_index_constant(
@@ -201,7 +171,9 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         Get a 'reg_index' constant declaration suitable for implementation of register/field
         access procedures.
         """
-        register_name = self.register_name(register=register, register_array=register_array)
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
         reg_index = (
             f"{register_name}(array_index=>array_index)" if register_array else register_name
         )
