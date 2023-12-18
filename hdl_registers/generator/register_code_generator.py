@@ -319,7 +319,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         We run this check at creation time, always and for every single generator.
         Hence the user will hopefully get warned when they generate e.g. a VHDL package at the start
         of the FPGA build that a register uses a reserved C++ name.
-        This check takes roughly 42 us on a decent computer with a typical register list.
+        This check takes roughly 140 us on a decent computer with a typical register list.
         Hence it is not a big deal that it might be run more than once for each register list.
 
         It is better to have it here in the generator rather than in the parser:
