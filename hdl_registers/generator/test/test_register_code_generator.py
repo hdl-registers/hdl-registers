@@ -64,6 +64,21 @@ description = "My register"
 # pylint: disable=redefined-outer-name
 
 
+def test_create_return_value(generator_from_toml):
+    generator = generator_from_toml()
+
+    status, artifact_path = generator.create_if_needed()
+    assert status is True
+    assert artifact_path == generator.output_file
+
+    status, artifact_path = generator.create_if_needed()
+    assert status is False
+    assert artifact_path == generator.output_file
+
+    artifact_path = generator.create()
+    assert artifact_path == generator.output_file
+
+
 def test_create_should_not_run_if_nothing_has_changed(generator_from_toml):
     generator = generator_from_toml()
     generator.register_list.add_constant(name="apa", value=3, description="")
