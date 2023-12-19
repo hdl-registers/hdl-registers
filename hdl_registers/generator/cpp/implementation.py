@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 
@@ -219,11 +220,20 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
     @staticmethod
     def _get_field_setter_value_checker(field: "RegisterField") -> str:
+        comment = "// Check that field value is within the legal range."
         if isinstance(field, Integer):
             return f"""\
-    // Check that field value is within the legal range.
+    {comment}
     assert(field_value >= {field.min_value});
     assert(field_value <= {field.max_value});
+
+"""
+
+        if isinstance(field, BitVector):
+            return f"""\
+    {comment}
+    const uint32_t mask_at_base_inverse = ~mask_at_base;
+    assert((field_value & mask_at_base_inverse) == 0);
 
 """
 

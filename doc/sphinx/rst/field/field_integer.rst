@@ -159,8 +159,8 @@ The signed field uses ``int32_t`` while the unsigned fields use ``uint32_t``.
 C++ implementation
 ~~~~~~~~~~~~~~~~~~
 
-Note that each setter performs assertions that the supplied argument is withing the legal range of
-the field.
+Note that each setter and getter perform assertions that the supplied argument is withing the legal
+range of the field.
 This will catch calculation errors during testing and at run-time.
 
 .. collapse:: Click to expand/collapse code.
