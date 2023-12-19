@@ -155,6 +155,10 @@ Note the setters and getters for each individual field value.
 C++ implementation
 ~~~~~~~~~~~~~~~~~~
 
+Note that each setter performs assertions that the supplied argument is withing the legal range of
+the field.
+This will catch calculation errors during testing and at run-time.
+
 .. collapse:: Click to expand/collapse code.
 
   .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_bit_vector/api/caesar.cpp
