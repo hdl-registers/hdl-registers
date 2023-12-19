@@ -19,6 +19,9 @@ from tsfpga.system_utils import read_file
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
+from hdl_registers.generator.vhdl.simulation.checker_package import (
+    VhdlSimulationCheckerPackageGenerator,
+)
 from hdl_registers.generator.vhdl.simulation.read_write_package import (
     VhdlSimulationReadWritePackageGenerator,
 )
@@ -42,6 +45,8 @@ def generate_strange_register_maps(output_path):
             register_list=register_list, output_folder=output_path
         ).create_if_needed()
 
+        VhdlAxiLiteWrapperGenerator(register_list=register_list, output_folder=output_path).create()
+
         VhdlSimulationReadWritePackageGenerator(
             register_list=register_list, output_folder=output_path
         ).create_if_needed()
@@ -50,7 +55,9 @@ def generate_strange_register_maps(output_path):
             register_list=register_list, output_folder=output_path
         ).create_if_needed()
 
-        VhdlAxiLiteWrapperGenerator(register_list=register_list, output_folder=output_path).create()
+        VhdlSimulationCheckerPackageGenerator(
+            register_list=register_list, output_folder=output_path
+        ).create_if_needed()
 
     def create_packages(direction, mode):
         def append_register(data, name):

@@ -15,6 +15,9 @@ from pathlib import Path
 from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
+from hdl_registers.generator.vhdl.simulation.checker_package import (
+    VhdlSimulationCheckerPackageGenerator,
+)
 from hdl_registers.generator.vhdl.simulation.read_write_package import (
     VhdlSimulationReadWritePackageGenerator,
 )
@@ -42,6 +45,10 @@ def main(output_folder: Path):
         register_list=register_list, output_folder=output_folder
     ).create_if_needed()
 
+    VhdlAxiLiteWrapperGenerator(
+        register_list=register_list, output_folder=output_folder
+    ).create_if_needed()
+
     VhdlSimulationReadWritePackageGenerator(
         register_list=register_list, output_folder=output_folder
     ).create_if_needed()
@@ -50,7 +57,7 @@ def main(output_folder: Path):
         register_list=register_list, output_folder=output_folder
     ).create_if_needed()
 
-    VhdlAxiLiteWrapperGenerator(
+    VhdlSimulationCheckerPackageGenerator(
         register_list=register_list, output_folder=output_folder
     ).create_if_needed()
 
