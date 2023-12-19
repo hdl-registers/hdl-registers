@@ -29,6 +29,7 @@ class BaseCppTest(CompileAndRunTest):
     def get_main(includes="", test_code=""):
         return f"""\
 #include <assert.h>
+#include <iostream>
 
 #include "include/caesar.h"
 
@@ -163,3 +164,35 @@ def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
         result = run_command(cmd=cmd, capture_output=True)
         assert result.stdout == ""
         assert "Assertion `field_value <= 100' failed." in result.stderr, result.stderr
+
+
+def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
+    # 'config' register is index 0 and 'plain_integer' field starts at bit 9.
+    test_code = """\
+  memory[0] = 100 << 9;
+  caesar.get_config_plain_integer();
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  memory[0] = 101 << 9;
+  caesar.get_config_plain_integer();
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        result = run_command(cmd=cmd, capture_output=True)
+        assert result.stdout == ""
+        assert "Assertion `field_value <= 100' failed." in result.stderr, result.stderr
+
+        test_code = """\
+  memory[0] = -51 << 9;
+  caesar.get_config_plain_integer();
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        result = run_command(cmd=cmd, capture_output=True)
+        assert result.stdout == ""
+        assert "Assertion `field_value >= -51' failed." in result.stderr, result.stderr
