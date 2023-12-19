@@ -141,16 +141,20 @@ In our VHDL code we can access a field value for example like this:
 |
 
 
+
+C++
+___
+
+The C++ interface header and implementation code below is produced by the ``generate()`` call in
+the Python example above.
+Click the button to expand and view each code block.
+
+The class header is skipped here, since its inclusion would make this page very long.
+See :ref:`generator_cpp` for more details and an example of how the excluded file might look.
+
+
 C++ interface header
-____________________
-
-The C++ interface header code below is produced by the ``generate()`` call in the Python
-example above.
-Click the button to expand and view the code.
-
-The class header and implementation are skipped here, since their inclusion would make this page
-very long.
-See :ref:`generator_cpp` for more details and an example of how the excluded files might look.
+~~~~~~~~~~~~~~~~~~~~
 
 Some interesting things to notice in the interface header:
 
@@ -168,6 +172,22 @@ Some interesting things to notice in the interface header:
      :linenos:
 
 |
+
+
+C++ implementation
+~~~~~~~~~~~~~~~~~~
+
+Note that each getter casts a ``uint32_t`` value read from the register bus to the enumeration type.
+
+.. collapse:: Click to expand/collapse code.
+
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_enumeration/api/caesar.cpp
+     :caption: Generated C++ class implementation code.
+     :language: C++
+     :linenos:
+
+|
+
 
 
 C header

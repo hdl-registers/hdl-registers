@@ -190,47 +190,48 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register, register_array=register_array, field=field, from_value=True, indent=2
         )
 
-        cpp_code = f"  uint32_t {self._class_name}::{signature} const\n"
-        cpp_code += "  {\n"
-        cpp_code += self._get_field_shift_and_mask(field=field)
-        cpp_code += self._get_field_range_checker(field=field)
+        return f"""\
+  uint32_t {self._class_name}::{signature} const\
+  {{
+{self._get_field_shift_and_mask(field=field)}\
+{self._get_field_setter_value_checker(field=field)}\
+    const uint32_t field_value_masked = field_value & mask_at_base;
+    const uint32_t field_value_masked_and_shifted = field_value_masked << shift;
 
-        cpp_code += "    const uint32_t field_value_masked = field_value & mask_at_base;\n"
-        cpp_code += (
-            "    const uint32_t field_value_masked_and_shifted = field_value_masked << shift;\n\n"
-        )
+    const uint32_t mask_shifted_inverse = ~mask_shifted;
+    const uint32_t register_value_masked = register_value & mask_shifted_inverse;
 
-        cpp_code += "    const uint32_t mask_shifted_inverse = ~mask_shifted;\n"
-        cpp_code += (
-            "    const uint32_t register_value_masked = register_value & mask_shifted_inverse;\n\n"
-        )
+    const uint32_t result_register_value = register_value_masked | field_value_masked_and_shifted;
 
-        cpp_code += (
-            "    const uint32_t result_register_value = "
-            "register_value_masked | field_value_masked_and_shifted;\n\n"
-        )
-        cpp_code += "    return result_register_value;\n"
+    return result_register_value;
+  }}
 
-        cpp_code += "  }\n\n"
-
-        return cpp_code
+"""
 
     @staticmethod
     def _get_field_shift_and_mask(field: "RegisterField") -> str:
-        cpp_code = f"    const uint32_t shift = {field.base_index}uL;\n"
-        cpp_code += f'    const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
-        cpp_code += "    const uint32_t mask_shifted = mask_at_base << shift;\n"
-        cpp_code += "\n"
-        return cpp_code
+        return f"""\
+    const uint32_t shift = {field.base_index}uL;
+    const uint32_t mask_at_base = 0b{"1" * field.width}uL;
+    const uint32_t mask_shifted = mask_at_base << shift;
+
+"""
 
     @staticmethod
-    def _get_field_range_checker(field: "RegisterField") -> str:
+    def _get_field_setter_value_checker(field: "RegisterField") -> str:
         if isinstance(field, Integer):
-            cpp_code = "    // Check that provided value is within the legal range of this field.\n"
-            cpp_code += f"    assert(field_value >= {field.min_value});\n"
-            cpp_code += f"    assert(field_value <= {field.max_value});\n"
-            cpp_code += "\n"
-            return cpp_code
+            return f"""\
+    // Check that field value is within the legal range.
+    assert(field_value >= {field.min_value});
+    assert(field_value <= {field.max_value});
+
+"""
+
+        return ""
+
+    def _get_field_getter_value_checker(self, field: "RegisterField") -> str:
+        if isinstance(field, Integer):
+            return self._get_field_setter_value_checker(field=field)
 
         return ""
 
@@ -294,10 +295,10 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += ");\n"
 
         cpp_code += (
-            f"    const {field_type_name} result = "
+            f"    const {field_type_name} field_value = "
             f"{field_getter_from_value_function_name}(register_value);\n"
         )
-        cpp_code += "\n    return result;\n"
+        cpp_code += "\n    return field_value;\n"
         cpp_code += "  }\n\n"
 
         return cpp_code
@@ -316,22 +317,30 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register, register_array=register_array, field=field
         )
 
-        cpp_code = f"  {type_name} {self._class_name}::{signature} const\n"
-        cpp_code += "  {\n"
+        cpp_code = f"""\
+  {type_name} {self._class_name}::{signature} const
+  {{
+{self._get_field_shift_and_mask(field=field)}\
+    const uint32_t result_masked = register_value & mask_shifted;
+    const uint32_t result_shifted = result_masked >> shift;
 
-        cpp_code += self._get_field_shift_and_mask(field=field)
+    {type_name} field_value;
 
-        cpp_code += "    const uint32_t result_masked = register_value & mask_shifted;\n"
-        cpp_code += "    const uint32_t result_shifted = result_masked >> shift;\n\n"
+"""
 
         if type_name == "uint32_t":
-            # No casting needed, simply return the value.
-            cpp_code += "    return result_shifted;\n"
+            cpp_code += """\
+    // No casting needed.
+    field_value = result_shifted;
+"""
 
         else:
             if isinstance(field, Enumeration):
-                # "Cast" to the enum type.
-                cpp_code += f"    const auto result = {type_name}(result_shifted);\n\n"
+                cpp_code += f"""\
+    // "Cast" to the enum type.
+    field_value = {type_name}(result_shifted);
+"""
+
             elif isinstance(field, Integer) and field.is_signed:
                 cpp_code += f"""\
     const {type_name} sign_bit_mask = 1 << {field.width - 1};
@@ -340,18 +349,22 @@ class CppImplementationGenerator(CppGeneratorCommon):
     {{
       // Value is to be interpreted as negative.
       // Sign extend it from the width of the field to the width of the return type.
-      const {type_name} result = result_shifted - 2 * sign_bit_mask;
-      return result;
+      field_value = result_shifted - 2 * sign_bit_mask;
     }}
-
-    // Value is positive.
-    const {type_name} result = result_shifted;
+    else
+    {{
+      // Value is positive.
+      field_value = result_shifted;
+    }}
 """
             else:
                 raise ValueError(f"Got unexpected field type: {type_name}")
 
-            cpp_code += "    return result;\n"
+        cpp_code += f"""
+{self._get_field_getter_value_checker(field=field)}\
+    return field_value;
+  }}
 
-        cpp_code += "  }\n\n"
+"""
 
         return cpp_code
