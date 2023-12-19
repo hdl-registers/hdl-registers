@@ -107,7 +107,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
-            description += f' Mode "{REGISTER_MODES[register.mode].mode_readable}".'
+            description += f" Mode '{REGISTER_MODES[register.mode].mode_readable}'."
 
             cpp_code += self.comment(comment=description)
             cpp_code += "\n"
@@ -192,16 +192,6 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
 
-    @staticmethod
-    def _field_description(
-        register: "Register", register_array: Optional["RegisterArray"], field: "RegisterField"
-    ) -> str:
-        result = f'the "{field.name}" field in the "{register.name}" register'
-        if register_array is not None:
-            result += f' within the "{register_array.name}" register array'
-
-        return result
-
     def _field_interface(
         self, register: "Register", register_array: Optional["RegisterArray"]
     ) -> str:
@@ -210,7 +200,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         cpp_code = ""
         for field in register.fields:
-            field_description = self._field_description(
+            field_description = self.field_description(
                 register=register, register_array=register_array, field=field
             )
             field_type_name = self._field_value_type_name(
@@ -219,7 +209,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
             if register.is_bus_readable:
                 comment = (
-                    f"Getter for {field_description},\n"
+                    f"Getter for the {field_description},\n"
                     "which will read register value over the register bus."
                 )
 
@@ -233,7 +223,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += function(return_type_name=field_type_name, signature=signature)
 
-                comment = f"Getter for {field_description},\ngiven the register's current value."
+                comment = f"Getter for the {field_description},\ngiven a register value."
                 cpp_code += self.comment_block(text=comment)
 
                 signature = self._field_getter_function_signature(
@@ -245,7 +235,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 cpp_code += function(return_type_name=field_type_name, signature=signature)
 
             if register.is_bus_writeable:
-                comment = f"Setter for {field_description},\n"
+                comment = f"Setter for the {field_description},\n"
                 if self.field_setter_should_read_modify_write(register=register):
                     comment += "which will read-modify-write over the register bus."
                 else:
@@ -265,8 +255,8 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 cpp_code += function(return_type_name="void", signature=signature)
 
                 comment = (
-                    f"Setter for {field_description},\n"
-                    "given the register's current value, which will return an updated value."
+                    f"Setter for the {field_description},\n"
+                    "given a register value, which will return an updated value."
                 )
                 cpp_code += self.comment_block(text=comment)
 
@@ -304,10 +294,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         register_array: Optional["RegisterArray"],
         field: "RegisterField",
     ) -> str:
-        field_description = self._field_description(
+        field_description = self.field_description(
             register=register, register_array=register_array, field=field
         )
-        cpp_code = self.comment(f"Attributes for {field_description}.", indent=2)
+        cpp_code = self.comment(f"Attributes for the {field_description}.", indent=2)
 
         array_namespace = f"::{register_array.name}" if register_array else ""
         namespace = f"{self.name}{array_namespace}::{register.name}::{field.name}"

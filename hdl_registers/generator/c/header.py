@@ -121,13 +121,13 @@ class CHeaderGenerator(RegisterCodeGenerator):
                 array_struct_type = f"{self.name}_{register_object.name}_t"
 
                 array_structs += self.comment(
-                    f'Type for the "{register_object.name}" register array.'
+                    f"Type for the '{register_object.name}' register array."
                 )
                 array_structs += f"typedef struct {array_struct_type}\n"
                 array_structs += "{\n"
                 for register in register_object.registers:
                     array_structs += self.comment(
-                        f'Mode "{REGISTER_MODES[register.mode].mode_readable}".', indent=2
+                        f"Mode '{REGISTER_MODES[register.mode].mode_readable}'.", indent=2
                     )
                     array_structs += f"  uint32_t {register.name};\n"
                 array_structs += f"}} {array_struct_type};\n\n"
@@ -165,13 +165,14 @@ class CHeaderGenerator(RegisterCodeGenerator):
             register=register, register_array=register_array
         ).upper()
 
-        comment = f'Address of the "{register.name}" register'
+        register_description = self.register_description(
+            register=register, register_array=register_array
+        )
+
+        comment = f"Address of the {register_description}"
         if register_array:
-            comment += (
-                f' within the "{register_array.name}" register array '
-                f"(array_index < {register_array.length})"
-            )
-        comment += f'.\nMode "{REGISTER_MODES[register.mode].mode_readable}".'
+            comment += f" (array_index < {register_array.length})"
+        comment += f".\nMode '{REGISTER_MODES[register.mode].mode_readable}'."
 
         c_code = self.comment_block(comment)
 
@@ -190,15 +191,12 @@ class CHeaderGenerator(RegisterCodeGenerator):
     def _field_definitions(
         self, register: Register, register_array: Optional["RegisterArray"]
     ) -> str:
-        register_string = f'"{register.name}" register'
-        if register_array is not None:
-            register_string += f' within the "{register_array.name}" register array'
-
         c_code = ""
         for field in register.fields:
-            c_code += self.comment(
-                f'Attributes for the "{field.name}" field in the {register_string}.'
+            field_description = self.field_description(
+                register=register, register_array=register_array, field=field
             )
+            c_code += self.comment(f"Attributes for the {field_description}.")
 
             name = self.qualified_field_name(
                 register=register, field=field, register_array=register_array
@@ -259,7 +257,7 @@ enum {self.to_pascal_case(name)}
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
 
-            c_code += self.comment(f'Value of register constant "{constant.name}".')
+            c_code += self.comment(f"Value of register constant '{constant.name}'.")
 
             if declaration:
                 c_code += f"{declaration}\n"
