@@ -299,7 +299,7 @@ end package body;
 
         comment = ""
         if not is_read_not_write:
-            if self._can_read_modify_write_register(register=register):
+            if self.field_setter_should_read_modify_write(register=register):
                 comment = (
                     "  -- Will read-modify-write the register to set the field to the "
                     "supplied 'value'.\n"
@@ -307,7 +307,7 @@ end package body;
             else:
                 comment = (
                     "  -- Will write the whole register, with the field set to the \n"
-                    "  -- supplied 'value' and all other fields to their default values.\n"
+                    "  -- supplied 'value' and everything else set to default.\n"
                 )
 
         value_direction = "out" if is_read_not_write else "in"
@@ -594,7 +594,7 @@ end package body;
             register=register, register_array=register_array
         )
 
-        if self._can_read_modify_write_register(register=register):
+        if self.field_setter_should_read_modify_write(register=register):
             set_base_value = f"""\
     read_{register_name}(
       net => net,
@@ -638,17 +638,3 @@ end package body;
     );
   end procedure;
 """
-
-    @staticmethod
-    def _can_read_modify_write_register(register: "Register") -> bool:
-        """
-        Return true if the register is of a writeable type where the bus can also read back
-        a previously-written value.
-        """
-        if register.mode == "r_w":
-            return True
-
-        if register.mode in ["w", "wpulse", "r_wpulse"]:
-            return False
-
-        raise ValueError(f"Got non-writeable register: {register}")

@@ -184,6 +184,26 @@ class RegisterCodeGeneratorHelpers:
         return f"'{field.name}' field in the {register_description}"
 
     @staticmethod
+    def field_setter_should_read_modify_write(register: Register) -> bool:
+        """
+        Returns True if a field value setter should read-modify-write the register.
+
+        Is only true if the register is of a writeable type where the bus can also read back
+        a previously-written value.
+        Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
+        it is a waste of CPU cycles.
+        """
+        assert register.fields, "Should not end up here if the register has no fields."
+
+        if register.mode == "r_w":
+            return len(register.fields) > 1
+
+        if register.mode in ["w", "wpulse", "r_wpulse"]:
+            return False
+
+        raise ValueError(f"Got non-writeable register: {register}")
+
+    @staticmethod
     def to_pascal_case(snake_string: str) -> str:
         """
         Converts e.g., "my_funny_string" to "MyFunnyString".

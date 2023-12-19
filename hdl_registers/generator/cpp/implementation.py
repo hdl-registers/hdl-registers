@@ -140,27 +140,23 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code = f"  void {self._class_name}::{signature} const\n"
         cpp_code += "  {\n"
 
-        if register.mode == "r_w":
+        if self.field_setter_should_read_modify_write(register=register):
             register_getter_function_name = self._register_getter_function_name(
                 register=register, register_array=register_array
             )
             cpp_code += self.comment(
-                comment="Get the current value of any other fields by reading register on the bus."
+                comment="Get the current value of other fields by reading register on the bus."
             )
             current_register_value = f"{register_getter_function_name}("
             if register_array:
                 current_register_value += "array_index"
             current_register_value += ")"
 
-        elif register.mode in ["w", "wpulse", "r_wpulse"]:
-            cpp_code += self.comment_block(
-                "This register's current value can not be read back due to its mode.\n"
-                "Hence set all bits except for the field to default when writing the value."
+        else:
+            cpp_code += self.comment(
+                "Set everything except for the field to default when writing the value."
             )
             current_register_value = str(register.default_value)
-
-        else:
-            raise ValueError(f"Can not handle this register's mode: {register}")
 
         cpp_code += f"    const uint32_t current_register_value = {current_register_value};\n"
 
@@ -196,8 +192,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         cpp_code = f"  uint32_t {self._class_name}::{signature} const\n"
         cpp_code += "  {\n"
-        cpp_code += self._get_shift_and_mask(field=field)
-        cpp_code += self._get_checker(field=field)
+        cpp_code += self._get_field_shift_and_mask(field=field)
+        cpp_code += self._get_field_range_checker(field=field)
 
         cpp_code += "    const uint32_t field_value_masked = field_value & mask_at_base;\n"
         cpp_code += (
@@ -220,7 +216,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _get_shift_and_mask(field: "RegisterField") -> str:
+    def _get_field_shift_and_mask(field: "RegisterField") -> str:
         cpp_code = f"    const uint32_t shift = {field.base_index}uL;\n"
         cpp_code += f'    const uint32_t mask_at_base = 0b{"1" * field.width}uL;\n'
         cpp_code += "    const uint32_t mask_shifted = mask_at_base << shift;\n"
@@ -228,7 +224,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _get_checker(field: "RegisterField") -> str:
+    def _get_field_range_checker(field: "RegisterField") -> str:
         if isinstance(field, Integer):
             cpp_code = "    // Check that provided value is within the legal range of this field.\n"
             cpp_code += f"    assert(field_value >= {field.min_value});\n"
@@ -323,7 +319,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code = f"  {type_name} {self._class_name}::{signature} const\n"
         cpp_code += "  {\n"
 
-        cpp_code += self._get_shift_and_mask(field=field)
+        cpp_code += self._get_field_shift_and_mask(field=field)
 
         cpp_code += "    const uint32_t result_masked = register_value & mask_shifted;\n"
         cpp_code += "    const uint32_t result_shifted = result_masked >> shift;\n\n"

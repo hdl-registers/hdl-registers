@@ -794,6 +794,7 @@ begin
       wait until regs_down.command'event for 10 * clk_period;
       wait until rising_edge(clk);
       assert regs_down.command.abort = '1';
+      -- The 'start' field still has its non-zero default value in the write.
       assert regs_down.command.start = '1';
 
       -- Should go back to default at the next clock cycle.

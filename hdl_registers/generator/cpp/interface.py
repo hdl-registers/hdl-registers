@@ -246,14 +246,13 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
             if register.is_bus_writeable:
                 comment = f"Setter for {field_description},\n"
-                if register.mode == "r_w":
+                if self.field_setter_should_read_modify_write(register=register):
                     comment += "which will read-modify-write over the register bus."
-                elif register.mode in ["w", "wpulse", "r_wpulse"]:
-                    comment += (
-                        "which will set the field to the given value, and all other bits to zero."
-                    )
                 else:
-                    raise ValueError(f"Can not handle this register's mode: {register}")
+                    comment += (
+                        "which will set the field to the given value, "
+                        "and everything else to default."
+                    )
 
                 cpp_code += self.comment_block(text=comment)
 
