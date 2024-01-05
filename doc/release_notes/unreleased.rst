@@ -5,7 +5,7 @@ Fixes
 * Fix "multiple definition" bug in generated C header for a string constant.
 * Fix C++ field setters on registers of mode ``w``, ``wpulse`` and ``r_wpulse`` not taking into
   account non-zero default values of other fields.
-* Decrease :class:`.RegisterList` hash calculation time by 40%.
+* Decrease :meth:`.RegisterList.object_hash` calculation time by 40%.
   Improves performance of :meth:`.RegisterCodeGenerator.should_create`.
 * Improve TOML parsing performance by a factor of ~8 by switching to ``rtoml`` instead of
   ``tomli`` package.

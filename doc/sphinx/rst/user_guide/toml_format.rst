@@ -18,6 +18,7 @@ Why TOML?
 ---------
 
 The TOML data file format is highly recommended for specifying your registers.
+All the examples on this website use TOML.
 
 It is a configuration file format that is easy to both read and write.
 Compared to XML, YAML and JSON, which would be the most obvious alternatives, it has the
