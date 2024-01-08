@@ -51,13 +51,14 @@ The basis of all register operations is the :class:`.RegisterList` class.
 An object of this type is returned when calling :func:`.from_toml` on a TOML file with the
 :ref:`correct format <toml_format>`.
 The :class:`.RegisterList` object makes up the register map, i.e. the registers of one module.
-If you have more than one module with registers in your project then these are represented with a
-:class:`.RegisterList` object each.
 
-Register code generation is then done using the class methods on this object.
-For example :class:`.VhdlRegisterPackageGenerator` as seen above.
+Register code generation is then done using one of the generator classes,
+for example :class:`.VhdlRegisterPackageGenerator` as seen in the example above.
 See the sidebar under "Code Generators" for information on what can be generated and how to
 invoke it.
+
+If you have more than one module with registers in your project then these are represented with a
+:class:`.RegisterList` object each.
 
 
 
@@ -68,8 +69,8 @@ The `tsfpga <https://tsfpga.com>`__ project, which is a sister project of hdl-re
 integrates register code generation in an elegant way.
 If a file named ``regs_<name>.toml`` is placed in the root of a module, and ``<name>`` matches the
 name of the module, it will be parsed and used as that module's register map.
-In the simulation and build scripts there is then a call to :class:`.VhdlRegisterPackageGenerator`
-for each module that has registers before each run.
+In the simulation and build scripts there is then a call to the
+:ref:`VHDL generators <generator_vhdl>` for each register list before each run.
 This makes sure that an up-to-date register definition is always used.
 
 This is a good example of how hdl-registers can be used in an effective way.
