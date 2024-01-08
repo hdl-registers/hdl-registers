@@ -64,7 +64,7 @@ The following code can be generated:
 * `VHDL <https://hdl-registers.com/rst/generator/generator_vhdl.html>`_
 
   * AXI-Lite register file wrapper using records and native VHDL types for values.
-  * Simulation support packages.
+  * Support packages for compact and efficient simulation.
 
 * `C++ <https://hdl-registers.com/rst/generator/generator_cpp.html>`_
 
