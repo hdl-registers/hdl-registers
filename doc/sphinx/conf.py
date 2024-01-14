@@ -41,7 +41,7 @@ intersphinx_mapping = {
 }
 
 # Base URL for generated sitemap XML
-html_baseurl = "https://hdl-registers.com"
+html_baseurl = "https://hdl-registers.com/"
 
 # Include robots.txt which points to sitemap
 html_extra_path = ["robots.txt"]
