@@ -40,8 +40,12 @@ intersphinx_mapping = {
     "tsfpga": ("https://tsfpga.com", None),
 }
 
-# Base URL for generated sitemap XML
+# Base URL for generated sitemap.xml.
 html_baseurl = "https://hdl-registers.com/"
+
+# To avoid "en" in the sitemap.xml URL.
+# https://sphinx-sitemap.readthedocs.io/en/latest/advanced-configuration.html
+sitemap_url_scheme = "{link}"
 
 # Include robots.txt which points to sitemap
 html_extra_path = ["robots.txt"]
