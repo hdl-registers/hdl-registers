@@ -17,8 +17,8 @@ library vunit_lib;
 context vunit_lib.vc_context;
 context vunit_lib.vunit_context;
 
-library axi;
-use axi.axi_lite_pkg.all;
+library axi_lite;
+use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 

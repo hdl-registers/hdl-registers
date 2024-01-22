@@ -267,9 +267,11 @@ See :ref:`here <performance>` for a comparison with the performance of other too
 Dependencies
 ------------
 
+Most of the generated code depends on VHDL packages from `hdl-modules <https://hdl-modules.com>`_
+version 4.0.0 or greater.
+
 The :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator` packages
-depend on :ref:`reg_file.reg_file_pkg`
-from the :ref:`reg_file <module_reg_file>` module of `hdl-modules <https://hdl-modules.com>`__.
+depend on :ref:`reg_file.reg_file_pkg`.
 Can be downloaded from github here:
 https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
@@ -277,7 +279,7 @@ The :class:`.VhdlSimulationReadWritePackageGenerator` and
 :class:`.VhdlSimulationWaitUntilPackageGenerator` packages
 furthermore depend on :ref:`reg_file.reg_operations_pkg` and :ref:`common.addr_pkg`.
 
-The :class:`.VhdlAxiLiteWrapperGenerator` package also depends on :ref:`axi.axi_lite_pkg`.
+The :class:`.VhdlAxiLiteWrapperGenerator` package also depends on :ref:`axi_lite.axi_lite_pkg`.
 
 
 Unresolved types
@@ -301,15 +303,15 @@ There is a large eco-system of register-related components in the
 `hdl-modules <https://hdl-modules.com>`__ project.
 Firstly there are wrappers in the :ref:`bfm library <module_bfm>` for easier working with VUnit
 verification components.
-Furthermore there is a large number of synthesizable AXI components available that enable the
-register bus:
+Furthermore there is a large number of synthesizable AXI/AXI-Lite components available that enable
+the register bus:
 
-* AXI-to-AXI-Lite converter: :ref:`axi.axi_to_axi_lite`,
+* AXI-to-AXI-Lite converter: :ref:`axi_lite.axi_to_axi_lite`,
 * AXI/AXI-Lite crossbar: :ref:`axi.axi_simple_read_crossbar`, :ref:`axi.axi_simple_write_crossbar`,
-  :ref:`axi.axi_lite_simple_read_crossbar`, :ref:`axi.axi_lite_simple_write_crossbar`,
-* AXI-Lite mux (splitter): :ref:`axi.axi_lite_mux`,
-* AXI-Lite clock domain crossing: :ref:`axi.axi_lite_cdc`,
+  :ref:`axi_lite.axi_lite_simple_read_crossbar`, :ref:`axi_lite.axi_lite_simple_write_crossbar`,
+* AXI-Lite mux (splitter): :ref:`axi_lite.axi_lite_mux`,
+* AXI-Lite clock domain crossing: :ref:`axi_lite.axi_lite_cdc`,
 * etc...
 
-See the :ref:`reg_file library <module_reg_file>` and :ref:`axi library <module_axi>` for
-more details.
+See the :ref:`reg_file library <module_reg_file>`, :ref:`axi library <module_axi>` and
+:ref:`axi_lite library <module_axi_lite>` for more details.
