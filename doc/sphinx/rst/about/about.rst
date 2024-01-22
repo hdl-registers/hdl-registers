@@ -21,7 +21,8 @@ clear list of requirements that was not, and is not, fulfilled by any other proj
    enumeration element encodings, etc.
 3. Bloat-free.
    Meaning, well-scoped and focused on the important features.
-4. Clean, intuitive, well-documented, easy-to-use code.
+4. Clean, intuitive, well-documented and easy-to-use API.
+5. Well-tested and reliable.
 
 Especially points 1. and 2. set this project apart from :ref:`others <similar_tools>`.
 
