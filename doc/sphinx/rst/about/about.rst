@@ -113,6 +113,20 @@ feel free to check out one of the other available tools listed below.
 
   No VHDL generator available, but possible to write your own custom generator.
 
+* **reggen**
+
+  Repo: https://github.com/lowRISC/opentitan
+
+  Documentation: https://opentitan.org/book/util/reggen/index.html
+
+  No VHDL generator available.
+
+* **regio**
+
+  Repo: https://github.com/esnet/regio
+
+  No VHDL generator available.
+
 * **registerMap**
 
   Repo: https://gitlab.com/registerMap/registermap
