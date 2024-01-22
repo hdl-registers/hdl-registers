@@ -12,8 +12,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library axi;
-use axi.axi_lite_pkg.all;
+library axi_lite;
+use axi_lite.axi_lite_pkg.all;
 
 library common;
 use common.types_pkg.all;
