@@ -35,8 +35,8 @@
 |pic_website| |pic_repository| |pic_pip_install| |pic_license| |pic_chat| |pic_ci_status|
 |pic_python_line_coverage|
 
-The hdl-registers project is an open-source HDL register code generator fast enough to run in
-real time.
+The hdl-registers project is an open-source HDL register interface code generator fast enough to run
+in real time.
 It makes FPGA/ASIC development more fun by automating a lot of time-consuming manual work.
 It also minimizes the risk of bugs by removing the need for duplicate information.
 `Read more <https://hdl-registers.com/rst/about/about.html>`_
