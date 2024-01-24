@@ -87,5 +87,5 @@ Breaking changes
     See :ref:`generator_html` for usage details.
   * Remove ``create_python_class`` method from :class:`.RegisterList`.
     Move ``hdl_registers.register_python_generator.RegisterPythonGenerator`` class to
-    :class:`.PythonClassGenerator` and update API.
+    :class:`.PythonPickleGenerator` and update API.
     See :ref:`generator_python` for usage details.

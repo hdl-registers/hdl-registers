@@ -7,10 +7,11 @@ The Python code "generator" is an automated way of saving a :class:`.RegisterLis
 object to a Python :py:mod:`pickle`.
 It is not intended to be used during development, but bundling the Python class pickles when making
 an FPGA release can be very useful.
+It is accessed via the :class:`.PythonPickleGenerator` class.
 
 The pickle is created e.g. like this:
 
-.. literalinclude:: py/generator_html.py
+.. literalinclude:: py/generator_python.py
    :caption: Python code that parses the example TOML file and generates Python register artifacts.
    :language: Python
    :linenos:

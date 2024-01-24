@@ -25,7 +25,7 @@ from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
-from hdl_registers.generator.python.python_class import PythonClassGenerator
+from hdl_registers.generator.python.pickle import PythonPickleGenerator
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
@@ -105,5 +105,5 @@ def test_can_generate_html_without_error(tmp_path, register_list):
 
 @pytest.mark.parametrize("register_list", REGISTER_LISTS)
 def test_can_generate_python_without_error(tmp_path, register_list):
-    PythonClassGenerator(register_list, tmp_path).create()
+    PythonPickleGenerator(register_list, tmp_path).create()
     assert (tmp_path / f"{register_list.name}.py").exists()

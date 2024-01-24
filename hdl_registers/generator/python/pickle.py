@@ -20,9 +20,11 @@ from hdl_registers.generator.register_code_generator import RegisterCodeGenerato
 from hdl_registers.register_list import RegisterList
 
 
-class PythonClassGenerator(RegisterCodeGenerator):
+class PythonPickleGenerator(RegisterCodeGenerator):
     """
-    Generate a Python class with register definitions.
+    Generate a Python pickle of the :class:`.RegisterList` object, along with a Python
+    module to re-create the pickle in a simple way.
+
     See the :ref:`generator_python` article for usage details.
     """
 

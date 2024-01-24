@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 # First party libraries
-from hdl_registers.generator.python.python_class import PythonClassGenerator
+from hdl_registers.generator.python.pickle import PythonPickleGenerator
 from hdl_registers.parser.toml import from_toml
 
 THIS_DIR = Path(__file__).parent
@@ -27,7 +27,7 @@ def main(output_folder: Path):
         toml_file=THIS_DIR.parent.parent / "user_guide" / "toml" / "toml_format.toml",
     )
 
-    PythonClassGenerator(register_list=register_list, output_folder=output_folder).create()
+    PythonPickleGenerator(register_list=register_list, output_folder=output_folder).create()
 
 
 if __name__ == "__main__":
