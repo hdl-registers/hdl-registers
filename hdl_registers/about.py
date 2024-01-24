@@ -28,15 +28,15 @@ def get_readme_rst(
 ) -> str:
     """
     Get the complete README.rst (to be used on website and in PyPI release).
-    RST file inclusion in README.rst does not work on github unfortunately, hence this
+    RST file inclusion in README.rst does not work on GitHub unfortunately, hence this
     cumbersome handling where the README is duplicated in two places.
 
     The arguments control some extra text that is included. This is mainly links to the
-    other places where you can find information on the project (website, github, PyPI).
+    other places where you can find information on the project (website, GitHub, PyPI).
 
     Arguments:
         include_extra_for_github (bool): Include the extra text that shall be included in the
-            github README.
+            GitHub README.
         include_extra_for_website (bool): Include the extra text that shall be included in the
             website main page.
         include_extra_for_pypi (bool): Include the extra text that shall be included in the
@@ -51,7 +51,7 @@ def get_readme_rst(
     elif include_extra_for_website:
         # The website needs the initial heading, in order for the landing page to get
         # the correct title.
-        # The others do not need this initial heading, it just makes the github/pypi page
+        # The others do not need this initial heading, it just makes the GitHub/PyPI page
         # more clunky.
         readme_rst = """\
 About hdl-registers
@@ -61,7 +61,7 @@ About hdl-registers
         extra_rst = """\
 To install the Python package, see :ref:`installation`.
 To check out the source code go to the
-`github page <https://github.com/hdl-registers/hdl-registers>`__. \
+`GitHub page <https://github.com/hdl-registers/hdl-registers>`__. \
 """
     elif include_extra_for_pypi:
         readme_rst = ""

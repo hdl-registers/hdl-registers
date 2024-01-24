@@ -272,7 +272,7 @@ version 4.0.0 or greater.
 
 The :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator` packages
 depend on :ref:`reg_file.reg_file_pkg`.
-Can be downloaded from github here:
+Can be downloaded from GitHub here:
 https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/reg_file_pkg.vhd
 
 The :class:`.VhdlSimulationReadWritePackageGenerator` and
