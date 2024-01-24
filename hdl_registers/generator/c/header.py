@@ -169,11 +169,13 @@ class CHeaderGenerator(RegisterCodeGenerator):
             register=register, register_array=register_array
         )
 
-        comment = f"Address of the {register_description}"
-        if register_array:
-            comment += f" (array_index < {register_array.length})"
-        comment += f".\nMode '{REGISTER_MODES[register.mode].mode_readable}'."
-
+        register_array_comment = (
+            f" (array_index < {register_array.length})" if register_array else ""
+        )
+        comment = [
+            f"Address of the {register_description}{register_array_comment}.",
+            f"Mode '{REGISTER_MODES[register.mode].mode_readable}'.",
+        ]
         c_code = self.comment_block(comment)
 
         if register_array:

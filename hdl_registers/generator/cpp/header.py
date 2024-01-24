@@ -69,7 +69,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 register=register, register_array=register_array
             )
             cpp_code += self.comment_block(
-                text=f"{description}\nSee interface header for documentation."
+                text=[description, "See interface header for documentation."]
             )
 
             if register.is_bus_readable:

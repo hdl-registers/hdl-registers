@@ -143,19 +143,11 @@ class RegisterCodeGeneratorHelpers:
         indentation = self.get_indentation(indent=indent)
         return f"{indentation}{self.COMMENT_START} {comment}{self.COMMENT_END}\n"
 
-    def comment_block(self, text: str, indent: Optional[int] = None) -> str:
+    def comment_block(self, text: list[str], indent: Optional[int] = None) -> str:
         """
         Create a comment block from a string with newlines.
         """
-        text_lines = text.split("\n")
-
-        # Very common that the last line is empty.
-        # An effect of TOML formatting with multi-line strings.
-        # Remove to make the output look more clean.
-        if text_lines[-1] == "":
-            text_lines.pop()
-
-        return "".join(self.comment(comment=line, indent=indent) for line in text_lines)
+        return "".join(self.comment(comment=line, indent=indent) for line in text)
 
     @staticmethod
     def register_description(

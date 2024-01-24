@@ -73,7 +73,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
                 register=register, register_array=register_array
             )
             cpp_code += self.comment_block(
-                text=f"{description}\nSee interface header for documentation.", indent=2
+                text=[description, "See interface header for documentation."], indent=2
             )
             cpp_code += "\n"
 

@@ -208,11 +208,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             )
 
             if register.is_bus_readable:
-                comment = (
-                    f"Getter for the {field_description},\n"
-                    "which will read register value over the register bus."
-                )
-
+                comment = [
+                    f"Getter for the {field_description},",
+                    "which will read register value over the register bus.",
+                ]
                 cpp_code += self.comment_block(text=comment)
 
                 signature = self._field_getter_function_signature(
@@ -223,7 +222,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += function(return_type_name=field_type_name, signature=signature)
 
-                comment = f"Getter for the {field_description},\ngiven a register value."
+                comment = [f"Getter for the {field_description},", "given a register value."]
                 cpp_code += self.comment_block(text=comment)
 
                 signature = self._field_getter_function_signature(
@@ -235,11 +234,11 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 cpp_code += function(return_type_name=field_type_name, signature=signature)
 
             if register.is_bus_writeable:
-                comment = f"Setter for the {field_description},\n"
+                comment = [f"Setter for the {field_description},"]
                 if self.field_setter_should_read_modify_write(register=register):
-                    comment += "which will read-modify-write over the register bus."
+                    comment.append("which will read-modify-write over the register bus.")
                 else:
-                    comment += (
+                    comment.append(
                         "which will set the field to the given value, "
                         "and everything else to default."
                     )
@@ -254,10 +253,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += function(return_type_name="void", signature=signature)
 
-                comment = (
-                    f"Setter for the {field_description},\n"
-                    "given a register value, which will return an updated value."
-                )
+                comment = [
+                    f"Setter for the {field_description},",
+                    "given a register value, which will return an updated value.",
+                ]
                 cpp_code += self.comment_block(text=comment)
 
                 signature = self._field_setter_function_signature(
