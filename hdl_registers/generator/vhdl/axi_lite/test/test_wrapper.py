@@ -13,7 +13,7 @@ Note that the generated VHDL code is also simulated in a functional test.
 """
 
 # First party libraries
-from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
+from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.register_list import RegisterList
 
 

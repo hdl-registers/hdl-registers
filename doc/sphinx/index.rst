@@ -75,5 +75,6 @@
     rst/api_reference/hdl_registers.generator.html
     rst/api_reference/hdl_registers.generator.python
     rst/api_reference/hdl_registers.generator.vhdl
+    rst/api_reference/hdl_registers.generator.vhdl.axi_lite
     rst/api_reference/hdl_registers.generator.vhdl.simulation
     rst/api_reference/hdl_registers.parser

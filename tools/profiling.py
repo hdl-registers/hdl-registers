@@ -26,7 +26,7 @@ from tsfpga.system_utils import create_directory, run_command
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
-from hdl_registers.generator.vhdl.axi_lite_wrapper import VhdlAxiLiteWrapperGenerator
+from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.generator.vhdl.simulation.read_write_package import (

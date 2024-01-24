@@ -11,8 +11,8 @@
 from pathlib import Path
 from typing import Any
 
-# Local folder libraries
-from .vhdl_generator_common import (
+# First party libraries
+from hdl_registers.generator.vhdl.vhdl_generator_common import (
     BUS_ACCESS_DIRECTIONS,
     FABRIC_ACCESS_DIRECTIONS,
     VhdlGeneratorCommon,
