@@ -283,7 +283,8 @@ end package body;
 {reg_index}\
     constant address : addr_t := base_address or to_unsigned(4 * reg_index, addr_t'length);
 
-{self.get_register_array_and_base_address_message(register_array=register_array)}\
+{self.get_register_array_message(register_array=register_array)}\
+{self.get_base_address_message()}\
     constant base_message : string := (
       "Timeout while waiting for{field_description} the '{register.name}' register"
       & register_array_message

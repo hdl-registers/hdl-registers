@@ -46,9 +46,16 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
         return ""
 
     @staticmethod
-    def get_register_array_and_base_address_message(
+    def get_register_array_message(
         register_array: Optional["RegisterArray"],
     ) -> str:
+        """
+        Status message for register array information.
+        Suitable for error printouts.
+
+        If the register we are working on is in a register array,  the 'array_index' value must
+        be available as an integer in VHDL.
+        """
         if register_array:
             register_array_message = (
                 f" within the '{register_array.name}["
@@ -59,6 +66,17 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
 
         return f"""\
     constant register_array_message : string := "{register_array_message}";
+"""
+
+    @staticmethod
+    def get_base_address_message() -> str:
+        """
+        Status message for base address information.
+        Suitable for error printouts.
+
+        Depends on a 'base_address' value being available as an 'unsigned' in VHDL.
+        """
+        return """\
     function base_address_message return string is
     begin
       if base_address /= 0 then
@@ -71,6 +89,13 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
 
     @staticmethod
     def get_message() -> str:
+        """
+        Get the compounded status message.
+        Suitable for error printouts.
+
+        Depends on a 'base_message' string being present in VHDL, as well as a 'message' string
+        from user which might be empty.
+        """
         return """\
     function get_message return string is
     begin

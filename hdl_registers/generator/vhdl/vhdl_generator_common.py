@@ -169,11 +169,14 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         return f"{field_name}_t"
 
     def reg_index_constant(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: "Register", register_array: Optional["RegisterArray"] = None
     ) -> str:
         """
-        Get a 'reg_index' constant declaration suitable for implementation of register/field
-        access procedures.
+        Get a 'reg_index' constant declaration, for the index of the supplied register.
+        If the register is in an array, the constant calculation depends on a 'array_index'
+        being present in the VHDL.
+
+        Is suitable for implementation of register/field access procedures.
         """
         register_name = self.qualified_register_name(
             register=register, register_array=register_array
@@ -306,7 +309,9 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
     def _create_if_there_are_registers_otherwise_delete_file(self, **kwargs: Any) -> Path:
         """
         Create the code artifact only if the register list actually has any registers.
-        Used in cases where the generated file would be an empty shell in that case.
+        Convenient to call in generators where no registers would result in the generated file being
+        an empty shell.
+
         If, for example, the user has a register list with only constants we do not want
         to flood the file system with unnecessary files.
 
