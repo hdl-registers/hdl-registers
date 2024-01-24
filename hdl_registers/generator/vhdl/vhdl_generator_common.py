@@ -59,7 +59,7 @@ class BusAccessDirection:
 
 class FabricAccessDirection:
     """
-    Keep track of and test the bus access direction.
+    Keep track of and test the fabric access direction.
     """
 
     def __init__(self, up_or_down: str):
@@ -128,7 +128,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         Via e.g. a function call or a cast.
 
         Arguments:
-            field: A field.
+            field: The field.
             field_name: The field's qualified name.
             value: The name of the variable/constant that holds the field's natively typed value.
         """
@@ -137,13 +137,17 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
         if isinstance(field, BitVector):
             if isinstance(field.field_type, (Signed, Unsigned)):
+                # Plain unsigned/signed vector is a subtype of std_logic_vector.
+                # Hence we can just cast it.
                 return f"std_logic_vector({value})"
 
             if isinstance(field.field_type, Fixed):
+                # Casting function built into ieee.fixed_pkg.
                 return f"to_slv({value})"
 
             raise ValueError(f"Unknown bit vector field: {field}")
 
+        # Our own conversion function.
         to_slv = self.field_to_slv_function_name(field=field, field_name=field_name)
         return f"{to_slv}({value})"
 

@@ -39,7 +39,7 @@ from .vhdl_generator_common import VhdlGeneratorCommon
 
 class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
     """
-    Generate a VHDL package with basic register information.
+    Generate a base VHDL package with basic register information.
     See the :ref:`generator_vhdl` article for usage details.
 
     * For each register constant, the value as a native VHDL constant.
