@@ -13,4 +13,4 @@
 # But we keep this file and dictionary anyway, to be consistent with the other generator languages.
 # Perhaps in the future add JavaScript reserved keywords here, if we do more fancy thing in the
 # generated HTML?
-RESERVED_KEYWORDS: set[str] = set()
+RESERVED_HTML_KEYWORDS: set[str] = set()

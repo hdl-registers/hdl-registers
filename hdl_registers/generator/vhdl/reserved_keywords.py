@@ -11,7 +11,7 @@
 # Should include everything up until VHDL-2019.
 # From e.g. https://docs.xilinx.com/r/en-US/ug901-vivado-synthesis/VHDL-RESERVED-Words
 # Note that they shall all be lowercase here in this set.
-RESERVED_KEYWORDS = {
+RESERVED_VHDL_KEYWORDS = {
     "abs",
     "access",
     "after",

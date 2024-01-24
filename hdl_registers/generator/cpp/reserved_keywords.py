@@ -11,7 +11,7 @@
 # Should include everything up until C++20.
 # From https://en.cppreference.com/w/cpp/keyword
 # Note that they shall all be lowercase here in this set.
-RESERVED_KEYWORDS = {
+RESERVED_CPP_KEYWORDS = {
     "alignas",
     "alignof",
     "and_eq",

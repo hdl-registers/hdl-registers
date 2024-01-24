@@ -11,7 +11,7 @@
 # Should include everything up until C23.
 # From https://en.cppreference.com/w/c/keyword
 # Note that they shall all be lowercase here in this set.
-RESERVED_KEYWORDS = {
+RESERVED_C_KEYWORDS = {
     "alignas",
     "alignof",
     "auto",

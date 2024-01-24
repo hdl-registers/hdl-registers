@@ -8,23 +8,17 @@
 # --------------------------------------------------------------------------------------------------
 
 # First party libraries
-from hdl_registers.generator.c.reserved_keywords import RESERVED_KEYWORDS as C_RESERVED_KEYWORDS
-from hdl_registers.generator.cpp.reserved_keywords import RESERVED_KEYWORDS as CPP_RESERVED_KEYWORDS
-from hdl_registers.generator.html.reserved_keywords import (
-    RESERVED_KEYWORDS as HTML_RESERVED_KEYWORDS,
-)
-from hdl_registers.generator.python.reserved_keywords import (
-    RESERVED_KEYWORDS as PYTHON_RESERVED_KEYWORDS,
-)
-from hdl_registers.generator.vhdl.reserved_keywords import (
-    RESERVED_KEYWORDS as VHDL_RESERVED_KEYWORDS,
-)
+from hdl_registers.generator.c.reserved_keywords import RESERVED_C_KEYWORDS
+from hdl_registers.generator.cpp.reserved_keywords import RESERVED_CPP_KEYWORDS
+from hdl_registers.generator.html.reserved_keywords import RESERVED_HTML_KEYWORDS
+from hdl_registers.generator.python.reserved_keywords import RESERVED_PYTHON_KEYWORDS
+from hdl_registers.generator.vhdl.reserved_keywords import RESERVED_VHDL_KEYWORDS
 
 # All reserved keywords from all target languages.
 RESERVED_KEYWORDS = (
-    C_RESERVED_KEYWORDS
-    | CPP_RESERVED_KEYWORDS
-    | HTML_RESERVED_KEYWORDS
-    | PYTHON_RESERVED_KEYWORDS
-    | VHDL_RESERVED_KEYWORDS
+    RESERVED_C_KEYWORDS
+    | RESERVED_CPP_KEYWORDS
+    | RESERVED_HTML_KEYWORDS
+    | RESERVED_PYTHON_KEYWORDS
+    | RESERVED_VHDL_KEYWORDS
 )

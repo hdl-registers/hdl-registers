@@ -11,7 +11,7 @@
 # Should include everything up until Python 3.12.
 # From https://docs.python.org/3/reference/lexical_analysis.html#keywords
 # Note that they shall all be lowercase here in this set.
-RESERVED_KEYWORDS = {
+RESERVED_PYTHON_KEYWORDS = {
     "and",
     "as",
     "assert",
