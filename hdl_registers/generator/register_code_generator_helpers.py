@@ -26,7 +26,8 @@ class RegisterCodeGeneratorHelpers:
     Various helper methods that make register code generation easier.
     """
 
-    # Defined in RegisterCodeGenerator, which shall also be inherited wherever this class is used.
+    # Defined in 'RegisterCodeGenerator' class, which shall also be inherited wherever this class
+    # is used.
     register_list: "RegisterList"
     name: str
     DEFAULT_INDENTATION_LEVEL: int
@@ -89,7 +90,8 @@ class RegisterCodeGeneratorHelpers:
         if register_array is None:
             return f"{self.name}_{register.name}"
 
-        return f"{self.name}_{register_array.name}_{register.name}"
+        register_array_name = self.qualified_register_array_name(register_array=register_array)
+        return f"{register_array_name}_{register.name}"
 
     def qualified_register_array_name(self, register_array: "RegisterArray") -> str:
         """

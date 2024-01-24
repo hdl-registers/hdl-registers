@@ -196,11 +196,12 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         Indicates if a (re-)create of artifacts is needed.
         Will be True if any of these conditions are true:
 
-        * File does not exist.
+        * Output file does not exist.
         * Generator version of artifact does not match current code version.
         * Artifact hash does not match :meth:`.RegisterList.object_hash` of the current
           register list.
-          I.e. something has changed since the previous file was generated.
+          I.e. something in the register list has changed since the previous file was generated
+          (e.g. a new register added).
 
         The version and hash checks above are dependent on the artifact file having a header
         as given by :meth:`.header`.
