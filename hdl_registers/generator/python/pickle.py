@@ -30,7 +30,7 @@ class PythonPickleGenerator(RegisterCodeGenerator):
 
     __version__ = "1.0.0"
 
-    SHORT_DESCRIPTION = "Python class"
+    SHORT_DESCRIPTION = "Python pickle"
 
     COMMENT_START = "#"
 
