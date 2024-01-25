@@ -33,23 +33,33 @@ PY_TYPED = hdl_registers.HDL_REGISTERS_PATH / "py.typed"
 
 def main():
     """
-    Be extremely careful when making changes to this setup script. It is hard to see what is
-    actually included and what is missing. Also the package data, and where it gets placed in the
-    release tree, is very messy.
+    Be extremely careful when making changes to this setup script.
+    It is hard to see what is actually included and what is missing.
+    Also the package data, and where it gets placed in the release tree, is very messy.
 
     When making changes it is recommended to try the release locally before committing to main.
     To test in a docker image do, e.g:
 
     python3 setup.py sdist
     docker run --rm --interactive --tty --volume $(pwd)/dist:/dist:ro --workdir /dist \
-        python:3.8-slim-buster /bin/bash
-    python -m pip install hdl_registers-1.0.2.tar.gz
+        python:3.11-slim-buster /bin/bash
+    python -m pip install hdl_registers-*.tar.gz
 
     The install should pass and you should be able to run python and "import hdl_registers".
-    You should see all the files in "/usr/local/lib/python3.8/site-packages/hdl_registers".
-    Test to run "python -m pip uninstall hdl_registers" and see that it passes. Check the output to
-    see that there are not package files installed in weird locations (such as /usr/local/lib/).
+    You should see all the files in "/usr/local/lib/python3.11/site-packages/hdl_registers".
+    Test to run "python -m pip uninstall hdl_registers" and see that it passes.
+    Check the output to see that there are not package files installed in weird locations
+    (such as /usr/local/lib/).
+
+    Can also try to run simulation/build in the tsfpga and hdl-modules repositories with the newly
+    created release dist installed.
+    If that passes, then everything that is needed is probably included.
     """
+    # Make sure the "tests" folder does not get included in the release.
+    packages = find_packages(include=["hdl_registers", "hdl_registers.*"])
+    for package_name in packages:
+        assert package_name.startswith("hdl_registers"), package_name
+
     setup(
         name="hdl_registers",
         version=hdl_registers.__version__,
@@ -69,7 +79,7 @@ def main():
         python_requires=">=3.9",
         install_requires=read_requirements_file(REQUIREMENTS_TXT),
         extras_require=dict(dev=read_requirements_file(REQUIREMENTS_DEVELOP_TXT)),
-        packages=find_packages(),
+        packages=packages,
         package_data={"hdl_registers": get_package_data()},
         classifiers=[
             "Development Status :: 5 - Production/Stable",
