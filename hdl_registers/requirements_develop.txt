@@ -1,12 +1,6 @@
-# Install symbolator and hdlparse from GitHub forks that are maintained.
-# The official versions do not work with newer setuptools or newer sphinx.
-# The pyHDLParser repo seems to be under active development and the current master did
-# not work, so peg to the latest revision that does work for us.
-
 black
 flake8
 GitPython
-hdlparse @ git+https://github.com/hdl/pyHDLParser@354dc73a231677f277709633b9bcd0110f1816d0
 mypy
 packaging
 pybadges
@@ -24,7 +18,6 @@ sphinx_sitemap
 sphinx-rtd-theme
 sphinx-toolbox
 sphinxcontrib-wavedrom
-symbolator @ git+https://github.com/hdl/symbolator
 twine
 types-PyYAML
 vunit_hdl
