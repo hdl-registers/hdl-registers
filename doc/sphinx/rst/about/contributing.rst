@@ -56,14 +56,14 @@ Releases are made to the Python Packaging Index (PyPI) and can be installed with
 To make a new release follow these steps.
 
 
-Test CI pipeline
-________________
+Test CI status
+______________
 
-Before doing anything, launch a CI run from ``main`` branch to see that everything works
-as expected.
+Before doing anything, launch an Actions workflow run from ``main`` branch to see that everything
+works as expected.
 The CI environment is stable but due to things like, e.g., new pylint version it can
 unexpectedly break.
-When the pipeline has finished and is green you can move on to the next step.
+When the workflow has finished and is green you can move on to the next step.
 
 
 Review the release notes
@@ -90,11 +90,61 @@ Run the script
     python3 tools/tag_release.py X.Y.Z
 
 where X.Y.Z is your new version number.
-The script will bump the ``hdl-registers`` version number and copy release notes to a new file.
+The script will bump the version number of the Python package, and copy release notes to a new file.
 The changes will be committed and then tagged.
 
 
-Push commit and tag
-___________________
+Push tag to deploy release
+__________________________
 
-TODO fill in this once we do our first release from GitHub.
+.. code-block:: shell
+
+    git push origin vX.Y.Z
+
+**WARNING:** Avoid the "git push --tags" command, which is dangerous since it pushes all your
+local tags.
+
+Pushing a tag will create a special Actions run on GitHub:
+
+.. image:: images/actions.png
+
+Usually, CI runs on pull request branches, but this run is on the tag itself.
+The run for the tag will execute the additional job ``PyPI release``:
+
+.. image:: images/jobs.png
+
+Wait until the workflow is finished and all green, meaning that the release has been deployed
+to PyPI.
+Visit https://pypi.org/project/hdl_registers/ to make sure that the new release is available.
+
+If anything goes wrong in the CI run, you can delete the tag and start over.
+
+.. code-block:: shell
+
+    git tag --delete vX.Y.Z
+    git push origin --delete  vX.Y.Z
+
+**WARNING:** Be extremely careful with this command.
+Do not delete any other tags.
+
+
+Merge release commit
+____________________
+
+This step is unnecessarily complicated due to the fact that GitHub does not allow a fast-forward
+merge in their Pull Request web UI.
+A GitHub repo with linear history will use the "rebase and merge" strategy, which changes the SHA
+of the commits.
+Hence, the tag that we just pushed will not match any commit on the main branch, if we merge our
+release commit via the web UI.
+(See https://stackoverflow.com/questions/60597400).
+
+Instead, this has to be done manually on the command line, and can only be done by a user with
+complete privileges to the repository.
+
+.. code-block:: shell
+
+    git push origin HEAD:main
+
+**WARNING:** Be very careful with this command and inspect locally that you do not push anything
+else than intended.
