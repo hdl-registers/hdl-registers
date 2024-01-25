@@ -25,7 +25,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
 
-  # Cancel in-progress runs when a new workflow with the same group name is triggered
+  # Cancel in-progress runs when a new workflow with the same group name is triggered.
   cancel-in-progress: true
 
 
