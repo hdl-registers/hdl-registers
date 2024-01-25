@@ -3,12 +3,15 @@ name: ci
 on:
   # Run when a pull request is opened or updated.
   pull_request:
-  # Add possibility of running manually from webpage.
-  workflow_dispatch:
-  # Run from main when a pull request is merged.
   push:
+    # Run when a version tag is pushed.
+    tags:
+      - 'v*'
+    # Run from main when a pull request is merged.
     branches:
       - main
+  # Add possibility of running manually from webpage.
+  workflow_dispatch:
   # Run nightly at 20:45 UTC.
   schedule:
   - cron: 45 20 * * *
@@ -164,7 +167,7 @@ jobs:
     name: Deploy website to pages
     if: github.ref == 'refs/heads/main'
     # Only do deployment if everything else has passed.
-    needs: [pytest, build_doc, build_pypi]
+    needs: [pytest, build_doc]
     permissions:
       pages: write
       id-token: write
@@ -180,10 +183,14 @@ jobs:
 
 
   # ------------------------------------------------------------------------------
-  # Build the Python release package for PyPI.
+  # Python release package to PyPI.
 
-  build_pypi:
-    name: Build PyPI release
+  release_pypi:
+    name: PyPI release
+    # Deploy new version when a version tag is pushed.
+    if: github.ref_type == 'tag' && contains(github.ref_name, 'v')
+    # Only do deployment if everything else has passed.
+    needs: [pytest, build_doc]
     runs-on: ubuntu-latest
     steps:
 
@@ -201,11 +208,10 @@ jobs:
         run: |
           python3 -m pip install build
 
-      - name: Run job
+      - name: Build artifact
         run: python3 -m build
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - name: Deploy artifact
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          name: pypi_dist
-          path: dist
+          password: ${{ secrets.PYPI_API_TOKEN }}
