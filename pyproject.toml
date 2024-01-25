@@ -1,7 +1,9 @@
+# ------------------------------------------------------------------------------
 [tool.black]
 line-length = 100
 
 
+# ------------------------------------------------------------------------------
 [tool.isort]
 # Make base formatting compatible with black settings
 profile = "black"
@@ -26,8 +28,16 @@ known_tools_pythonpath = "tools.tools_pythonpath"
 sections = "FUTURE,STDLIB,TOOLS_PYTHONPATH,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 
 
+# ------------------------------------------------------------------------------
 [tool.mypy]
 exclude = ['/test_.*\.py$']
 
 # Use strict as a base, and explicitly remove the checks that we do not want.
 strict = true
+
+
+# ------------------------------------------------------------------------------
+[build-system]
+
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
