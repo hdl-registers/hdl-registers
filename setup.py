@@ -40,7 +40,7 @@ def main():
     When making changes it is recommended to try the release locally before committing to main.
     To test in a docker image do, e.g:
 
-    python3 setup.py sdist
+    python3 -m build
     docker run --rm --interactive --tty --volume $(pwd)/dist:/dist:ro --workdir /dist \
         python:3.11-slim-buster /bin/bash
     python -m pip install hdl_registers-*.tar.gz
@@ -62,36 +62,70 @@ def main():
 
     setup(
         name="hdl_registers",
+        #
         version=hdl_registers.__version__,
+        #
         description=get_short_slogan(),
+        #
         long_description=get_readme_rst(include_extra_for_pypi=True),
         long_description_content_type="text/x-rst",
-        license="BSD 3-Clause License",
+        #
         author="Lukas Vik",
         author_email="10241915+LukasVik@users.noreply.github.com",
-        url="https://hdl-registers.com",
+        #
+        packages=packages,
+        package_data={"hdl_registers": get_package_data()},
+        #
+        classifiers=[
+            "Development Status :: 5 - Production/Stable",
+            "Intended Audience :: Developers",
+            "Intended Audience :: Education",
+            "Intended Audience :: Information Technology",
+            "License :: OSI Approved :: BSD License",
+            "Natural Language :: English",
+            "Operating System :: MacOS :: MacOS X",
+            "Operating System :: Microsoft :: Windows",
+            "Operating System :: OS Independent",
+            "Operating System :: POSIX :: Linux",
+            "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+            "Topic :: Scientific/Engineering",
+            "Topic :: Software Development :: Testing",
+            "Topic :: Software Development",
+        ],
+        #
+        license="BSD 3-Clause License",
+        #
+        # Same as on GitHub
+        keywords=[
+            "python",
+            "c",
+            "html",
+            "asic",
+            "generator",
+            "fpga",
+            "cplusplus",
+            "register",
+            "vhdl",
+            "eda",
+            "rtl",
+            "csr",
+            "axi",
+            "axi-lite",
+            "register-interface",
+        ],
+        #
+        install_requires=read_requirements_file(REQUIREMENTS_TXT),
+        extras_require=dict(develop=read_requirements_file(REQUIREMENTS_DEVELOP_TXT)),
+        #
+        python_requires=">=3.9",
+        #
         project_urls={
+            "Homepage": "https://hdl-registers.com",
             "Documentation": "https://hdl-registers.com/",
             "Changelog": "https://hdl-registers.com/rst/about/release_notes.html",
             "Source": "https://github.com/hdl-registers/hdl-registers",
             "Issues": "https://github.com/hdl-registers/hdl-registers/issues",
         },
-        python_requires=">=3.9",
-        install_requires=read_requirements_file(REQUIREMENTS_TXT),
-        extras_require=dict(dev=read_requirements_file(REQUIREMENTS_DEVELOP_TXT)),
-        packages=packages,
-        package_data={"hdl_registers": get_package_data()},
-        classifiers=[
-            "Development Status :: 5 - Production/Stable",
-            "License :: OSI Approved :: BSD License",
-            "Natural Language :: English",
-            "Intended Audience :: Developers",
-            "Operating System :: Microsoft :: Windows",
-            "Operating System :: MacOS :: MacOS X",
-            "Operating System :: POSIX :: Linux",
-            "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
-        ],
-        zip_safe=False,
     )
 
 

@@ -19,7 +19,7 @@ From the repo checkout you can install the Python package by running
 
 .. code-block:: shell
 
-  python3 setup.py install
+  python3 -m pip install .
 
 in the repo root.
 You can also access it in your scripts by adding the repo path to the ``PYTHONPATH`` environment
