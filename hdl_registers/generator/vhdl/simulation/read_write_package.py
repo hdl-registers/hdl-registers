@@ -258,9 +258,7 @@ end package body;
         type_comment = (
             " as a plain 'reg_t'"
             if value_type == "reg_t"
-            else " as an 'integer'"
-            if value_type == "integer"
-            else ""
+            else " as an 'integer'" if value_type == "integer" else ""
         )
 
         return f"""\

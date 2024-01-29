@@ -12,7 +12,6 @@ from .register import Register
 
 
 class RegisterArray:
-
     """
     Represent an array of registers. That is, a sequence of registers that shall be repeated a
     number of times in a register list.

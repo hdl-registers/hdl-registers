@@ -18,7 +18,6 @@ DEFAULT_FIELD_TYPE = Unsigned()
 
 
 class RegisterField(ABC):
-
     """
     Meta class for all register fields (bits, bit vectors, integers, ...).
     Lists a few methods that must be implemented.

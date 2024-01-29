@@ -32,7 +32,6 @@ if TYPE_CHECKING:
 
 
 class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
-
     """
     Abstract interface and common functions for generating register code.
     Should be inherited by all custom code generators.

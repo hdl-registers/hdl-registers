@@ -61,7 +61,6 @@ description={self.description},\
 
 
 class Enumeration(RegisterField):
-
     """
     Used to represent an enumeration field in a register.
     """
