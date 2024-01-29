@@ -13,7 +13,6 @@ from typing import Any
 
 
 class Constant(ABC):
-
     """
     Meta class for all register constants (integer, boolean, ...).
     Lists a few properties that must be available.

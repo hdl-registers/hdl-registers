@@ -62,7 +62,6 @@ REGISTER_MODES = dict(
 
 
 class Register:
-
     """
     Used to represent a register and its fields.
     """

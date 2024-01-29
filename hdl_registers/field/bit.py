@@ -12,7 +12,6 @@ from .register_field import RegisterField
 
 
 class Bit(RegisterField):
-
     """
     Used to represent a bit field in a register.
     """

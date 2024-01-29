@@ -13,7 +13,6 @@ from .register_field_type import FieldType, Fixed
 
 
 class BitVector(RegisterField):
-
     """
     Used to represent a bit vector field in a register.
     """

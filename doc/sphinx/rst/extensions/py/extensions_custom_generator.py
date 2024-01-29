@@ -17,7 +17,6 @@ from hdl_registers.register_list import RegisterList
 
 
 class TxtRegisterListGenerator(RegisterCodeGenerator):
-
     """
     Custom code generator that generates a .txt file with all register names.
     """

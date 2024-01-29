@@ -28,7 +28,6 @@ if TYPE_CHECKING:
 
 
 class RegisterList:
-
     """
     Used to handle the registers of a module. Also known as a register map.
     """

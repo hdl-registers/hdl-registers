@@ -13,7 +13,6 @@ from .register_field_type import FieldType, Signed, Unsigned
 
 
 class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
-
     """
     Used to represent an integer field in a register.
     """
