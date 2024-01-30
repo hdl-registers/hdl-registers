@@ -32,6 +32,7 @@ extensions = [
     "sphinx_toolbox.collapse",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinxext.opengraph",
 ]
 
 intersphinx_mapping = {
@@ -61,7 +62,7 @@ html_theme_options = {
 html_logo = "hdl_registers_sphinx.png"
 
 # These folders are copied to the documentation's HTML output
-html_static_path = ["css"]
+html_static_path = ["css", "opengraph"]
 
 # These paths are either relative to html_static_path
 # or fully qualified paths (eg. https://...)
@@ -71,6 +72,10 @@ html_css_files = [
     # https://stackoverflow.com/questions/69845499/
     "docutils_table_caption_below.css",
 ]
+
+# OpenGraph settings.
+ogp_site_url = "https://hdl-registers.com"
+ogp_image = "_static/500.png"
 
 
 # Make autodoc include __init__ class method.
