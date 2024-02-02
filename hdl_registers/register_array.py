@@ -13,8 +13,9 @@ from .register import Register
 
 class RegisterArray:
     """
-    Represent an array of registers. That is, a sequence of registers that shall be repeated a
-    number of times in a register list.
+    Represent an array of registers.
+    That is, a sequence of registers that shall be repeated a number of times in
+    a :class:`.RegisterList`.
     """
 
     def __init__(self, name: str, base_index: int, length: int, description: str):
@@ -46,7 +47,7 @@ class RegisterArray:
             The register object that was created.
         """
         index = len(self.registers)
-        register = Register(name, index, mode, description)
+        register = Register(name=name, index=index, mode=mode, description=description)
 
         self.registers.append(register)
         return register
@@ -82,7 +83,7 @@ class RegisterArray:
 
         Arguments:
             array_index: The array iteration index.
-                Shall be less than or equal to the array ``length``.
+                Must be less than the array ``length``.
         """
         if array_index >= self.length:
             raise ValueError(

@@ -35,11 +35,13 @@ class RegisterList:
     def __init__(self, name: str, source_definition_file: Optional[Path] = None):
         """
         Arguments:
-            name: The name of this register list. Typically the name of the module that uses it.
-            source_definition_file: The TOML source file that defined this register list.
-                Will be displayed in generated source code and documentation
-                for traceability.
-                Can be left out when working directly with the Python API.
+            name: The name of this register list.
+                Typically the name of the module that uses it.
+            source_definition_file: The source file that defined this register list.
+                Will be displayed in generated source code and documentation for traceability.
+
+                Can be set to ``None`` if this information does not make sense in the current
+                use case.
         """
         self.name = name
         self.source_definition_file = source_definition_file
@@ -61,7 +63,8 @@ class RegisterList:
 
                 Can be set to ``None`` if this information does not make sense in the current
                 use case.
-            default_registers: These registers will be inserted in the register list.
+            default_registers: These registers will be inserted at the beginning of the
+                register list.
         """
         # Before proceeding, perform a basic sanity check.
         # If the indexes are not correct, that will cause problems with the default registers
@@ -81,7 +84,7 @@ class RegisterList:
 
     def append_register(self, name: str, mode: str, description: str) -> Register:
         """
-        Append a register to this list.
+        Append a register to this register list.
 
         Arguments:
             name: The name of the register.
@@ -128,8 +131,9 @@ class RegisterList:
 
     def get_register(self, name: str) -> Register:
         """
-        Get a register from this list. Will only find single registers, not registers in a
-        register array. Will raise exception if no register matches.
+        Get a register from this list.
+        Will only find plain registers, not registers in a register array.
+        Will raise exception if no register matches.
 
         Arguments:
             name: The name of the register.
