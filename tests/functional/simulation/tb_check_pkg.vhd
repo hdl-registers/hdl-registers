@@ -21,18 +21,18 @@ library bfm;
 
 use work.caesar_simulation_test_pkg.all;
 
-use work.caesar_register_checker_pkg.all;
+use work.caesar_register_check_pkg.all;
 use work.caesar_register_record_pkg.all;
 use work.caesar_register_read_write_pkg.all;
 
 
-entity tb_checker_pkg is
+entity tb_check_pkg is
   generic (
     runner_cfg : string
   );
 end entity;
 
-architecture tb of tb_checker_pkg is
+architecture tb of tb_check_pkg is
 
   constant clk_period : time := 10 ns;
   signal clk : std_ulogic := '0';

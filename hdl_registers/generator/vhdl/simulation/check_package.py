@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_array import RegisterArray
 
 
-class VhdlSimulationCheckerPackageGenerator(VhdlSimulationGeneratorCommon):
+class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
     """
     Generate VHDL code with simulation procedures to check the values of registers and fields.
     See the :ref:`generator_vhdl` article for usage details.
@@ -44,14 +44,14 @@ class VhdlSimulationCheckerPackageGenerator(VhdlSimulationGeneratorCommon):
 
     __version__ = "1.0.0"
 
-    SHORT_DESCRIPTION = "VHDL simulation checker package"
+    SHORT_DESCRIPTION = "VHDL simulation check package"
 
     @property
     def output_file(self) -> Path:
         """
         Result will be placed in this file.
         """
-        return self.output_folder / f"{self.name}_register_checker_pkg.vhd"
+        return self.output_folder / f"{self.name}_register_check_pkg.vhd"
 
     def create(self, **kwargs: Any) -> Path:
         """
@@ -116,7 +116,7 @@ end package body;
             declarations = []
 
             for field in register.fields:
-                signature = self._field_checker_signature(
+                signature = self._field_check_signature(
                     register=register,
                     register_array=register_array,
                     field=field,
@@ -131,7 +131,7 @@ end package body;
 
         return vhdl
 
-    def _field_checker_signature(
+    def _field_check_signature(
         self,
         register: "Register",
         register_array: Optional["RegisterArray"],
@@ -178,7 +178,7 @@ end package body;
 
             for field in register.fields:
                 implementations.append(
-                    self._field_checker_implementation(
+                    self._field_check_implementation(
                         register=register, register_array=register_array, field=field
                     )
                 )
@@ -191,7 +191,7 @@ end package body;
 
         return vhdl
 
-    def _field_checker_implementation(
+    def _field_check_implementation(
         self,
         register: "Register",
         register_array: Optional["RegisterArray"],
@@ -200,7 +200,7 @@ end package body;
         """
         Get implementation for a 'check_X_equal' procedure.
         """
-        signature = self._field_checker_signature(
+        signature = self._field_check_signature(
             register=register, register_array=register_array, field=field
         )
 
@@ -218,7 +218,7 @@ end package body;
         if isinstance(field, Enumeration) or (
             isinstance(field, BitVector) and isinstance(field.field_type, Fixed)
         ):
-            # These field types do not work with the standard VUnit checker procedures.
+            # These field types do not work with the standard VUnit check procedures.
             # Enumeration because it is a custom type.
             # ufixed and sfixed could for all intents and purposes be supported in VUnit,
             # but they are not at the moment (4.7.0).

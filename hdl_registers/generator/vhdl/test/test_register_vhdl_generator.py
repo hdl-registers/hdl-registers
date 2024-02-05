@@ -22,8 +22,8 @@ from tsfpga.system_utils import read_file
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-from hdl_registers.generator.vhdl.simulation.checker_package import (
-    VhdlSimulationCheckerPackageGenerator,
+from hdl_registers.generator.vhdl.simulation.check_package import (
+    VhdlSimulationCheckPackageGenerator,
 )
 from hdl_registers.generator.vhdl.simulation.read_write_package import (
     VhdlSimulationReadWritePackageGenerator,
@@ -51,7 +51,7 @@ def generate_all_vhdl_artifacts(register_list: RegisterList, output_folder: Path
         register_list=register_list, output_folder=output_folder
     ).create_if_needed()
 
-    VhdlSimulationCheckerPackageGenerator(
+    VhdlSimulationCheckPackageGenerator(
         register_list=register_list, output_folder=output_folder
     ).create_if_needed()
 
