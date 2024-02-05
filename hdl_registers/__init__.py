@@ -21,5 +21,5 @@ HDL_REGISTERS_GENERATED = REPO_ROOT / "generated"
 HDL_REGISTERS_TESTS = REPO_ROOT / "tests"
 HDL_REGISTERS_TOOLS = REPO_ROOT / "tools"
 
-__version__ = "5.0.1-dev"
+__version__ = "5.1.0"
 __doc__ = get_short_slogan()  # pylint: disable=redefined-builtin
