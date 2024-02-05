@@ -23,7 +23,7 @@ library reg_file;
 use reg_file.reg_operations_pkg.all;
 
 use work.counter_register_record_pkg.all;
-use work.counter_register_checker_pkg.all;
+use work.counter_register_check_pkg.all;
 use work.counter_register_read_write_pkg.all;
 use work.counter_register_wait_until_pkg.all;
 use work.counter_regs_pkg.all;

@@ -15,7 +15,7 @@ See the :ref:`vhdl_register_example` below for a real-world use case of all thes
   register file, and exposes register values to application using the natively typed records.
 * :class:`.VhdlSimulationReadWritePackageGenerator` generates a VHDL simulation support package with
   procedures for reading/writing register or field values.
-* :class:`.VhdlSimulationCheckerPackageGenerator` generates a VHDL simulation support package with
+* :class:`.VhdlSimulationCheckPackageGenerator` generates a VHDL simulation support package with
   procedures for checking current register and field values against a given expected value.
 * :class:`.VhdlSimulationWaitUntilPackageGenerator` generates a VHDL simulation support package with
   procedures for waiting until a readable register or field assumes a given value.
@@ -142,8 +142,8 @@ The VHDL below is the testbench for our example counter implementation above.
       a record that contains a bit ``enabled`` and an integer ``pulse_count``.
 
 4. The testbench uses register field check procedures from the package produced by
-   :class:`.VhdlSimulationCheckerPackageGenerator`, which can be seen
-   :ref:`below <example_counter_simulation_checker_package>`.
+   :class:`.VhdlSimulationCheckPackageGenerator`, which can be seen
+   :ref:`below <example_counter_simulation_check_package>`.
    For example ``check_counter_status_enabled_equal``.
 
 5. The testbench instantiates :ref:`bfm.axi_lite_master` which creates AXI-Lite transactions
@@ -240,20 +240,20 @@ It is used by the :ref:`example_tb_counter` to read/write registers in a compact
 |
 
 
-.. _example_counter_simulation_checker_package:
+.. _example_counter_simulation_check_package:
 
-Generated VHDL simulation checker package
-_________________________________________
+Generated VHDL simulation check package
+_______________________________________
 
-Below is the generated register simulation checker package, created from the TOML file above via
-the :class:`.VhdlSimulationCheckerPackageGenerator` class.
+Below is the generated register simulation check package, created from the TOML file above via
+the :class:`.VhdlSimulationCheckPackageGenerator` class.
 It is used by the :ref:`example_tb_counter` to check that the ``status`` register has the
 expected value.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_checker_pkg.vhd
-    :caption: Example register simulation checker package.
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_check_pkg.vhd
+    :caption: Example register simulation check package.
     :language: VHDL
     :linenos:
 
