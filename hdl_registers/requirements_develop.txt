@@ -18,6 +18,7 @@ sphinx_sitemap
 sphinx-rtd-theme
 sphinx-toolbox
 sphinxcontrib-wavedrom
+sphinxext-opengraph
 twine
 types-PyYAML
 vunit_hdl
