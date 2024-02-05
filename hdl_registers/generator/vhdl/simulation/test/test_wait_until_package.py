@@ -22,20 +22,20 @@ from hdl_registers.register_list import RegisterList
 def test_package_is_not_generated_without_registers(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
 
-    assert not (VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create()).exists()
+    assert not VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create().exists()
 
     register_list.add_constant(name="apa", value=True, description="")
-    assert not (VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create()).exists()
+    assert not VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create().exists()
 
     register_list.append_register(name="hest", mode="r_w", description="")
-    assert (VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create()).exists()
+    assert VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create().exists()
 
 
 def test_re_generating_package_without_registers_should_delete_old_file(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
     register_list.append_register(name="apa", mode="r_w", description="")
 
-    assert (VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create()).exists()
+    assert VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create().exists()
 
     register_list.register_objects = []
-    assert not (VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create()).exists()
+    assert not VhdlSimulationWaitUntilPackageGenerator(register_list, tmp_path).create().exists()
