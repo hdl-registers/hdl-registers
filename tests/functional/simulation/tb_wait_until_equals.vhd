@@ -23,12 +23,11 @@ library reg_file;
 use reg_file.reg_file_pkg.all;
 use reg_file.reg_operations_pkg.all;
 
-use work.caesar_simulation_test_pkg.all;
-
 use work.caesar_regs_pkg.all;
 use work.caesar_register_record_pkg.all;
 use work.caesar_register_read_write_pkg.all;
 use work.caesar_register_wait_until_pkg.all;
+use work.caesar_simulation_test_pkg.all;
 
 
 entity tb_wait_until_equals is

@@ -20,9 +20,6 @@ use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 
-library common;
-use common.types_pkg.all;
-
 library reg_file;
 use reg_file.reg_file_pkg.all;
 use reg_file.reg_operations_pkg.all;
