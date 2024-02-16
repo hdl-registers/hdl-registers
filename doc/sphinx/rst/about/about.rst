@@ -66,6 +66,8 @@ for details.
 We do not mean to bash anyone.
 We encourage and applaud all open-source contributions.
 See :ref:`similar_tools` below for links to the other projects.
+The PeakRDL tool has no official VHDL generator, so we used the SystemVerilog generator
+for comparison.
 
 
 Scope
