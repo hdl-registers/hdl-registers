@@ -8,7 +8,13 @@ Furthermore, this information is usually written by hand at great discomfort to 
 hdl-registers aims to solve this situation, which is unacceptable in a modern
 development environment.
 
-The project started in late 2017.
+
+.. _philosophy:
+
+Philosophy
+----------
+
+The project started in late 2018.
 While there have always been :ref:`other tools <similar_tools>` available, the authors had a very
 clear list of requirements that was not, and is not, fulfilled by any other project.
 
@@ -22,7 +28,7 @@ clear list of requirements that was not, and is not, fulfilled by any other proj
 3. Bloat-free.
    Meaning, well-scoped and focused on the important features.
 4. Clean, intuitive, well-documented and easy-to-use API.
-5. Well-tested and reliable.
+5. Well-tested and reliable code.
 
 Especially points 1. and 2. set this project apart from :ref:`others <similar_tools>`.
 
