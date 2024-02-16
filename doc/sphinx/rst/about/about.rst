@@ -50,11 +50,12 @@ and 50 fields each.
   --------------------------------------------------------------------------
                          Tool | Execution time | Relative (lower is better)
   ----------------------------+----------------+----------------------------
-   hdl-registers (4.1.1-dev2) |        17.1 ms | 1x (baseline)
-             cheby (1.6.dev0) |        1.86  s | 108x
-              corsair (1.0.4) |        2.59  s | 151x
-                 rggen (0.31) |        9.79  s | 571x
-              vhdmmio (0.0.3) |        17.3  s | 1009x
+    hdl-registers (5.1.1-dev) |        17.5 ms | 1x (baseline)
+             cheby (1.6.dev0) |        1.83  s | 104x
+              corsair (1.0.4) |         2.6  s | 148x
+              PeakRDL (1.1.0) |         7.2  s | 410x
+                 rggen (0.31) |        9.74  s | 555x
+              vhdmmio (0.0.3) |        17.3  s | 987x
 
 Clearly, only one of these tools is fast enough to run in real time without impacting productivity.
 
