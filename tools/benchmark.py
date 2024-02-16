@@ -54,6 +54,7 @@ def main():
         ("hdl-registers", benchmark_hdl_registers),
         ("cheby", benchmark_cheby),
         ("corsair", benchmark_corsair),
+        ("PeakRDL", benchmark_peakrdl),
         ("rggen", benchmark_rggen),
         ("vhdmmio", benchmark_vhdmmio),
     ]:
@@ -208,7 +209,7 @@ def benchmark_cheby() -> tuple[float, int, str]:
     This will always be slower than function calls from a Python script, and the comparison is
     hence unfair.
     Unlike with e.g. "corsair", it was not possible to re-create the Python function calls for
-    parsing and VHDL generation with reasonable effort,
+    parsing and VHDL generation with reasonable effort.
     Hence we have to make the comparison with a command-line call, but if that is how the tool is
     designed then that is the comparison we have to make.
     """
@@ -320,6 +321,53 @@ def benchmark_rggen() -> tuple[float, int, str]:
 
     # Command will give and output like "RgGen 0.31\n"
     version = run_command(["rggen", "--version"], capture_output=True).stdout.strip().split(" ")[1]
+
+    return time_taken_s, num_iterations, version
+
+
+def benchmark_peakrdl() -> tuple[float, int, str]:
+    """
+    Benchmark the "PeakRDL" tool from https://github.com/SystemRDL/PeakRDL
+    Uses the "PeakRDL-regblock" SystemVerilog generator
+    from https://github.com/SystemRDL/PeakRDL-regblock
+    Need to run "python3 -m pip install peakrdl" before.
+
+    Based on the documentation and the code, this tool is clearly made to be used as a command-line
+    program.
+    This will always be slower than function calls from a Python script, and the comparison is
+    hence unfair.
+    Unlike with e.g. "corsair", it was not possible to re-create the Python function calls for
+    parsing and code generation with reasonable effort.
+    Hence we have to make the comparison with a command-line call, but if that is how the tool is
+    designed then that is the comparison we have to make.
+
+    There is no (official) VHDL generator in PeakRDL, so we generate SystemVerilog code instead.
+    This is not a one-to-one comparison, but it gives a hint at the speed of the tool.
+    """
+
+    def run_test():
+        # Configuration file adapted from
+        # https://github.com/SystemRDL/PeakRDL/blob/main/examples/atxmega_spi.rdl
+        # Registers and fields added so it has 21 registers and 56 fields.
+        # So that comparison is fair with the others.
+        command = [
+            "peakrdl",
+            "regblock",
+            str(BENCHMARK_FOLDER / "peakrdl" / "peakrdl_config.rdl"),
+            "-o",
+            str(OUTPUT_FOLDER / "peakrdl"),
+            "--cpuif",
+            "axi4-lite-flat",
+        ]
+        run_command(command)
+
+    # A decent number of runs that gives representative data.
+    num_iterations = 20
+
+    time_taken_s = timeit.timeit(run_test, number=num_iterations)
+
+    # Command will give and output like "1.1.0\n"
+    version = run_command(["peakrdl", "--version"], capture_output=True).stdout.strip()
 
     return time_taken_s, num_iterations, version
 
