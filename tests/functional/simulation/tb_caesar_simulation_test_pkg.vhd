@@ -12,7 +12,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library vunit_lib;
-context vunit_lib.vunit_context;
+use vunit_lib.run_pkg.all;
 
 use work.caesar_simulation_test_pkg.all;
 

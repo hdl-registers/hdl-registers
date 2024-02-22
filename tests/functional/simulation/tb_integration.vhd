@@ -12,8 +12,11 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library vunit_lib;
-context vunit_lib.vc_context;
-context vunit_lib.vunit_context;
+use vunit_lib.bus_master_pkg.as_sync;
+use vunit_lib.check_pkg.all;
+use vunit_lib.com_pkg.net;
+use vunit_lib.run_pkg.all;
+use vunit_lib.sync_pkg.wait_until_idle;
 
 library axi_lite;
 use axi_lite.axi_lite_pkg.all;

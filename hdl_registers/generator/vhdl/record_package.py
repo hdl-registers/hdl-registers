@@ -87,7 +87,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library reg_file;
-use reg_file.reg_file_pkg.all;
+use reg_file.reg_file_pkg.reg_t;
 
 use work.{self.name}_regs_pkg.all;
 
