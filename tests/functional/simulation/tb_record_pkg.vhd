@@ -13,7 +13,7 @@ use ieee.numeric_std.all;
 use ieee.fixed_pkg.all;
 
 library vunit_lib;
-context vunit_lib.vunit_context;
+use vunit_lib.run_pkg.all;
 
 library reg_file;
 use reg_file.reg_file_pkg.all;

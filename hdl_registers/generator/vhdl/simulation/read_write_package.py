@@ -80,14 +80,18 @@ use ieee.numeric_std.all;
 use ieee.std_logic_1164.all;
 
 library vunit_lib;
-context vunit_lib.vc_context;
+use vunit_lib.bus_master_pkg.bus_master_t;
+use vunit_lib.com_types_pkg.network_t;
 
 library common;
-use common.addr_pkg.all;
+use common.addr_pkg.addr_t;
 
 library reg_file;
-use reg_file.reg_file_pkg.all;
-use reg_file.reg_operations_pkg.all;
+use reg_file.reg_file_pkg.reg_t;
+use reg_file.reg_file_pkg.reg_width;
+use reg_file.reg_operations_pkg.read_reg;
+use reg_file.reg_operations_pkg.regs_bus_master;
+use reg_file.reg_operations_pkg.write_reg;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;

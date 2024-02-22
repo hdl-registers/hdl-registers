@@ -76,15 +76,18 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 library vunit_lib;
-context vunit_lib.vc_context;
-context vunit_lib.vunit_context;
+use vunit_lib.bus_master_pkg.bus_master_t;
+use vunit_lib.com_types_pkg.max_timeout;
+use vunit_lib.com_types_pkg.network_t;
+use vunit_lib.string_ops.hex_image;
 
 library common;
-use common.addr_pkg.all;
+use common.addr_pkg.addr_t;
 
 library reg_file;
-use reg_file.reg_file_pkg.all;
-use reg_file.reg_operations_pkg.all;
+use reg_file.reg_file_pkg.reg_t;
+use reg_file.reg_operations_pkg.regs_bus_master;
+use reg_file.reg_operations_pkg.wait_until_reg_equals;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -252,13 +255,14 @@ end package body;
     constant reg_value : reg_t := {conversion};
 {self._get_common_constants(register=register, register_array=register_array, field=None)}\
   begin
-    wait_until_read_equals(
+    wait_until_reg_equals(
       net=>net,
-      bus_handle=>bus_handle,
-      addr=>std_ulogic_vector(address),
+      reg_index=>reg_index,
       value=>reg_value,
+      base_address=>base_address,
+      bus_handle=>bus_handle,
       timeout=>timeout,
-      msg=>get_message
+      message=>get_message
     );
   end procedure;
 """
@@ -280,9 +284,7 @@ end package body;
             field_description = ""
 
         return f"""\
-{reg_index}\
-    constant address : addr_t := base_address or to_unsigned(4 * reg_index, addr_t'length);
-
+{reg_index}
 {self.get_register_array_message(register_array=register_array)}\
 {self.get_base_address_message()}\
     constant base_message : string := (
@@ -294,8 +296,6 @@ end package body;
       & "."
     );
 {self.get_message()}\
-
-
 """
 
     def _field_wait_until_equals_implementation(
@@ -323,13 +323,14 @@ end package body;
     );
 {self._get_common_constants(register=register, register_array=register_array, field=field)}\
   begin
-    wait_until_read_equals(
+    wait_until_reg_equals(
       net=>net,
-      bus_handle=>bus_handle,
-      addr=>std_ulogic_vector(address),
+      reg_index=>reg_index,
       value=>reg_value,
+      base_address=>base_address,
+      bus_handle=>bus_handle,
       timeout=>timeout,
-      msg=>get_message
+      message=>get_message
     );
   end procedure;
 """
