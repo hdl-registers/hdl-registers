@@ -38,16 +38,14 @@ class RegisterCodeGeneratorHelpers:
         """
         Iterate of all constants in the register list.
         """
-        for constant in self.register_list.constants:
-            yield constant
+        yield from self.register_list.constants
 
     def iterate_register_objects(self) -> Iterator[Union[Register, RegisterArray]]:
         """
         Iterate over all register objects in the register list.
         I.e. all plain registers and all register arrays.
         """
-        for register_object in self.register_list.register_objects:
-            yield register_object
+        yield from self.register_list.register_objects
 
     def iterate_registers(self) -> Iterator[tuple[Register, Union[RegisterArray, None]]]:
         """
