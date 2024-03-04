@@ -10,6 +10,7 @@
 # Standard libraries
 import sys
 from pathlib import Path
+from xml.etree import ElementTree
 
 THIS_DIR = Path(__file__).parent.resolve()
 REPO_ROOT = THIS_DIR.parent.parent.parent.resolve()
@@ -54,8 +55,16 @@ def test_running_simulation(tmp_path):
     generate_strange_register_maps(output_path=tmp_path)
     generate_doc_registers(output_path=tmp_path)
 
-    def run(args, exit_code):
-        argv = ["--minimal", "--num-threads", "10", "--output-path", str(tmp_path)] + args
+    def run(args: list[str], exit_code: int, xml_report_path: Path) -> None:
+        argv = [
+            "--minimal",
+            "--num-threads",
+            "10",
+            "--output-path",
+            str(tmp_path),
+            "--xunit-xml",
+            str(xml_report_path),
+        ] + args
         vunit_proj = VUnit.from_argv(argv=argv)
         vunit_proj.add_verification_components()
         vunit_proj.add_vhdl_builtins()
@@ -82,13 +91,109 @@ def test_running_simulation(tmp_path):
             assert exception.code == exit_code
 
     # All these tests should pass.
-    run(args=["--without-attribute", ".expected_failure"], exit_code=0)
+    run(
+        args=["--without-attribute", ".expected_failure"],
+        exit_code=0,
+        xml_report_path=tmp_path / "passing.xml",
+    )
+
     # All these should fail.
-    # The only error checking here is that the return code is non-zero.
-    # That will trigger as long as at least one test case fails, but others could technically pass.
-    # A more robust method would be to parse the VUnit test report and check that each test case
-    # has failed.
-    run(args=["--with-attribute", ".expected_failure"], exit_code=1)
+    run(
+        args=["--with-attribute", ".expected_failure"],
+        exit_code=1,
+        xml_report_path=tmp_path / "failing.xml",
+    )
+
+    tb_check = "example.tb_check_pkg."
+    tb_integration = "example.tb_integration."
+    tb_regs_pkg = "example.tb_regs_pkg."
+    tb_wait_until = "example.tb_wait_until_equals."
+    check_failed_tests(
+        xml_report_file=tmp_path / "failing.xml",
+        test_outputs={
+            f"{tb_check}test_check_equal_fail_for_array_register_field_at_a_base_address": (
+                "ERROR - Checking the 'array_bit_vector' field in the 'first' register within "
+                "the 'dummies[1]' register array (at base address x\"00050000\"). "
+                "Custom message here. - Got 0_1100 (12). Expected 1_1001 (25)"
+            ),
+            f"{tb_check}test_check_equal_fail_for_array_register_field": (
+                "ERROR - Checking the 'array_bit_a' field in the 'first' register within "
+                "the 'dummies[1]' register array. - Got 1. Expected 0."
+            ),
+            f"{tb_check}test_check_equal_fail_for_bit_field": (
+                "ERROR - Checking the 'plain_bit_a' field in the 'config' "
+                "register. - Got 0. Expected 1."
+            ),
+            f"{tb_check}test_check_equal_fail_for_bit_vector_field_at_a_base_address": (
+                "ERROR - Checking the 'plain_bit_vector' field in the 'config' "
+                'register (at base address x"00050000"). - Got 0011 (3). Expected 1100 (12).'
+            ),
+            f"{tb_check}test_check_equal_fail_for_enumeration_field": (
+                "ERROR - Checking the 'plain_enumeration' field in the 'config' "
+                "register. - Got plain_enumeration_third. Expected plain_enumeration_fifth."
+            ),
+            f"{tb_check}test_check_equal_fail_for_integer_field": (
+                "ERROR - Checking the 'plain_integer' field in the 'config' "
+                "register. - Got 66. Expected -33."
+            ),
+            f"{tb_check}test_check_equal_fail_for_sfixed_field": (
+                "ERROR - Checking the 'sfixed0' field in the 'field_test' "
+                "register. - Got 111.111 (-1.25e-1). Expected 101.010 (-2.75)."
+            ),
+            f"{tb_check}test_check_equal_fail_for_ufixed_field": (
+                "ERROR - Checking the 'ufixed0' field in the 'field_test' "
+                "register. Custom message here. - Got 111111.11 (6.375e1). "
+                "Expected 101010.10 (4.25e1)."
+            ),
+            #
+            f"{tb_integration}test_reading_write_only_register_should_fail": (
+                "FAILURE - rresp - Got AXI response SLVERR(10) expected OKAY(00)"
+            ),
+            f"{tb_integration}test_writing_read_only_register_should_fail": (
+                "FAILURE - bresp - Got AXI response SLVERR(10) expected OKAY(00)"
+            ),
+            #
+            f"{tb_regs_pkg}test_enumeration_out_of_range": "ghdl:error: bound check failure",
+            f"{tb_regs_pkg}test_integer_from_slv_out_of_range": "ghdl:error: bound check failure",
+            f"{tb_regs_pkg}test_integer_to_slv_out_of_range": "ghdl:error: bound check failure",
+            #
+            f"{tb_wait_until}test_wait_until_array_field_equals_timeout_with_base_address": (
+                "FAILURE - reg_index: 9, base_address: 00000000000001010000000000000000, message: "
+                "Timeout while waiting for the 'array_integer' field in the 'first' register "
+                "within the 'dummies[1]' register array (at base address x\"00050000\") to equal "
+                "the given value: -----------------0100001--------. Extra printout "
+                "that can be set!."
+            ),
+            f"{tb_wait_until}test_wait_until_array_field_equals_timeout": (
+                "FAILURE - reg_index: 9, base_address: 00000000000000000000000000000000, message: "
+                "Timeout while waiting for the 'array_integer' field in the 'first' register "
+                "within the 'dummies[1]' register array to equal the given "
+                "value: -----------------0100001--------. Extra printout that can be set!."
+            ),
+            f"{tb_wait_until}test_wait_until_array_register_equals_timeout": (
+                "FAILURE - reg_index: 9, base_address: 00000000000000000000000000000000, "
+                "message: Timeout while waiting for the 'first' register within the 'dummies[1]' "
+                "register array to equal the given "
+                "value: -----------------010000101100110. Extra printout that can be set!."
+            ),
+            f"{tb_wait_until}test_wait_until_plain_field_equals_timeout_with_message": (
+                "FAILURE - reg_index: 0, base_address: 00000000000000000000000000000000, "
+                "message: Timeout while waiting for the 'plain_integer' field in the 'config' "
+                "register to equal the given "
+                "value: ---------------11011111---------. Extra printout that can be set!."
+            ),
+            f"{tb_wait_until}test_wait_until_plain_field_equals_timeout": (
+                "FAILURE - reg_index: 0, base_address: 00000000000000000000000000000000, "
+                "message: Timeout while waiting for the 'plain_integer' field in the 'config' "
+                "register to equal the given value: ---------------11011111---------."
+            ),
+            f"{tb_wait_until}test_wait_until_plain_register_equals_timeout": (
+                "FAILURE - reg_index: 0, base_address: 00000000000000000000000000000000, "
+                "message: Timeout while waiting for the 'config' register to equal the given "
+                "value: ---------------11011111100110001."
+            ),
+        },
+    )
 
 
 def generate_toml_registers(output_path):
@@ -129,6 +234,41 @@ def generate_doc_registers(output_path):
     register_list = from_toml(name="counter", toml_file=DOC_SIM_FOLDER / "regs_counter.toml")
 
     generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
+
+
+def check_failed_tests(xml_report_file: Path, test_outputs: dict[str, str]) -> None:
+    """
+    Check an XML report from VUnit that it
+    * contains only the expected tests,
+    * all tests failed, and
+    * the test output is the expected.
+    """
+    print(xml_report_file)
+
+    tree = ElementTree.parse(xml_report_file)
+    root = tree.getroot()
+
+    num_tests = int(root.attrib["tests"])
+    assert num_tests == len(test_outputs)
+
+    xml_test_outputs = {}
+    for test in root.iter("testcase"):
+        test_name = f"{test.attrib['classname']}.{test.attrib['name']}"
+
+        assert test.find("failure") is not None, f"Test {test_name} did not fail."
+
+        xml_test_outputs[test_name] = test.find("system-out").text
+
+    got_names = set(xml_test_outputs.keys())
+    expected_names = set(test_outputs.keys())
+    assert got_names == expected_names, f"Test case name difference: {got_names ^ expected_names}"
+
+    for test_name, expected_output in test_outputs.items():
+        got_output = xml_test_outputs[test_name]
+        if expected_output not in got_output:
+            raise AssertionError(
+                f"Test {test_name}. Got:\n{got_output}\nExpected:\n{expected_output}"
+            )
 
 
 if __name__ == "__main__":
