@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any, Union
 # Third party libraries
 from tsfpga.git_utils import get_git_commit, git_commands_are_available
 from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_available
-from tsfpga.system_utils import create_file, read_file
+from tsfpga.system_utils import create_file, path_relative_to, read_file
 
 # First party libraries
 from hdl_registers import __version__ as hdl_registers_version
@@ -146,7 +146,12 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         """
         output_file = self.output_file
 
-        print(f"Creating {self.SHORT_DESCRIPTION} file: {output_file}")
+        try:
+            path_to_print = path_relative_to(path=output_file, other=Path("."))
+        except ValueError:
+            # Fails on Windows if CWD and the file are on different drives.
+            path_to_print = output_file
+        print(f"Creating {self.SHORT_DESCRIPTION} file: {path_to_print}")
 
         self._sanity_check()
 

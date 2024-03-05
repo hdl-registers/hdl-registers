@@ -8,12 +8,14 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
+import contextlib
+import io
 from pathlib import Path
 from unittest.mock import PropertyMock, patch
 
 # Third party libraries
 import pytest
-from tsfpga.system_utils import create_file
+from tsfpga.system_utils import create_directory, create_file
 
 # First party libraries
 from hdl_registers import __version__ as hdl_registers_version
@@ -488,3 +490,33 @@ def test_array_field_with_same_qualified_name_as_plain_register_should_raise_exc
         'Error in register list "test": Qualified name of field "apa.hest.zebra" '
         '("test_apa_hest_zebra") clashes with another item.'
     )
+
+
+def test_relative_path_printout(tmp_path, monkeypatch):
+    register_list = RegisterList(name="test")
+    generator = CustomGenerator(register_list=register_list, output_folder=tmp_path / "out")
+
+    string_io = io.StringIO()
+    with contextlib.redirect_stdout(string_io):
+        monkeypatch.chdir(tmp_path)
+        generator.create()
+        stdout = string_io.getvalue()
+
+    assert f"file: {Path('out') / 'test.x'}" in stdout
+
+    string_io = io.StringIO()
+    with contextlib.redirect_stdout(string_io):
+        path = create_directory(tmp_path / "apa")
+        monkeypatch.chdir(path)
+        generator.create()
+        stdout = string_io.getvalue()
+
+    assert f"file: {Path('..') / 'out' / 'test.x'}" in stdout
+
+    string_io = io.StringIO()
+    with contextlib.redirect_stdout(string_io):
+        monkeypatch.chdir(tmp_path.parent)
+        generator.create()
+        stdout = string_io.getvalue()
+
+    assert f"file: {Path(tmp_path.name) / 'out' / 'test.x'}" in stdout
