@@ -15,6 +15,7 @@ from hdl_registers.generator.vhdl.vhdl_generator_common import VhdlGeneratorComm
 
 if TYPE_CHECKING:
     # First party libraries
+    from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
 
 
@@ -44,6 +45,38 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
             return "      array_index => array_index,\n"
 
         return ""
+
+    def reg_index_constant(
+        self, register: "Register", register_array: Optional["RegisterArray"] = None
+    ) -> str:
+        """
+        Get a 'reg_index' constant declaration, for the index of the supplied register.
+        If the register is in an array, the constant calculation depends on a 'array_index'
+        being present in the VHDL.
+
+        Is suitable for implementation of register/field access procedures.
+        """
+        register_name = self.qualified_register_name(
+            register=register, register_array=register_array
+        )
+        reg_index = (
+            f"{register_name}(array_index=>array_index)" if register_array else register_name
+        )
+
+        return f"    constant reg_index : {self.name}_reg_range := {reg_index};\n"
+
+    @staticmethod
+    def reg_address_constant() -> str:
+        """
+        Get a 'reg_address' constant declaration, for the byte address of the current register.
+        Depends on the 'reg_index' and 'base_address' constants being present in the VHDL.
+
+        Is suitable for implementation of register/field access procedures.
+        """
+        return (
+            "    constant reg_address : addr_t := base_address + "
+            "to_unsigned(4 * reg_index, addr_width);\n"
+        )
 
     @staticmethod
     def get_register_array_message(

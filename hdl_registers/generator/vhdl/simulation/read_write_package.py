@@ -486,18 +486,17 @@ end package body;
             register_array=register_array,
             value_type=value_type,
         )
-        reg_index = self.reg_index_constant(register=register, register_array=register_array)
 
         return f"""\
 {signature} is
-{reg_index}\
-    constant address : addr_t := base_address + to_unsigned(4 * reg_index, addr_width);
+{self.reg_index_constant(register=register, register_array=register_array)}\
+{self.reg_address_constant()}\
     variable reg_value : reg_t := (others => '0');
   begin
     read_bus(
       net => net,
       bus_handle => bus_handle,
-      address => std_logic_vector(address),
+      address => std_logic_vector(reg_address),
       data => reg_value
     );
     value := {value_conversion};
@@ -520,18 +519,17 @@ end package body;
             register_array=register_array,
             value_type=value_type,
         )
-        reg_index = self.reg_index_constant(register=register, register_array=register_array)
 
         return f"""\
 {signature} is
-{reg_index}\
-    constant address : addr_t := base_address + to_unsigned(4 * reg_index, addr_width);
+{self.reg_index_constant(register=register, register_array=register_array)}\
+{self.reg_address_constant()}\
     constant reg_value : reg_t := {value_conversion};
   begin
     write_bus(
       net => net,
       bus_handle => bus_handle,
-      address => std_logic_vector(address),
+      address => std_logic_vector(reg_address),
       data => reg_value
     );
   end procedure;

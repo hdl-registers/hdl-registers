@@ -35,8 +35,7 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
     * For each field in each readable register, a procedure that waits until the field assumes a
       given natively-typed value.
 
-    Uses VUnit Verification Component calls, via :ref:`reg_file.reg_operations_pkg`
-    from hdl_modules.
+    Uses VUnit Verification Component calls to create bus read operations.
 
     The generated VHDL file needs also the generated packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
@@ -77,17 +76,18 @@ use ieee.numeric_std.all;
 
 library vunit_lib;
 use vunit_lib.bus_master_pkg.bus_master_t;
+use vunit_lib.bus_master_pkg.wait_until_read_equals;
 use vunit_lib.com_types_pkg.max_timeout;
 use vunit_lib.com_types_pkg.network_t;
 use vunit_lib.string_ops.hex_image;
 
 library common;
 use common.addr_pkg.addr_t;
+use common.addr_pkg.addr_width;
 
 library reg_file;
 use reg_file.reg_file_pkg.reg_t;
 use reg_file.reg_operations_pkg.regs_bus_master;
-use reg_file.reg_operations_pkg.wait_until_reg_equals;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -253,49 +253,18 @@ end package body;
         return f"""\
 {signature} is
     constant reg_value : reg_t := {conversion};
+
 {self._get_common_constants(register=register, register_array=register_array, field=None)}\
   begin
-    wait_until_reg_equals(
-      net=>net,
-      reg_index=>reg_index,
-      value=>reg_value,
-      base_address=>base_address,
-      bus_handle=>bus_handle,
-      timeout=>timeout,
-      message=>get_message
+    wait_until_read_equals(
+      net => net,
+      bus_handle => bus_handle,
+      addr => std_ulogic_vector(reg_address),
+      value => reg_value,
+      timeout => timeout,
+      msg => get_message
     );
   end procedure;
-"""
-
-    def _get_common_constants(
-        self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: Optional["RegisterField"],
-    ) -> str:
-        """
-        Get constants code that is common for all 'wait_until_*_equals' procedures.
-        """
-        reg_index = self.reg_index_constant(register=register, register_array=register_array)
-
-        if field:
-            field_description = f" the '{field.name}' field in"
-        else:
-            field_description = ""
-
-        return f"""\
-{reg_index}
-{self.get_register_array_message(register_array=register_array)}\
-{self.get_base_address_message()}\
-    constant base_message : string := (
-      "Timeout while waiting for{field_description} the '{register.name}' register"
-      & register_array_message
-      & base_address_message
-      & " to equal the given value: "
-      & to_string(reg_value)
-      & "."
-    );
-{self.get_message()}\
 """
 
     def _field_wait_until_equals_implementation(
@@ -321,16 +290,47 @@ end package body;
       {field_name} => {field_to_slv},
       others => '-'
     );
+
 {self._get_common_constants(register=register, register_array=register_array, field=field)}\
   begin
-    wait_until_reg_equals(
-      net=>net,
-      reg_index=>reg_index,
-      value=>reg_value,
-      base_address=>base_address,
-      bus_handle=>bus_handle,
-      timeout=>timeout,
-      message=>get_message
+    wait_until_read_equals(
+      net => net,
+      bus_handle => bus_handle,
+      addr => std_ulogic_vector(reg_address),
+      value => reg_value,
+      timeout => timeout,
+      msg => get_message
     );
   end procedure;
+"""
+
+    def _get_common_constants(
+        self,
+        register: "Register",
+        register_array: Optional["RegisterArray"],
+        field: Optional["RegisterField"],
+    ) -> str:
+        """
+        Get constants code that is common for all 'wait_until_*_equals' procedures.
+        """
+        if field:
+            field_description = f" the '{field.name}' field in"
+        else:
+            field_description = ""
+
+        return f"""\
+{self.reg_index_constant(register=register, register_array=register_array)}\
+{self.reg_address_constant()}\
+
+{self.get_register_array_message(register_array=register_array)}\
+{self.get_base_address_message()}\
+    constant base_message : string := (
+      "Timeout while waiting for{field_description} the '{register.name}' register"
+      & register_array_message
+      & base_address_message
+      & " to equal the given value: "
+      & to_string(reg_value)
+      & "."
+    );
+{self.get_message()}\
 """

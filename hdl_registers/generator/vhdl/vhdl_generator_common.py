@@ -168,25 +168,6 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         )
         return f"{field_name}_t"
 
-    def reg_index_constant(
-        self, register: "Register", register_array: Optional["RegisterArray"] = None
-    ) -> str:
-        """
-        Get a 'reg_index' constant declaration, for the index of the supplied register.
-        If the register is in an array, the constant calculation depends on a 'array_index'
-        being present in the VHDL.
-
-        Is suitable for implementation of register/field access procedures.
-        """
-        register_name = self.qualified_register_name(
-            register=register, register_array=register_array
-        )
-        reg_index = (
-            f"{register_name}(array_index=>array_index)" if register_array else register_name
-        )
-
-        return f"    constant reg_index : {self.name}_reg_range := {reg_index};\n"
-
     def has_any_bus_accessible_register(self, direction: BusAccessDirection) -> bool:
         """
         Return True if the register list contains any register, plain or in array, that is

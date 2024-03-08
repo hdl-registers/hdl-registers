@@ -158,38 +158,32 @@ def test_running_simulation(tmp_path):
             f"{tb_regs_pkg}test_integer_to_slv_out_of_range": "ghdl:error: bound check failure",
             #
             f"{tb_wait_until}test_wait_until_array_field_equals_timeout_with_base_address": (
-                "FAILURE - reg_index: 9, base_address: 00000000000001010000000000000000, message: "
-                "Timeout while waiting for the 'array_integer' field in the 'first' register "
-                "within the 'dummies[1]' register array (at base address x\"00050000\") to equal "
-                "the given value: -----------------0100001--------. Extra printout "
+                "FAILURE - Timeout while waiting for the 'array_integer' field in the 'first' "
+                "register within the 'dummies[1]' register array (at base address x\"00050000\") "
+                "to equal the given value: -----------------0100001--------. Extra printout "
                 "that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_array_field_equals_timeout": (
-                "FAILURE - reg_index: 9, base_address: 00000000000000000000000000000000, message: "
-                "Timeout while waiting for the 'array_integer' field in the 'first' register "
-                "within the 'dummies[1]' register array to equal the given "
+                "FAILURE - Timeout while waiting for the 'array_integer' field in the 'first' "
+                "register within the 'dummies[1]' register array to equal the given "
                 "value: -----------------0100001--------. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_array_register_equals_timeout": (
-                "FAILURE - reg_index: 9, base_address: 00000000000000000000000000000000, "
-                "message: Timeout while waiting for the 'first' register within the 'dummies[1]' "
+                "FAILURE - Timeout while waiting for the 'first' register within the 'dummies[1]' "
                 "register array to equal the given "
                 "value: -----------------010000101100110. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_plain_field_equals_timeout_with_message": (
-                "FAILURE - reg_index: 0, base_address: 00000000000000000000000000000000, "
-                "message: Timeout while waiting for the 'plain_integer' field in the 'config' "
-                "register to equal the given "
+                "FAILURE - Timeout while waiting for the 'plain_integer' field in the "
+                "'config' register to equal the given "
                 "value: ---------------11011111---------. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_plain_field_equals_timeout": (
-                "FAILURE - reg_index: 0, base_address: 00000000000000000000000000000000, "
-                "message: Timeout while waiting for the 'plain_integer' field in the 'config' "
-                "register to equal the given value: ---------------11011111---------."
+                "FAILURE - Timeout while waiting for the 'plain_integer' field in the "
+                "'config' register to equal the given value: ---------------11011111---------."
             ),
             f"{tb_wait_until}test_wait_until_plain_register_equals_timeout": (
-                "FAILURE - reg_index: 0, base_address: 00000000000000000000000000000000, "
-                "message: Timeout while waiting for the 'config' register to equal the given "
+                "FAILURE - Timeout while waiting for the 'config' register to equal the given "
                 "value: ---------------11011111100110001."
             ),
         },
