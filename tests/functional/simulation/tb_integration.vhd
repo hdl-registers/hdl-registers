@@ -28,6 +28,7 @@ use common.types_pkg.all;
 
 library reg_file;
 use reg_file.reg_file_pkg.all;
+use reg_file.reg_operations_pkg.read_reg;
 use reg_file.reg_operations_pkg.regs_bus_master;
 use reg_file.reg_operations_pkg.write_reg;
 
