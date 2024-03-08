@@ -40,8 +40,7 @@ class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
 
     * For each field in each writeable register, a procedure that writes a given field value.
 
-    Uses VUnit Verification Component calls, via :ref:`reg_file.reg_operations_pkg`
-    from hdl_modules.
+    Uses VUnit Verification Component calls to create bus read/write operations.
 
     The generated VHDL file needs also the generated packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
@@ -81,17 +80,18 @@ use ieee.std_logic_1164.all;
 
 library vunit_lib;
 use vunit_lib.bus_master_pkg.bus_master_t;
+use vunit_lib.bus_master_pkg.read_bus;
+use vunit_lib.bus_master_pkg.write_bus;
 use vunit_lib.com_types_pkg.network_t;
 
 library common;
 use common.addr_pkg.addr_t;
+use common.addr_pkg.addr_width;
 
 library reg_file;
 use reg_file.reg_file_pkg.reg_t;
 use reg_file.reg_file_pkg.reg_width;
-use reg_file.reg_operations_pkg.read_reg;
 use reg_file.reg_operations_pkg.regs_bus_master;
-use reg_file.reg_operations_pkg.write_reg;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -491,14 +491,14 @@ end package body;
         return f"""\
 {signature} is
 {reg_index}\
+    constant address : addr_t := base_address + to_unsigned(4 * reg_index, addr_width);
     variable reg_value : reg_t := (others => '0');
   begin
-    read_reg(
+    read_bus(
       net => net,
-      reg_index => reg_index,
-      value => reg_value,
-      base_address => base_address,
-      bus_handle => bus_handle
+      bus_handle => bus_handle,
+      address => std_logic_vector(address),
+      data => reg_value
     );
     value := {value_conversion};
   end procedure;
@@ -525,14 +525,14 @@ end package body;
         return f"""\
 {signature} is
 {reg_index}\
+    constant address : addr_t := base_address + to_unsigned(4 * reg_index, addr_width);
     constant reg_value : reg_t := {value_conversion};
   begin
-    write_reg(
+    write_bus(
       net => net,
-      reg_index => reg_index,
-      value => reg_value,
-      base_address => base_address,
-      bus_handle => bus_handle
+      bus_handle => bus_handle,
+      address => std_logic_vector(address),
+      data => reg_value
     );
   end procedure;
 """
