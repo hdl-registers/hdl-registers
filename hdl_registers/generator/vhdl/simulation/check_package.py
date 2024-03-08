@@ -241,11 +241,11 @@ end package body;
             check = f"""\
     if got /= expected then
       failing_check(
-        checker=>default_checker,
-        msg=>p_std_msg(
-          check_result=>"Equality check failed",
-          msg=>get_message,
-          ctx=> (
+        checker => default_checker,
+        msg => p_std_msg(
+          check_result => "Equality check failed",
+          msg => get_message,
+          ctx => (
             "Got " & {to_string("got")} & "."
             & " Expected " & {to_string("expected")} & "."
           )
