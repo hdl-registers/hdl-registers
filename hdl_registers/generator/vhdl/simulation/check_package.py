@@ -234,7 +234,7 @@ end package body;
                     return f"to_string({name})"
 
                 if isinstance(field, BitVector) and isinstance(field.field_type, Fixed):
-                    return f'to_string({name}) & " (" & to_string(to_real({name})) & ")"'
+                    return f'to_string({name}) & " (" & to_string(to_real({name}), "%f") & ")"'
 
                 raise ValueError(f"Unsupported field type: {field}")
 

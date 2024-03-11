@@ -138,12 +138,12 @@ def test_running_simulation(tmp_path):
             ),
             f"{tb_check}test_check_equal_fail_for_sfixed_field": (
                 "ERROR - Checking the 'sfixed0' field in the 'field_test' "
-                "register. - Got 111.111 (-1.25e-1). Expected 101.010 (-2.75)."
+                "register. - Got 111.111 (-0.125000). Expected 101.010 (-2.750000)."
             ),
             f"{tb_check}test_check_equal_fail_for_ufixed_field": (
                 "ERROR - Checking the 'ufixed0' field in the 'field_test' "
-                "register. Custom message here. - Got 111111.11 (6.375e1). "
-                "Expected 101010.10 (4.25e1)."
+                "register. Custom message here. - Got 111111.11 (63.750000). "
+                "Expected 101010.10 (42.500000)."
             ),
             #
             f"{tb_integration}test_reading_write_only_register_should_fail": (
