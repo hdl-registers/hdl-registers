@@ -9,6 +9,7 @@
 
 # Standard libraries
 import sys
+from os import environ
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -108,6 +109,13 @@ def test_running_simulation(tmp_path):
     tb_integration = "example.tb_integration."
     tb_regs_pkg = "example.tb_regs_pkg."
     tb_wait_until = "example.tb_wait_until_equals."
+
+    out_of_range = (
+        "is out of range"
+        if environ.get("VUNIT_SIMULATOR") == "modelsim"
+        else "ghdl:error: bound check failure"
+    )
+
     check_failed_tests(
         xml_report_file=tmp_path / "failing.xml",
         test_outputs={
@@ -153,9 +161,9 @@ def test_running_simulation(tmp_path):
                 "FAILURE - bresp - Got AXI response SLVERR(10) expected OKAY(00)"
             ),
             #
-            f"{tb_regs_pkg}test_enumeration_out_of_range": "ghdl:error: bound check failure",
-            f"{tb_regs_pkg}test_integer_from_slv_out_of_range": "ghdl:error: bound check failure",
-            f"{tb_regs_pkg}test_integer_to_slv_out_of_range": "ghdl:error: bound check failure",
+            f"{tb_regs_pkg}test_enumeration_out_of_range": out_of_range,
+            f"{tb_regs_pkg}test_integer_from_slv_out_of_range": out_of_range,
+            f"{tb_regs_pkg}test_integer_to_slv_out_of_range": out_of_range,
             #
             f"{tb_wait_until}test_wait_until_array_field_equals_timeout_with_base_address": (
                 "FAILURE - Timeout while waiting for the 'array_integer' field in the 'first' "
