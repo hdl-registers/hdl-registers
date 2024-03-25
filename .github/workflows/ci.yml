@@ -89,7 +89,7 @@ jobs:
           pytest-cov \
           pytest-xdist \
           types-PyYAML \
-          vunit-hdl
+          vunit-hdl@git+https://github.com/VUnit/vunit.git
 
     # Run ALL tests, including unit, lint and functional ones.
     # The execution time goes from 1:13 -> 0:50 when two threads are used.
