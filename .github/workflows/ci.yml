@@ -56,7 +56,7 @@ jobs:
 
     - name: Install Python packages
       run: |
-        python3 -m pip install pytest PyYAML rtoml
+        python3 -m pip install pytest PyYAML rtoml==0.9.0
 
     - name: Clone dependency repos
       run: |

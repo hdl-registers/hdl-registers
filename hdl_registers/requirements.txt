@@ -1,4 +1,4 @@
 GitPython
 PyYAML
-rtoml
+rtoml>= 0.9.0, < 0.10.0
 tsfpga>= 12.3.1
