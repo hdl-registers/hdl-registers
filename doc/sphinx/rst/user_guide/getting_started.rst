@@ -44,7 +44,7 @@ A minimal usage example:
 
   this_dir = Path(__file__).parent
 
-  register_list = from_toml(module_name="caesar", toml_file=this_dir / "caesar_registers.toml")
+  register_list = from_toml(name="caesar", toml_file=this_dir / "caesar_registers.toml")
   VhdlRegisterPackageGenerator(register_list=register_list, output_folder=this_dir).create_if_needed()
 
 The basis of all register operations is the :class:`.RegisterList` class.
