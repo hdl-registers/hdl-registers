@@ -30,7 +30,8 @@ clear list of requirements that was not, and is not, fulfilled by any other proj
 4. Clean, intuitive, well-documented and easy-to-use API.
 5. Well-tested and reliable code.
 
-Especially points 1. and 2. set this project apart from :ref:`others <similar_tools>`.
+All of these, but especially points 1. and 2., set this project apart
+from :ref:`others <similar_tools>`.
 
 
 .. _performance:
@@ -75,6 +76,8 @@ See :ref:`similar_tools` below for links to the other projects.
 The PeakRDL tool has no official VHDL generator, so we used the SystemVerilog generator
 for comparison.
 
+
+.. _scope:
 
 Scope
 -----
