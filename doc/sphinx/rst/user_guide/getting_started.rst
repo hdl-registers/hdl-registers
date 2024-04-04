@@ -59,6 +59,7 @@ invoke it.
 
 If you have more than one module with registers in your project then these are represented with a
 :class:`.RegisterList` object each.
+See :ref:`scope` for a background on this.
 
 
 
