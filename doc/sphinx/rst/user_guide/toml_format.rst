@@ -70,7 +70,7 @@ Using JSON data file
 --------------------
 
 The TOML format is highly recommended due to the benefits it offers, listed above.
-Also all the examples on this website are using TOML.
+Also all the examples on this website use TOML.
 However, the tool also supports using JSON data files if that is desired.
 
 In this case you need to construct your JSON data on the exact format as the
@@ -89,7 +89,7 @@ Using YAML data file
 --------------------
 
 The TOML format is highly recommended due to the benefits it offers, listed above.
-Also all the examples on this website are using TOML.
+Also all the examples on this website use TOML.
 However, the tool also supports using YAML data files if that is desired.
 
 In this case you need to construct your YAML data on the exact format as the
