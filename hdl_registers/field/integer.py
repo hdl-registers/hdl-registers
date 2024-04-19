@@ -127,6 +127,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
     @property
     def min_value(self) -> int:
         """
+        Minimum numeric value this field can assume.
         Getter for private member.
         """
         return self._min_value
@@ -134,6 +135,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
     @property
     def max_value(self) -> int:
         """
+        Maximum numeric value this field can assume.
         Getter for private member.
         """
         return self._max_value
