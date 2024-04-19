@@ -193,15 +193,17 @@ class RegisterList:
         """
         if register_array_name is None or register_array_index is None:
             # Target is plain register
-            register = self.get_register(register_name)
+            register = self.get_register(name=register_name)
 
             return register.index
 
         # Target is in register array
-        register_array = self.get_register_array(register_array_name)
-        register_array_start_index = register_array.get_start_index(register_array_index)
+        register_array = self.get_register_array(name=register_array_name)
+        register_array_start_index = register_array.get_start_index(
+            array_index=register_array_index
+        )
 
-        register = register_array.get_register(register_name)
+        register = register_array.get_register(name=register_name)
         register_index = register.index
 
         return register_array_start_index + register_index
