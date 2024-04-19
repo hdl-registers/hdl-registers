@@ -129,17 +129,26 @@ class RegisterList:
         self.register_objects.append(register_array)
         return register_array
 
-    def get_register(self, name: str) -> Register:
+    def get_register(self, name: str, register_array_name: Optional[str] = None) -> Register:
         """
         Get a register from this list.
-        Will only find plain registers, not registers in a register array.
         Will raise exception if no register matches.
+
+        If ``register_array_name`` is specified, this method will search only withing that array.
+        If it is not specified, the method will only search for plain registers (not registers
+        in any arrays).
 
         Arguments:
             name: The name of the register.
+            register_array_name: If the register is within a register array, this is the name of
+                the array.
         Return:
             The register.
         """
+        if register_array_name is not None:
+            register_array = self.get_register_array(name=register_array_name)
+            return register_array.get_register(name=name)
+
         for register_object in self.register_objects:
             if isinstance(register_object, Register) and register_object.name == name:
                 return register_object
