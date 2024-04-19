@@ -107,7 +107,7 @@ def get_register_list() -> "RegisterList":
     @property
     def should_create(self) -> bool:
         """
-        Since this generator creates two files, where on is binary, it is impossible to do the
+        Since this generator creates two files, where one is binary, it is impossible to do the
         version/hash check.
         Hence, set it to "always create".
         The mechanism "create if needed" should not be used for this generator anyway, since
