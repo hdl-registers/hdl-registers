@@ -117,6 +117,42 @@ def test_set_value():
     assert field.set_value(-0.00390625) == 0b11_11111111_11111100
 
 
+def test_min_and_max_value():
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=4, default_value="0000", field_type=Unsigned()
+    )
+    assert bit_vector.min_value == 0
+    assert bit_vector.max_value == 15
+
+    bit_vector = BitVector(
+        name="", base_index=0, description="", width=4, default_value="0000", field_type=Signed()
+    )
+    assert bit_vector.min_value == -8
+    assert bit_vector.max_value == 7
+
+    bit_vector = BitVector(
+        name="",
+        base_index=0,
+        description="",
+        width=4,
+        default_value="0000",
+        field_type=UnsignedFixedPoint(1, -2),
+    )
+    assert bit_vector.min_value == 0
+    assert bit_vector.max_value == 3.75
+
+    bit_vector = BitVector(
+        name="",
+        base_index=0,
+        description="",
+        width=4,
+        default_value="0000",
+        field_type=SignedFixedPoint(1, -2),
+    )
+    assert bit_vector.min_value == -2
+    assert bit_vector.max_value == 1.75
+
+
 def test_repr():
     # Check that repr is an actual representation, not just "X object at 0xABCDEF"
     assert "apa" in repr(
