@@ -12,7 +12,7 @@ import datetime
 import re
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any, Optional
 
 # Third party libraries
 from tsfpga.git_utils import get_git_commit, git_commands_are_available
@@ -226,7 +226,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
     def _find_versions_and_hash_of_existing_file(
         self, file_path: Path
-    ) -> tuple[Union[None, str], Union[None, str], Union[None, str]]:
+    ) -> tuple[Optional[str], Optional[str], Optional[str]]:
         """
         Returns the matching strings in a tuple. Either field can be ``None`` if nothing found.
         """
