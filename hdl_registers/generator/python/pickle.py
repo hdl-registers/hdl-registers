@@ -80,28 +80,32 @@ if TYPE_CHECKING:
     from hdl_registers.register_list import RegisterList
 
 THIS_DIR = Path(__file__).parent
+PICKLE_FILE = THIS_DIR / "{self.pickle_file.name}"
 
 
 class {class_name}:
 
     """
-    Instantiate this class to get the RegisterList object for the '{self.name}' module.
+    Instantiate this class to get the ``RegisterList`` object for the
+    ``{self.name}`` register list.
     """
 
     def __new__(cls):
         """
-        Recreate the RegisterList object from binary pickle.
+        Recreate the ``RegisterList`` object from binary pickle.
         """
-        with (THIS_DIR / "{self.pickle_file.name}").open("rb") as file_handle:
+        with PICKLE_FILE.open("rb") as file_handle:
             return pickle.load(file_handle)
 
 
 def get_register_list() -> "RegisterList":
     """
-    Return a RegisterList object with the registers/constants from the '{self.name}' module.
+    Return a ``RegisterList`` object with the registers/constants from the
+    ``{self.name}`` register list.
     Recreated from a Python pickle file.
     """
-    return {class_name}()
+    with PICKLE_FILE.open("rb") as file_handle:
+        return pickle.load(file_handle)
 '''
 
     @property
