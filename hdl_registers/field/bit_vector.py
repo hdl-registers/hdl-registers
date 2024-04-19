@@ -7,6 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
+# Standard libraries
+from typing import Union
+
 # Local folder libraries
 from .register_field import DEFAULT_FIELD_TYPE, RegisterField
 from .register_field_type import FieldType, Fixed
@@ -54,12 +57,35 @@ class BitVector(RegisterField):
         self._field_type = field_type
 
     @property
+    def base_index(self) -> int:
+        return self._base_index
+
+    @property
     def field_type(self) -> FieldType:
         return self._field_type
 
     @property
     def width(self) -> int:
+        """
+        Getter for private member.
+        """
         return self._width
+
+    @property
+    def min_value(self) -> Union[int, float]:
+        """
+        Minimum numeric value this field can assume.
+        Getter for private member.
+        """
+        return self._field_type.min_value(bit_width=self._width)
+
+    @property
+    def max_value(self) -> Union[int, float]:
+        """
+        Maximum numeric value this field can assume.
+        Getter for private member.
+        """
+        return self._field_type.max_value(bit_width=self._width)
 
     def _check_width(self, width: int, field_type: FieldType) -> None:
         """
@@ -84,10 +110,6 @@ class BitVector(RegisterField):
                     f'Inconsistent width for bit vector "{self.name}". '
                     f'Field is "{width}" bits, type is "{field_type.expected_bit_width}".'
                 )
-
-    @property
-    def base_index(self) -> int:
-        return self._base_index
 
     @property  # type: ignore[override]
     def default_value(self) -> str:
