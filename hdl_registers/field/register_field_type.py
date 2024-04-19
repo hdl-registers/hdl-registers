@@ -112,6 +112,13 @@ def _to_unsigned_binary(
 
 
 class FieldType(ABC):
+    @property
+    @abstractmethod
+    def is_signed(self) -> bool:
+        """
+        Is the field signed (two's complement)?
+        """
+
     @abstractmethod
     def min_value(self, bit_width: int) -> Union[int, float]:
         """
@@ -182,6 +189,8 @@ class Unsigned(FieldType):
     Unsigned integer.
     """
 
+    is_signed: bool = False
+
     def min_value(self, bit_width: int) -> int:
         return 0
 
@@ -204,6 +213,8 @@ class Signed(FieldType):
     """
     Two's complement signed integer format.
     """
+
+    is_signed: bool = True
 
     def min_value(self, bit_width: int) -> int:
         result: int = -(2 ** (bit_width - 1))
@@ -240,7 +251,7 @@ class Fixed(FieldType, ABC):
             max_bit_index: Position of the upper bit relative to the decimal point.
             min_bit_index: Position of the lower bit relative to the decimal point.
         """
-        self.is_signed = is_signed
+        self._is_signed = is_signed
         self._integer = Signed() if is_signed else Unsigned()
         self.max_bit_index = max_bit_index
         self.min_bit_index = min_bit_index
@@ -250,6 +261,10 @@ class Fixed(FieldType, ABC):
         self.integer_bit_width = self.max_bit_index + 1
         self.fraction_bit_width = -self.min_bit_index
         self.expected_bit_width = self.integer_bit_width + self.fraction_bit_width
+
+    @property
+    def is_signed(self) -> bool:
+        return self._is_signed
 
     def min_value(self, bit_width: int) -> float:
         min_integer_value = self._integer.min_value(bit_width)
