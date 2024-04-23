@@ -115,3 +115,9 @@ def test_start_index_with_argument_outside_of_length_should_raise_exception():
     with pytest.raises(ValueError) as exception_info:
         register_array.get_start_index(4)
     assert str(exception_info.value) == 'Index 4 out of range for register array "apa" of length 4.'
+
+    with pytest.raises(ValueError) as exception_info:
+        register_array.get_start_index(-1)
+    assert (
+        str(exception_info.value) == 'Index -1 out of range for register array "apa" of length 4.'
+    )
