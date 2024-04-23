@@ -85,7 +85,7 @@ class RegisterArray:
             array_index: The array iteration index.
                 Must be less than the array ``length``.
         """
-        if array_index >= self.length:
+        if not 0 <= array_index < self.length:
             raise ValueError(
                 f'Index {array_index} out of range for register array "{self.name}" '
                 f"of length {self.length}."
