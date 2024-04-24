@@ -12,99 +12,104 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 
-def _from_unsigned_binary(
-    bit_width: int,
-    unsigned_binary: int,
-    integer_bit_width: Optional[int] = None,
-    fraction_bit_width: int = 0,
+def from_unsigned_binary(
+    num_bits: int,
+    value: int,
+    num_integer_bits: Optional[int] = None,
+    num_fractional_bits: int = 0,
     is_signed: bool = False,
 ) -> Union[int, float]:
     """
-    Convert from an unsigned binary to one of:
-    - unsigned integer
-    - signed integer
-    - unsigned fixed point
-    - signed fixed point
+    Convert from a fixed-point unsigned binary value to one of
 
-    Signed uses two's complement representation.
+    * unsigned integer (Python ``int``)
+    * signed integer (Python ``int``)
+    * unsigned floating-point (Python ``float``)
+    * signed floating-point (Python ``float``)
 
+    Signed types use two's complement representation for the binary value.
     Sources:
-        https://en.wikibooks.org/wiki/Floating_Point/Fixed-Point_Numbers
-        https://vhdlguru.blogspot.com/2010/03/fixed-point-operations-in-vhdl-tutorial.html
+
+    * https://en.wikibooks.org/wiki/Floating_Point/Fixed-Point_Numbers
+    * https://vhdlguru.blogspot.com/2010/03/fixed-point-operations-in-vhdl-tutorial.html
 
     Arguments:
-        bit_width: Width of the field.
-        unsigned_binary: Unsigned binary integer representation of the field.
-        integer_bit_width: If fixed point, the number of bits assigned to the integer part of the
-            field value.
-        fraction_bit_width: If fixed point, the number of bits assigned to the fractional part of
-            the field value.
-        is_signed: Is the field signed (two's complement)?
+        num_bits: Width of the field.
+        value: Unsigned binary integer representation of the value.
+        num_integer_bits: The number of integer bits in the fixed-point ``value``.
+            Might be negative if this is a fixed-point word with only fractional bits.
+        num_fractional_bits: The number of fractional bits in the fixed-point ``value``.
+            Might be negative if this is a fixed-point word with only integer bits.
+        is_signed: If ``True``, the MSB of the ``value`` will be treated as a sign bit.
+            Enables the handling of negative result values.
 
     Return:
-        Native Python representation of the field value.
-        Will be a ``float`` if ``fraction_bit_width`` is non-zero, otherwise it will be an ``int``.
+        Native Python representation of the ``value``.
+        Will be a ``float`` if ``num_fractional_bits`` is non-zero, otherwise it will be an ``int``.
     """
-    integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
+    num_integer_bits = num_bits if num_integer_bits is None else num_integer_bits
 
-    if integer_bit_width + fraction_bit_width != bit_width:
+    if num_integer_bits + num_fractional_bits != num_bits:
         raise ValueError("Inconsistent bit width")
 
-    value: Union[int, float] = unsigned_binary * 2**-fraction_bit_width
+    result: Union[int, float] = value * 2**-num_fractional_bits
 
     if is_signed:
-        sign_bit = unsigned_binary & (1 << (bit_width - 1))
+        sign_bit = value & (1 << (num_bits - 1))
         if sign_bit != 0:
             # If sign bit is set, compute negative value.
-            value -= 2**integer_bit_width
+            result -= 2**num_integer_bits
 
-    return value
+    return result
 
 
-def _to_unsigned_binary(
-    bit_width: int,
+def to_unsigned_binary(
+    num_bits: int,
     value: Union[int, float],
-    integer_bit_width: Optional[int] = None,
-    fraction_bit_width: int = 0,
+    num_integer_bits: Optional[int] = None,
+    num_fractional_bits: int = 0,
     is_signed: bool = False,
 ) -> int:
     """
-    Convert from one of:
-        - unsigned integer
-        - signed integer
-        - unsigned fixed point
-        - signed fixed point
+    Convert from one of
+
+    * unsigned integer (Python ``int``)
+    * signed integer (Python ``int``)
+    * unsigned floating-point (Python ``float``)
+    * signed floating-point (Python ``float``)
+
     into an unsigned binary.
-
-    Signed uses two's complement representation.
-
+    Signed types use two's complement representation for the binary value.
     Sources:
-        https://en.wikibooks.org/wiki/Floating_Point/Fixed-Point_Numbers
-        https://vhdlguru.blogspot.com/2010/03/fixed-point-operations-in-vhdl-tutorial.html
+
+    * https://en.wikibooks.org/wiki/Floating_Point/Fixed-Point_Numbers
+    * https://vhdlguru.blogspot.com/2010/03/fixed-point-operations-in-vhdl-tutorial.html
 
     Arguments:
-        bit_width: Width of the field.
-        value: Native Python representation of the field value.
-           If ``fraction_bit_width`` is non-zero the value is expected to be a ``float``, otherwise
-           an ``int`` is expected.
-        integer_bit_width: If fixed point, the number of bits assigned to the integer part of the
-            field value.
-        fraction_bit_width: If fixed point, the number of bits assigned to the fractional part of
-            the field value.
-        is_signed: Is the field signed (two's complement)?
+        num_bits: Width of the field.
+        value: Native numeric Python representation of the value.
+            If ``num_fractional_bits`` is non-zero the value is expected to be a ``float``,
+            otherwise an ``int`` is expected.
+        num_integer_bits: The number of integer bits in the target fixed-point word.
+            Might be negative if this is a fixed-point word with only fractional bits.
+        num_fractional_bits: The number of fractional bits in the target fixed-point word.
+            Might be negative if this is a fixed-point word with only integer bits.
+        is_signed: Enables the handling of negative input ``value``.
+            If ``True``, the MSB of the result word will be treated as a sign bit.
 
     Return:
-        Unsigned binary integer representation of the field.
+        Unsigned binary integer representation of the value.
+        Potentially rounded, if the input ``value`` is a floating-point number.
     """
-    integer_bit_width = bit_width if integer_bit_width is None else integer_bit_width
+    num_integer_bits = num_bits if num_integer_bits is None else num_integer_bits
 
-    if integer_bit_width + fraction_bit_width != bit_width:
+    if num_integer_bits + num_fractional_bits != num_bits:
         raise ValueError("Inconsistent bit width")
 
-    binary_value: int = round(value * 2**fraction_bit_width)
+    binary_value: int = round(value * 2**num_fractional_bits)
     if value < 0:
         if is_signed:
-            binary_value += 1 << bit_width
+            binary_value += 1 << num_bits
         else:
             raise ValueError("Attempting to convert negative value to unsigned")
 
@@ -225,11 +230,11 @@ class Signed(FieldType):
         return result
 
     def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> int:
-        return int(_from_unsigned_binary(bit_width, unsigned_binary, is_signed=True))
+        return int(from_unsigned_binary(num_bits=bit_width, value=unsigned_binary, is_signed=True))
 
     def convert_to_unsigned_binary(self, bit_width: int, value: float) -> int:
         self._check_value_in_range(bit_width, value)
-        return _to_unsigned_binary(bit_width, value, is_signed=True)
+        return to_unsigned_binary(num_bits=bit_width, value=value, is_signed=True)
 
     def __repr__(self) -> str:
         return self.__class__.__name__
@@ -277,21 +282,21 @@ class Fixed(FieldType, ABC):
         return self.convert_from_unsigned_binary(bit_width, max_integer_binary)
 
     def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> float:
-        return _from_unsigned_binary(
-            bit_width=bit_width,
-            unsigned_binary=unsigned_binary,
-            integer_bit_width=self.integer_bit_width,
-            fraction_bit_width=self.fraction_bit_width,
+        return from_unsigned_binary(
+            num_bits=bit_width,
+            value=unsigned_binary,
+            num_integer_bits=self.integer_bit_width,
+            num_fractional_bits=self.fraction_bit_width,
             is_signed=self.is_signed,
         )
 
     def convert_to_unsigned_binary(self, bit_width: int, value: float) -> int:
         self._check_value_in_range(bit_width, value)
-        return _to_unsigned_binary(
-            bit_width=bit_width,
+        return to_unsigned_binary(
+            num_bits=bit_width,
             value=value,
-            integer_bit_width=self.integer_bit_width,
-            fraction_bit_width=self.fraction_bit_width,
+            num_integer_bits=self.integer_bit_width,
+            num_fractional_bits=self.fraction_bit_width,
             is_signed=self.is_signed,
         )
 

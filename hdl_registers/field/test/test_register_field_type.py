@@ -121,7 +121,7 @@ def test_out_of_range(field_type: FieldType, bit_width: int):
         (8, -126, 0b10000010),
     ],
 )
-def test_singed(bit_width, value, expected):
+def test_signed(bit_width, value, expected):
     field_type = Signed()
     field_type._check_value_in_range(bit_width, value)
     unsigned = field_type.convert_to_unsigned_binary(bit_width, value)
