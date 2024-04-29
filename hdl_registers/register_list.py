@@ -134,7 +134,8 @@ class RegisterList:
         Get a register from this list.
         Will raise exception if no register matches.
 
-        If ``register_array_name`` is specified, this method will search only withing that array.
+        If ``register_array_name`` is specified, this method will search for registers within
+        that array.
         If it is not specified, the method will only search for plain registers (not registers
         in any arrays).
 
