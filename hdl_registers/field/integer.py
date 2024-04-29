@@ -9,7 +9,7 @@
 
 # Local folder libraries
 from .register_field import RegisterField
-from .register_field_type import FieldType, Signed, Unsigned
+from .register_field_type import Signed, Unsigned
 
 
 class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
@@ -51,21 +51,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         self.default_value = default_value
 
         # Determines how bits are to be interpreted in 'set_value' and 'get_value'.
-        self._field_type = Signed() if self.is_signed else Unsigned()
-
-    @property
-    def field_type(self) -> FieldType:
-        """
-        Getter for private member.
-        """
-        return self._field_type
-
-    @property
-    def is_signed(self) -> bool:
-        """
-        Returns True if the field can hold negative numbers.
-        """
-        return self._min_value < 0
+        self._field_type = Signed() if min_value < 0 else Unsigned()
 
     @property
     def width(self) -> int:
@@ -93,10 +79,6 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
                 return num_bits
 
         raise ValueError(error_message)
-
-    @property
-    def base_index(self) -> int:
-        return self._base_index
 
     def _check_range(self, min_value: int, max_value: int) -> None:
         """

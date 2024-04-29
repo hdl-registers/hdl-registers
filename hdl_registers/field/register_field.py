@@ -23,10 +23,21 @@ class RegisterField(ABC):
     Lists a few methods that must be implemented.
     """
 
-    # Must set these two as class members in subclasses.
+    # Must set as class members in subclasses.
     name: str
+    _base_index: int
     description: str
     default_value: Union[str, int]
+
+    # Default type, should be assigned to something else in subclasses when appropriate.
+    _field_type: FieldType = DEFAULT_FIELD_TYPE
+
+    @property
+    def base_index(self) -> int:
+        """
+        The index within the register for the lowest bit of this field.
+        """
+        return self._base_index
 
     @property
     def max_binary_value(self) -> int:
@@ -54,21 +65,20 @@ class RegisterField(ABC):
         The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint, ...)
         used to interpret the bits of the field.
         """
-        # Default for all RegisterFields
-        return DEFAULT_FIELD_TYPE
+        return self._field_type
+
+    @property
+    def is_signed(self) -> bool:
+        """
+        Returns True if the field can hold negative numbers.
+        """
+        return self._field_type.is_signed
 
     @property
     @abstractmethod
     def width(self) -> int:
         """
         Return the width, in number of bits, that this field occupies.
-        """
-
-    @property
-    @abstractmethod
-    def base_index(self) -> int:
-        """
-        The index within the register for the lowest bit of this field.
         """
 
     @property
