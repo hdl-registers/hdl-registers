@@ -115,10 +115,6 @@ class Enumeration(RegisterField):
         return num_bits
 
     @property
-    def base_index(self) -> int:
-        return self._base_index
-
-    @property
     def elements(self) -> list[EnumerationElement]:
         """
         Getter for elements.

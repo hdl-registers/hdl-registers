@@ -34,10 +34,6 @@ class Bit(RegisterField):
         # Assign self._default_value via setter
         self.default_value = default_value
 
-    @property
-    def base_index(self) -> int:
-        return self._base_index
-
     @property  # type: ignore[override]
     def default_value(self) -> str:
         """

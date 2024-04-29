@@ -57,14 +57,6 @@ class BitVector(RegisterField):
         self._field_type = field_type
 
     @property
-    def base_index(self) -> int:
-        return self._base_index
-
-    @property
-    def field_type(self) -> FieldType:
-        return self._field_type
-
-    @property
     def width(self) -> int:
         """
         Getter for private member.
