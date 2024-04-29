@@ -30,7 +30,7 @@ sections = "FUTURE,STDLIB,TOOLS_PYTHONPATH,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 
 # ------------------------------------------------------------------------------
 [tool.mypy]
-exclude = ['/test_.*\.py$']
+exclude = ['/test_.*\.py$', '/conftest.py$']
 
 # Use strict as a base, and explicitly remove the checks that we do not want.
 strict = true

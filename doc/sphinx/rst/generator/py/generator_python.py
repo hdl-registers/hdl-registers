@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 # First party libraries
+from hdl_registers.generator.python.accessor import PythonAccessorGenerator
 from hdl_registers.generator.python.pickle import PythonPickleGenerator
 from hdl_registers.parser.toml import from_toml
 
@@ -28,6 +29,8 @@ def main(output_folder: Path):
     )
 
     PythonPickleGenerator(register_list=register_list, output_folder=output_folder).create()
+
+    PythonAccessorGenerator(register_list=register_list, output_folder=output_folder).create()
 
 
 if __name__ == "__main__":

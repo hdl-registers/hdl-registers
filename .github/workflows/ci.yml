@@ -56,7 +56,7 @@ jobs:
 
     - name: Install Python packages
       run: |
-        python3 -m pip install pytest PyYAML rtoml==0.9.0
+        python3 -m pip install black pytest PyYAML rtoml==0.9.0
 
     - name: Clone dependency repos
       run: |
@@ -135,6 +135,7 @@ jobs:
     - name: Install Python packages
       run: |
         pip install \
+          black \
           GitPython \
           pybadges \
           PyYAML \
