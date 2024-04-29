@@ -84,7 +84,6 @@ PICKLE_FILE = THIS_DIR / "{self.pickle_file.name}"
 
 
 class {class_name}:
-
     """
     Instantiate this class to get the ``RegisterList`` object for the
     ``{self.name}`` register list.
