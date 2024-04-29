@@ -47,7 +47,7 @@ class RegisterCodeGeneratorHelpers:
         """
         yield from self.register_list.register_objects
 
-    def iterate_registers(self) -> Iterator[tuple[Register, Union[RegisterArray, None]]]:
+    def iterate_registers(self) -> Iterator[tuple[Register, Optional[RegisterArray]]]:
         """
         Iterate over all registers, plain or in array, in the register list.
 
