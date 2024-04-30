@@ -21,7 +21,7 @@ sys.path.insert(0, str(REPO_ROOT))
 
 # First party libraries
 import hdl_registers
-from hdl_registers.about import get_readme_rst, get_short_slogan
+from hdl_registers.about import REPOSITORY_URL, WEBSITE_URL, get_readme_rst, get_short_slogan
 
 # Duplicated from tsfpga/__init__.py since setup.py may not depend on tsfpga
 DEFAULT_FILE_ENCODING = "utf-8"
@@ -120,11 +120,11 @@ def main():
         python_requires=">=3.9",
         #
         project_urls={
-            "Homepage": "https://hdl-registers.com",
-            "Documentation": "https://hdl-registers.com/",
-            "Changelog": "https://hdl-registers.com/rst/about/release_notes.html",
-            "Source": "https://github.com/hdl-registers/hdl-registers",
-            "Issues": "https://github.com/hdl-registers/hdl-registers/issues",
+            "Homepage": WEBSITE_URL,
+            "Documentation": WEBSITE_URL,
+            "Changelog": f"{WEBSITE_URL}/rst/about/release_notes.html",
+            "Source": REPOSITORY_URL,
+            "Issues": f"{REPOSITORY_URL}/issues",
         },
     )
 

@@ -13,13 +13,14 @@ from tsfpga.test.lint.copyright_lint import CopyrightHeader
 
 # First party libraries
 from hdl_registers import REPO_ROOT
+from hdl_registers.about import REPOSITORY_URL, WEBSITE_URL
 
 COPYRIGHT_HOLDER = "Lukas Vik"
 COPYRIGHT_TEXT = [
     "This file is part of the hdl-registers project, an HDL register generator fast enough to run",
     "in real time.",
-    "https://hdl-registers.com",
-    "https://github.com/hdl-registers/hdl-registers",
+    WEBSITE_URL,
+    REPOSITORY_URL,
 ]
 
 
