@@ -22,6 +22,9 @@ sys.path.insert(0, str(REPO_ROOT))
 # Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
 import tools.tools_pythonpath  # noqa: F401
 
+# First party libraries
+from hdl_registers.about import WEBSITE_URL
+
 project = "hdl-registers"
 copyright = "Lukas Vik"
 author = "Lukas Vik"
@@ -42,7 +45,8 @@ intersphinx_mapping = {
 }
 
 # Base URL for generated sitemap.xml.
-html_baseurl = "https://hdl-registers.com/"
+# Note that this must end with a trailing slash, otherwise the sitemap.xml will be incorrect.
+html_baseurl = f"{WEBSITE_URL}/"
 
 # To avoid "en" in the sitemap.xml URL.
 # https://sphinx-sitemap.readthedocs.io/en/latest/advanced-configuration.html
@@ -74,8 +78,8 @@ html_css_files = [
 ]
 
 # OpenGraph settings.
-ogp_site_url = "https://hdl-registers.com"
-ogp_image = "_static/500.png"
+ogp_site_url = WEBSITE_URL
+ogp_image = "_static/social_media_preview.png"
 
 
 # Make autodoc include __init__ class method.

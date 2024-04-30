@@ -28,7 +28,7 @@ from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
 # First party libraries
 import hdl_registers
-from hdl_registers.about import get_readme_rst, get_short_slogan
+from hdl_registers.about import WEBSITE_URL, get_readme_rst, get_short_slogan
 
 GENERATED_SPHINX = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_rst"
 GENERATED_SPHINX_HTML = hdl_registers.HDL_REGISTERS_GENERATED / "sphinx_html"
@@ -137,9 +137,9 @@ def generate_bibtex() -> None:
     author = {Vik, Lukas},
     title  = {{hdl-registers: """
 
-    rst_after = """}},
-    url    = {https://hdl-registers.com},
-  }
+    rst_after = f"""}}}},
+    url    = {{{WEBSITE_URL}}},
+  }}
 """
 
     rst = f"{rst_before}{get_short_slogan()}{rst_after}"
