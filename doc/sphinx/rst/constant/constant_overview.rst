@@ -7,6 +7,9 @@ Using register constants is a convenient way to avoid duplication or hard-coding
 important values.
 It makes it possible to programmatically provide values from the HDL project build flow to the
 software that will integrate it.
+Adding a constant to a register list will make it available in the generated code, e.g. in
+:ref:`VHDL <generator_vhdl>` for HDL use, and in e.g. :ref:`C++ header <generator_cpp>` for
+software use.
 
 We support all conceivable types of constants.
 See the menu sidebar for details about the different types and how to use them.

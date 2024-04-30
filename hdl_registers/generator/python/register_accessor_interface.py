@@ -56,7 +56,7 @@ class PythonRegisterAccessorInterface(ABC):
         self, register_list_name: str, register_address: int, register_value: int
     ) -> None:
         """
-        Read the value of a register.
+        Write a register.
 
         Arguments:
             register_list_name: Name of the register list that the requested register belongs to.

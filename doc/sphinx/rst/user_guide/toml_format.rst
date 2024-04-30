@@ -107,7 +107,7 @@ Below is an example YAML snippet that sets up some register data:
 Other data file formats
 -----------------------
 
-The TOML format is highly recommended due to the benefits it offers, listed above.
+The TOML format is highly recommended due to the benefits it offers, :ref:`listed above <why_toml>`.
 We also officially support parsing JSON and YAML, see above.
 However, if you want to parse some other exotic data file format then that is also possible.
 

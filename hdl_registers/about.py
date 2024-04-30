@@ -144,7 +144,7 @@ The following code can be generated:
 * `VHDL <https://hdl-registers.com/rst/generator/generator_vhdl.html>`_
 
   * AXI-Lite register file wrapper using records and native VHDL types for values.
-  * Support packages for compact and efficient simulation.
+  * Simulation support packages for compact read/write/wait/checking of register and field values.
 
 * `C++ <https://hdl-registers.com/rst/generator/generator_cpp.html>`_
 
@@ -153,8 +153,12 @@ The following code can be generated:
 
 * `C header <https://hdl-registers.com/rst/generator/generator_c.html>`_
   with register addresses and field information.
+
 * `HTML <https://hdl-registers.com/rst/generator/generator_html.html>`_
   website with documentation of registers and fields.
+
+* `Python <https://hdl-registers.com/rst/generator/generator_python.html>`_
+  class with methods to read/write/print each register and field on a target device.
 
 The tool can also be extended by
 `writing your own code generator \
