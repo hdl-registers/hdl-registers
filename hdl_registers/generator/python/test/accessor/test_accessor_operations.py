@@ -876,6 +876,10 @@ def test_print_registers(default_accessor):
         default_accessor.test_accessor.print_registers()
         stdout = string_io.getvalue()
 
+    # To inspect:
+    # print(stdout)
+    # assert False
+
     values = """\
   bit_aa0: 0
   bit_aa1: 1
@@ -913,10 +917,6 @@ Register 'reg_array_a[2].reg_wpulse' .......................................... 
 """
         in stdout
     )
-
-    # To inspect:
-    # print(stdout)
-    # assert False
 
 
 def test_print_registers_value1(default_accessor):

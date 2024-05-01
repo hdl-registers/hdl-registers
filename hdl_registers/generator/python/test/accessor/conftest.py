@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from typing import Union
 
 # Third party libraries
 import pytest
@@ -24,6 +25,7 @@ from hdl_registers.field.register_field_type import (
 from hdl_registers.generator.python.accessor import PythonAccessorGenerator
 from hdl_registers.generator.python.pickle import PythonPickleGenerator
 from hdl_registers.register import REGISTER_MODES
+from hdl_registers.register_array import RegisterArray
 from hdl_registers.register_list import RegisterList
 
 # False positive for pytest fixtures
@@ -70,12 +72,14 @@ def generate_default_accessor(tmp_session_path):
     return tmp_session_path, python_module
 
 
-def add_test_registers(register_list_or_array: RegisterList):
+def add_test_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
     for mode in REGISTER_MODES:
         setup_test_register(register_list_or_array=register_list_or_array, mode=mode)
 
 
-def setup_test_register(register_list_or_array: RegisterList, mode: str):
+def setup_test_register(
+    register_list_or_array: Union[RegisterList, RegisterArray], mode: str
+) -> None:
     register = register_list_or_array.append_register(f"reg_{mode}", mode=mode, description="")
 
     register.append_bit(name="bit_aa0", description="", default_value="0")
@@ -117,12 +121,12 @@ def setup_test_register(register_list_or_array: RegisterList, mode: str):
     )
 
 
-def add_empty_registers(register_list_or_array: RegisterList):
+def add_empty_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
     for mode in REGISTER_MODES:
         register_list_or_array.append_register(name=f"empty_{mode}", mode=mode, description="")
 
 
-def add_single_field_registers(register_list_or_array: RegisterList):
+def add_single_field_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
     register = register_list_or_array.append_register("single_w_bit", mode="w", description="")
     register.append_bit(name="bit_bb", description="", default_value="1")
 
