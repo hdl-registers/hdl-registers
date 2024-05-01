@@ -56,7 +56,7 @@ jobs:
 
     - name: Install Python packages
       run: |
-        python3 -m pip install black pytest PyYAML rtoml==0.9.0
+        python3 -m pip install black pytest PyYAML rtoml==0.9.0 termcolor
 
     - name: Clone dependency repos
       run: |
@@ -145,7 +145,8 @@ jobs:
           sphinx-rtd-theme \
           sphinx_sitemap \
           sphinx-toolbox \
-          sphinxext-opengraph
+          sphinxext-opengraph \
+          termcolor
 
     - name: Clone dependency repos
       run: |

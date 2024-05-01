@@ -83,6 +83,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
+from termcolor import colored
 
 # Third party libraries
 from hdl_registers.field.register_field_type import to_unsigned_binary
@@ -146,7 +147,7 @@ class {class_name}:
 
         return register_value
 
-    def _write_register(self, register_index: int, register_value: int):
+    def _write_register(self, register_index: int, register_value: int) -> None:
         """
         Write a register value via the register accessor provided by the user.
         We perform sanity checks in both directions here, since this is the glue logic between
@@ -175,14 +176,6 @@ def get_accessor(register_accessor: "PythonRegisterAccessorInterface") -> {class
     Factory function to create an accessor object.
     """
     return {class_name}(register_accessor=register_accessor)
-
-
-def _indent_string(string : str) -> str:
-    """
-    Apply indentation to a string.
-    Uses a pre-defined indentation level intended for printing field values.
-    """
-    return "  " + string.replace("\\n", "\\n  ")
 
 
 def _format_unsigned_number(value: int, width: int, include_decimal: bool=True) -> str:
@@ -281,18 +274,27 @@ class {class_name}:
     {field.name}: {field_type}
 """
         result += '''
-    def __str__(self) -> str:
+    def to_string(self, indentation: str="", no_color: bool = False) -> str:
         """
-        Cast register value to string, suitable for printing.
+        Get a string of the field values, suitable for printing.
+
+        Arguments:
+            indentation: Optionally indent each field value line.
+            no_color: Disable color output.
+                Can also be achieved by setting the environment variable ``NO_COLOR`` to any value.
         """
         values = []
 
 '''
         for field in register.fields:
             result += self._get_field_type_to_string_value(field=field)
-            result += f'        values.append(f"{field.name}: {{value}}")\n\n'
+            result += f"""\
+        field_name = colored("{field.name}", color="light_cyan", no_color=no_color)
+        values.append(f"{{indentation}}{{field_name}}: {{value}}")
 
-        result += '        return "\\n".join([_indent_string(string=value) for value in values])\n'
+"""
+
+        result += '        return "\\n".join(values)'
 
         return result
 
@@ -877,9 +879,13 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
         Python method to print all registers and their values.
         """
         result = '''
-    def print_registers(self) -> None:
+    def print_registers(self, no_color: bool=False) -> None:
         """
         Print all registers and their values to STDOUT.
+
+        Arguments:
+            no_color: Disable color output.
+                Can also be achieved by setting the environment variable ``NO_COLOR`` to any value.
         """
 '''
 
@@ -924,9 +930,14 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
             index = register.index
             read = f"self.read_{register.name}()"
 
-        name_with_space = f"'{name}' "
-        name_padded = f"{name_with_space:.<70}"
-        heading = f'print("Register {name_padded} (index {index}, address {4 *index}):")\n'
+        heading = f"""\
+print(
+    colored("Register", color="light_yellow", no_color=no_color)
+    + " '{name}' "
+    + colored("." * {67 - len(name)}, color="dark_grey", no_color=no_color)
+    + " (index {index}, address {4 *index}):"
+)
+"""
 
         if not is_readable:
             return f"""\
@@ -948,7 +959,7 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
         return f"""\
         {heading}\
         {read_value}\
-        print(register_value)
+        print(register_value.to_string(indentation="  ", no_color=no_color))
         print()
 
 """
