@@ -54,7 +54,7 @@ Interesting things to notice:
 
 1. Register read/write operations use a generated Python :py:mod:`dataclass <dataclasses>` to
    represent a register with field value members.
-   See e.g. ``read_config`` and ``write_config``, and the ``ExampleConfigValue`` type in
+   See e.g. ``read_config`` and ``write_config`` methods, and the ``ExampleConfigValue`` type in
    the :ref:`generated code <python_accessor_code>`.
 
 2. Field values are represented using native Python types.
