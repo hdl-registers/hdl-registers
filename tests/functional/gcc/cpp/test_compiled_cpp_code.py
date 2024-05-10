@@ -169,14 +169,14 @@ def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
 def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
     # 'config' register is index 0 and 'plain_integer' field starts at bit 9.
     test_code = """\
-  memory[0] = 100 << 9;
+  memory[0] = 100 << 5;
   caesar.get_config_plain_integer();
 """
     cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd, capture_output=True)
 
     test_code = """\
-  memory[0] = 101 << 9;
+  memory[0] = 101 << 5;
   caesar.get_config_plain_integer();
 """
     cmd = base_cpp_test.compile(test_code=test_code)
@@ -186,8 +186,8 @@ def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
         assert result.stdout == ""
         assert "Assertion `field_value <= 100' failed." in result.stderr, result.stderr
 
-        test_code = """\
-  memory[0] = -51 << 9;
+    test_code = """\
+  memory[0] = -51 << 5;
   caesar.get_config_plain_integer();
 """
     cmd = base_cpp_test.compile(test_code=test_code)

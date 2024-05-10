@@ -247,10 +247,10 @@ begin
     procedure check_config(got : caesar_config_t; expected : caesar_config_t) is
     begin
       check_equal(got.plain_bit_a, expected.plain_bit_a);
-      check_equal(got.plain_bit_b, expected.plain_bit_b);
       check_equal(got.plain_bit_vector, expected.plain_bit_vector);
-      assert got.plain_enumeration = expected.plain_enumeration;
       check_equal(got.plain_integer, expected.plain_integer);
+      assert got.plain_enumeration = expected.plain_enumeration;
+      check_equal(got.plain_bit_b, expected.plain_bit_b);
     end procedure;
 
     procedure test_plain_r_w_register is
@@ -282,11 +282,11 @@ begin
         got : caesar_dummies_first_t; expected : caesar_dummies_first_t
       ) is
       begin
+        check_equal(got.array_integer, expected.array_integer);
         check_equal(got.array_bit_a, expected.array_bit_a);
         check_equal(got.array_bit_b, expected.array_bit_b);
         check_equal(got.array_bit_vector, expected.array_bit_vector);
         assert got.array_enumeration = expected.array_enumeration;
-        check_equal(got.array_integer, expected.array_integer);
       end procedure;
 
       variable first : caesar_dummies_first_t := caesar_dummies_first_init;
@@ -555,10 +555,10 @@ begin
       -- A plain register of type 'r_w' that has all the different field types.
       -- Show that the default value constants have been set correctly.
       check_equal(caesar_config_plain_bit_a_init, '0');
-      check_equal(caesar_config_plain_bit_b_init, '1');
       check_equal(caesar_config_plain_bit_vector_init, std_logic_vector'("0011"));
-      assert caesar_config_plain_enumeration_init = plain_enumeration_third;
       check_equal(caesar_config_plain_integer_init, 66);
+      assert caesar_config_plain_enumeration_init = plain_enumeration_third;
+      check_equal(caesar_config_plain_bit_b_init, '1');
 
       -- The aggregated record type should have identical init values.
       check_config(got=>caesar_regs_down_init.config, expected=>caesar_config_init);
@@ -619,10 +619,10 @@ begin
     elsif run("test_write_value_to_plain_register") then
       -- Set different values than the default values.
       config.plain_bit_a := '1';
-      config.plain_bit_b := '0';
       config.plain_bit_vector := "1010";
-      config.plain_enumeration := plain_enumeration_fifth;
       config.plain_integer := -13;
+      config.plain_enumeration := plain_enumeration_fifth;
+      config.plain_bit_b := '0';
 
       -- Convert to SLV, write over register bus.
       -- Register file converts it back to a record for the checks below.
@@ -631,60 +631,60 @@ begin
       wait_for_write;
 
       check_equal(regs_down.config.plain_bit_a, '1');
-      check_equal(regs_down.config.plain_bit_b, '0');
       check_equal(regs_down.config.plain_bit_vector, std_logic_vector'("1010"));
-      assert regs_down.config.plain_enumeration = plain_enumeration_fifth;
       check_equal(regs_down.config.plain_integer, -13);
+      assert regs_down.config.plain_enumeration = plain_enumeration_fifth;
+      check_equal(regs_down.config.plain_bit_b, '0');
 
     elsif run("test_write_value_to_array_register") then
       -- Test writing different data to the same register but different repetitions of the array.
 
+      dummies_first.array_integer := 13;
       dummies_first.array_bit_a := '1';
       dummies_first.array_bit_b := '0';
       dummies_first.array_bit_vector := "10101";
       dummies_first.array_enumeration := array_enumeration_element1;
-      dummies_first.array_integer := 13;
 
       write_caesar_dummies_first(net=>net, array_index=>0, value=>dummies_first);
       reg_was_written_expected(caesar_dummies_first(0)) := 1;
 
+      dummies_first.array_integer := 57;
       dummies_first.array_bit_a := '0';
       dummies_first.array_bit_b := '1';
       dummies_first.array_bit_vector := "01010";
       dummies_first.array_enumeration := array_enumeration_element1;
-      dummies_first.array_integer := 57;
 
       write_caesar_dummies_first(net=>net, array_index=>1, value=>dummies_first);
       reg_was_written_expected(caesar_dummies_first(1)) := 1;
 
+      dummies_first.array_integer := 99;
       dummies_first.array_bit_a := '1';
       dummies_first.array_bit_b := '1';
       dummies_first.array_bit_vector := "11001";
       dummies_first.array_enumeration := array_enumeration_element0;
-      dummies_first.array_integer := 99;
 
       write_caesar_dummies_first(net=>net, array_index=>2, value=>dummies_first);
       reg_was_written_expected(caesar_dummies_first(2)) := 1;
 
       wait_for_write;
 
+      check_equal(regs_down.dummies(0).first.array_integer, 13);
       check_equal(regs_down.dummies(0).first.array_bit_a, '1');
       check_equal(regs_down.dummies(0).first.array_bit_b, '0');
       check_equal(regs_down.dummies(0).first.array_bit_vector, std_logic_vector'("10101"));
       assert regs_down.dummies(0).first.array_enumeration = array_enumeration_element1;
-      check_equal(regs_down.dummies(0).first.array_integer, 13);
 
+      check_equal(regs_down.dummies(1).first.array_integer, 57);
       check_equal(regs_down.dummies(1).first.array_bit_a, '0');
       check_equal(regs_down.dummies(1).first.array_bit_b, '1');
       check_equal(regs_down.dummies(1).first.array_bit_vector, std_logic_vector'("01010"));
       assert regs_down.dummies(1).first.array_enumeration = array_enumeration_element1;
-      check_equal(regs_down.dummies(1).first.array_integer, 57);
 
+      check_equal(regs_down.dummies(2).first.array_integer, 99);
       check_equal(regs_down.dummies(2).first.array_bit_a, '1');
       check_equal(regs_down.dummies(2).first.array_bit_b, '1');
       check_equal(regs_down.dummies(2).first.array_bit_vector, std_logic_vector'("11001"));
       assert regs_down.dummies(2).first.array_enumeration = array_enumeration_element0;
-      check_equal(regs_down.dummies(2).first.array_integer, 99);
 
     elsif run("test_operations_on_plain_r_register") then
       test_plain_r_register;

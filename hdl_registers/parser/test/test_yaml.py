@@ -25,10 +25,8 @@ def test_load_nonexistent_yaml_file_should_raise_exception(tmp_path):
 
 def test_load_dirty_yaml_file_should_raise_exception(tmp_path):
     yaml = """
-register:
-  apa:
-    mode: r_w
-
+apa:
+  mode: r_w
 """
     yaml_path = create_file(tmp_path / "apa.yaml", yaml)
     from_yaml(name="", yaml_file=yaml_path)
@@ -45,21 +43,20 @@ def test_default_registers(tmp_path):
     yaml_path = create_file(
         file=tmp_path / "regs.yaml",
         contents="""
-register:
-  apa:
-    mode: r_w
-    description: Apa.
-    bit:
-      enable:
-        default_value: '1'
-        description: Enable.
+apa:
+  mode: r_w
+  description: Apa.
+  enable:
+    type: bit
+    default_value: '1'
+    description: Enable.
 
-  hest:
-    mode: r
-    description: Hest.
-    bit:
-      disable:
-        description: Disable.
+hest:
+  mode: r
+  description: Hest.
+  disable:
+    type: bit
+    description: Disable.
 """,
     )
     register_list = from_yaml(
@@ -100,13 +97,11 @@ def test_two_registers_with_same_name_does_not_raise_exception(tmp_path):
     yaml_path = create_file(
         file=tmp_path / "regs.yaml",
         contents="""
-register:
-  apa:
-    mode: r_w
+apa:
+  mode: r_w
 
-register:
-  apa:
-    mode: r
+apa:
+  mode: r
 """,
     )
 

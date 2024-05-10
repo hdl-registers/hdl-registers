@@ -101,7 +101,8 @@ Once again, the application is a bit silly, but it does showcase a lot of intere
 
   a. How to take different action depending on an enumeration field
      in a "Read, Write" register.
-     Note that the field type is a VHDL enum with its elements (e.g. ``mode_clock_cycles``) exposed.
+     Note that the field type is a VHDL enum with its elements
+     (e.g. ``condition_clock_cycles``) exposed.
 
   b. How to use a numeric value from a "Read, Write" register.
      Since the field is of integer type, it can simply be added to another integer.

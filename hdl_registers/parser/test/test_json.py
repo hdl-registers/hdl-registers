@@ -26,10 +26,8 @@ def test_load_nonexistent_json_file_should_raise_exception(tmp_path):
 def test_load_dirty_json_file_should_raise_exception(tmp_path):
     json = """
 {
-    "register": {
-        "config": {
-            "mode": "r_w"
-        }
+    "config": {
+        "mode": "r_w"
     }
 }
 """
@@ -49,25 +47,21 @@ def test_default_registers(tmp_path):
         file=tmp_path / "regs.json",
         contents="""
 {
-    "register": {
-        "apa": {
-            "mode": "r_w",
-            "description": "Apa.",
-            "bit": {
-                "enable": {
-                    "description": "Enable.",
-                    "default_value": "1"
-                }
-            }
-        },
-        "hest": {
-            "mode": "r",
-            "description": "Hest.",
-            "bit": {
-                "disable": {
-                    "description": "Disable."
-                }
-            }
+    "apa": {
+        "mode": "r_w",
+        "description": "Apa.",
+        "enable": {
+            "type": "bit",
+            "description": "Enable.",
+            "default_value": "1"
+        }
+    },
+    "hest": {
+        "mode": "r",
+        "description": "Hest.",
+        "disable": {
+            "type": "bit",
+            "description": "Disable."
         }
     }
 }
@@ -111,13 +105,11 @@ def test_two_registers_with_same_name_does_not_raise_exception(tmp_path):
         file=tmp_path / "regs.json",
         contents="""
 {
-    "register": {
-        "apa": {
-            "mode": "r"
-        },
-        "apa": {
-            "mode": "r_w"
-        }
+    "apa": {
+        "mode": "r"
+    },
+    "apa": {
+        "mode": "r_w"
     }
 }
 """,

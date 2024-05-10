@@ -1,40 +1,46 @@
 ################################################################################
-[register.config]
+[config]
 
 mode = "r_w"
 
-enumeration.mode.description = "Set mode for how the counter operates."
-enumeration.mode.element.clock_cycles = "Increment counter each clock cycle."
-enumeration.mode.element.clock_cycles_with_enable = """
+condition.type = "enumeration"
+condition.description = "Set mode for how the counter operates."
+condition.element.clock_cycles = "Increment counter each clock cycle."
+condition.element.clock_cycles_with_enable = """
 Increment counter each clock cycle when **clock_enable** is asserted.
 """
-enumeration.mode.element.enable_edges = """
+condition.element.enable_edges = """
 Increment counter each time **clock_enable** changes state.
 """
 
-integer.increment.description = "How much to increment counter."
-integer.increment.max_value = 15
+increment.type = "integer"
+increment.description = "How much to increment counter."
+increment.max_value = 15
 
 
 ################################################################################
-[register.command]
+[command]
 
 mode = "wpulse"
 
-bit.start.description = "Write '1' to start operation."
+start.type = "bit"
+start.description = "Write '1' to start operation."
 
-bit.stop.description = "Write '1' to stop operation."
+stop.type = "bit"
+stop.description = "Write '1' to stop operation."
 
 
 ################################################################################
-[register.status]
+[status]
 
 mode = "r"
 
-bit.enabled.description = "Reads as '1' if operation is enabled."
+enabled.type = "bit"
+enabled.description = "Reads as '1' if operation is enabled."
 
-integer.pulse_count.max_value = 255
-integer.pulse_count.description = """
+pulse_count.type = "integer"
+pulse_count.max_value = 255
+pulse_count.description = """
 Number of pulses that have been sent.
 Will wrap around.
 Value will be cleared to zero when **config** register is written.

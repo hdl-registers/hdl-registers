@@ -107,7 +107,7 @@ def test_registers(html_test):
         index=0,
         address="0x0000",
         mode="Read, Write",
-        default_value="0x848E",
+        default_value="0x14846",
         description="A plain <strong>dummy</strong> register.",
         html=html,
     )
@@ -125,7 +125,7 @@ def test_registers(html_test):
         index="7 + i &times; 2",
         address="0x001C + i &times; 0x0008",
         mode="Read, Write",
-        default_value="0xB1",
+        default_value="0x5880",
         description="The first register in the array.",
         html=html,
     )
@@ -156,50 +156,50 @@ def test_register_fields(html_test):
         html=html,
     )
     html_test.check_field(
-        name="plain_bit_b",
-        index="1",
-        default_value="0b1",
-        description="Bit B",
-        html=html,
-    )
-    html_test.check_field(
         name="plain_bit_vector",
-        index="5:2",
+        index="4:1",
         default_value="0b0011",
         description="Bit <strong>vector</strong>",
         html=html,
     )
     html_test.check_field(
+        name="plain_integer",
+        index="12:5",
+        default_value="66",
+        html=html,
+    )
+    html_test.check_field(
         name="plain_enumeration",
-        index="8:6",
+        index="15:13",
         default_value="third",
         html=html,
     )
     html_test.check_field(
-        name="plain_integer",
-        index="16:9",
-        default_value="66",
+        name="plain_bit_b",
+        index="16",
+        default_value="0b1",
+        description="Bit B",
         html=html,
     )
 
     # Fields in register array
     html_test.check_field(
         name="array_bit_a",
-        index="0",
+        index="7",
         default_value="0b1",
         description="Array register bit A",
         html=html,
     )
     html_test.check_field(
         name="array_bit_b",
-        index="1",
+        index="8",
         default_value="0b0",
         description="Array register bit B",
         html=html,
     )
     html_test.check_field(
         name="array_bit_vector",
-        index="6:2",
+        index="13:9",
         default_value="0b01100",
         description="Array register bit vector",
         html=html,

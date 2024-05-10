@@ -25,8 +25,11 @@ def test_load_nonexistent_toml_file_should_raise_exception(tmp_path):
 
 def test_load_dirty_toml_file_should_raise_exception(tmp_path):
     toml = """
-a = 1
-b = "c"
+a.type = "constant"
+a.value = 1
+
+b.type = "constant"
+b.value = "2"
 """
     toml_path = create_file(tmp_path / "apa.toml", toml)
     from_toml(name="", toml_file=toml_path)
@@ -36,7 +39,7 @@ b = "c"
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value).startswith(
         f"Error while parsing TOML file {toml_path}:\n"
-        "expected an equals, found eof at line 4 column 8"
+        "expected an equals, found eof at line 7 column 8"
     )
 
 
@@ -44,11 +47,11 @@ def test_default_registers(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
-[register.apa]
+[apa]
 
 mode = "w"
 
-[register.hest]
+[hest]
 
 mode = "w"
 """,
@@ -74,11 +77,11 @@ def test_two_registers_with_same_name_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
-[register.status]
+[status]
 
 mode = "w"
 
-[register.status]
+[status]
 
 mode = "w"
 """,
@@ -88,25 +91,27 @@ mode = "w"
         from_toml(name="", toml_file=toml_path)
     expected = (
         f"Error while parsing TOML file {toml_path}:\n"
-        "redefinition of table `register.status` for key `register.status` at line 6 column 1"
+        "redefinition of table `status` for key `status` at line 6 column 1"
     )
     assert str(exception_info.value).startswith(expected)
 
 
-def test_two_bit_fields_with_same_name_should_raise_exception(tmp_path):
+def test_two_fields_with_same_name_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
-[register.test_reg]
+[test_reg]
 
 mode = "w"
 
-[register.test_reg.bit.test_bit]
+[test_reg.test_bit]
 
+type = "bit"
 description = "Declaration 1"
 
-[register.test_reg.bit.test_bit]
+[test_reg.test_bit]
 
+type = "bit_vector"
 description = "Declaration 2"
 """,
     )
@@ -115,7 +120,7 @@ description = "Declaration 2"
         from_toml(name="", toml_file=toml_path)
     expected = (
         f"Error while parsing TOML file {toml_path}:\n"
-        "redefinition of table `register.test_reg.bit.test_bit` for key "
-        "`register.test_reg.bit.test_bit` at line 10 column 1"
+        "redefinition of table `test_reg.test_bit` for key "
+        "`test_reg.test_bit` at line 11 column 1"
     )
     assert str(exception_info.value).startswith(expected)

@@ -1,15 +1,20 @@
-# This will allocate a register constant with the name "clock_frequency_hz" of type float.
-[constant.clock_frequency_hz]
+# This will allocate a register constant with the name "clock_frequency_hz" of data type float.
+[clock_frequency_hz]
+
+# The "type" property MUST be present and set to "constant".
+type = "constant"
 
 # The "value" property MUST be present for a float constant.
-# The value specified must be a float.
+# The value specified MUST be a float.
 value = 156.25e6
 
-# The "description" property is optional for a constant. Will default to "" if not specified.
-# The value specified must be a string.
+# The "description" property is OPTIONAL for a constant.
+# Will default to "" if not specified.
+# The value specified MUST be a string.
 description = "The frequency in Hertz of the system clock."
 
 
-[constant.division_factor]
+[division_factor]
 
+type = "constant"
 value = 8.125

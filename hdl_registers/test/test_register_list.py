@@ -161,22 +161,27 @@ def test_get_register():
 
 def test_get_register_array():
     register_list = RegisterList(name="apa", source_definition_file=None)
+
     hest = register_list.append_register_array(name="hest", length=3, description="")
+    hest.append_register(name="foo", mode="r", description="")
+
     zebra = register_list.append_register_array(name="zebra", length=2, description="")
+    zebra.append_register(name="bar", mode="r", description="")
+
     register_list.append_register(name="register", mode="r", description="")
 
     assert register_list.get_register_array("hest") is hest
     assert register_list.get_register_array("zebra") is zebra
 
     with pytest.raises(ValueError) as exception_info:
-        assert register_list.get_register_array("non existing") is None
+        register_list.get_register_array("non existing")
     assert (
         str(exception_info.value)
         == 'Could not find register array "non existing" within register list "apa"'
     )
 
     with pytest.raises(ValueError) as exception_info:
-        assert register_list.get_register_array("register") is None
+        register_list.get_register_array("register")
     assert (
         str(exception_info.value)
         == 'Could not find register array "register" within register list "apa"'

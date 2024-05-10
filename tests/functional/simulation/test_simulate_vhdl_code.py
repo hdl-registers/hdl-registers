@@ -107,7 +107,7 @@ def test_running_simulation(tmp_path):
 
     tb_check = "example.tb_check_pkg."
     tb_integration = "example.tb_integration."
-    tb_regs_pkg = "example.tb_regs_pkg."
+    tb_register_package = "example.tb_register_package."
     tb_wait_until = "example.tb_wait_until_equals."
 
     out_of_range = (
@@ -161,38 +161,38 @@ def test_running_simulation(tmp_path):
                 "FAILURE - bresp - Got AXI response SLVERR(10) expected OKAY(00)"
             ),
             #
-            f"{tb_regs_pkg}test_enumeration_out_of_range": out_of_range,
-            f"{tb_regs_pkg}test_integer_from_slv_out_of_range": out_of_range,
-            f"{tb_regs_pkg}test_integer_to_slv_out_of_range": out_of_range,
+            f"{tb_register_package}test_enumeration_out_of_range": out_of_range,
+            f"{tb_register_package}test_integer_from_slv_out_of_range": out_of_range,
+            f"{tb_register_package}test_integer_to_slv_out_of_range": out_of_range,
             #
             f"{tb_wait_until}test_wait_until_array_field_equals_timeout_with_base_address": (
                 "FAILURE - Timeout while waiting for the 'array_integer' field in the 'first' "
                 "register within the 'dummies[1]' register array (at base address x\"00050000\") "
-                "to equal the given value: -----------------0100001--------. Extra printout "
+                "to equal the given value: -------------------------0100001. Extra printout "
                 "that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_array_field_equals_timeout": (
                 "FAILURE - Timeout while waiting for the 'array_integer' field in the 'first' "
                 "register within the 'dummies[1]' register array to equal the given "
-                "value: -----------------0100001--------. Extra printout that can be set!."
+                "value: -------------------------0100001. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_array_register_equals_timeout": (
                 "FAILURE - Timeout while waiting for the 'first' register within the 'dummies[1]' "
                 "register array to equal the given "
-                "value: -----------------010000101100110. Extra printout that can be set!."
+                "value: -----------------011001100100001. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_plain_field_equals_timeout_with_message": (
                 "FAILURE - Timeout while waiting for the 'plain_integer' field in the "
                 "'config' register to equal the given "
-                "value: ---------------11011111---------. Extra printout that can be set!."
+                "value: -------------------11011111-----. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_plain_field_equals_timeout": (
                 "FAILURE - Timeout while waiting for the 'plain_integer' field in the "
-                "'config' register to equal the given value: ---------------11011111---------."
+                "'config' register to equal the given value: -------------------11011111-----."
             ),
             f"{tb_wait_until}test_wait_until_plain_register_equals_timeout": (
                 "FAILURE - Timeout while waiting for the 'config' register to equal the given "
-                "value: ---------------11011111100110001."
+                "value: ---------------01001101111111001."
             ),
         },
     )
@@ -267,7 +267,7 @@ def check_failed_tests(xml_report_file: Path, test_outputs: dict[str, str]) -> N
         got_output = xml_test_outputs[test_name]
         if expected_output not in got_output:
             raise AssertionError(
-                f"Test {test_name}. Got:\n{got_output}\nExpected:\n{expected_output}"
+                f"\nTest {test_name}. Got:\n{got_output}\nExpected:\n{expected_output}"
             )
 
 
