@@ -1,15 +1,21 @@
-# This will allocate a register constant with the name "supports_pre_filtering" of type boolean.
-[constant.supports_pre_filtering]
+# This will allocate a register constant with the name "supports_pre_filtering" of
+# data type boolean.
+[supports_pre_filtering]
+
+# The "type" property MUST be present and set to "constant".
+type = "constant"
 
 # The "value" property MUST be present for a boolean constant.
-# The value specified must be a boolean.
+# The value specified MUST be a boolean.
 value = true
 
-# The "description" property is optional for a constant. Will default to "" if not specified.
-# The value specified must be a string.
+# The "description" property is OPTIONAL for a constant.
+# Will default to "" if not specified.
+# The value specified MUST be a string.
 description = "Will indicate **True** if the module supports data pre-filtering."
 
 
-[constant.is_release_version]
+[is_release_version]
 
+type = "constant"
 value = false

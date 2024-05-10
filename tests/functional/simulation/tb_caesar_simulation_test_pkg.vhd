@@ -37,13 +37,14 @@ begin
 
     if run("test_check_config_non_init_has_all_fields_different_than_init") then
       assert caesar_config_non_init.plain_bit_a /= caesar_config_init.plain_bit_a;
-      assert caesar_config_non_init.plain_bit_b /= caesar_config_init.plain_bit_b;
       assert caesar_config_non_init.plain_bit_vector /= caesar_config_init.plain_bit_vector;
-      assert caesar_config_non_init.plain_enumeration /= caesar_config_init.plain_enumeration;
       assert caesar_config_non_init.plain_integer /= caesar_config_init.plain_integer;
+      assert caesar_config_non_init.plain_enumeration /= caesar_config_init.plain_enumeration;
+      assert caesar_config_non_init.plain_bit_b /= caesar_config_init.plain_bit_b;
 
 
     elsif run("test_check_dummies_first_non_init_has_all_fields_different_than_init") then
+      assert caesar_dummies_first_non_init.array_integer /= caesar_dummies_first_init.array_integer;
       assert caesar_dummies_first_non_init.array_bit_a /= caesar_dummies_first_init.array_bit_a;
       assert caesar_dummies_first_non_init.array_bit_b /= caesar_dummies_first_init.array_bit_b;
       assert (
@@ -54,7 +55,6 @@ begin
         caesar_dummies_first_non_init.array_enumeration
         /= caesar_dummies_first_init.array_enumeration
       );
-      assert caesar_dummies_first_non_init.array_integer /= caesar_dummies_first_init.array_integer;
 
     end if;
 

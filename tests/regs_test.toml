@@ -1,180 +1,215 @@
-
 ################################################################################
-[register.config]
+[config]
 
 mode = "r_w"
 description = "A plain **dummy** register."
 
-bit.plain_bit_a.description = "Bit A"
-bit.plain_bit_a.default_value = "0"
+plain_bit_a.type = "bit"
+plain_bit_a.description = "Bit A"
+plain_bit_a.default_value = "0"
 
-bit.plain_bit_b.description = "Bit B"
-bit.plain_bit_b.default_value = "1"
+plain_bit_vector.type = "bit_vector"
+plain_bit_vector.description = "Bit **vector**"
+plain_bit_vector.width = 4
+plain_bit_vector.default_value = "0011"
 
-bit_vector.plain_bit_vector.description = "Bit **vector**"
-bit_vector.plain_bit_vector.width = 4
-bit_vector.plain_bit_vector.default_value = "0011"
+plain_integer.type = "integer"
+plain_integer.description = "Integer"
+plain_integer.min_value = -50
+plain_integer.max_value = 100
+plain_integer.default_value = 66
 
-integer.plain_integer.description = "Integer"
-integer.plain_integer.min_value = -50
-integer.plain_integer.max_value = 100
-integer.plain_integer.default_value = 66
+plain_enumeration.type = "enumeration"
+plain_enumeration.description = "Enumeration"
+plain_enumeration.default_value = "third"
+plain_enumeration.element.first = "element 0"
+plain_enumeration.element.second = "element 1"
+plain_enumeration.element.third = "element 2"
+plain_enumeration.element.fourth = "element 3"
+plain_enumeration.element.fifth = "element 4"
 
-enumeration.plain_enumeration.description = "Enumeration"
-enumeration.plain_enumeration.default_value = "third"
-enumeration.plain_enumeration.element.first = "element 0"
-enumeration.plain_enumeration.element.second = "element 1"
-enumeration.plain_enumeration.element.third = "element 2"
-enumeration.plain_enumeration.element.fourth = "element 3"
-enumeration.plain_enumeration.element.fifth = "element 4"
+plain_bit_b.type = "bit"
+plain_bit_b.description = "Bit B"
+plain_bit_b.default_value = "1"
 
 
 ################################################################################
-[register.command]
+[command]
 
 mode = "wpulse"
 
-bit.start.default_value = "1"
-bit.abort.default_value = "0"
+start.type = "bit"
+start.default_value = "1"
+
+abort.type = "bit"
+abort.default_value = "0"
 
 
 ################################################################################
-[register.irq_status]
+[irq_status]
 
 mode = "r_wpulse"
 
-bit.a.default_value = "1"
-bit.b.default_value = "0"
+a.type = "bit"
+a.default_value = "1"
 
-bit_vector.c.width = 3
-bit_vector.c.default_value = "101"
+b.type = "bit"
+b.default_value = "0"
 
-enumeration.d.default_value = "second"
-enumeration.d.element.first = "element 0"
-enumeration.d.element.second = "element 1"
+c.type = "bit_vector"
+c.width = 3
+c.default_value = "101"
 
-integer.e.min_value = -100
-integer.e.max_value = 100
-integer.e.default_value = -10
+d.type = "enumeration"
+d.default_value = "second"
+d.element.first = "element 0"
+d.element.second = "element 1"
+
+e.type = "integer"
+e.min_value = -100
+e.max_value = 100
+e.default_value = -10
 
 
 ################################################################################
-[register.status]
+[status]
 
 mode = "r"
 description = "A register with fields that is only 'up'."
 
-bit.a.default_value = "0"
-bit.b.default_value = "1"
+a.type = "bit"
+a.default_value = "0"
+
+b.type = "bit"
+b.default_value = "1"
 
 # An 30 bit wide integer that will fill up the whole register (check this manually!).
-integer.c.min_value = -536870912
-integer.c.max_value = 1
-integer.c.default_value = -128
+c.type = "integer"
+c.min_value = -536870912
+c.max_value = 1
+c.default_value = -128
 
 
 ################################################################################
-[register.address]
+[address]
 
 mode = "w"
 description = "A register with fields that is only 'down'."
 
-bit_vector.a.width = 8
-bit_vector.a.default_value = "11001100"
+a.type = "bit_vector"
+a.width = 8
+a.default_value = "11001100"
 
-bit_vector.b.width = 8
-bit_vector.b.default_value = "10101010"
+b.type = "bit_vector"
+b.width = 8
+b.default_value = "10101010"
 
 
 ################################################################################
-[register.current_timestamp]
+[current_timestamp]
 
 mode = "r"
 description = "An empty register that is only 'up'."
 
 
 ################################################################################
-[register.tuser]
+[tuser]
 
 mode = "w"
 description = "An empty register that is only 'down'."
 
 
 ################################################################################
-[register_array.dummies]
+[dummies]
 
+type = "register_array"
 array_length = 3
 description = "An **array** with some dummy regs"
 
 
 # ------------------------------------------------------------------------------
-[register_array.dummies.register.first]
+[dummies.first]
 
 mode = "r_w"
 description = "The first register in the array."
 
-bit.array_bit_a.description = "Array register bit A"
-bit.array_bit_a.default_value = "1"
+array_integer.type = "integer"
+array_integer.description = "Array register integer"
+array_integer.max_value = 100
 
-bit.array_bit_b.description = "Array register bit B"
-bit.array_bit_b.default_value = "0"
+array_bit_a.type = "bit"
+array_bit_a.description = "Array register bit A"
+array_bit_a.default_value = "1"
 
-bit_vector.array_bit_vector.description = "Array register bit vector"
-bit_vector.array_bit_vector.width = 5
-bit_vector.array_bit_vector.default_value = "01100"
+array_bit_b.type = "bit"
+array_bit_b.description = "Array register bit B"
+array_bit_b.default_value = "0"
 
-integer.array_integer.description = "Array register integer"
-integer.array_integer.max_value = 100
+array_bit_vector.type = "bit_vector"
+array_bit_vector.description = "Array register bit vector"
+array_bit_vector.width = 5
+array_bit_vector.default_value = "01100"
 
-enumeration.array_enumeration.description = "Array register enumeration"
-enumeration.array_enumeration.default_value = "element1"
-enumeration.array_enumeration.element.element0 = "element index 0"
-enumeration.array_enumeration.element.element1 = "element index 1"
+array_enumeration.type = "enumeration"
+array_enumeration.description = "Array register enumeration"
+array_enumeration.default_value = "element1"
+array_enumeration.element.element0 = "element index 0"
+array_enumeration.element.element1 = "element index 1"
 
 
 # ------------------------------------------------------------------------------
-[register_array.dummies.register.second]
+[dummies.second]
 
 description = "The second register in the array."
 mode = "r"
 
-bit.flip.default_value = "1"
+flip.type = "bit"
+flip.default_value = "1"
 
-integer.flop.max_value = 100
-integer.flop.default_value = 99
+flop.type = "integer"
+flop.max_value = 100
+flop.default_value = 99
 
 
 ################################################################################
-[register_array.dummies2]
+[dummies2]
 
+type = "register_array"
 array_length = 2
 description = "An array that contains both 'up' and 'down' register."
 
 # ------------------------------------------------------------------------------
-[register_array.dummies2.register.dummy]
+[dummies2.dummy]
 
 mode = "r_wpulse"
 
-bit.f.default_value = "0"
-bit.g.default_value = "1"
+f.type = "bit"
+f.default_value = "0"
 
-bit_vector.h.width = 5
-bit_vector.h.default_value = "01010"
+g.type = "bit"
+g.default_value = "1"
 
-enumeration.i.default_value = "third"
-enumeration.i.element.first = "element 0"
-enumeration.i.element.second = "element 1"
-enumeration.i.element.third = "element 2"
-enumeration.i.element.fourth = "element 4"
+h.type = "bit_vector"
+h.width = 5
+h.default_value = "01010"
 
-integer.j.min_value = -100
-integer.j.max_value = 100
-integer.j.default_value = -19
+i.type = "enumeration"
+i.default_value = "third"
+i.element.first = "element 0"
+i.element.second = "element 1"
+i.element.third = "element 2"
+i.element.fourth = "element 4"
+
+j.type = "integer"
+j.min_value = -100
+j.max_value = 100
+j.default_value = -19
 
 
 ################################################################################
-[register_array.dummies3]
+[dummies3]
 
+type = "register_array"
 array_length = 1
 description = """
 An array that contains only 'up' register(s).
@@ -182,62 +217,108 @@ Length 1, i.e. no repetition, which is a little bit odd, but allowed.
 """
 
 # ------------------------------------------------------------------------------
-[register_array.dummies3.register.dummy]
+[dummies3.dummy]
 
 mode = "r"
 
-integer.count.max_value = 19
-bit.enable.default_value = "1"
+count.type = "integer"
+count.max_value = 19
+
+enable.type = "bit"
+enable.default_value = "1"
 
 
 # ------------------------------------------------------------------------------
-[register_array.dummies3.register.status]
+[dummies3.status]
 
 mode = "r"
 
 
 ################################################################################
-[register_array.dummies4]
+[dummies4]
 
+type = "register_array"
 array_length = 2
 description = "An array that contains only 'down' register(s)."
 
 # ------------------------------------------------------------------------------
-[register_array.dummies4.register.dummy]
+[dummies4.dummy]
 
 mode = "wpulse"
 
-bit.a.default_value = "0"
-bit.b.default_value = "1"
+a.type = "bit"
+a.default_value = "0"
+
+b.type = "bit"
+b.default_value = "1"
 
 
 # ------------------------------------------------------------------------------
-[register_array.dummies4.register.flabby]
+[dummies4.flabby]
 
 mode = "w"
 
-integer.count.min_value = -19
-integer.count.max_value = 19
+count.type = "integer"
+count.min_value = -19
+count.max_value = 19
 
-bit.enable.default_value = "1"
+enable.type = "bit"
+enable.default_value = "1"
 
 
 ################################################################################
-[constant]
+[data_width]
 
-data_width.value = 24
-decrement.value = -8
+type = "constant"
+value = 24
 
-enabled.value = true
 
-disabled.value = false
+################################################################################
+[decrement]
 
-rate.value = 3.5
+type = "constant"
+value = -8
 
-paragraph.value = "hello there :)"
 
-base_address_bin.value = "0b1000_0000_0000_0000_0000_0000_0000_0000_0000"
-base_address_bin.data_type = "unsigned"
+################################################################################
+[enabled]
 
-base_address_hex.value = "0x8_0000_0000"
-base_address_hex.data_type = "unsigned"
+type = "constant"
+value = true
+
+
+################################################################################
+[disabled]
+
+type = "constant"
+value = false
+
+
+################################################################################
+[rate]
+
+type = "constant"
+value = 3.5
+
+
+################################################################################
+[paragraph]
+
+type = "constant"
+value = "hello there :)"
+
+
+################################################################################
+[base_address_bin]
+
+type = "constant"
+value = "0b1000_0000_0000_0000_0000_0000_0000_0000_0000"
+data_type = "unsigned"
+
+
+################################################################################
+[base_address_hex]
+
+type = "constant"
+value = "0x8_0000_0000"
+data_type = "unsigned"

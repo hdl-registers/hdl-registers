@@ -6,6 +6,7 @@
 
     rst/about/about
     rst/about/release_notes
+    rst/about/new_data_file_format
     rst/about/contributing
     rst/about/license_information
 

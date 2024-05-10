@@ -1,21 +1,26 @@
-[register.config]
+[config]
 
 mode = "r_w"
 description = "Configuration register."
 
 # This will allocate a bit field named "enable" in the "config" register.
-[register.config.bit.enable]
+[config.enable]
 
-# The "description" property is optional for a bit field. Will default to "" if not specified.
-# The value specified must be a string.
+# The "type" property MUST be present and set to "bit".
+type = "bit"
+
+# The "description" property is OPTIONAL for a bit field.
+# Will default to "" if not specified.
+# The value specified MUST be a string.
 description = "Enable data passthrough."
 
-# The "default_value" property is optional for a bit field.
+# The "default_value" property is OPTIONAL for a bit field.
 # Will default to "0" if not specified.
-# The value specified must be a string, consisting of either a "1" or a "0".
+# The value specified MUST be a string, consisting of either a "1" or a "0".
 default_value = "1"
 
 
-[register.config.bit.invert]
+[config.invert]
 
+type = "bit"
 description = "Optionally enable inversion of data."

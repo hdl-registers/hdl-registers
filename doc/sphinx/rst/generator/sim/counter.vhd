@@ -100,16 +100,16 @@ begin
 
       pulse <= '0';
 
-      case regs_down.config.mode is
-        when mode_clock_cycles =>
+      case regs_down.config.condition is
+        when condition_clock_cycles =>
           count <= count + regs_down.config.increment;
 
-        when mode_clock_cycles_with_enable =>
+        when condition_clock_cycles_with_enable =>
           if clock_enable then
             count <= count + regs_down.config.increment;
           end if;
 
-        when mode_enable_edges =>
+        when condition_enable_edges =>
           if clock_enable /= clock_enable_p1 then
             count <= count + regs_down.config.increment;
           end if;

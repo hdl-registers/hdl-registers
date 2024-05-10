@@ -1,8 +1,14 @@
 ################################################################################
-[register.config]
+[config]
+
+# The "type" property is OPTIONAL for a register (but required for register arrays and constants).
+# It is commonly left out for registers to keep line count down.
+# Will default to "register" if not specified.
+# The value specified MUST be "register".
+type = "register"
 
 # The "mode" property MUST be present for a register.
-# The value specified must be a valid shorthand mode name. Either of:
+# The value specified MUST be a valid shorthand mode name. Either of:
 # * "r" for Read.
 # * "w" for Write.
 # * "r_w" for Read, Write.
@@ -10,22 +16,25 @@
 # * "r_wpulse" for Read, Write-pulse.
 # See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html for details.
 mode = "r_w"
-# The "description" property is optional for a register.
+
+# The "description" property is OPTIONAL for a register.
 # Will default to "" if not specified.
-# The value specified must be a string.
+# The value specified MUST be a string.
 description = """
 This is the description of my register.
 
 Rudimentary RST formatting can be used, such as **boldface** and *italics*.
 """
 
-[register.config.bit.enable]
+[config.enable]
 
+type = "bit"
 description = "Enable operation."
 default_value = "1"
 
-[register.config.enumeration.direction]
+[config.direction]
 
+type = "enumeration"
 description = "Set the data direction."
 default_value = "high_z"
 
@@ -39,46 +48,51 @@ element.data_out = "Send data from FPGA."
 
 
 ################################################################################
-[register.status]
+[status]
 
 mode = "r"
 
 
 ################################################################################
-[register_array.channels]
+[channels]
 
+type = "register_array"
 array_length = 4
 description = "Configuration for each channel."
 
 
 # ------------------------------------------------------------------------------
-[register_array.channels.register.read_address]
+[channels.read_address]
 
 mode = "r_w"
 description = "Read address for DMA data."
 
 
 # ------------------------------------------------------------------------------
-[register_array.channels.register.config]
+[channels.config]
 
 mode = "w"
 description = "Configuration of channel settings."
 
-bit.enable.description = "Enable this channel."
+enable.type = "bit"
+enable.description = "Enable this channel."
 
-bit_vector.tuser.width = 8
-bit_vector.tuser.description = "**TUSER** value for this channel."
+tuser.type = "bit_vector"
+tuser.width = 8
+tuser.description = "**TUSER** value for this channel."
 
 
 ################################################################################
-[constant.axi_data_width]
+[axi_data_width]
 
+type = "constant"
 value = 64
 description = "Data width of the AXI port used by this module."
 
 
 ################################################################################
-[constant.clock_rate_hz]
+[clock_rate_hz]
 
+type = "constant"
 value = 156.25e6
 description = "The clock rate used in the system, given in Hertz."

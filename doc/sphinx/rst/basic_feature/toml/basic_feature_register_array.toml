@@ -1,38 +1,41 @@
-[register_array.base_addresses]
+[base_addresses]
+
+# The "type" property MUST be present and set to "register_array".
+type = "register_array"
 
 # The "array_length" property MUST be present for a register array.
-# The value specified must be a positive integer.
+# The value specified MUST be a positive integer.
 # The registers within the array will be repeated this many times.
 array_length = 3
-# The "description" property is optional for a register array.
+
+# The "description" property is OPTIONAL for a register array.
 # Will default to "" if not specified.
-# The value specified must be a string.
+# The value specified MUST be a string.
 description = "One set of base addresses for each feature."
 
 
 # ------------------------------------------------------------------------------
 # This will allocate a register "read_address" in the "base_addresses" array.
-[register_array.base_addresses.register.read_address]
+[base_addresses.read_address]
 
 # Registers in a register array follow the exact same rules as "plain" registers.
-# The properties that may and must be set are the same.
+# The properties that MUST be set or are OPTIONAL are the same.
+# Just as with plain registers, the "type" property can be left out or explicitly set to "register".
 # Fields (bits, bit vectors, ...) can be added to array registers in the same way.
 mode = "r_w"
 
 # This will allocate a bit vector field named "address" in the "read_address" register within
 # the "base_addresses" array.
-[register_array.base_addresses.register.read_address.bit_vector.address]
-
-width = 28
-description = "Read address for a 256 MiB address space."
+address.type = "bit_vector"
+address.width = 28
+address.description = "Read address for a 256 MiB address space."
 
 
 # ------------------------------------------------------------------------------
-[register_array.base_addresses.register.write_address]
+[base_addresses.write_address]
 
 mode = "r_w"
 
-[register_array.base_addresses.register.write_address.bit_vector.address]
-
-width = 28
-description = "Write address for a 256 MiB address space."
+address.type = "bit_vector"
+address.width = 28
+address.description = "Write address for a 256 MiB address space."

@@ -1,10 +1,10 @@
-[register.config]
+[config]
 
 mode = "r_w"
 description = "Generic configuration register."
 
 
-[register.status]
+[status]
 
 mode = "r"
 description = "Generic status register."

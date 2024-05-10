@@ -1,38 +1,46 @@
-[register.config]
+[config]
 
 mode = "r_w"
 description = "Configuration register."
 
 # This will allocate an integer field named "burst_length_bytes" in the "config" register.
-[register.config.integer.burst_length_bytes]
+[config.burst_length_bytes]
 
-# The "min_value" property is optional for an integer field.
+# The "type" property MUST be present and set to "integer".
+type = "integer"
+
+# The "min_value" property is OPTIONAL for an integer field.
 # Will default to 0 if not specified.
-# The value specified must be an integer.
+# The value specified MUST be an integer.
 min_value = 1
+
 # The "max_value" property MUST be present for an integer field.
-# The value specified must be an integer, and greater than or equal to the
+# The value specified MUST be an integer, and greater than or equal to the
 # "min_value" parameter value.
 max_value = 256
-# The "description" property is optional for an integer field.
+
+# The "description" property is OPTIONAL for an integer field.
 # Will default to "" if not specified.
-# The value specified must be a string.
+# The value specified MUST be a string.
 description = "The number of bytes to request."
-# The "default_value" property is optional for a integer field.
-# The value specified must be an integer within the specified min/max range.
+
+# The "default_value" property is OPTIONAL for a integer field.
 # Will default to the "min_value" parameter value if not specified.
+# The value specified MUST be an integer within the specified min/max range.
 default_value = 64
 
 
-[register.config.integer.increment]
+[config.increment]
 
-description = "Offset that will be added to data."
+type = "integer"
 min_value = -4
 max_value = 3
+description = "Offset that will be added to data."
 default_value = 0
 
 
-[register.config.integer.retry_count]
+[config.retry_count]
 
-description = "Number of retry attempts before giving up."
+type = "integer"
 max_value = 5
+description = "Number of retry attempts before giving up."

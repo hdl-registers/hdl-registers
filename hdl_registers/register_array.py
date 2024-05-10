@@ -16,6 +16,10 @@ class RegisterArray:
     Represent an array of registers.
     That is, a sequence of registers that shall be repeated a number of times in
     a :class:`.RegisterList`.
+
+    Note that every register array must have at least one register added to it via
+    the :meth:`.append_register` method.
+    Empty register arrays will result in errors.
     """
 
     def __init__(self, name: str, base_index: int, length: int, description: str):
@@ -27,6 +31,11 @@ class RegisterArray:
             length: The number of times the register sequence shall be repeated.
             description: Textual register array description.
         """
+        if length < 1:
+            raise ValueError(
+                f'Register array "{name}" length must be greater than 0. Got "{length}".'
+            )
+
         self.name = name
         self.base_index = base_index
         self.length = length
@@ -75,6 +84,9 @@ class RegisterArray:
         Return:
             The highest index occupied by this array.
         """
+        if len(self.registers) == 0:
+            raise ValueError(f'Register array "{self.name}" must contain at least one register.')
+
         return self.base_index + self.length * len(self.registers) - 1
 
     def get_start_index(self, array_index: int) -> int:

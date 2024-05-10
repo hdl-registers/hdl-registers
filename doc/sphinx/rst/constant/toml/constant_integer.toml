@@ -1,15 +1,20 @@
-# This will allocate a register constant with the name "axi_data_width" of type integer.
-[constant.axi_data_width]
+# This will allocate a register constant with the name "axi_data_width" of data type integer.
+[axi_data_width]
+
+# The "type" property MUST be present and set to "constant".
+type = "constant"
 
 # The "value" property MUST be present for an integer constant.
-# The value specified must be an integer.
+# The value specified MUST be an integer.
 value = 64
 
-# The "description" property is optional for a constant. Will default to "" if not specified.
-# The value specified must be a string.
+# The "description" property is OPTIONAL for a constant.
+# Will default to "" if not specified.
+# The value specified MUST be a string.
 description = "Data width of the AXI port used by this module."
 
 
-[constant.burst_length_beats]
+[burst_length_beats]
 
+type = "constant"
 value = 256

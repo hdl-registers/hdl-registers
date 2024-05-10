@@ -1,22 +1,26 @@
-[register.config]
+[config]
 
 mode = "r_w"
 description = "Configuration register."
 
 # This will allocate an enumeration field named "severity_level" in the "config" register.
-[register.config.enumeration.severity_level]
+[config.severity_level]
 
-# The "description" property is optional for an enumeration field.
+# The "type" property MUST be present and set to "enumeration".
+type = "enumeration"
+
+# The "description" property is OPTIONAL for an enumeration field.
 # Will default to "" if not specified.
-# The value specified must be a string.
+# The value specified MUST be a string.
 description = "Run-time configuration of severity."
-# The "default_value" property is optional for an enumeration field.
-# The value specified must be a string that matches one of the enumeration element names
-# specified below.
+
+# The "default_value" property is OPTIONAL for an enumeration field.
 # Will default to the first enumeration element declared below, if not specified.
+# The value specified MUST be a string that matches one of the enumeration element names
+# specified below.
 default_value = "warning"
 
-# For an enumeration field there must be at least one enumeration element declared.
+# For an enumeration field there MUST be at least one enumeration element declared.
 # The name of each element is mapped below to the description of that element.
 element.info = "Informational message. Is not considered an error."
 element.warning = "Warning message. Is not considered an error."
@@ -24,8 +28,9 @@ element.error = "Error message. Is considered an error."
 element.failure = "Failure message. Is considered an error."
 
 
-[register.config.enumeration.packet_source]
+[config.packet_source]
 
+type = "enumeration"
 description = "Set input mux."
 
 element.streaming = "Process incoming streaming data."

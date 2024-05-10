@@ -45,7 +45,7 @@ def generator_from_toml(tmp_path):
     def get(toml_extras=""):
         toml_data = f"""\
 ################################################################################
-[register.data]
+[data]
 
 mode = "w"
 description = "My register"
@@ -114,8 +114,9 @@ def test_create_should_run_again_if_toml_file_has_changed(generator_from_toml):
 
     generator = generator_from_toml(
         """
-[constant.apa]
+[apa]
 
+type = "constant"
 value = 3
 """
     )
@@ -247,7 +248,9 @@ def test_generated_source_info(
 def test_constant_with_reserved_name_should_raise_exception(generator_from_toml):
     generator = generator_from_toml(
         """
-[constant.for]
+[for]
+
+type = "constant"
 value = 3
 """
     )
@@ -262,7 +265,8 @@ value = 3
 def test_plain_register_with_reserved_name_should_raise_exception(generator_from_toml):
     generator = generator_from_toml(
         """
-[register.for]
+[for]
+
 mode = "r_w"
 """
     )
@@ -277,9 +281,11 @@ mode = "r_w"
 def test_plain_register_field_with_reserved_name_should_raise_exception(generator_from_toml):
     generator = generator_from_toml(
         """
-[register.test]
+[test]
+
 mode = "r_w"
-bit.for.description = ""
+
+for.type = "bit"
 """,
     )
     with pytest.raises(ValueError) as exception_info:
@@ -293,9 +299,12 @@ bit.for.description = ""
 def test_register_array_with_reserved_name_should_raise_exception(generator_from_toml):
     generator = generator_from_toml(
         """
-[register_array.for]
+[for]
+
+type = "register_array"
 array_length = 3
-register.data.mode = "r_w"
+
+data.mode = "r_w"
 """,
     )
     with pytest.raises(ValueError) as exception_info:
@@ -309,9 +318,12 @@ register.data.mode = "r_w"
 def test_array_register_with_reserved_name_should_raise_exception(generator_from_toml):
     generator = generator_from_toml(
         """
-[register_array.test]
+[test]
+
+type = "register_array"
 array_length = 3
-register.for.mode = "r_w"
+
+for.mode = "r_w"
 """,
     )
     with pytest.raises(ValueError) as exception_info:
@@ -325,10 +337,14 @@ register.for.mode = "r_w"
 def test_array_register_field_with_reserved_name_should_raise_exception(generator_from_toml):
     generator = generator_from_toml(
         """
-[register_array.test]
+[test]
+
+type = "register_array"
 array_length = 3
-register.data.mode = "r_w"
-register.data.bit.for.description = ""
+
+data.mode = "r_w"
+
+data.for.type = "bit"
 """,
     )
     with pytest.raises(ValueError) as exception_info:
@@ -342,7 +358,8 @@ register.data.bit.for.description = ""
 def test_reserved_name_check_works_even_with_strange_case(generator_from_toml):
     generator = generator_from_toml(
         """
-[register.FoR]
+[FoR]
+
 mode = "r_w"
 """
     )
@@ -423,8 +440,12 @@ def test_two_array_fields_with_the_same_name_should_raise_exception(tmp_path):
 
 def test_two_register_arrays_with_the_same_name_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register_list.append_register_array(name="apa", length=2, description="")
-    register_list.append_register_array(name="apa", length=3, description="")
+    register_list.append_register_array(name="apa", length=2, description="").append_register(
+        name="hest", mode="r", description=""
+    )
+    register_list.append_register_array(name="apa", length=3, description="").append_register(
+        name="zebra", mode="w", description=""
+    )
 
     with pytest.raises(ValueError) as exception_info:
         CustomGenerator(register_list=register_list, output_folder=tmp_path).create()

@@ -21,13 +21,13 @@ use reg_file.reg_file_pkg.all;
 use work.caesar_regs_pkg.all;
 
 
-entity tb_regs_pkg is
+entity tb_register_package is
   generic (
     runner_cfg : string
   );
 end entity;
 
-architecture tb of tb_regs_pkg is
+architecture tb of tb_register_package is
 
 begin
 
@@ -74,20 +74,21 @@ begin
 
       -- Status register
       check_equal(caesar_config_plain_bit_a, 0);
-      check_equal(caesar_config_plain_bit_b, 1);
 
-      check_equal(caesar_config_plain_bit_vector'low, 2);
-      check_equal(caesar_config_plain_bit_vector'high, 5);
+      check_equal(caesar_config_plain_bit_vector'low, 1);
+      check_equal(caesar_config_plain_bit_vector'high, 4);
       check_equal(caesar_config_plain_bit_vector_width, 4);
       check_equal(caesar_config_plain_bit_vector_t'high, 3);
       check_equal(caesar_config_plain_bit_vector_t'low, 0);
 
-      -- Fields in array registers
-      check_equal(caesar_dummies_first_array_bit_a, 0);
-      check_equal(caesar_dummies_first_array_bit_b, 1);
+      check_equal(caesar_config_plain_bit_b, 16);
 
-      check_equal(caesar_dummies_first_array_bit_vector'low, 2);
-      check_equal(caesar_dummies_first_array_bit_vector'high, 6);
+      -- Fields in array registers
+      check_equal(caesar_dummies_first_array_bit_a, 7);
+      check_equal(caesar_dummies_first_array_bit_b, 8);
+
+      check_equal(caesar_dummies_first_array_bit_vector'low, 9);
+      check_equal(caesar_dummies_first_array_bit_vector'high, 13);
       check_equal(caesar_dummies_first_array_bit_vector_width, 5);
       check_equal(caesar_dummies_first_array_bit_vector_t'high, 4);
       check_equal(caesar_dummies_first_array_bit_vector_t'low, 0);

@@ -83,6 +83,14 @@ def test_repr_with_registers_appended():
     assert repr(register_array_a) != repr(register_array_b)
 
 
+def test_invalid_length_should_raise_exception():
+    with pytest.raises(ValueError) as exception_info:
+        RegisterArray(name="apa", base_index=0, length=0, description="")
+    assert (
+        str(exception_info.value) == 'Register array "apa" length must be greater than 0. Got "0".'
+    )
+
+
 def test_index():
     register_array = RegisterArray(name="apa", base_index=0, length=4, description="")
     register_array.append_register(name="hest", mode="r", description="")
@@ -93,6 +101,14 @@ def test_index():
 
     register_array.append_register(name="zebra", mode="r", description="")
     assert register_array.index == 9
+
+
+def test_index_for_array_without_registers_should_raise_exception():
+    register_array = RegisterArray(name="apa", base_index=0, length=4, description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        print(register_array.index)
+    assert str(exception_info.value) == 'Register array "apa" must contain at least one register.'
 
 
 def test_start_index():

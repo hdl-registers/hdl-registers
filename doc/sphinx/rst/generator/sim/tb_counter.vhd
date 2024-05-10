@@ -60,11 +60,11 @@ begin
     check_counter_status_pulse_count_equal(net=>net, expected=>0);
 
     if run("test_count_clock_cycles") then
-      config.mode := mode_clock_cycles;
+      config.condition := condition_clock_cycles;
       config.increment := 13;
 
     elsif run("test_count_clock_cycles_with_enable") then
-      config.mode := mode_clock_cycles_with_enable;
+      config.condition := condition_clock_cycles_with_enable;
       config.increment := 8;
 
       clock_enable <= '1';

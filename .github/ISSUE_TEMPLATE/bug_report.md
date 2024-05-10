@@ -23,11 +23,12 @@ With sample code it's easier to reproduce and much faster to fix.
 Add code for example like this:
 
 ```toml
-[register.config]
+[config]
 
 mode = "w"
 
-integer.increment.max_value = 100
+increment.type = "integer"
+increment.max_value = 100
 ```
 
 ```vhdl
