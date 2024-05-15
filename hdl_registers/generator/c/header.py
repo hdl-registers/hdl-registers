@@ -228,43 +228,39 @@ enum {self.to_pascal_case(name)}
 
     def _constants(self) -> str:
         c_code = ""
+
+        def define(name: str, value: str) -> str:
+            return f"#define {name} ({value})\n"
+
         for constant in self.iterate_constants():
+            c_code += self.comment(f"Value of register constant '{constant.name}'.")
+
             constant_name = f"{self.name.upper()}_{constant.name.upper()}"
 
-            # Most of the types are a simple "#define". But some are special, where we explicitly
-            # set the declaration.
-            declaration = ""
-
             if isinstance(constant, BooleanConstant):
-                value = str(constant.value).lower()
+                c_code += define(constant_name, str(constant.value).lower())
             elif isinstance(constant, IntegerConstant):
                 # No suffix -> "int", i.e. signed integer of at least 32 bits.
-                value = str(constant.value)
+                c_code += define(constant_name, str(constant.value))
             elif isinstance(constant, FloatConstant):
                 # No suffix -> "double" (https://stackoverflow.com/questions/13276862).
                 # Matches the VHDL type which is at least 64 bits (IEEE 1076-2008, 5.2.5.1).
                 # Note that casting a Python float to string guarantees full precision in the
                 # resulting string: https://stackoverflow.com/a/60026172
-                value = str(constant.value)
+                c_code += define(constant_name, str(constant.value))
             elif isinstance(constant, StringConstant):
                 # C string literal: Raw value enclosed in double quotation marks.
                 # Without "static", we get a linker warning about multiple definitions
                 # despite the multiple-include guard.
                 # See here https://stackoverflow.com/a/9196883 for some other information.
-                declaration = f'static char *{constant_name} = "{constant.value}";'
+                c_code += f'static char *{constant_name} = "{constant.value}";\n'
             elif isinstance(constant, UnsignedVectorConstant):
                 # "unsigned" and "long" as suffix.
                 # Makes it possible to use large numbers for e.g. base addresses.
-                value = f"{constant.prefix}{constant.value_without_separator}UL"
+                c_code += define(
+                    constant_name, f"{constant.prefix}{constant.value_without_separator}UL"
+                )
             else:
                 raise ValueError(f"Got unexpected constant type. {constant}")
-
-            c_code += self.comment(f"Value of register constant '{constant.name}'.")
-
-            if declaration:
-                c_code += f"{declaration}\n"
-            else:
-                # Default: simple "#define"
-                c_code += f"#define {constant_name} ({value})\n"
 
         return c_code
