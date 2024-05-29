@@ -826,7 +826,6 @@ def test_write_enumeration_out_of_range_should_raise_exception(default_accessor)
         uint_aa: int
         sint_aa: int
 
-    print(default_accessor.tmp_path_session)
     with pytest.raises(ValueError) as exception_info:
         default_accessor.test_accessor.write_reg_r_w(a_value0_class(value_class=ValueClass))
     assert (
