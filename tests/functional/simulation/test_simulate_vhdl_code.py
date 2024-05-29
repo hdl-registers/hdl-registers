@@ -245,8 +245,6 @@ def check_failed_tests(xml_report_file: Path, test_outputs: dict[str, str]) -> N
     * all tests failed, and
     * the test output is the expected.
     """
-    print(xml_report_file)
-
     tree = ElementTree.parse(xml_report_file)
     root = tree.getroot()
 
