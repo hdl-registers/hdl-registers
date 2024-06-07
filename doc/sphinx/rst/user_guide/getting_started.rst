@@ -39,7 +39,7 @@ A minimal usage example:
   from pathlib import Path
 
   from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-  from hdl_registers.parser import from_toml
+  from hdl_registers.parser.toml import from_toml
 
 
   this_dir = Path(__file__).parent
@@ -47,10 +47,12 @@ A minimal usage example:
   register_list = from_toml(name="caesar", toml_file=this_dir / "caesar_registers.toml")
   VhdlRegisterPackageGenerator(register_list=register_list, output_folder=this_dir).create_if_needed()
 
-The basis of all register operations is the :class:`.RegisterList` class.
+The basis of all register operations is the :class:`.RegisterList` class, which represents a
+register map, meaning, the registers of one module.
 An object of this type is returned when calling :func:`.from_toml` on a TOML file with the
 :ref:`correct format <toml_format>`.
-The :class:`.RegisterList` object makes up the register map, i.e. the registers of one module.
+To try things out you could use the register TOML data from the
+:ref:`TOML format example <toml_formatting>`.
 
 Register code generation is then done using one of the generator classes,
 for example :class:`.VhdlRegisterPackageGenerator` as seen in the example above.
