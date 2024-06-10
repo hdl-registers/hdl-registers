@@ -64,6 +64,8 @@ class RegisterParser:
                 Will be displayed in generated source code and documentation
                 for traceability.
             default_registers: List of default registers.
+                Note that this list with :class:`.Register` objects will be deep copied, so you can
+                use the same list many times without worrying about mutability.
         """
         self._register_list = RegisterList(name=name, source_definition_file=source_definition_file)
         self._source_definition_file = source_definition_file
