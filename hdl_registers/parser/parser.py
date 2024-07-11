@@ -226,7 +226,7 @@ ERROR: Please inspect that file and update your data file to the new format.
                 )
                 raise ValueError(message)
 
-            register = self._register_list.get_register(name)
+            register = self._register_list.get_register(register_name=name)
             register.description = description
 
         else:

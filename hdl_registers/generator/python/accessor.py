@@ -495,7 +495,7 @@ class {class_name}:
         )
         result = f"""{common}\
         register = self._register_list.get_register(
-            name="{register.name}", register_array_name={register_array_name}
+            register_name="{register.name}", register_array_name={register_array_name}
         )
         return {register_value_type_name}(
 """
@@ -589,7 +589,7 @@ class {class_name}:
         )
         result = f"""{common}\
         register = self._register_list.get_register(
-            name="{register.name}", register_array_name={register_array_name}
+            register_name="{register.name}", register_array_name={register_array_name}
         )
         integer_value = 0
 """
@@ -771,7 +771,7 @@ Will write the ``{register.name}`` register, setting the ``{field.name}`` field 
         result += f"""\
 {index_variable}
         register = self._register_list.get_register(
-            name="{register.name}", register_array_name={register_array_name}
+            register_name="{register.name}", register_array_name={register_array_name}
         )
         register_value = 0
 """

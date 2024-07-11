@@ -127,18 +127,18 @@ def test_get_register():
     )
     zebra = register_array.append_register(name="zebra", mode="r", description="")
 
-    assert register_list.get_register(name="apa") is apa
-    assert register_list.get_register(name="hest") is hest
+    assert register_list.get_register(register_name="apa") is apa
+    assert register_list.get_register(register_name="hest") is hest
 
     with pytest.raises(ValueError) as exception_info:
-        assert register_list.get_register(name="non existing") is None
+        assert register_list.get_register(register_name="non existing") is None
     assert (
         str(exception_info.value)
         == 'Could not find register "non existing" within register list "apa"'
     )
 
     with pytest.raises(ValueError) as exception_info:
-        register_list.get_register(name="register_array")
+        register_list.get_register(register_name="register_array")
     assert (
         str(exception_info.value)
         == 'Could not find register "register_array" within register list "apa"'
@@ -146,13 +146,16 @@ def test_get_register():
     register_list.get_register_array("register_array")
 
     with pytest.raises(ValueError) as exception_info:
-        register_list.get_register(name="zebra")
+        register_list.get_register(register_name="zebra")
     assert str(exception_info.value) == 'Could not find register "zebra" within register list "apa"'
 
-    assert register_list.get_register(name="zebra", register_array_name="register_array") is zebra
+    assert (
+        register_list.get_register(register_name="zebra", register_array_name="register_array")
+        is zebra
+    )
 
     with pytest.raises(ValueError) as exception_info:
-        register_list.get_register(name="hest", register_array_name="register_array")
+        register_list.get_register(register_name="hest", register_array_name="register_array")
     assert (
         str(exception_info.value)
         == 'Could not find register "hest" within register array "register_array"'
