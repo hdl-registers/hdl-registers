@@ -116,7 +116,15 @@ def to_unsigned_binary(
     return binary_value
 
 
-class FieldType(ABC):
+class NumericalInterpretation(ABC):
+    """
+    This class represents different modes used when interpreting a field of bits as a numeric value.
+    Contains metadata, helper methods, etc.
+    """
+
+    # Width of the field in number of bits.
+    bit_width: int
+
     @property
     @abstractmethod
     def is_signed(self) -> bool:
@@ -124,10 +132,22 @@ class FieldType(ABC):
         Is the field signed (two's complement)?
         """
 
+    @property
     @abstractmethod
-    def min_value(self, bit_width: int) -> Union[int, float]:
+    def min_value(self) -> Union[int, float]:
         """
-        Minimum representable value for this field type.
+        Minimum representable value for this field, in its native numeric representation.
+
+        Return type is the native Python representation of the value, which depends on the subclass.
+        If the subclass has a non-zero number of fractional bits, the value will be a ``float``.
+        If not, it will be an ``int``.
+        """
+
+    @property
+    @abstractmethod
+    def max_value(self) -> Union[int, float]:
+        """
+        Maximum representable value for this field, in its native numeric representation.
 
         Return type is the native Python representation of the value, which depends on the subclass.
         If the subclass has a non-zero number of fractional bits, the value will be a ``float``.
@@ -135,36 +155,22 @@ class FieldType(ABC):
         """
 
     @abstractmethod
-    def max_value(self, bit_width: int) -> Union[int, float]:
-        """
-        Maximum representable value for this field type.
-
-        Return type is the native Python representation of the value, which depends on the subclass.
-        If the subclass has a non-zero number of fractional bits, the value will be a ``float``.
-        If not, it will be an ``int``.
-        """
-
-    @abstractmethod
-    def convert_from_unsigned_binary(
-        self, bit_width: int, unsigned_binary: int
-    ) -> Union[int, float]:
+    def convert_from_unsigned_binary(self, unsigned_binary: int) -> Union[int, float]:
         """
         Convert from the unsigned binary integer representation of a field,
-        into the native Python value of the field.
+        into the native value of the field.
 
         Arguments:
-            bit_width: Width of the field.
             unsigned_binary: Unsigned binary integer representation of the field.
         """
 
     @abstractmethod
-    def convert_to_unsigned_binary(self, bit_width: int, value: Union[int, float]) -> int:
+    def convert_to_unsigned_binary(self, value: Union[int, float]) -> int:
         """
-        Convert from the native Python value of the field, into the
+        Convert from the native value of the field, into the
         unsigned binary integer representation which can be written to a register.
 
         Arguments:
-            bit_width: Width of the field.
             value: Native Python representation of the field value.
 
         Return:
@@ -175,75 +181,108 @@ class FieldType(ABC):
     def __repr__(self) -> str:
         pass
 
-    def _check_value_in_range(self, bit_width: int, value: Union[int, float]) -> None:
+    def _check_native_value_in_range(self, value: Union[int, float]) -> None:
         """
         Raise an exception if the given field value is not within the allowed range.
+        Note that this is the native field value, not the raw binary value.
 
         Arguments:
-            bit_width: Width of the field.
             value: Native Python representation of the field value.
         """
-        min_ = self.min_value(bit_width)
-        max_ = self.max_value(bit_width)
+        min_ = self.min_value
+        max_ = self.max_value
         if not min_ <= value <= max_:
-            raise ValueError(f"Value: {value} out of range of {bit_width}-bit ({min_}, {max_}).")
+            raise ValueError(
+                f"Value: {value} out of range of {self.bit_width}-bit ({min_}, {max_})."
+            )
+
+    def _check_unsigned_binary_value_in_range(self, value: Union[int, float]) -> None:
+        """
+        Raise an exception if the given unsigned binary value does not fit in the field.
+
+        Arguments:
+            value: Unsigned binary representation of the field value.
+        """
+        max_ = 2**self.bit_width - 1
+        if not 0 <= value <= max_:
+            raise ValueError(f"Value: {value} out of range of {self.bit_width}-bit (0, {max_}).")
 
 
-class Unsigned(FieldType):
+class Unsigned(NumericalInterpretation):
     """
     Unsigned integer.
     """
 
     is_signed: bool = False
 
-    def min_value(self, bit_width: int) -> int:
+    def __init__(self, bit_width: int):
+        self.bit_width = bit_width
+
+    @property
+    def min_value(self) -> int:
         return 0
 
-    def max_value(self, bit_width: int) -> int:
-        result: int = 2**bit_width - 1
+    @property
+    def max_value(self) -> int:
+        result: int = 2**self.bit_width - 1
         return result
 
-    def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> int:
+    def convert_from_unsigned_binary(self, unsigned_binary: int) -> int:
+        self._check_unsigned_binary_value_in_range(unsigned_binary)
         return unsigned_binary
 
-    def convert_to_unsigned_binary(self, bit_width: int, value: float) -> int:
-        self._check_value_in_range(bit_width, value)
+    def convert_to_unsigned_binary(self, value: float) -> int:
+        self._check_native_value_in_range(value)
         return round(value)
 
     def __repr__(self) -> str:
-        return self.__class__.__name__
+        return f"""{self.__class__.__name__}(\
+bit_width={self.bit_width},\
+)"""
 
 
-class Signed(FieldType):
+class Signed(NumericalInterpretation):
     """
     Two's complement signed integer format.
     """
 
     is_signed: bool = True
 
-    def min_value(self, bit_width: int) -> int:
-        result: int = -(2 ** (bit_width - 1))
+    def __init__(self, bit_width: int):
+        self.bit_width = bit_width
+
+    @property
+    def min_value(self) -> int:
+        result: int = -(2 ** (self.bit_width - 1))
         return result
 
-    def max_value(self, bit_width: int) -> int:
-        result: int = 2 ** (bit_width - 1) - 1
+    @property
+    def max_value(self) -> int:
+        result: int = 2 ** (self.bit_width - 1) - 1
         return result
 
-    def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> int:
-        return int(from_unsigned_binary(num_bits=bit_width, value=unsigned_binary, is_signed=True))
+    def convert_from_unsigned_binary(self, unsigned_binary: int) -> int:
+        self._check_unsigned_binary_value_in_range(unsigned_binary)
+        return int(
+            from_unsigned_binary(
+                num_bits=self.bit_width, value=unsigned_binary, is_signed=self.is_signed
+            )
+        )
 
-    def convert_to_unsigned_binary(self, bit_width: int, value: float) -> int:
-        self._check_value_in_range(bit_width, value)
-        return to_unsigned_binary(num_bits=bit_width, value=value, is_signed=True)
+    def convert_to_unsigned_binary(self, value: float) -> int:
+        self._check_native_value_in_range(value)
+        return to_unsigned_binary(num_bits=self.bit_width, value=value, is_signed=self.is_signed)
 
     def __repr__(self) -> str:
-        return self.__class__.__name__
+        return f"""{self.__class__.__name__}(\
+bit_width={self.bit_width},\
+)"""
 
 
-class Fixed(FieldType, ABC):
+class Fixed(NumericalInterpretation, ABC):
     def __init__(self, is_signed: bool, max_bit_index: int, min_bit_index: int):
         """
-        Abstract baseclass for Fixed field types.
+        Abstract baseclass for fixed-point fields.
 
         The bit_index arguments indicates the position of the decimal point in
         relation to the number expressed by the field. The decimal point is
@@ -256,44 +295,52 @@ class Fixed(FieldType, ABC):
             max_bit_index: Position of the upper bit relative to the decimal point.
             min_bit_index: Position of the lower bit relative to the decimal point.
         """
-        self._is_signed = is_signed
-        self._integer = Signed() if is_signed else Unsigned()
+        if max_bit_index < min_bit_index:
+            raise ValueError("max_bit_index must be >= min_bit_index")
+
         self.max_bit_index = max_bit_index
         self.min_bit_index = min_bit_index
-        if not self.max_bit_index >= self.min_bit_index:
-            raise ValueError("max_bit_index must be >= min_bit_index")
 
         self.integer_bit_width = self.max_bit_index + 1
         self.fraction_bit_width = -self.min_bit_index
-        self.expected_bit_width = self.integer_bit_width + self.fraction_bit_width
+        # The total width. Use the same property name as the 'Unsigned' and 'Signed' classes.
+        self.bit_width = self.integer_bit_width + self.fraction_bit_width
+
+        self._is_signed = is_signed
+        self._integer = (
+            Signed(bit_width=self.bit_width) if is_signed else Unsigned(bit_width=self.bit_width)
+        )
 
     @property
     def is_signed(self) -> bool:
         return self._is_signed
 
-    def min_value(self, bit_width: int) -> float:
-        min_integer_value = self._integer.min_value(bit_width)
-        min_integer_binary = self._integer.convert_to_unsigned_binary(bit_width, min_integer_value)
-        return self.convert_from_unsigned_binary(bit_width, min_integer_binary)
+    @property
+    def min_value(self) -> float:
+        min_integer_value = self._integer.min_value
+        min_integer_binary = self._integer.convert_to_unsigned_binary(min_integer_value)
+        return self.convert_from_unsigned_binary(min_integer_binary)
 
-    def max_value(self, bit_width: int) -> float:
-        max_integer_value = self._integer.max_value(bit_width)
-        max_integer_binary = self._integer.convert_to_unsigned_binary(bit_width, max_integer_value)
-        return self.convert_from_unsigned_binary(bit_width, max_integer_binary)
+    @property
+    def max_value(self) -> float:
+        max_integer_value = self._integer.max_value
+        max_integer_binary = self._integer.convert_to_unsigned_binary(max_integer_value)
+        return self.convert_from_unsigned_binary(max_integer_binary)
 
-    def convert_from_unsigned_binary(self, bit_width: int, unsigned_binary: int) -> float:
+    def convert_from_unsigned_binary(self, unsigned_binary: int) -> float:
+        self._check_unsigned_binary_value_in_range(unsigned_binary)
         return from_unsigned_binary(
-            num_bits=bit_width,
+            num_bits=self.bit_width,
             value=unsigned_binary,
             num_integer_bits=self.integer_bit_width,
             num_fractional_bits=self.fraction_bit_width,
             is_signed=self.is_signed,
         )
 
-    def convert_to_unsigned_binary(self, bit_width: int, value: float) -> int:
-        self._check_value_in_range(bit_width, value)
+    def convert_to_unsigned_binary(self, value: float) -> int:
+        self._check_native_value_in_range(value)
         return to_unsigned_binary(
-            num_bits=bit_width,
+            num_bits=self.bit_width,
             value=value,
             num_integer_bits=self.integer_bit_width,
             num_fractional_bits=self.fraction_bit_width,

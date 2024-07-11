@@ -16,7 +16,7 @@ Note that the generated VHDL code is also simulated in a functional test.
 from tsfpga.system_utils import read_file
 
 # First party libraries
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
     Unsigned,
@@ -71,28 +71,28 @@ def test_read_write_as_integer(tmp_path):
         description="",
         width=4,
         default_value="0000",
-        field_type=Signed(),
+        numerical_interpretation=Signed(bit_width=4),
     )
     register.append_bit_vector(
         name="my_sfixed_bit_vector",
         description="",
         width=4,
         default_value="0000",
-        field_type=SignedFixedPoint(1, -2),
+        numerical_interpretation=SignedFixedPoint(1, -2),
     )
     register.append_bit_vector(
         name="my_unsigned_bit_vector",
         description="",
         width=4,
         default_value="0000",
-        field_type=Unsigned(),
+        numerical_interpretation=Unsigned(bit_width=4),
     )
     register.append_bit_vector(
         name="my_ufixed_bit_vector",
         description="",
         width=4,
         default_value="0000",
-        field_type=UnsignedFixedPoint(1, -2),
+        numerical_interpretation=UnsignedFixedPoint(1, -2),
     )
 
     vhdl = read_file(VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create())

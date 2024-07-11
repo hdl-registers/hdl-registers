@@ -8,11 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import Union
+from typing import Optional, Union
 
 # Local folder libraries
-from .register_field import DEFAULT_FIELD_TYPE, RegisterField
-from .register_field_type import FieldType, Fixed
+from .numerical_interpretation import NumericalInterpretation, Unsigned
+from .register_field import RegisterField
 
 
 class BitVector(RegisterField):
@@ -27,59 +27,50 @@ class BitVector(RegisterField):
         description: str,
         width: int,
         default_value: str,
-        field_type: FieldType = DEFAULT_FIELD_TYPE,
+        numerical_interpretation: Optional[NumericalInterpretation] = None,
     ):  # pylint: disable=too-many-arguments
         """
         Arguments:
             name: The name of the bit vector.
             base_index: The zero-based index within the register for the lowest bit of this
                 bit vector.
-            description: Textual bit vector description.
+            description: Textual field description.
             width: The width of the bit vector field.
-            default_value: Default value as a string. Must be of length ``width`` and contain
-                only "1" and "0".
-            field_type: The field type used to interpret the bits of the field.
+            default_value: Default value as a string.
+                Must be of length ``width`` and contain only "1" and "0".
+            numerical_interpretation: The mode used when interpreting the bits of this field as
+                a numeric value.
+                Default is unsigned with no fractional bits.
         """
         self.name = name
         self._base_index = base_index
         self.description = description
 
-        # The width of the field affects the base index of the next fields.
-        # Hence the user is not allowed to change it, nor the base index of this field,
-        # after initialization.
-        self._check_width(width=width, field_type=field_type)
+        self._numerical_interpretation = (
+            Unsigned(bit_width=width)
+            if numerical_interpretation is None
+            else numerical_interpretation
+        )
+
+        self._check_width(width=width)
         self._width = width
 
         self._default_value = ""
         # Assign self._default_value via setter
         self.default_value = default_value
 
-        self._field_type = field_type
-
     @property
-    def width(self) -> int:
+    def numerical_interpretation(self) -> NumericalInterpretation:
         """
+        The mode used when interpreting the bits of this field as a numeric value
+        (E.g. signed, unsigned fixed-point, etc.).
+        Is used by :meth:`get_value` and :meth:`set_value`.
+
         Getter for private member.
         """
-        return self._width
+        return self._numerical_interpretation
 
-    @property
-    def min_value(self) -> Union[int, float]:
-        """
-        Minimum numeric value this field can assume.
-        Getter for private member.
-        """
-        return self._field_type.min_value(bit_width=self._width)
-
-    @property
-    def max_value(self) -> Union[int, float]:
-        """
-        Maximum numeric value this field can assume.
-        Getter for private member.
-        """
-        return self._field_type.max_value(bit_width=self._width)
-
-    def _check_width(self, width: int, field_type: FieldType) -> None:
+    def _check_width(self, width: int) -> None:
         """
         Sanity checks for the provided width
         Will raise exception if something is wrong.
@@ -93,15 +84,12 @@ class BitVector(RegisterField):
         if width < 1 or width > 32:
             raise ValueError(f'Invalid width for bit vector "{self.name}". Got: "{width}".')
 
-        # A fixed-point field type specifies its integer width and fractional width,
-        # which together form a total width.
-        # Check that this does not clash with the width specified for the field.
-        if isinstance(field_type, Fixed):
-            if width != field_type.expected_bit_width:
-                raise ValueError(
-                    f'Inconsistent width for bit vector "{self.name}". '
-                    f'Field is "{width}" bits, type is "{field_type.expected_bit_width}".'
-                )
+        if width != self.numerical_interpretation.bit_width:
+            raise ValueError(
+                f'Inconsistent width for bit vector "{self.name}". '
+                f'Field is "{width}" bits, numerical interpretation specification is '
+                f'"{self.numerical_interpretation.bit_width}".'
+            )
 
     @property  # type: ignore[override]
     def default_value(self) -> str:
@@ -139,6 +127,32 @@ class BitVector(RegisterField):
 
         self._default_value = value
 
+    def get_value(self, register_value: int) -> Union[int, float]:  # type: ignore[override]
+        """
+        See super method for details.
+        This subclass method uses the native numeric representation of the field value
+        (not the raw value of the bits).
+        If the field has a non-zero number of fractional bits, the type of the result
+        will be a ``float``.
+        Otherwise it will be an ``int``.
+        """
+        value_unsigned = super().get_value(register_value=register_value)
+        return self.numerical_interpretation.convert_from_unsigned_binary(
+            unsigned_binary=value_unsigned
+        )
+
+    def set_value(self, field_value: Union[int, float]) -> int:
+        """
+        See super method for details.
+        This subclass method uses the native numeric representation of the field value
+        (not the raw value of the bits).
+        If the field has a non-zero number of fractional bits, the type of the argument
+        should be a ``float``.
+        Otherwise it should be an ``int``.
+        """
+        unsigned_value = self.numerical_interpretation.convert_to_unsigned_binary(value=field_value)
+        return super().set_value(field_value=unsigned_value)
+
     @property
     def default_value_str(self) -> str:
         return f"0b{self.default_value}"
@@ -154,5 +168,5 @@ _base_index={self._base_index},\
 description={self.description},
 _width={self._width},\
 _default_value={self._default_value},\
-_field_type={self._field_type},\
+_numerical_interpretation={self._numerical_interpretation},\
 )"""

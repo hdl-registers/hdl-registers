@@ -16,7 +16,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.field.register_field_type import Fixed, Signed, Unsigned
+from hdl_registers.field.numerical_interpretation import Fixed, Signed, Unsigned
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 
 if TYPE_CHECKING:
@@ -136,12 +136,12 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
             return value
 
         if isinstance(field, BitVector):
-            if isinstance(field.field_type, (Signed, Unsigned)):
+            if isinstance(field.numerical_interpretation, (Signed, Unsigned)):
                 # Plain unsigned/signed vector is a subtype of std_logic_vector.
                 # Hence we can just cast it.
                 return f"std_logic_vector({value})"
 
-            if isinstance(field.field_type, Fixed):
+            if isinstance(field.numerical_interpretation, Fixed):
                 # Casting function built into ieee.fixed_pkg.
                 return f"to_slv({value})"
 

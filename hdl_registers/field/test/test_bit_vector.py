@@ -12,7 +12,7 @@ import pytest
 
 # First party libraries
 from hdl_registers.field.bit_vector import BitVector
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
     Unsigned,
@@ -20,47 +20,32 @@ from hdl_registers.field.register_field_type import (
 )
 
 
-def test_get_value():
-    bit = BitVector(name="", base_index=2, description="", width=4, default_value="0000")
+def test_get_value_plain():
+    field = BitVector(name="", base_index=2, description="", width=4, default_value="0000")
 
-    register_value = int("111000011", base=2)
-    assert bit.get_value(register_value) == 0
+    register_value = int("1110000_11", base=2)
+    assert field.get_value(register_value) == 0
 
-    register_value = int("000111100", base=2)
-    assert bit.get_value(register_value) == 15
+    register_value = int("0001111_00", base=2)
+    assert field.get_value(register_value) == 15
 
-    register_value = int("101010101", base=2)
-    assert bit.get_value(register_value) == 5
+    register_value = int("1010101_01", base=2)
+    assert field.get_value(register_value) == 5
 
-    # Test field_type
+
+def test_get_value_fixed():
     field = BitVector(
         name="",
         base_index=2,
         description="",
         width=16,
         default_value="0" * 16,
-        field_type=SignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8),
+        numerical_interpretation=SignedFixedPoint.from_bit_widths(
+            integer_bit_width=8, fraction_bit_width=8
+        ),
     )
     register_value = 0b11111111_00000011_11111111_11111100
     assert field.get_value(register_value) == -0.00390625
-
-
-def test_max_binary_value():
-    bit_vector = BitVector(
-        name="", base_index=0, description="", width=2, default_value=format(0, "02b")
-    )
-    assert bit_vector.max_binary_value == 0b11
-
-    bit_vector = BitVector(
-        name="", base_index=0, description="", width=32, default_value=format(0, "032b")
-    )
-    assert bit_vector.max_binary_value == 0b11111111_11111111_11111111_11111111
-
-    # Test with base_index > 0
-    bit_vector = BitVector(
-        name="", base_index=4, description="", width=4, default_value=format(0, "04b")
-    )
-    assert bit_vector.max_binary_value == 0b1111
 
 
 def test_set_value():
@@ -76,12 +61,12 @@ def test_set_value():
     bit_vector = BitVector(
         name="", base_index=2, description="", width=2, default_value=format(0, "02b")
     )
-    assert bit_vector.set_value(0b10) == 0b1000
+    assert bit_vector.set_value(0b10) == 0b10_00
 
     bit_vector = BitVector(
         name="", base_index=3, description="", width=4, default_value=format(0, "04b")
     )
-    assert bit_vector.set_value(0b1111) == 0b1111000
+    assert bit_vector.set_value(0b1111) == 0b1111_000
 
     bit_vector0 = BitVector(name="", base_index=0, description="", width=2, default_value="00")
     bit_vector1 = BitVector(name="", base_index=2, description="", width=4, default_value="0000")
@@ -105,30 +90,24 @@ def test_set_value():
     value2 = bit_vector2.set_value(bit_vector2.get_value(register_value))
     assert value0 | value1 | value2 == register_value
 
-    # Test field_type
+    # Test numerical_interpretation
     field = BitVector(
         name="",
         base_index=2,
         description="",
         width=16,
         default_value="0" * 16,
-        field_type=SignedFixedPoint.from_bit_widths(integer_bit_width=8, fraction_bit_width=8),
+        numerical_interpretation=SignedFixedPoint.from_bit_widths(
+            integer_bit_width=8, fraction_bit_width=8
+        ),
     )
     assert field.set_value(-0.00390625) == 0b11_11111111_11111100
 
 
 def test_min_and_max_value():
-    bit_vector = BitVector(
-        name="", base_index=0, description="", width=4, default_value="0000", field_type=Unsigned()
-    )
-    assert bit_vector.min_value == 0
-    assert bit_vector.max_value == 15
-
-    bit_vector = BitVector(
-        name="", base_index=0, description="", width=4, default_value="0000", field_type=Signed()
-    )
-    assert bit_vector.min_value == -8
-    assert bit_vector.max_value == 7
+    bit_vector = BitVector(name="", base_index=0, description="", width=4, default_value="0000")
+    assert bit_vector.numerical_interpretation.min_value == 0
+    assert bit_vector.numerical_interpretation.max_value == 15
 
     bit_vector = BitVector(
         name="",
@@ -136,10 +115,10 @@ def test_min_and_max_value():
         description="",
         width=4,
         default_value="0000",
-        field_type=UnsignedFixedPoint(1, -2),
+        numerical_interpretation=Signed(bit_width=4),
     )
-    assert bit_vector.min_value == 0
-    assert bit_vector.max_value == 3.75
+    assert bit_vector.numerical_interpretation.min_value == -8
+    assert bit_vector.numerical_interpretation.max_value == 7
 
     bit_vector = BitVector(
         name="",
@@ -147,10 +126,21 @@ def test_min_and_max_value():
         description="",
         width=4,
         default_value="0000",
-        field_type=SignedFixedPoint(1, -2),
+        numerical_interpretation=UnsignedFixedPoint(1, -2),
     )
-    assert bit_vector.min_value == -2
-    assert bit_vector.max_value == 1.75
+    assert bit_vector.numerical_interpretation.min_value == 0
+    assert bit_vector.numerical_interpretation.max_value == 3.75
+
+    bit_vector = BitVector(
+        name="",
+        base_index=0,
+        description="",
+        width=4,
+        default_value="0000",
+        numerical_interpretation=SignedFixedPoint(1, -2),
+    )
+    assert bit_vector.numerical_interpretation.min_value == -2
+    assert bit_vector.numerical_interpretation.max_value == 1.75
 
 
 def test_repr():
@@ -184,14 +174,14 @@ def test_repr():
         BitVector(name="apa", base_index=0, description="", width=1, default_value="1")
     ) != repr(BitVector(name="apa", base_index=0, description="", width=1, default_value="0"))
 
-    # Different field_type
+    # Different numerical_interpretation
     field0 = BitVector(
         name="apa",
         base_index=0,
         description="",
         width=10,
         default_value="0" * 10,
-        field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+        numerical_interpretation=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
     )
     field1 = BitVector(
         name="apa",
@@ -199,7 +189,7 @@ def test_repr():
         description="",
         width=10,
         default_value="0" * 10,
-        field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+        numerical_interpretation=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
     )
     field2 = BitVector(
         name="apa",
@@ -207,7 +197,7 @@ def test_repr():
         description="",
         width=10,
         default_value="0" * 10,
-        field_type=UnsignedFixedPoint(max_bit_index=8, min_bit_index=-1),
+        numerical_interpretation=UnsignedFixedPoint(max_bit_index=8, min_bit_index=-1),
     )
     assert repr(field0) == repr(field1) != repr(field2)
 
@@ -280,47 +270,25 @@ def test_default_value_uint():
     assert bit_vector.default_value_uint == 9
 
 
-def test_field_type():
-    bit_vector = BitVector(name="", base_index=0, description="", width=4, default_value="1111")
-    assert isinstance(bit_vector.field_type, Unsigned)
+def test_numeric_interpretation():
+    bit_vector = BitVector(name="", base_index=5, description="", width=4, default_value="1111")
+    assert isinstance(bit_vector.numerical_interpretation, Unsigned)
+    assert bit_vector.numerical_interpretation.bit_width == 4
 
-    bit_vector = BitVector(
-        name="", base_index=0, description="", width=4, default_value="1111", field_type=Unsigned()
-    )
-    assert isinstance(bit_vector.field_type, Unsigned)
-
-    bit_vector = BitVector(
-        name="", base_index=0, description="", width=4, default_value="1111", field_type=Signed()
-    )
-    assert isinstance(bit_vector.field_type, Signed)
-
+    numerical_interpretation = Signed(bit_width=10)
     bit_vector = BitVector(
         name="",
         base_index=0,
         description="",
         width=10,
-        default_value="1" * 10,
-        field_type=SignedFixedPoint(max_bit_index=7, min_bit_index=-2),
+        default_value="1111111111",
+        numerical_interpretation=numerical_interpretation,
     )
-    assert isinstance(bit_vector.field_type, SignedFixedPoint)
-    assert bit_vector.field_type.max_bit_index == 7
-    assert bit_vector.field_type.min_bit_index == -2
-
-    bit_vector = BitVector(
-        name="",
-        base_index=0,
-        description="",
-        width=10,
-        default_value="1" * 10,
-        field_type=UnsignedFixedPoint(max_bit_index=7, min_bit_index=-2),
-    )
-    assert isinstance(bit_vector.field_type, UnsignedFixedPoint)
-    assert bit_vector.field_type.max_bit_index == 7
-    assert bit_vector.field_type.min_bit_index == -2
+    assert bit_vector.numerical_interpretation is numerical_interpretation
 
 
-def test_invalid_field_type_width_should_raise_exception():
-    def test(field_type):
+def test_invalid_numerical_interpretation_width_should_raise_exception():
+    def test(numerical_interpretation):
         with pytest.raises(ValueError) as exception_info:
             BitVector(
                 name="apa",
@@ -328,12 +296,15 @@ def test_invalid_field_type_width_should_raise_exception():
                 description="",
                 width=4,
                 default_value="1111",
-                field_type=field_type,
+                numerical_interpretation=numerical_interpretation,
             )
 
-        type_width = field_type.integer_bit_width + field_type.fraction_bit_width
+        bit_width = (
+            numerical_interpretation.integer_bit_width + numerical_interpretation.fraction_bit_width
+        )
         expected = (
-            f'Inconsistent width for bit vector "apa". Field is "4" bits, type is "{type_width}".'
+            f'Inconsistent width for bit vector "apa". '
+            f'Field is "4" bits, numerical interpretation specification is "{bit_width}".'
         )
         assert str(exception_info.value) == expected
 

@@ -27,7 +27,7 @@ from vunit import VUnit
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
     Unsigned,
@@ -208,25 +208,33 @@ def generate_toml_registers(output_path):
     # This is not supported by the TOML parser at this point, so we do it manually.
     register = register_list.append_register(name="field_test", mode="r_w", description="")
     register.append_bit_vector(
-        name="u0", description="", width=2, default_value="11", field_type=Unsigned()
+        name="u0",
+        description="",
+        width=2,
+        default_value="11",
+        numerical_interpretation=Unsigned(bit_width=2),
     )
 
     register.append_bit_vector(
-        name="s0", description="", width=2, default_value="11", field_type=Signed()
+        name="s0",
+        description="",
+        width=2,
+        default_value="11",
+        numerical_interpretation=Signed(bit_width=2),
     )
     register.append_bit_vector(
         name="ufixed0",
         description="",
         width=8,
         default_value="1" * 8,
-        field_type=UnsignedFixedPoint(5, -2),
+        numerical_interpretation=UnsignedFixedPoint(5, -2),
     )
     register.append_bit_vector(
         name="sfixed0",
         description="",
         width=6,
         default_value="1" * 6,
-        field_type=SignedFixedPoint(2, -3),
+        numerical_interpretation=SignedFixedPoint(2, -3),
     )
 
     generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)

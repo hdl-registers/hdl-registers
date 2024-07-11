@@ -16,14 +16,14 @@ class Bit(RegisterField):
     Used to represent a bit field in a register.
     """
 
-    width = 1
+    _width = 1
 
     def __init__(self, name: str, index: int, description: str, default_value: str):
         """
         Arguments:
             name: The name of the bit.
             index: The zero-based index of this bit within the register.
-            description: Textual bit description.
+            description: Textual field description.
             default_value: Default value. Either "1" or "0".
         """
         self.name = name
@@ -69,7 +69,7 @@ class Bit(RegisterField):
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
-base_index={self.base_index},\
+_base_index={self._base_index},\
 description={self.description},\
-default_value={self.default_value},\
+_default_value={self._default_value},\
 )"""

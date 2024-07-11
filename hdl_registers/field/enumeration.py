@@ -18,7 +18,6 @@ class EnumerationElement:
 
     Optionally we could use a python dataclass: https://docs.python.org/3/library/dataclasses.html
     Would get the __repr__ method for free, but also a lot of other stuff that we do not need.
-    Requires Python 3.7+ which should not be a problem though since 3.6 is end of life.
 
     We could also use Python enum class: https://docs.python.org/3/library/enum.html
     Which would be a whole other concept.
@@ -85,10 +84,8 @@ class Enumeration(RegisterField):
         self._base_index = base_index
         self.description = description
 
-        # The number of elements affects the width of the field, which affects the base index of the
-        # next fields.
-        # Hence the user is not allowed to change the element set, nor the base index of this field,
-        # after initialization.
+        # The number of elements decides the width of the field.
+        # Hence the user is not allowed to change the element set after initialization.
         self._elements = []
 
         if not elements:
@@ -105,10 +102,11 @@ class Enumeration(RegisterField):
             self._elements.append(element)
 
         self._default_value = self._elements[0]
-        self.set_default_value(default_value)
+        self.set_default_value(name=default_value)
 
-    @property
-    def width(self) -> int:
+        self._width = self._calculate_width()
+
+    def _calculate_width(self) -> int:
         num_elements = len(self._elements)
         num_bits = (num_elements - 1).bit_length() if num_elements > 1 else 1
 
@@ -166,23 +164,14 @@ class Enumeration(RegisterField):
         """
         return self._default_value
 
-    def set_default_value(self, value: str) -> None:
+    def set_default_value(self, name: str) -> None:
         """
         Set the default value for this enumeration field.
 
         Arguments:
             value: The name of the enumeration element that shall be set as default.
         """
-        for element in self._elements:
-            if element.name == value:
-                self._default_value = element
-                return
-
-        message = (
-            f'Enumeration "{self.name}", requested "default_value" element does not exist. '
-            f'Got: "{value}".'
-        )
-        raise ValueError(message)
+        self._default_value = self.get_element_by_name(name=name)
 
     @property
     def default_value_str(self) -> str:
@@ -193,12 +182,19 @@ class Enumeration(RegisterField):
         return self.default_value.value
 
     def get_value(self, register_value: int) -> EnumerationElement:  # type: ignore[override]
-        # We know that the return value is an integer and not a float, since this field uses
-        # the default value for field_type which is an unsigned with no fractional bits.
-        value_integer: int = super().get_value(register_value=register_value)  # type: ignore
+        """
+        See super method for details.
+        This subclass method uses a different type to represent the field value, and also
+        adds some sanity checks.
+        """
+        value_integer = super().get_value(register_value=register_value)
         return self.get_element_by_value(value=value_integer)
 
     def set_value(self, field_value: EnumerationElement) -> int:  # type: ignore[override]
+        """
+        See super method for details.
+        This subclass method uses a different type to represent the field value.
+        """
         return super().set_value(field_value=field_value.value)
 
     def __repr__(self) -> str:

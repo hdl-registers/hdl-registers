@@ -184,10 +184,10 @@ def test_get_value_unsigned():
     )
     assert integer.width == 7
 
-    register_value = int("010101011", base=2)
+    register_value = int("0101010_11", base=2)
     assert integer.get_value(register_value) == 42
 
-    register_value = int("101010100", base=2)
+    register_value = int("1010101_00", base=2)
     assert integer.get_value(register_value) == 85
 
 
@@ -197,10 +197,10 @@ def test_get_value_signed():
     )
     assert integer.width == 8
 
-    register_value = int("10101010111", base=2)
+    register_value = int("10101010_111", base=2)
     assert integer.get_value(register_value) == -86
 
-    register_value = int("01010101000", base=2)
+    register_value = int("01010101_000", base=2)
     assert integer.get_value(register_value) == 85
 
 
@@ -224,8 +224,8 @@ def test_set_value_unsigned():
     )
     assert integer.width == 3
 
-    assert integer.set_value(5) == int("10100000", base=2)
-    assert integer.set_value(2) == int("01000000", base=2)
+    assert integer.set_value(5) == int("101_00000", base=2)
+    assert integer.set_value(2) == int("010_00000", base=2)
 
 
 def test_set_value_signed():
@@ -234,8 +234,8 @@ def test_set_value_signed():
     )
     assert integer.width == 4
 
-    assert integer.set_value(5) == int("010100000", base=2)
-    assert integer.set_value(-6) == int("101000000", base=2)
+    assert integer.set_value(5) == int("0101_00000", base=2)
+    assert integer.set_value(-6) == int("1010_00000", base=2)
 
 
 def test_set_value_should_raise_exception_if_value_out_of_range():

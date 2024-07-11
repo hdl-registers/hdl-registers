@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
 from hdl_registers.field.bit_vector import BitVector
-from hdl_registers.field.register_field_type import Signed, Unsigned
+from hdl_registers.field.numerical_interpretation import Signed, Unsigned
 
 # Local folder libraries
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
@@ -332,7 +332,9 @@ end package body;
         Return True if the field is of a type where there should be procedures to read/write it
         casted as an integer.
         """
-        return isinstance(field, BitVector) and isinstance(field.field_type, (Signed, Unsigned))
+        return isinstance(field, BitVector) and isinstance(
+            field.numerical_interpretation, (Signed, Unsigned)
+        )
 
     def _implementations(self) -> str:
         """
@@ -613,9 +615,13 @@ end package body;
             )
             field_width = f"{field_name}_width"
 
-            if isinstance(field, BitVector) and isinstance(field.field_type, Unsigned):
+            if isinstance(field, BitVector) and isinstance(
+                field.numerical_interpretation, Unsigned
+            ):
                 field_conversion = f"to_unsigned(value, {field_width})"
-            elif isinstance(field, BitVector) and isinstance(field.field_type, Signed):
+            elif isinstance(field, BitVector) and isinstance(
+                field.numerical_interpretation, Signed
+            ):
                 field_conversion = f"to_signed(value, {field_width})"
             else:
                 raise ValueError(f"Should not end up here for field: {field}")
