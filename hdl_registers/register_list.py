@@ -129,7 +129,9 @@ class RegisterList:
         self.register_objects.append(register_array)
         return register_array
 
-    def get_register(self, name: str, register_array_name: Optional[str] = None) -> Register:
+    def get_register(
+        self, register_name: str, register_array_name: Optional[str] = None
+    ) -> Register:
         """
         Get a register from this list.
         Will raise exception if no register matches.
@@ -140,7 +142,7 @@ class RegisterList:
         in any arrays).
 
         Arguments:
-            name: The name of the register.
+            register_name: The name of the register.
             register_array_name: If the register is within a register array, this is the name of
                 the array.
         Return:
@@ -148,13 +150,15 @@ class RegisterList:
         """
         if register_array_name is not None:
             register_array = self.get_register_array(name=register_array_name)
-            return register_array.get_register(name=name)
+            return register_array.get_register(name=register_name)
 
         for register_object in self.register_objects:
-            if isinstance(register_object, Register) and register_object.name == name:
+            if isinstance(register_object, Register) and register_object.name == register_name:
                 return register_object
 
-        raise ValueError(f'Could not find register "{name}" within register list "{self.name}"')
+        raise ValueError(
+            f'Could not find register "{register_name}" within register list "{self.name}"'
+        )
 
     def get_register_array(self, name: str) -> RegisterArray:
         """
@@ -194,7 +198,7 @@ class RegisterList:
         """
         if register_array_name is None or register_array_index is None:
             # Target is plain register
-            register = self.get_register(name=register_name)
+            register = self.get_register(register_name=register_name)
 
             return register.index
 

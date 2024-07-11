@@ -98,13 +98,17 @@ description = "stuff"
     )
 
     register_list = from_toml(name="", toml_file=toml_path)
-    assert register_list.get_register(name="hest", register_array_name="apa").index == 0
-    assert register_list.get_register(name="hest", register_array_name="apa").mode == "r"
-    assert register_list.get_register(name="hest", register_array_name="apa").description == ""
-    assert register_list.get_register(name="zebra", register_array_name="apa").index == 1
-    assert register_list.get_register(name="zebra", register_array_name="apa").mode == "w"
+    assert register_list.get_register(register_name="hest", register_array_name="apa").index == 0
+    assert register_list.get_register(register_name="hest", register_array_name="apa").mode == "r"
     assert (
-        register_list.get_register(name="zebra", register_array_name="apa").description == "stuff"
+        register_list.get_register(register_name="hest", register_array_name="apa").description
+        == ""
+    )
+    assert register_list.get_register(register_name="zebra", register_array_name="apa").index == 1
+    assert register_list.get_register(register_name="zebra", register_array_name="apa").mode == "w"
+    assert (
+        register_list.get_register(register_name="zebra", register_array_name="apa").description
+        == "stuff"
     )
 
 
