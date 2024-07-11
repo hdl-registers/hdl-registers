@@ -8,18 +8,17 @@
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 # Local folder libraries
 from .field.bit import Bit
 from .field.bit_vector import BitVector
 from .field.enumeration import Enumeration
 from .field.integer import Integer
-from .field.register_field import DEFAULT_FIELD_TYPE
-from .field.register_field_type import FieldType
 
 if TYPE_CHECKING:
     # Local folder libraries
+    from .field.numerical_interpretation import NumericalInterpretation
     from .field.register_field import RegisterField
 
 
@@ -114,7 +113,7 @@ class Register:
         description: str,
         width: int,
         default_value: str,
-        field_type: FieldType = DEFAULT_FIELD_TYPE,
+        numerical_interpretation: Optional["NumericalInterpretation"] = None,
     ) -> BitVector:
         """
         Append a bit vector field to this register.
@@ -130,7 +129,7 @@ class Register:
             description=description,
             width=width,
             default_value=default_value,
-            field_type=field_type,
+            numerical_interpretation=numerical_interpretation,
         )
         self._append_field(field=bit_vector)
 

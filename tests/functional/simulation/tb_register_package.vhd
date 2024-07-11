@@ -101,7 +101,7 @@ begin
       check_equal(caesar_constant_paragraph, "hello there :)");
       check_equal(caesar_constant_base_address_bin, expected_base_address);
 
-    elsif run("test_bit_vector_field_types") then
+    elsif run("test_bit_vector_numerical_interpretations") then
       check_equal(caesar_field_test_u0_t'high, 1);
       check_equal(caesar_field_test_u0_t'low, 0);
 

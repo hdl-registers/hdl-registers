@@ -19,7 +19,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Fixed,
     Signed,
     SignedFixedPoint,
@@ -86,7 +86,7 @@ from typing import TYPE_CHECKING
 from termcolor import colored
 
 # Third party libraries
-from hdl_registers.field.register_field_type import to_unsigned_binary
+from hdl_registers.field.numerical_interpretation import to_unsigned_binary
 from tsfpga.math_utils import to_binary_nibble_string, to_hex_byte_string
 
 if TYPE_CHECKING:
@@ -313,7 +313,7 @@ class {class_name}:
                 know the name of the register value class also.
         """
         if isinstance(field, BitVector):
-            if isinstance(field.field_type, Fixed):
+            if isinstance(field.numerical_interpretation, Fixed):
                 return "float"
 
             return "int"
@@ -341,21 +341,28 @@ class {class_name}:
         Suitable for descriptions in accessor methods.
         """
         if isinstance(field, BitVector):
-            if field.field_type.is_signed:
-                result = "Signed"
+            if field.numerical_interpretation.is_signed:
+                sign_comment = "Signed"
             else:
-                result = "Unsigned"
+                sign_comment = "Unsigned"
 
-            range_comment = f"Range: {field.min_value} - {field.max_value}."
+            range_comment = (
+                f"Range: {field.numerical_interpretation.min_value} - "
+                f"{field.numerical_interpretation.max_value}."
+            )
 
-            if isinstance(field.field_type, (Signed, Unsigned)):
-                return f"{result} bit vector. Width: {field.width}. {range_comment}"
+            if isinstance(field.numerical_interpretation, (Signed, Unsigned)):
+                return f"{sign_comment} bit vector. Width: {field.width}. {range_comment}"
 
-            if isinstance(field.field_type, (SignedFixedPoint, UnsignedFixedPoint)):
-                integer_width = f"Integer width: {field.field_type.integer_bit_width}."
-                fractional_width = f"Fractional width: {field.field_type.fraction_bit_width}."
+            if isinstance(field.numerical_interpretation, (SignedFixedPoint, UnsignedFixedPoint)):
+                integer_width = (
+                    f"Integer width: {field.numerical_interpretation.integer_bit_width}."
+                )
+                fractional_width = (
+                    f"Fractional width: {field.numerical_interpretation.fraction_bit_width}."
+                )
                 width_comment = f"{integer_width} {fractional_width} "
-                return f"{result} fixed-point bit vector. {width_comment}{range_comment}"
+                return f"{sign_comment} fixed-point bit vector. {width_comment}{range_comment}"
 
             raise ValueError(f"Unknown field type {field}")
 
@@ -368,10 +375,10 @@ class {class_name}:
 
         if isinstance(field, Integer):
             if field.is_signed:
-                result = "Signed"
+                sign_comment = "Signed"
             else:
-                result = "Unsigned"
-            return f"{result} integer. Range: {field.min_value} - {field.max_value}."
+                sign_comment = "Unsigned"
+            return f"{sign_comment} integer. Range: {field.min_value} - {field.max_value}."
 
         raise ValueError(f"Unknown field {field}")
 
@@ -405,14 +412,14 @@ class {class_name}:
             return f"        value = str(self.{field.name})\n"
 
         if isinstance(field, BitVector):
-            if isinstance(field.field_type, Unsigned):
+            if isinstance(field.numerical_interpretation, Unsigned):
                 return f"""
         value_comment = _format_unsigned_number(
             value={field_value}, width={field.width}, include_decimal=False
         )
         value = f"{{{field_value}}} ({{value_comment}})"
 """
-            if isinstance(field.field_type, Signed):
+            if isinstance(field.numerical_interpretation, Signed):
                 return f"""
         unsigned_value = to_unsigned_binary(
             num_bits={field.width}, value={field_value}, is_signed=True
@@ -423,14 +430,14 @@ class {class_name}:
         value = f"{{{field_value}}} ({{value_comment}})"
 """
 
-            if isinstance(field.field_type, (UnsignedFixedPoint, SignedFixedPoint)):
+            if isinstance(field.numerical_interpretation, (UnsignedFixedPoint, SignedFixedPoint)):
                 return f"""
         unsigned_value = to_unsigned_binary(
             num_bits={field.width},
             value={field_value},
-            num_integer_bits={field.field_type.integer_bit_width},
-            num_fractional_bits={field.field_type.fraction_bit_width},
-            is_signed={field.is_signed}
+            num_integer_bits={field.numerical_interpretation.integer_bit_width},
+            num_fractional_bits={field.numerical_interpretation.fraction_bit_width},
+            is_signed={field.numerical_interpretation.is_signed}
         )
         value_comment = _format_unsigned_number(
             value=unsigned_value, width={field.width}

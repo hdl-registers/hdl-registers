@@ -11,11 +11,6 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
-# Local folder libraries
-from .register_field_type import FieldType, Unsigned
-
-DEFAULT_FIELD_TYPE = Unsigned()
-
 
 class RegisterField(ABC):
     """
@@ -26,27 +21,30 @@ class RegisterField(ABC):
     # Must set as class members in subclasses.
     name: str
     _base_index: int
+    _width: int
     description: str
     default_value: Union[str, int]
-
-    # Default type, should be assigned to something else in subclasses when appropriate.
-    _field_type: FieldType = DEFAULT_FIELD_TYPE
 
     @property
     def base_index(self) -> int:
         """
         The index within the register for the lowest bit of this field.
+        Note that this (along with :attr:`.width`) decides the base index of upcoming fields, and
+        thus it may not be changed.
+        Hence this read-only property which is a getter for a private member.
         """
         return self._base_index
 
     @property
-    def max_binary_value(self) -> int:
+    def width(self) -> int:
         """
-        Get the maximum value, represented as a positive integer, that this
-        field can hold given its width.
+        The width, in number of bits, that this field occupies.
+        The index within the register for the lowest bit of this field.
+        Note that this (along with :attr:`.width`) decides the base index of upcoming fields, and
+        thus it may not be changed.
+        Hence this read-only property which is a getter for a private member.
         """
-        result: int = 2**self.width - 1
-        return result
+        return self._width
 
     @property
     def range_str(self) -> str:
@@ -58,28 +56,6 @@ class RegisterField(ABC):
             return f"{self.base_index}"
 
         return f"{self.base_index + self.width - 1}:{self.base_index}"
-
-    @property
-    def field_type(self) -> FieldType:
-        """
-        The field type (Unsigned, Signed, UnsignedFixedPoint, SignedFixedPoint, ...)
-        used to interpret the bits of the field.
-        """
-        return self._field_type
-
-    @property
-    def is_signed(self) -> bool:
-        """
-        Returns True if the field can hold negative numbers.
-        """
-        return self._field_type.is_signed
-
-    @property
-    @abstractmethod
-    def width(self) -> int:
-        """
-        Return the width, in number of bits, that this field occupies.
-        """
 
     @property
     @abstractmethod
@@ -96,64 +72,53 @@ class RegisterField(ABC):
         Return a the default value as an unsigned int.
         """
 
-    def get_value(self, register_value: int) -> Union[int, float]:
+    def get_value(self, register_value: int) -> int:
         """
         Get the value of this field, given the supplied register value.
-        Subclasses might implement sanity checks on the value.
 
         Arguments:
-            register_value: Value of the register that this field belongs to.
+            register_value: Value of the register that this field belongs to,
+                as an unsigned integer.
 
         Return:
-            The value of the field.
-            If the field has a non-zero number of fractional bits, the type of the result
-            will be a ``float``.
-            Otherwise it will be an ``int``.
+            The value of the field as an unsigned integer.
 
             Note that a subclass might have a different type for the resulting value.
             Subclasses should call this super method and convert the numeric value to whatever
             type is applicable for that field.
+            Subclasses might also implement sanity checks of the value given the constraints
+            of that field.
         """
-        shift = self.base_index
+        shift_count = self.base_index
 
         mask_at_base = (1 << self.width) - 1
-        mask = mask_at_base << shift
+        mask_shifted = mask_at_base << shift_count
 
-        value_unsigned = (register_value & mask) >> shift
-        field_value = self.field_type.convert_from_unsigned_binary(self.width, value_unsigned)
+        value = (register_value & mask_shifted) >> shift_count
 
-        return field_value
+        return value
 
-    def set_value(self, field_value: Union[int, float]) -> int:
+    def set_value(self, field_value: int) -> int:
         """
         Convert the supplied value into the bit-shifted unsigned integer ready
-        to be written to the register. The bits of the other fields in the
-        register are masked out and will be set to zero.
+        to be written to the register.
+        The bits of the other fields in the register are masked out and will be set to zero.
 
         Arguments:
-            field_value: Desired value to set the field to.
-                If the field has a non-zero number of fractional bits, the type of the value is
-                expected to be a ``float``.
-                Otherwise it should be an ``int``.
+            field_value: Desired unsigned integer value to set the field to.
 
                 Note that a subclass might have a different type for this argument.
-                Subclasses should convert their argument value to an integer/float and call
+                Subclasses should convert their argument value to an integer and call
                 this super method.
 
         Return:
             The register value as an unsigned integer.
         """
-        value_unsigned = self.field_type.convert_to_unsigned_binary(self.width, field_value)
-        max_value = self.max_binary_value
-        if not 0 <= value_unsigned <= max_value:
-            raise ValueError(
-                f"Value: {value_unsigned} is invalid for unsigned of width {self.width}"
-            )
+        max_value = 2**self.width - 1
+        if not 0 <= field_value <= max_value:
+            raise ValueError(f"Value: {field_value} is invalid for unsigned of width {self.width}")
 
-        mask = max_value << self.base_index
-        value_shifted = value_unsigned << self.base_index
-
-        return value_shifted & mask
+        return field_value << self.base_index
 
     @abstractmethod
     def __repr__(self) -> str:

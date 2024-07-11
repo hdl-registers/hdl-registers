@@ -21,7 +21,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
     Unsigned,
@@ -320,22 +320,24 @@ range {field.width + field.base_index - 1} downto {field.base_index};
             field_name: The field's qualified name.
         """
         if isinstance(field, BitVector):
-            if isinstance(field.field_type, Unsigned):
+            if isinstance(field.numerical_interpretation, Unsigned):
                 return f"  subtype {field_name}_t is u_unsigned({field.width - 1} downto 0);"
 
-            if isinstance(field.field_type, Signed):
+            if isinstance(field.numerical_interpretation, Signed):
                 return f"  subtype {field_name}_t is u_signed({field.width - 1} downto 0);"
 
-            if isinstance(field.field_type, UnsignedFixedPoint):
+            if isinstance(field.numerical_interpretation, UnsignedFixedPoint):
                 return (
                     f"  subtype {field_name}_t is ufixed("
-                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index});"
+                    f"{field.numerical_interpretation.max_bit_index} downto "
+                    f"{field.numerical_interpretation.min_bit_index});"
                 )
 
-            if isinstance(field.field_type, SignedFixedPoint):
+            if isinstance(field.numerical_interpretation, SignedFixedPoint):
                 return (
                     f"  subtype {field_name}_t is sfixed("
-                    f"{field.field_type.max_bit_index} downto {field.field_type.min_bit_index});"
+                    f"{field.numerical_interpretation.max_bit_index} downto "
+                    f"{field.numerical_interpretation.min_bit_index});"
                 )
 
             raise TypeError(f'Got unexpected bit vector type for field: "{field}".')

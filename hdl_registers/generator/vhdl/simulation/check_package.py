@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any, Optional
 # First party libraries
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
-from hdl_registers.field.register_field_type import Fixed
+from hdl_registers.field.numerical_interpretation import Fixed
 from hdl_registers.generator.vhdl.vhdl_generator_common import BUS_ACCESS_DIRECTIONS
 
 # Local folder libraries
@@ -219,7 +219,7 @@ end package body;
         )
 
         if isinstance(field, Enumeration) or (
-            isinstance(field, BitVector) and isinstance(field.field_type, Fixed)
+            isinstance(field, BitVector) and isinstance(field.numerical_interpretation, Fixed)
         ):
             # These field types do not work with the standard VUnit check procedures.
             # Enumeration because it is a custom type.
@@ -233,7 +233,9 @@ end package body;
                 if isinstance(field, Enumeration):
                     return f"to_string({name})"
 
-                if isinstance(field, BitVector) and isinstance(field.field_type, Fixed):
+                if isinstance(field, BitVector) and isinstance(
+                    field.numerical_interpretation, Fixed
+                ):
                     return f'to_string({name}) & " (" & to_string(to_real({name}), "%f") & ")"'
 
                 raise ValueError(f"Unsupported field type: {field}")

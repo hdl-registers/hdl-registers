@@ -16,7 +16,7 @@ import pytest
 from tsfpga.system_utils import load_python_module
 
 # First party libraries
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
     Unsigned,
@@ -86,24 +86,32 @@ def setup_test_register(
     register.append_bit(name="bit_aa1", description="", default_value="1")
 
     register.append_bit_vector(
-        name="unsigned_aa", description="", width=4, default_value="0101", field_type=Unsigned()
+        name="unsigned_aa",
+        description="",
+        width=4,
+        default_value="0101",
+        numerical_interpretation=Unsigned(bit_width=4),
     )
     register.append_bit_vector(
-        name="signed_aa", description="", width=4, default_value="1010", field_type=Signed()
+        name="signed_aa",
+        description="",
+        width=4,
+        default_value="1010",
+        numerical_interpretation=Signed(bit_width=4),
     )
     register.append_bit_vector(
         name="ufixed_aa",
         description="",
         width=4,
         default_value="0110",
-        field_type=UnsignedFixedPoint(1, -2),
+        numerical_interpretation=UnsignedFixedPoint(1, -2),
     )
     register.append_bit_vector(
         name="sfixed_aa",
         description="",
         width=4,
         default_value="1001",
-        field_type=SignedFixedPoint(0, -3),
+        numerical_interpretation=SignedFixedPoint(0, -3),
     )
 
     register.append_enumeration(
@@ -132,7 +140,11 @@ def add_single_field_registers(register_list_or_array: Union[RegisterList, Regis
 
     register = register_list_or_array.append_register("single_w_unsigned", mode="w", description="")
     register.append_bit_vector(
-        name="unsigned_bb", description="", width=4, default_value="1011", field_type=Unsigned()
+        name="unsigned_bb",
+        description="",
+        width=4,
+        default_value="1011",
+        numerical_interpretation=Unsigned(bit_width=4),
     )
 
     register = register_list_or_array.append_register(
@@ -143,7 +155,7 @@ def add_single_field_registers(register_list_or_array: Union[RegisterList, Regis
         description="",
         width=4,
         default_value="1100",
-        field_type=SignedFixedPoint(1, -2),
+        numerical_interpretation=SignedFixedPoint(1, -2),
     )
 
     register = register_list_or_array.append_register(

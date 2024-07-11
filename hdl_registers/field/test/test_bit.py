@@ -12,25 +12,16 @@ import pytest
 
 # First party libraries
 from hdl_registers.field.bit import Bit
-from hdl_registers.field.register_field_type import Unsigned
 
 
 def test_get_value():
     bit = Bit(name="", index=2, description="", default_value="1")
 
-    register_value = int("1111011", base=2)
+    register_value = int("11110_11", base=2)
     assert bit.get_value(register_value) == 0
 
-    register_value = int("0000100", base=2)
+    register_value = int("00001_00", base=2)
     assert bit.get_value(register_value) == 1
-
-
-def test_max_binary_value():
-    bit = Bit(name="", index=0, description="", default_value="1")
-    assert bit.max_binary_value == 0b1
-
-    bit = Bit(name="", index=4, description="", default_value="0")
-    assert bit.max_binary_value == 0b1
 
 
 def test_set_value():
@@ -41,7 +32,8 @@ def test_set_value():
         bit.set_value(0b11)
 
     bit = Bit(name="", index=4, description="", default_value="0")
-    assert bit.set_value(0b1) == 0b10000
+    assert bit.set_value(0b0) == 0b0
+    assert bit.set_value(0b1) == 0b1_0000
 
     with pytest.raises(ValueError):
         bit.set_value(0b11)
@@ -115,8 +107,3 @@ def test_updating_to_invalid_default_value_should_raise_exception():
     assert str(exception_info.value) == (
         'Bit "hest" invalid binary value for "default_value". Got: "2".'
     )
-
-
-def test_field_type():
-    bit = Bit(name="test", index=0, description="", default_value="1")
-    assert isinstance(bit.field_type, Unsigned)

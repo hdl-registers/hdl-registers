@@ -18,7 +18,7 @@ from tsfpga.system_utils import read_file
 
 # First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
-from hdl_registers.field.register_field_type import (
+from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
     Unsigned,
@@ -114,11 +114,19 @@ def test_vhdl_typedef(tmp_path):
     register = register_list.append_register("number", "r_w", "")
 
     register.append_bit_vector(
-        name="u0", description="", width=2, default_value="11", field_type=Unsigned()
+        name="u0",
+        description="",
+        width=2,
+        default_value="11",
+        numerical_interpretation=Unsigned(bit_width=2),
     )
 
     register.append_bit_vector(
-        name="s0", description="", width=2, default_value="11", field_type=Signed()
+        name="s0",
+        description="",
+        width=2,
+        default_value="11",
+        numerical_interpretation=Signed(bit_width=2),
     )
 
     register.append_bit_vector(
@@ -126,14 +134,14 @@ def test_vhdl_typedef(tmp_path):
         description="",
         width=2,
         default_value="11",
-        field_type=UnsignedFixedPoint(-1, -2),
+        numerical_interpretation=UnsignedFixedPoint(-1, -2),
     )
     register.append_bit_vector(
         name="ufixed1",
         description="",
         width=8,
         default_value="1" * 8,
-        field_type=UnsignedFixedPoint(5, -2),
+        numerical_interpretation=UnsignedFixedPoint(5, -2),
     )
 
     register.append_bit_vector(
@@ -141,14 +149,14 @@ def test_vhdl_typedef(tmp_path):
         description="",
         width=2,
         default_value="11",
-        field_type=SignedFixedPoint(-1, -2),
+        numerical_interpretation=SignedFixedPoint(-1, -2),
     )
     register.append_bit_vector(
         name="sfixed1",
         description="",
         width=6,
         default_value="1" * 6,
-        field_type=SignedFixedPoint(5, 0),
+        numerical_interpretation=SignedFixedPoint(5, 0),
     )
 
     register.append_integer(

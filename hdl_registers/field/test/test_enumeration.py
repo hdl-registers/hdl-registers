@@ -153,7 +153,7 @@ def test_setting_default_value_that_does_not_exist_should_raise_exception():
         )
     assert (
         str(exception_info.value)
-    ) == 'Enumeration "apa", requested "default_value" element does not exist. Got: "element1".'
+    ) == 'Enumeration "apa", requested element name does not exist. Got: "element1".'
 
     # Valid value to constructor but then an invalid update of the value.
     enumeration = Enumeration(
@@ -167,7 +167,7 @@ def test_setting_default_value_that_does_not_exist_should_raise_exception():
         enumeration.set_default_value("element1")
     assert (
         str(exception_info.value)
-    ) == 'Enumeration "apa", requested "default_value" element does not exist. Got: "element1".'
+    ) == 'Enumeration "apa", requested element name does not exist. Got: "element1".'
 
 
 def test_get_value():
@@ -188,7 +188,7 @@ def test_get_value():
     assert enumeration.width == 2
 
     # Ones outside of this field. Should be masked out when getting value.
-    register_base_value = 0b1110_0111
+    register_base_value = 0b111_00_111
 
     register_value = register_base_value
     assert enumeration.get_value(register_value=register_value) is enumeration.elements[0]

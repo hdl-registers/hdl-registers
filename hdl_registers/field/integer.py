@@ -8,8 +8,8 @@
 # --------------------------------------------------------------------------------------------------
 
 # Local folder libraries
+from .numerical_interpretation import Signed, Unsigned
 from .register_field import RegisterField
-from .register_field_type import Signed, Unsigned
 
 
 class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
@@ -39,46 +39,22 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         self._base_index = base_index
         self.description = description
 
-        # These affect the width of the field, and hence the base index of the next fields.
-        # Hence the user is not allowed to change them, nor the base index of this field,
-        # after initialization.
+        # The min and max values determine the width of the field.
+        # Hence the user is not allowed to change them after initialization.
         self._check_range(min_value=min_value, max_value=max_value)
         self._min_value = min_value
         self._max_value = max_value
+
+        self._width = self._calculate_width()
 
         self._default_value = 0
         # Assign self._default_value via setter
         self.default_value = default_value
 
-        # Determines how bits are to be interpreted in 'set_value' and 'get_value'.
-        self._field_type = Signed() if min_value < 0 else Unsigned()
-
-    @property
-    def width(self) -> int:
-        # Calculate the width based on the supplied numerical limits.
-        error_message = (
-            f"Supplied integer range [{self._min_value}, {self._max_value}] does not fit "
-            "in a register."
+        # Helper object to convert between unsigned binary and signed/unsigned integer.
+        self._numerical_interpretation = (
+            Signed(bit_width=self._width) if min_value < 0 else Unsigned(self._width)
         )
-
-        if not self.is_signed:
-            # The number of bits needed to represent UNSIGNED numbers [0, max_value].
-            num_bits = self._max_value.bit_length()
-
-            if num_bits > 32:
-                raise ValueError(error_message)
-
-            return num_bits
-
-        for num_bits in range(1, 33):
-            # Two's complement range for signed numbers.
-            min_range = -(2 ** (num_bits - 1))
-            max_range = 2 ** (num_bits - 1) - 1
-
-            if self._min_value >= min_range and self._max_value <= max_range:
-                return num_bits
-
-        raise ValueError(error_message)
 
     def _check_range(self, min_value: int, max_value: int) -> None:
         """
@@ -106,12 +82,41 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
             )
             raise ValueError(message)
 
+    def _calculate_width(self) -> int:
+        # Calculate the width based on the supplied numerical limits.
+        error_message = (
+            f"Supplied integer range [{self._min_value}, {self._max_value}] does not fit "
+            "in a register."
+        )
+
+        if self._min_value >= 0:
+            # The number of bits needed to represent UNSIGNED numbers [0, max_value].
+            num_bits = self._max_value.bit_length()
+
+            if num_bits > 32:
+                raise ValueError(error_message)
+
+            return num_bits
+
+        for num_bits in range(1, 33):
+            # Two's complement range for signed numbers.
+            min_range = -(2 ** (num_bits - 1))
+            max_range = 2 ** (num_bits - 1) - 1
+
+            if self._min_value >= min_range and self._max_value <= max_range:
+                return num_bits
+
+        raise ValueError(error_message)
+
     @property
     def min_value(self) -> int:
         """
         Minimum numeric value this field can assume.
         Getter for private member.
         """
+        # Note that it would be wrong to return 'self._numeric_interpretation.min_value'.
+        # The range of an integer field is not necessarily the same as the total range
+        # enabled by the bit width.
         return self._min_value
 
     @property
@@ -120,7 +125,16 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         Maximum numeric value this field can assume.
         Getter for private member.
         """
+        # Same comment as for 'min_value'.
         return self._max_value
+
+    @property
+    def is_signed(self) -> bool:
+        """
+        Is the field signed (two's complement)?
+        Getter for private member.
+        """
+        return self._numerical_interpretation.is_signed
 
     @property  # type: ignore[override]
     def default_value(self) -> int:
@@ -169,11 +183,13 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
     def get_value(self, register_value: int) -> int:
         """
         See super method for details.
-        Adds sanity checks of the value.
+        Adds signed/unsigned logic, and sanity checks of the value.
         """
-        # We know that the return value is an integer and not a float, since this field uses
-        # a field_type with no fractional bits.
-        result: int = super().get_value(register_value=register_value)  # type: ignore
+        unsigned_value = super().get_value(register_value=register_value)
+        # We know that this is an integer (not a float) since there are no fractional bits set.
+        result: int = self._numerical_interpretation.convert_from_unsigned_binary(
+            unsigned_binary=unsigned_value
+        )  # type: ignore[assignment]
 
         if self.min_value <= result <= self.max_value:
             return result
@@ -186,7 +202,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
     def set_value(self, field_value: int) -> int:  # type: ignore
         """
         See super method for details.
-        Adds sanity checks of the value.
+        Adds signed/unsigned logic, and sanity checks of the value.
         """
         if not self.min_value <= field_value <= self.max_value:
             raise ValueError(
@@ -194,7 +210,10 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
                 f"legal range: ({self.min_value}, {self.max_value})."
             )
 
-        return super().set_value(field_value=field_value)
+        unsigned_value = self._numerical_interpretation.convert_to_unsigned_binary(
+            value=field_value
+        )
+        return super().set_value(field_value=unsigned_value)
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
