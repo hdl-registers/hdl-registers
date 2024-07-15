@@ -12,41 +12,42 @@ import pytest
 
 # First party libraries
 from hdl_registers.register import Register
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_repr_basic():
     # Check that repr is an actual representation, not just "X object at 0xABCDEF"
-    assert "apa" in repr(Register(name="apa", index=0, mode="r", description=""))
+    assert "apa" in repr(Register(name="apa", index=0, mode=REGISTER_MODES["r"], description=""))
 
     # Different name
-    assert repr(Register(name="apa", index=0, mode="r", description="")) != repr(
-        Register(name="hest", index=0, mode="r", description="")
+    assert repr(Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")) != repr(
+        Register(name="hest", index=0, mode=REGISTER_MODES["r"], description="")
     )
 
     # Different index
-    assert repr(Register(name="apa", index=0, mode="r", description="")) != repr(
-        Register(name="apa", index=1, mode="r", description="")
+    assert repr(Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")) != repr(
+        Register(name="apa", index=1, mode=REGISTER_MODES["r"], description="")
     )
 
     # Different mode
-    assert repr(Register(name="apa", index=0, mode="r", description="")) != repr(
-        Register(name="apa", index=0, mode="w", description="")
+    assert repr(Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")) != repr(
+        Register(name="apa", index=0, mode=REGISTER_MODES["w"], description="")
     )
 
     # Different description
-    assert repr(Register(name="apa", index=0, mode="r", description="Blah")) != repr(
-        Register(name="apa", index=0, mode="r", description="Gah")
-    )
+    assert repr(
+        Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="Blah")
+    ) != repr(Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="Gah"))
 
 
 def test_repr_with_bits_appended():
     """
     Shows that the ``fields`` impact the repr. Do not need to test with other fields than bits.
     """
-    register_a = Register(name="apa", index=0, mode="r", description="")
+    register_a = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register_a.append_bit(name="hest", description="", default_value="0")
 
-    register_b = Register(name="apa", index=0, mode="r", description="")
+    register_b = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register_b.append_bit(name="hest", description="", default_value="0")
 
     assert repr(register_a) == repr(register_b)
@@ -58,7 +59,7 @@ def test_repr_with_bits_appended():
 
 
 def test_bits_are_appended_properly_and_can_be_edited_in_place():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
 
     bit_hest = register.append_bit(name="hest", description="abc", default_value="0")
     assert bit_hest.base_index == 0
@@ -71,7 +72,7 @@ def test_bits_are_appended_properly_and_can_be_edited_in_place():
 
 
 def test_bit_vectors_are_appended_properly_and_can_be_edited_in_place():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
 
     bit_vector_hest = register.append_bit_vector(
         name="hest", description="abc", width=3, default_value="000"
@@ -88,7 +89,7 @@ def test_bit_vectors_are_appended_properly_and_can_be_edited_in_place():
 
 
 def test_integers_are_appended_properly_and_can_be_edited_in_place():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
 
     integer_hest = register.append_integer(
         name="hest",
@@ -113,7 +114,7 @@ def test_integers_are_appended_properly_and_can_be_edited_in_place():
 
 
 def test_appending_bit_to_full_register():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register.append_bit_vector(name="foo", width=32, description="", default_value="0" * 32)
 
     with pytest.raises(ValueError) as exception_info:
@@ -122,7 +123,7 @@ def test_appending_bit_to_full_register():
 
 
 def test_appending_bit_vector_to_full_register():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register.append_bit_vector(name="foo", width=30, description="", default_value="0" * 30)
 
     with pytest.raises(ValueError) as exception_info:
@@ -131,7 +132,7 @@ def test_appending_bit_vector_to_full_register():
 
 
 def test_appending_integer_to_full_register():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register.append_bit_vector(name="foo", width=30, description="", default_value="0" * 30)
 
     with pytest.raises(ValueError) as exception_info:
@@ -146,7 +147,7 @@ def test_appending_integer_to_full_register():
 
 
 def test_default_value():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register.append_bit(name="foo", description="", default_value="1")
     register.append_bit(name="foo", description="", default_value="0")
     register.append_bit(name="foo", description="", default_value="1")
@@ -157,7 +158,7 @@ def test_default_value():
 
 
 def test_default_value_can_be_updated():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register.append_bit(name="foo", description="", default_value="1")
 
     assert register.default_value == 1
@@ -167,7 +168,7 @@ def test_default_value_can_be_updated():
 
 
 def test_get_field():
-    register = Register(name="apa", index=0, mode="r", description="")
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     hest = register.append_bit(name="hest", description="", default_value="1")
     zebra = register.append_bit(name="zebra", description="", default_value="1")
 

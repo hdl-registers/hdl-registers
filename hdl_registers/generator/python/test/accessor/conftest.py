@@ -24,9 +24,10 @@ from hdl_registers.field.numerical_interpretation import (
 )
 from hdl_registers.generator.python.accessor import PythonAccessorGenerator
 from hdl_registers.generator.python.pickle import PythonPickleGenerator
-from hdl_registers.register import REGISTER_MODES
 from hdl_registers.register_array import RegisterArray
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_mode import RegisterMode
+from hdl_registers.register_modes import REGISTER_MODES
 
 # False positive for pytest fixtures
 # pylint: disable=redefined-outer-name
@@ -73,14 +74,16 @@ def generate_default_accessor(tmp_session_path):
 
 
 def add_test_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
-    for mode in REGISTER_MODES:
+    for mode in REGISTER_MODES.values():
         setup_test_register(register_list_or_array=register_list_or_array, mode=mode)
 
 
 def setup_test_register(
-    register_list_or_array: Union[RegisterList, RegisterArray], mode: str
+    register_list_or_array: Union[RegisterList, RegisterArray], mode: RegisterMode
 ) -> None:
-    register = register_list_or_array.append_register(f"reg_{mode}", mode=mode, description="")
+    register = register_list_or_array.append_register(
+        f"reg_{mode.shorthand}", mode=mode, description=""
+    )
 
     register.append_bit(name="bit_aa0", description="", default_value="0")
     register.append_bit(name="bit_aa1", description="", default_value="1")
@@ -130,15 +133,21 @@ def setup_test_register(
 
 
 def add_empty_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
-    for mode in REGISTER_MODES:
-        register_list_or_array.append_register(name=f"empty_{mode}", mode=mode, description="")
+    for mode in REGISTER_MODES.values():
+        register_list_or_array.append_register(
+            name=f"empty_{mode.shorthand}", mode=mode, description=""
+        )
 
 
 def add_single_field_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
-    register = register_list_or_array.append_register("single_w_bit", mode="w", description="")
+    register = register_list_or_array.append_register(
+        "single_w_bit", mode=REGISTER_MODES["w"], description=""
+    )
     register.append_bit(name="bit_bb", description="", default_value="1")
 
-    register = register_list_or_array.append_register("single_w_unsigned", mode="w", description="")
+    register = register_list_or_array.append_register(
+        "single_w_unsigned", mode=REGISTER_MODES["w"], description=""
+    )
     register.append_bit_vector(
         name="unsigned_bb",
         description="",
@@ -148,7 +157,7 @@ def add_single_field_registers(register_list_or_array: Union[RegisterList, Regis
     )
 
     register = register_list_or_array.append_register(
-        "single_r_w_sfixed", mode="r_w", description=""
+        "single_r_w_sfixed", mode=REGISTER_MODES["r_w"], description=""
     )
     register.append_bit_vector(
         name="sfixed_bb",
@@ -159,7 +168,7 @@ def add_single_field_registers(register_list_or_array: Union[RegisterList, Regis
     )
 
     register = register_list_or_array.append_register(
-        "single_wpulse_enumeration", mode="wpulse", description=""
+        "single_wpulse_enumeration", mode=REGISTER_MODES["wpulse"], description=""
     )
     register.append_enumeration(
         name="enumeration_bb",
@@ -169,7 +178,7 @@ def add_single_field_registers(register_list_or_array: Union[RegisterList, Regis
     )
 
     register = register_list_or_array.append_register(
-        "single_r_wpulse_uint", mode="r_wpulse", description=""
+        "single_r_wpulse_uint", mode=REGISTER_MODES["r_wpulse"], description=""
     )
     register.append_integer(
         name="uint_bb", description="", min_value=10, max_value=15, default_value=15

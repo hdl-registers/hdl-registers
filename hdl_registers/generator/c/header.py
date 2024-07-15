@@ -19,7 +19,7 @@ from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.register import REGISTER_MODES, Register
+from hdl_registers.register import Register
 from hdl_registers.register_list import RegisterList
 
 if TYPE_CHECKING:
@@ -112,9 +112,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
         for register_object in self.iterate_register_objects():
             if isinstance(register_object, Register):
-                register_struct += self.comment(
-                    f'Mode "{REGISTER_MODES[register_object.mode].mode_readable}".', indent=2
-                )
+                register_struct += self.comment(f'Mode "{register_object.mode.name}".', indent=2)
                 register_struct += f"  uint32_t {register_object.name};\n"
 
             else:
@@ -126,9 +124,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
                 array_structs += f"typedef struct {array_struct_type}\n"
                 array_structs += "{\n"
                 for register in register_object.registers:
-                    array_structs += self.comment(
-                        f"Mode '{REGISTER_MODES[register.mode].mode_readable}'.", indent=2
-                    )
+                    array_structs += self.comment(f"Mode '{register.mode.name}'.", indent=2)
                     array_structs += f"  uint32_t {register.name};\n"
                 array_structs += f"}} {array_struct_type};\n\n"
 
@@ -174,7 +170,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
         )
         comment = [
             f"Address of the {register_description}{register_array_comment}.",
-            f"Mode '{REGISTER_MODES[register.mode].mode_readable}'.",
+            f"Mode '{register.mode.name}'.",
         ]
         c_code = self.comment_block(comment)
 

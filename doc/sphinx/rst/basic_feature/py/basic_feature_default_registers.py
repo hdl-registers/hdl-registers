@@ -19,6 +19,7 @@ from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGen
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register import Register
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 THIS_DIR = Path(__file__).parent
 
@@ -27,13 +28,13 @@ DEFAULT_REGISTERS = [
     Register(
         name="interrupt_status",
         index=0,
-        mode="r_wpulse",
+        mode=REGISTER_MODES["r_wpulse"],
         description="Interrupt status. Clear interrupt(s) by writing the corresponding bitmask.",
     ),
     Register(
         name="interrupt_mask",
         index=1,
-        mode="r_w",
+        mode=REGISTER_MODES["r_w"],
         description="Enable or disable interrupts by setting bitmask.",
     ),
 ]
@@ -68,7 +69,7 @@ def create_from_api() -> RegisterList:
     )
 
     register_list.append_register(
-        name="config", mode="r_w", description="Generic configuration register."
+        name="config", mode=REGISTER_MODES["r_w"], description="Generic configuration register."
     )
 
     return register_list

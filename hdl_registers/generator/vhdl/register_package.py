@@ -452,7 +452,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
                 opening = f"{vhdl_array_index} => "
 
                 register_definitions.append(
-                    f"{opening}(idx => {idx}, reg_type => {register_object.mode})"
+                    f"{opening}(idx => {idx}, reg_type => {register_object.mode.shorthand})"
                 )
                 default_values.append(f'{opening}"{register_object.default_value:032b}"')
 
@@ -466,7 +466,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
                         opening = f"{vhdl_array_index} => "
 
                         register_definitions.append(
-                            f"{opening}(idx => {idx}, reg_type => {register.mode})"
+                            f"{opening}(idx => {idx}, reg_type => {register.mode.shorthand})"
                         )
                         default_values.append(f'{opening}"{register.default_value:032b}"')
 

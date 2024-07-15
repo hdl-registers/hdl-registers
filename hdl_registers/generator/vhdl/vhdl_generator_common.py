@@ -18,80 +18,13 @@ from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.field.numerical_interpretation import Fixed, Signed, Unsigned
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
-
-
-class BusAccessDirection:
-    """
-    Keep track of and test the bus access direction.
-    """
-
-    def __init__(self, read_or_write: str):
-        if read_or_write not in ["read", "write"]:
-            raise ValueError(f"Unknown bus access direction name: {read_or_write}")
-
-        self.name = read_or_write
-
-        self.is_read_not_write = read_or_write == "read"
-        self.name_past = "read" if self.is_read_not_write else "written"
-
-    @property
-    def name_adjective(self) -> str:
-        """
-        Return "readable" or "writeable".
-        """
-        return f"{self.name}able"
-
-    def register_is_accessible(self, register: "Register") -> bool:
-        """
-        Return True if the supplied register is accessible in this direction.
-        """
-        if self.is_read_not_write:
-            return register.is_bus_readable
-
-        return register.is_bus_writeable
-
-
-class FabricAccessDirection:
-    """
-    Keep track of and test the fabric access direction.
-    """
-
-    def __init__(self, up_or_down: str):
-        if up_or_down not in ["up", "down"]:
-            raise ValueError(f"Unknown fabric access direction name: {up_or_down}")
-
-        self.name = up_or_down
-        self.is_up_not_down = up_or_down == "up"
-
-    def register_is_accessible(self, register: "Register") -> bool:
-        """
-        Return True if the supplied register is accessible in this direction.
-        """
-        if self.is_up_not_down:
-            # Modes where fabric provides a value to the bus.
-            # Analogous the 'reg_file.reg_file_pkg.is_fabric_gives_value_type' VHDL function.
-            return register.mode in ["r", "r_wpulse"]
-
-        # Modes where the bus provides a value to the fabric.
-        # Analogous the 'reg_file.reg_file_pkg.is_write_type' VHDL function.
-        return register.mode in ["w", "r_w", "wpulse", "r_wpulse"]
-
-
-# The valid bus access directions.
-BUS_ACCESS_DIRECTIONS = dict(
-    read=BusAccessDirection(read_or_write="read"), write=BusAccessDirection(read_or_write="write")
-)
-
-# The valid fabric access directions.
-FABRIC_ACCESS_DIRECTIONS = dict(
-    up=FabricAccessDirection(up_or_down="up"), down=FabricAccessDirection(up_or_down="down")
-)
 
 
 class VhdlGeneratorCommon(RegisterCodeGenerator):
@@ -168,119 +101,120 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         )
         return f"{field_name}_t"
 
-    def has_any_bus_accessible_register(self, direction: BusAccessDirection) -> bool:
+    def has_any_software_accessible_register(self, direction: SoftwareAccessDirection) -> bool:
         """
         Return True if the register list contains any register, plain or in array, that is
-        bus-accessible in the given direction.
+        software-accessible in the given direction.
         """
         for register, _ in self.iterate_registers():
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_software_accessible(direction=direction):
                 return True
 
         return False
 
-    def iterate_bus_accessible_registers(
-        self, direction: BusAccessDirection
+    def iterate_software_accessible_registers(
+        self, direction: SoftwareAccessDirection
     ) -> Iterator[tuple["Register", Optional["RegisterArray"]]]:
         """
-        Iterate all registers in the register list, plain or in array, that are bus-accessible in
-        the given direction.
+        Iterate all registers in the register list, plain or in array, that are software-accessible
+        in the given direction.
         """
         for register, register_array in self.iterate_registers():
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_software_accessible(direction=direction):
                 yield register, register_array
 
-    def iterate_bus_accessible_plain_registers(
-        self, direction: BusAccessDirection
+    def iterate_software_accessible_plain_registers(
+        self, direction: SoftwareAccessDirection
     ) -> Iterator["Register"]:
         """
-        Iterate all plain registers in the register list that are bus-accessible in the
+        Iterate all plain registers in the register list that are software-accessible in the
         given direction.
         """
         for register in self.iterate_plain_registers():
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_software_accessible(direction=direction):
                 yield register
 
-    def iterate_bus_accessible_array_registers(
-        self, register_array: "RegisterArray", direction: BusAccessDirection
+    def iterate_software_accessible_array_registers(
+        self, register_array: "RegisterArray", direction: SoftwareAccessDirection
     ) -> Iterator["Register"]:
         """
-        Iterate all registers in the register array that are bus-accessible in the given direction.
+        Iterate all registers in the register array that are software-accessible in the
+        given direction.
         """
         for register in register_array.registers:
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_software_accessible(direction=direction):
                 yield register
 
-    def iterate_bus_accessible_register_arrays(
-        self, direction: BusAccessDirection
+    def iterate_software_accessible_register_arrays(
+        self, direction: SoftwareAccessDirection
     ) -> Iterator["RegisterArray"]:
         """
         Iterate all register arrays in the register list that contain at least one register that
-        is bus-accessible in the given direction.
+        is software-accessible in the given direction.
         """
         for register_array in self.iterate_register_arrays():
             accessible_registers = list(
-                self.iterate_bus_accessible_array_registers(
+                self.iterate_software_accessible_array_registers(
                     register_array=register_array, direction=direction
                 )
             )
             if accessible_registers:
                 yield register_array
 
-    def has_any_fabric_accessible_register(self, direction: FabricAccessDirection) -> bool:
+    def has_any_hardware_accessible_register(self, direction: HardwareAccessDirection) -> bool:
         """
         Return True if the register list contains at least one register, plain or in array, with a
-        mode where fabric accesses the value in the given direction.
+        mode where hardware accesses the value in the given direction.
         """
         for register, _ in self.iterate_registers():
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_hardware_accessible(direction=direction):
                 return True
 
         return False
 
-    def iterate_fabric_accessible_registers(
-        self, direction: FabricAccessDirection
+    def iterate_hardware_accessible_registers(
+        self, direction: HardwareAccessDirection
     ) -> Iterator[tuple["Register", Optional["RegisterArray"]]]:
         """
-        Iterate all registers in the register list, plain or in array, that are fabric-accessible in
-        the given direction.
+        Iterate all registers in the register list, plain or in array, that are hardware-accessible
+        in the given direction.
         """
         for register, register_array in self.iterate_registers():
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_hardware_accessible(direction=direction):
                 yield register, register_array
 
-    def iterate_fabric_accessible_plain_registers(
-        self, direction: FabricAccessDirection
+    def iterate_hardware_accessible_plain_registers(
+        self, direction: HardwareAccessDirection
     ) -> Iterator["Register"]:
         """
-        Iterate all plain registers in the register list that are fabric-accessible in the
+        Iterate all plain registers in the register list that are hardware-accessible in the
         given direction.
         """
         for register in self.iterate_plain_registers():
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_hardware_accessible(direction=direction):
                 yield register
 
-    def iterate_fabric_accessible_array_registers(
-        self, register_array: "RegisterArray", direction: FabricAccessDirection
+    def iterate_hardware_accessible_array_registers(
+        self, register_array: "RegisterArray", direction: HardwareAccessDirection
     ) -> Iterator["Register"]:
         """
-        Iterate all registers in the register array that are fabric-accessible in the
+        Iterate all registers in the register array that are hardware-accessible in the
         given direction.
         """
         for register in register_array.registers:
-            if direction.register_is_accessible(register=register):
+            if register.mode.is_hardware_accessible(direction=direction):
                 yield register
 
-    def iterate_fabric_accessible_register_arrays(
-        self, direction: FabricAccessDirection
+    def iterate_hardware_accessible_register_arrays(
+        self, direction: HardwareAccessDirection
     ) -> Iterator["RegisterArray"]:
         """
         Iterate all register arrays in the register list that contain at least one register that
-        is fabric-accessible in the given direction.
+        is hardware-accessible in the given direction.
         """
         for register_array in self.iterate_register_arrays():
             accessible_registers = list(
-                self.iterate_fabric_accessible_array_registers(
+                self.iterate_hardware_accessible_array_registers(
                     register_array=register_array, direction=direction
                 )
             )

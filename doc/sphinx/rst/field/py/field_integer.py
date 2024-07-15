@@ -20,6 +20,7 @@ from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerat
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 THIS_DIR = Path(__file__).parent
 
@@ -38,7 +39,7 @@ def create_from_api() -> RegisterList:
     register_list = RegisterList(name="caesar")
 
     register = register_list.append_register(
-        name="config", mode="r_w", description="Configuration register."
+        name="config", mode=REGISTER_MODES["r_w"], description="Configuration register."
     )
 
     register.append_integer(

@@ -22,6 +22,7 @@ from hdl_registers import __version__ as hdl_registers_version
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 class CustomGenerator(RegisterCodeGenerator):
@@ -385,8 +386,8 @@ def test_two_constants_with_the_same_name_should_raise_exception(tmp_path):
 
 def test_two_registers_with_the_same_name_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register_list.append_register(name="apa", mode="r_w", description="")
-    register_list.append_register(name="apa", mode="w", description="")
+    register_list.append_register(name="apa", mode=REGISTER_MODES["r_w"], description="")
+    register_list.append_register(name="apa", mode=REGISTER_MODES["w"], description="")
 
     with pytest.raises(ValueError) as exception_info:
         CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
@@ -398,7 +399,7 @@ def test_two_registers_with_the_same_name_should_raise_exception(tmp_path):
 
 def test_register_with_the_same_name_as_register_array_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register_list.append_register(name="apa", mode="r_w", description="")
+    register_list.append_register(name="apa", mode=REGISTER_MODES["r_w"], description="")
     register_list.append_register_array(name="apa", length=2, description="")
 
     with pytest.raises(ValueError) as exception_info:
@@ -411,7 +412,7 @@ def test_register_with_the_same_name_as_register_array_should_raise_exception(tm
 
 def test_two_plain_fields_with_the_same_name_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register = register_list.append_register(name="apa", mode="r_w", description="")
+    register = register_list.append_register(name="apa", mode=REGISTER_MODES["r_w"], description="")
     register.append_bit(name="hest", description="", default_value="0")
     register.append_bit(name="hest", description="", default_value="0")
 
@@ -426,7 +427,7 @@ def test_two_plain_fields_with_the_same_name_should_raise_exception(tmp_path):
 def test_two_array_fields_with_the_same_name_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
     array = register_list.append_register_array(name="apa", length=2, description="")
-    register = array.append_register(name="hest", mode="r_w", description="")
+    register = array.append_register(name="hest", mode=REGISTER_MODES["r_w"], description="")
     register.append_bit(name="zebra", description="", default_value="0")
     register.append_bit(name="zebra", description="", default_value="0")
 
@@ -441,10 +442,10 @@ def test_two_array_fields_with_the_same_name_should_raise_exception(tmp_path):
 def test_two_register_arrays_with_the_same_name_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
     register_list.append_register_array(name="apa", length=2, description="").append_register(
-        name="hest", mode="r", description=""
+        name="hest", mode=REGISTER_MODES["r"], description=""
     )
     register_list.append_register_array(name="apa", length=3, description="").append_register(
-        name="zebra", mode="w", description=""
+        name="zebra", mode=REGISTER_MODES["w"], description=""
     )
 
     with pytest.raises(ValueError) as exception_info:
@@ -457,9 +458,9 @@ def test_two_register_arrays_with_the_same_name_should_raise_exception(tmp_path)
 
 def test_array_register_with_same_qualified_name_as_plain_register_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register_list.append_register(name="apa_hest", mode="r_w", description="")
+    register_list.append_register(name="apa_hest", mode=REGISTER_MODES["r_w"], description="")
     register_array = register_list.append_register_array(name="apa", length=3, description="")
-    register_array.append_register(name="hest", mode="r_w", description="")
+    register_array.append_register(name="hest", mode=REGISTER_MODES["r_w"], description="")
 
     with pytest.raises(ValueError) as exception_info:
         CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
@@ -471,8 +472,8 @@ def test_array_register_with_same_qualified_name_as_plain_register_should_raise_
 
 def test_plain_field_with_same_qualified_name_as_plain_register_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register_list.append_register(name="apa_hest", mode="r_w", description="")
-    register = register_list.append_register(name="apa", mode="r_w", description="")
+    register_list.append_register(name="apa_hest", mode=REGISTER_MODES["r_w"], description="")
+    register = register_list.append_register(name="apa", mode=REGISTER_MODES["r_w"], description="")
     register.append_bit(name="hest", description="", default_value="0")
 
     with pytest.raises(ValueError) as exception_info:
@@ -485,10 +486,10 @@ def test_plain_field_with_same_qualified_name_as_plain_register_should_raise_exc
 
 def test_plain_field_with_same_qualified_name_as_array_register_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register = register_list.append_register(name="apa", mode="r_w", description="")
+    register = register_list.append_register(name="apa", mode=REGISTER_MODES["r_w"], description="")
     register.append_bit(name="hest_zebra", description="", default_value="0")
     array = register_list.append_register_array(name="apa_hest", length=2, description="")
-    array.append_register(name="zebra", mode="r_w", description="")
+    array.append_register(name="zebra", mode=REGISTER_MODES["r_w"], description="")
 
     with pytest.raises(ValueError) as exception_info:
         CustomGenerator(register_list=register_list, output_folder=tmp_path).create()
@@ -500,9 +501,9 @@ def test_plain_field_with_same_qualified_name_as_array_register_should_raise_exc
 
 def test_array_field_with_same_qualified_name_as_plain_register_should_raise_exception(tmp_path):
     register_list = RegisterList(name="test")
-    register_list.append_register(name="apa_hest_zebra", mode="r_w", description="")
+    register_list.append_register(name="apa_hest_zebra", mode=REGISTER_MODES["r_w"], description="")
     array = register_list.append_register_array(name="apa", length=3, description="")
-    register = array.append_register(name="hest", mode="r_w", description="")
+    register = array.append_register(name="hest", mode=REGISTER_MODES["r_w"], description="")
     register.append_bit(name="zebra", description="", default_value="0")
 
     with pytest.raises(ValueError) as exception_info:

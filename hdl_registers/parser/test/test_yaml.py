@@ -14,6 +14,7 @@ from tsfpga.system_utils import create_file
 # First party libraries
 from hdl_registers.parser.yaml import from_yaml
 from hdl_registers.register import Register
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_load_nonexistent_yaml_file_should_raise_exception(tmp_path):
@@ -63,8 +64,8 @@ hest:
         name="",
         yaml_file=yaml_path,
         default_registers=[
-            Register(name="config", index=0, mode="r_w", description=""),
-            Register(name="status", index=1, mode="r", description=""),
+            Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description=""),
+            Register(name="status", index=1, mode=REGISTER_MODES["r"], description=""),
         ],
     )
 
@@ -74,7 +75,7 @@ hest:
 
     # yaml registers.
     assert register_list.get_register("apa").index == 2
-    assert register_list.get_register("apa").mode == "r_w"
+    assert register_list.get_register("apa").mode == REGISTER_MODES["r_w"]
     assert register_list.get_register("apa").description == "Apa."
     assert len(register_list.get_register("apa").fields) == 1
     assert register_list.get_register("apa").fields[0].name == "enable"
@@ -82,7 +83,7 @@ hest:
     assert register_list.get_register("apa").fields[0].default_value == "1"
 
     assert register_list.get_register("hest").index == 3
-    assert register_list.get_register("hest").mode == "r"
+    assert register_list.get_register("hest").mode == REGISTER_MODES["r"]
     assert register_list.get_register("hest").description == "Hest."
     assert len(register_list.get_register("hest").fields) == 1
     assert register_list.get_register("hest").fields[0].name == "disable"
@@ -107,4 +108,4 @@ apa:
 
     register_list = from_yaml(name="", yaml_file=yaml_path)
     assert len(register_list.register_objects) == 1
-    assert register_list.register_objects[0].mode == "r"
+    assert register_list.register_objects[0].mode == REGISTER_MODES["r"]

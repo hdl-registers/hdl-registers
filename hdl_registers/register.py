@@ -15,6 +15,7 @@ from .field.bit import Bit
 from .field.bit_vector import BitVector
 from .field.enumeration import Enumeration
 from .field.integer import Integer
+from .register_mode import RegisterMode
 
 if TYPE_CHECKING:
     # Local folder libraries
@@ -22,50 +23,12 @@ if TYPE_CHECKING:
     from .field.register_field import RegisterField
 
 
-class RegisterMode:
-    def __init__(self, mode_readable: str, description: str):
-        """
-        Arguments:
-            mode_readable: The readable representation of this mode. E.g. "r" -> "Read".
-            description: Textual description of mode.
-        """
-        self.mode_readable = mode_readable
-        self.description = description
-
-
-REGISTER_MODES = dict(
-    r=RegisterMode(mode_readable="Read", description="Bus can read a value that fabric provides."),
-    w=RegisterMode(
-        mode_readable="Write",
-        description="Bus can write a value that is available for fabric usage.",
-    ),
-    r_w=RegisterMode(
-        mode_readable="Read, Write",
-        description=(
-            "Bus can write a value and read it back. "
-            "The written value is available for fabric usage."
-        ),
-    ),
-    wpulse=RegisterMode(
-        mode_readable="Write-pulse",
-        description="Bus can write a value that is asserted for one clock cycle in fabric.",
-    ),
-    r_wpulse=RegisterMode(
-        mode_readable="Read, Write-pulse",
-        description=(
-            "Bus can read a value that fabric provides. "
-            "Bus can write a value that is asserted for one clock cycle in fabric."
-        ),
-    ),
-)
-
-
 class Register:
     """
     Used to represent a register and its fields.
     """
 
-    def __init__(self, name: str, index: int, mode: str, description: str):
+    def __init__(self, name: str, index: int, mode: "RegisterMode", description: str):
         """
         Arguments:
             name: The name of the register.
@@ -74,15 +37,15 @@ class Register:
                 start of the array. I.e. the index is zero for the first register in the array.
                 If the register is a plain register, the index shall be relative to the start of
                 the register list.
-            mode: A valid register mode.
-                Should be a key in the ``REGISTER_MODES`` dictionary.
-                I.e. the shorthand name for the mode, e.g. ``"r_w"``.
+            mode: A mode that decides the behavior of this register.
                 See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
-                for more information.
+                for more information about the different modes.
             description: Textual register description.
         """
-        if mode not in REGISTER_MODES:
-            raise ValueError(f'Invalid mode "{mode}" for register "{name}"')
+        if not isinstance(mode, RegisterMode):
+            # This check should be removed eventually.
+            # It is only here to help users during the transition period.
+            raise ValueError(f"Invalid mode: {mode}")
 
         self.name = name
         self.index = index
@@ -222,22 +185,6 @@ class Register:
         Byte address, within the register list, of this register.
         """
         return 4 * self.index
-
-    @property
-    def is_bus_readable(self) -> bool:
-        """
-        True if the register is readable by bus. Based on the register mode.
-        Analogous the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
-        """
-        return self.mode in ["r", "r_w", "r_wpulse"]
-
-    @property
-    def is_bus_writeable(self) -> bool:
-        """
-        True if the register is writeable by bus. Based on the register mode.
-        Analogous the ``reg_file.reg_file_pkg.is_write_type`` VHDL function.
-        """
-        return self.mode in ["w", "r_w", "wpulse", "r_wpulse"]
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\

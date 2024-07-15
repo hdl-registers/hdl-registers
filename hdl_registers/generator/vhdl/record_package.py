@@ -16,21 +16,15 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
+from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 # Local folder libraries
-from .vhdl_generator_common import (
-    BUS_ACCESS_DIRECTIONS,
-    FABRIC_ACCESS_DIRECTIONS,
-    VhdlGeneratorCommon,
-)
+from .vhdl_generator_common import VhdlGeneratorCommon
 
 if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
-
-    # Local folder libraries
-    from .vhdl_generator_common import BusAccessDirection, FabricAccessDirection
 
 
 class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
@@ -191,32 +185,34 @@ end package body;
         """
         vhdl = ""
 
-        direction = FABRIC_ACCESS_DIRECTIONS["up"]
+        direction = HardwareAccessDirection.UP
 
-        if self.has_any_fabric_accessible_register(direction=direction):
+        if self.has_any_hardware_accessible_register(direction=direction):
             vhdl += self._array_field_records(direction=direction)
             vhdl += self._get_register_record(direction=direction)
             vhdl += f"""\
-  -- Convert record with everything in the '{direction.name}' direction to SLV register list.
-  function to_slv(data : {self.name}_regs_{direction.name}_t) return {self.name}_regs_t;
+  -- Convert record with everything in the '{direction.name.lower()}' direction to SLV \
+register list.
+  function to_slv(data : {self.name}_regs_{direction.name.lower()}_t) return {self.name}_regs_t;
 
 """
 
-        direction = FABRIC_ACCESS_DIRECTIONS["down"]
+        direction = HardwareAccessDirection.DOWN
 
-        if self.has_any_fabric_accessible_register(direction=direction):
+        if self.has_any_hardware_accessible_register(direction=direction):
             vhdl += self._array_field_records(direction=direction)
             vhdl += self._get_register_record(direction=direction)
             vhdl += f"""\
-  -- Convert SLV register list to record with everything in the '{direction.name}' direction.
-  function to_{self.name}_regs_{direction.name}(data : {self.name}_regs_t) \
-return {self.name}_regs_{direction.name}_t;
+  -- Convert SLV register list to record with everything in the \
+'{direction.name.lower()}' direction.
+  function to_{self.name}_regs_{direction.name.lower()}(data : {self.name}_regs_t) \
+return {self.name}_regs_{direction.name.lower()}_t;
 
 """
 
         return vhdl
 
-    def _array_field_records(self, direction: "FabricAccessDirection") -> str:
+    def _array_field_records(self, direction: "HardwareAccessDirection") -> str:
         """
         For every register array that has at least one register in the specified direction:
 
@@ -228,15 +224,15 @@ return {self.name}_regs_{direction.name}_t;
         """
         vhdl = ""
 
-        for array in self.iterate_fabric_accessible_register_arrays(direction=direction):
+        for array in self.iterate_hardware_accessible_register_arrays(direction=direction):
             array_name = self.qualified_register_array_name(register_array=array)
             vhdl += f"""\
-  -- Registers of the '{array.name}' array that are in the '{direction.name}' direction.
-  type {array_name}_{direction.name}_t is record
+  -- Registers of the '{array.name}' array that are in the '{direction.name.lower()}' direction.
+  type {array_name}_{direction.name.lower()}_t is record
 """
 
             vhdl_array_init = []
-            for register in self.iterate_fabric_accessible_array_registers(
+            for register in self.iterate_hardware_accessible_array_registers(
                 register_array=array, direction=direction
             ):
                 vhdl += self._record_member_declaration_for_register(
@@ -253,30 +249,30 @@ return {self.name}_regs_{direction.name}_t;
             vhdl += f"""\
   end record;
   -- Default value of the above record.
-  constant {array_name}_{direction.name}_init : {array_name}_{direction.name}_t := (
+  constant {array_name}_{direction.name.lower()}_init : {array_name}_{direction.name.lower()}_t := (
 {init}
   );
   -- VHDL array of the above record, ranged per the length of the '{array.name}' \
 register array.
-  type {array_name}_{direction.name}_vec_t is array (0 to {array.length - 1}) of \
-{array_name}_{direction.name}_t;
+  type {array_name}_{direction.name.lower()}_vec_t is array (0 to {array.length - 1}) of \
+{array_name}_{direction.name.lower()}_t;
 
 """
 
         heading = f"""\
   -- -----------------------------------------------------------------------------
   -- Below is a record with correctly typed and ranged members for all registers, register arrays
-  -- and fields that are in the '{direction.name}' direction.
+  -- and fields that are in the '{direction.name.lower()}' direction.
 """
         if vhdl:
             heading += f"""\
   -- But first, records for the registers of each register array the are in \
-the '{direction.name}' direction.
+the '{direction.name.lower()}' direction.
 """
 
         return f"{heading}{vhdl}"
 
-    def _get_register_record(self, direction: "FabricAccessDirection") -> str:
+    def _get_register_record(self, direction: "HardwareAccessDirection") -> str:
         """
         Get the record that contains all registers and arrays in the specified direction.
         Also default value constant for this record.
@@ -285,17 +281,19 @@ the '{direction.name}' direction.
         """
         record_init = []
         vhdl = f"""\
-  -- Record with everything in the '{direction.name}' direction.
-  type {self.name}_regs_{direction.name}_t is record
+  -- Record with everything in the '{direction.name.lower()}' direction.
+  type {self.name}_regs_{direction.name.lower()}_t is record
 """
 
-        for array in self.iterate_fabric_accessible_register_arrays(direction=direction):
+        for array in self.iterate_hardware_accessible_register_arrays(direction=direction):
             array_name = self.qualified_register_array_name(register_array=array)
 
-            vhdl += f"    {array.name} : {array_name}_{direction.name}_vec_t;\n"
-            record_init.append(f"{array.name} => (others => {array_name}_{direction.name}_init)")
+            vhdl += f"    {array.name} : {array_name}_{direction.name.lower()}_vec_t;\n"
+            record_init.append(
+                f"{array.name} => (others => {array_name}_{direction.name.lower()}_init)"
+            )
 
-        for register in self.iterate_fabric_accessible_plain_registers(direction=direction):
+        for register in self.iterate_hardware_accessible_plain_registers(direction=direction):
             vhdl += self._record_member_declaration_for_register(register=register)
 
             if register.fields:
@@ -310,8 +308,8 @@ the '{direction.name}' direction.
 {vhdl}\
   end record;
   -- Default value of the above record.
-  constant {self.name}_regs_{direction.name}_init : \
-{self.name}_regs_{direction.name}_t := (
+  constant {self.name}_regs_{direction.name.lower()}_init : \
+{self.name}_regs_{direction.name.lower()}_t := (
 {init}
   );
 """
@@ -338,32 +336,32 @@ the '{direction.name}' direction.
         """
         vhdl = ""
 
-        for direction in BUS_ACCESS_DIRECTIONS.values():
-            if self.has_any_bus_accessible_register(direction=direction):
+        for direction in SoftwareAccessDirection:
+            if self.has_any_software_accessible_register(direction=direction):
                 vhdl += self._register_was_accessed_record(direction=direction)
 
         return vhdl
 
-    def _register_was_accessed_record(self, direction: "BusAccessDirection") -> str:
+    def _register_was_accessed_record(self, direction: "SoftwareAccessDirection") -> str:
         """
         Get the record for 'reg_was_read' or 'reg_was_written'.
         """
         vhdl = f"""\
   -- ---------------------------------------------------------------------------
-  -- Below is a record with a status bit for each {direction.name_adjective} register in the \
+  -- Below is a record with a status bit for each {direction.value.name_adjective} register in the \
 register map.
-  -- It can be used for the 'reg_was_{direction.name_past}' port of a register file wrapper.
+  -- It can be used for the 'reg_was_{direction.value.name_past}' port of a register file wrapper.
 """
 
-        for array in self.iterate_bus_accessible_register_arrays(direction=direction):
+        for array in self.iterate_software_accessible_register_arrays(direction=direction):
             array_name = self.qualified_register_array_name(register_array=array)
             vhdl += f"""\
-  -- One status bit for each {direction.name_adjective} register in the '{array.name}' \
+  -- One status bit for each {direction.value.name_adjective} register in the '{array.name}' \
 register array.
-  type {array_name}_was_{direction.name_past}_t is record
+  type {array_name}_was_{direction.value.name_past}_t is record
 """
 
-            for register in self.iterate_bus_accessible_array_registers(
+            for register in self.iterate_software_accessible_array_registers(
                 register_array=array, direction=direction
             ):
                 vhdl += f"    {register.name} : std_ulogic;\n"
@@ -371,31 +369,31 @@ register array.
             vhdl += f"""\
   end record;
   -- Default value of the above record.
-  constant {array_name}_was_{direction.name_past}_init : {array_name}_was_{direction.name_past}_t \
-:= (others => '0');
+  constant {array_name}_was_{direction.value.name_past}_init : \
+{array_name}_was_{direction.value.name_past}_t := (others => '0');
   -- Vector of the above record, ranged per the length of the '{array.name}' \
 register array.
-  type {array_name}_was_{direction.name_past}_vec_t is array (0 to {array.length - 1}) \
-of {array_name}_was_{direction.name_past}_t;
+  type {array_name}_was_{direction.value.name_past}_vec_t is array (0 to {array.length - 1}) \
+of {array_name}_was_{direction.value.name_past}_t;
 
 """
 
         vhdl += f"""\
-  -- Combined status mask record for all {direction.name_adjective} register.
-  type {self.name}_reg_was_{direction.name_past}_t is record
+  -- Combined status mask record for all {direction.value.name_adjective} register.
+  type {self.name}_reg_was_{direction.value.name_past}_t is record
 """
 
         array_init = []
-        for array in self.iterate_bus_accessible_register_arrays(direction=direction):
+        for array in self.iterate_software_accessible_register_arrays(direction=direction):
             array_name = self.qualified_register_array_name(register_array=array)
 
-            vhdl += f"    {array.name} : {array_name}_was_{direction.name_past}_vec_t;\n"
+            vhdl += f"    {array.name} : {array_name}_was_{direction.value.name_past}_vec_t;\n"
             array_init.append(
-                f"{array.name} => (others => {array_name}_was_{direction.name_past}_init)"
+                f"{array.name} => (others => {array_name}_was_{direction.value.name_past}_init)"
             )
 
         has_at_least_one_register = False
-        for register in self.iterate_bus_accessible_plain_registers(direction=direction):
+        for register in self.iterate_software_accessible_plain_registers(direction=direction):
             vhdl += f"    {register.name} : std_ulogic;\n"
             has_at_least_one_register = True
 
@@ -406,14 +404,15 @@ of {array_name}_was_{direction.name_past}_t;
         vhdl += f"""\
   end record;
   -- Default value for the above record.
-  constant {self.name}_reg_was_{direction.name_past}_init : \
-{self.name}_reg_was_{direction.name_past}_t := (
+  constant {self.name}_reg_was_{direction.value.name_past}_init : \
+{self.name}_reg_was_{direction.value.name_past}_t := (
 {init_arrays}{separator}{init_registers}
   );
-  -- Convert an SLV 'reg_was_{direction.name_past}' from generic register file to the record above.
-  function to_{self.name}_reg_was_{direction.name_past}(
+  -- Convert an SLV 'reg_was_{direction.value.name_past}' from generic register file \
+to the record above.
+  function to_{self.name}_reg_was_{direction.value.name_past}(
     data : {self.name}_reg_was_accessed_t
-  ) return {self.name}_reg_was_{direction.name_past}_t;
+  ) return {self.name}_reg_was_{direction.value.name_past}_t;
 
 """
 
@@ -487,10 +486,10 @@ of {array_name}_was_{direction.name_past}_t;
         """
         vhdl = ""
 
-        if self.has_any_fabric_accessible_register(direction=FABRIC_ACCESS_DIRECTIONS["up"]):
+        if self.has_any_hardware_accessible_register(direction=HardwareAccessDirection.UP):
             vhdl += self._register_record_up_to_slv()
 
-        if self.has_any_fabric_accessible_register(direction=FABRIC_ACCESS_DIRECTIONS["down"]):
+        if self.has_any_hardware_accessible_register(direction=HardwareAccessDirection.DOWN):
             vhdl += self._get_registers_down_to_record_function()
 
         return vhdl
@@ -504,8 +503,8 @@ of {array_name}_was_{direction.name_past}_t;
         """
         to_slv = ""
 
-        for register, register_array in self.iterate_fabric_accessible_registers(
-            direction=FABRIC_ACCESS_DIRECTIONS["up"]
+        for register, register_array in self.iterate_hardware_accessible_registers(
+            direction=HardwareAccessDirection.UP
         ):
             register_name = self.qualified_register_name(
                 register=register, register_array=register_array
@@ -549,8 +548,8 @@ of {array_name}_was_{direction.name_past}_t;
         """
         to_record = ""
 
-        for register, register_array in self.iterate_fabric_accessible_registers(
-            direction=FABRIC_ACCESS_DIRECTIONS["down"]
+        for register, register_array in self.iterate_hardware_accessible_registers(
+            direction=HardwareAccessDirection.DOWN
         ):
             register_name = self.qualified_register_name(
                 register=register, register_array=register_array
@@ -592,33 +591,33 @@ of {array_name}_was_{direction.name_past}_t;
         """
         vhdl = ""
 
-        for direction in BUS_ACCESS_DIRECTIONS.values():
-            if self.has_any_bus_accessible_register(direction=direction):
+        for direction in SoftwareAccessDirection:
+            if self.has_any_software_accessible_register(direction=direction):
                 vhdl += self._register_was_accessed_conversion_implementation(direction=direction)
 
         return vhdl
 
     def _register_was_accessed_conversion_implementation(
-        self, direction: "BusAccessDirection"
+        self, direction: "SoftwareAccessDirection"
     ) -> str:
         """
         Get a conversion function  from SLV 'reg_was_read'/'reg_was_written' to record type.
         """
         vhdl = f"""\
-  function to_{self.name}_reg_was_{direction.name_past}(
+  function to_{self.name}_reg_was_{direction.value.name_past}(
     data : {self.name}_reg_was_accessed_t
-  ) return {self.name}_reg_was_{direction.name_past}_t is
-    variable result : {self.name}_reg_was_{direction.name_past}_t := \
-{self.name}_reg_was_{direction.name_past}_init;
+  ) return {self.name}_reg_was_{direction.value.name_past}_t is
+    variable result : {self.name}_reg_was_{direction.value.name_past}_t := \
+{self.name}_reg_was_{direction.value.name_past}_init;
   begin
 """
 
-        for register in self.iterate_bus_accessible_plain_registers(direction=direction):
+        for register in self.iterate_software_accessible_plain_registers(direction=direction):
             register_name = self.qualified_register_name(register=register)
             vhdl += f"    result.{register.name} := data({register_name});\n"
 
         for array in self.iterate_register_arrays():
-            for register in self.iterate_bus_accessible_array_registers(
+            for register in self.iterate_software_accessible_array_registers(
                 register_array=array, direction=direction
             ):
                 register_name = self.qualified_register_name(

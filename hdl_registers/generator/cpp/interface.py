@@ -21,7 +21,6 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.register import REGISTER_MODES
 
 # Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
@@ -107,12 +106,12 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
-            description += f" Mode '{REGISTER_MODES[register.mode].mode_readable}'."
+            description += f" Mode '{register.mode.name}'."
 
             cpp_code += self.comment(comment=description)
             cpp_code += "\n"
 
-            if register.is_bus_readable:
+            if register.mode.is_software_readable:
                 cpp_code += self.comment(
                     "Getter that will read the whole register's value over the register bus."
                 )
@@ -121,7 +120,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += f"    virtual uint32_t {signature} const = 0;\n\n"
 
-            if register.is_bus_writeable:
+            if register.mode.is_software_writeable:
                 cpp_code += self.comment(
                     "Setter that will write the whole register's value over the register bus."
                 )
@@ -207,7 +206,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 register=register, register_array=register_array, field=field
             )
 
-            if register.is_bus_readable:
+            if register.mode.is_software_readable:
                 comment = [
                     f"Getter for the {field_description},",
                     "which will read register value over the register bus.",
@@ -233,7 +232,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += function(return_type_name=field_type_name, signature=signature)
 
-            if register.is_bus_writeable:
+            if register.mode.is_software_writeable:
                 comment = [f"Setter for the {field_description},"]
                 if self.field_setter_should_read_modify_write(register=register):
                     comment.append("which will read-modify-write over the register bus.")
