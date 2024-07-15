@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 # First party libraries
-from hdl_registers.register import REGISTER_MODES
+from hdl_registers.register_modes import REGISTER_MODES
 
 # Local folder libraries
 from .constant_table import HtmlConstantTableGenerator
@@ -162,7 +162,7 @@ th {
         for mode in REGISTER_MODES.values():
             html += f"""
 <tr>
-  <td>{mode.mode_readable}</td>
+  <td>{mode.name}</td>
   <td>{mode.description}</td>
 </tr>
 """

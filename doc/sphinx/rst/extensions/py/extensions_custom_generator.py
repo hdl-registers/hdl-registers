@@ -14,6 +14,7 @@ from pathlib import Path
 # First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 class TxtRegisterListGenerator(RegisterCodeGenerator):
@@ -54,13 +55,13 @@ def main(output_folder: Path):
     """
     register_list = RegisterList(name="caesar")
 
-    register_list.append_register(name="config", mode="r_w", description="")
-    register_list.append_register(name="status", mode="r", description="")
-    register_list.append_register(name="command", mode="wpulse", description="")
+    register_list.append_register(name="config", mode=REGISTER_MODES["r_w"], description="")
+    register_list.append_register(name="status", mode=REGISTER_MODES["r"], description="")
+    register_list.append_register(name="command", mode=REGISTER_MODES["wpulse"], description="")
 
     register_array = register_list.append_register_array(name="channels", length=4, description="")
-    register_array.append_register(name="read_address", mode="r_w", description="")
-    register_array.append_register(name="write_address", mode="r_w", description="")
+    register_array.append_register(name="read_address", mode=REGISTER_MODES["r_w"], description="")
+    register_array.append_register(name="write_address", mode=REGISTER_MODES["r_w"], description="")
 
     TxtRegisterListGenerator(register_list=register_list, output_folder=output_folder).create()
 

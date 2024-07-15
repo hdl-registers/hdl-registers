@@ -21,6 +21,7 @@ from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
 from .register import Register
 from .register_array import RegisterArray
+from .register_mode import RegisterMode
 
 if TYPE_CHECKING:
     # Local folder libraries
@@ -82,17 +83,15 @@ class RegisterList:
 
         return register_list
 
-    def append_register(self, name: str, mode: str, description: str) -> Register:
+    def append_register(self, name: str, mode: "RegisterMode", description: str) -> Register:
         """
         Append a register to this register list.
 
         Arguments:
             name: The name of the register.
-            mode: A valid register mode.
-                Should be a key in the ``REGISTER_MODES`` dictionary.
-                I.e. the shorthand name for the mode, e.g. ``"r_w"``.
+            mode: A mode that decides the behavior of the register.
                 See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
-                for more information.
+                for more information about the different modes.
             description: Textual register description.
         Return:
             The register object that was created.

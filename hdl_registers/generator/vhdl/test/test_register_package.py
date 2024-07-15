@@ -27,6 +27,7 @@ from hdl_registers.field.numerical_interpretation import (
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 class RegisterConfiguration:
@@ -94,7 +95,9 @@ def test_vhdl_package_with_only_one_register(tmp_path):
     Test that reg_map constant has valid VHDL syntax even when there is only one register.
     """
     register_list = RegisterList(name="apa", source_definition_file=None)
-    register_list.append_register(name="hest", mode="r", description="a single register")
+    register_list.append_register(
+        name="hest", mode=REGISTER_MODES["r"], description="a single register"
+    )
     vhdl = read_file(VhdlRegisterPackageGenerator(register_list, tmp_path).create())
 
     expected = """
@@ -111,7 +114,7 @@ def test_vhdl_package_with_only_one_register(tmp_path):
 
 def test_vhdl_typedef(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
-    register = register_list.append_register("number", "r_w", "")
+    register = register_list.append_register("number", REGISTER_MODES["r_w"], "")
 
     register.append_bit_vector(
         name="u0",

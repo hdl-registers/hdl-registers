@@ -26,6 +26,7 @@ from hdl_registers.generator.vhdl.simulation.read_write_package import (
     VhdlSimulationReadWritePackageGenerator,
 )
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_package_is_not_generated_without_registers(tmp_path):
@@ -36,13 +37,13 @@ def test_package_is_not_generated_without_registers(tmp_path):
     register_list.add_constant(name="apa", value=True, description="")
     assert not VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create().exists()
 
-    register_list.append_register(name="hest", mode="r_w", description="")
+    register_list.append_register(name="hest", mode=REGISTER_MODES["r_w"], description="")
     assert VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create().exists()
 
 
 def test_re_generating_package_without_registers_should_delete_old_file(tmp_path):
     register_list = RegisterList(name="test", source_definition_file=None)
-    register_list.append_register(name="apa", mode="r_w", description="")
+    register_list.append_register(name="apa", mode=REGISTER_MODES["r_w"], description="")
 
     assert VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create().exists()
 
@@ -53,9 +54,11 @@ def test_re_generating_package_without_registers_should_delete_old_file(tmp_path
 def test_read_write_as_integer(tmp_path):
     register_list = RegisterList(name="caesar", source_definition_file=None)
 
-    register_list.append_register(name="empty", mode="r_w", description="")
+    register_list.append_register(name="empty", mode=REGISTER_MODES["r_w"], description="")
 
-    register = register_list.append_register(name="full", mode="r_w", description="")
+    register = register_list.append_register(
+        name="full", mode=REGISTER_MODES["r_w"], description=""
+    )
     register.append_bit(name="my_bit", description="", default_value="0")
     register.append_enumeration(
         name="my_enumeration",

@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING, Any, Optional
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.numerical_interpretation import Fixed
-from hdl_registers.generator.vhdl.vhdl_generator_common import BUS_ACCESS_DIRECTIONS
+from hdl_registers.register_mode import SoftwareAccessDirection
 
 # Local folder libraries
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
@@ -113,8 +113,8 @@ end package body;
         separator = self.get_separator_line(indent=2)
         vhdl = ""
 
-        for register, register_array in self.iterate_bus_accessible_registers(
-            direction=BUS_ACCESS_DIRECTIONS["read"]
+        for register, register_array in self.iterate_software_accessible_registers(
+            direction=SoftwareAccessDirection.READ
         ):
             declarations = []
 
@@ -174,8 +174,8 @@ end package body;
         separator = self.get_separator_line(indent=2)
         vhdl = ""
 
-        for register, register_array in self.iterate_bus_accessible_registers(
-            direction=BUS_ACCESS_DIRECTIONS["read"]
+        for register, register_array in self.iterate_software_accessible_registers(
+            direction=SoftwareAccessDirection.READ
         ):
             implementations = []
 

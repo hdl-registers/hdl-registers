@@ -13,6 +13,7 @@ from tsfpga.system_utils import create_file
 
 # First party libraries
 from hdl_registers.parser.toml import from_toml
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_register_can_be_specified_with_and_without_type(tmp_path):
@@ -33,10 +34,10 @@ description = "zebra"
     register_list = from_toml(name="", toml_file=toml_path)
 
     assert register_list.get_register("apa").index == 0
-    assert register_list.get_register("apa").mode == "w"
+    assert register_list.get_register("apa").mode == REGISTER_MODES["w"]
     assert register_list.get_register("apa").description == ""
     assert register_list.get_register("hest").index == 1
-    assert register_list.get_register("hest").mode == "r"
+    assert register_list.get_register("hest").mode == REGISTER_MODES["r"]
     assert register_list.get_register("hest").description == "zebra"
 
 
@@ -99,13 +100,19 @@ description = "stuff"
 
     register_list = from_toml(name="", toml_file=toml_path)
     assert register_list.get_register(register_name="hest", register_array_name="apa").index == 0
-    assert register_list.get_register(register_name="hest", register_array_name="apa").mode == "r"
+    assert (
+        register_list.get_register(register_name="hest", register_array_name="apa").mode
+        == REGISTER_MODES["r"]
+    )
     assert (
         register_list.get_register(register_name="hest", register_array_name="apa").description
         == ""
     )
     assert register_list.get_register(register_name="zebra", register_array_name="apa").index == 1
-    assert register_list.get_register(register_name="zebra", register_array_name="apa").mode == "w"
+    assert (
+        register_list.get_register(register_name="zebra", register_array_name="apa").mode
+        == REGISTER_MODES["w"]
+    )
     assert (
         register_list.get_register(register_name="zebra", register_array_name="apa").description
         == "stuff"
@@ -198,4 +205,45 @@ array_length = 4
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing register "apa" in {toml_path}: Got unknown property "array_length".'
+    )
+
+
+def test_unknown_register_mode_should_raise_exception(tmp_path):
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[test_reg]
+
+mode = "rw"
+""",
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(name="", toml_file=toml_path)
+    assert str(exception_info.value) == (
+        f'Error while parsing register "test_reg" in {toml_path}: '
+        'Got unknown mode "rw". Expected one of "r", "w", "r_w", "wpulse", "r_wpulse".'
+    )
+
+
+def test_unknown_array_register_mode_should_raise_exception(tmp_path):
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[test_array]
+
+type = "register_array"
+array_length = 2
+
+[test_array.hest]
+
+mode = "r_pulse"
+""",
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(name="", toml_file=toml_path)
+    assert (
+        str(exception_info.value) == f'Error while parsing register "hest" in {toml_path}: '
+        'Got unknown mode "r_pulse". Expected one of "r", "w", "r_w", "wpulse", "r_wpulse".'
     )

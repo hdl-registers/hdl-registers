@@ -32,6 +32,7 @@ from hdl_registers.generator.vhdl.simulation.wait_until_package import (
     VhdlSimulationWaitUntilPackageGenerator,
 )
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def generate_all_vhdl_artifacts(register_list: RegisterList, output_folder: Path) -> None:
@@ -70,7 +71,9 @@ def generate_strange_register_maps(output_path):
             """
             Append a register with some fields.
             """
-            register = data.append_register(name=f"{name}_{mode}", mode=mode, description="")
+            register = data.append_register(
+                name=f"{name}_{mode.shorthand}", mode=mode, description=""
+            )
 
             register.append_integer(
                 name="integer", description="", min_value=-10, max_value=10, default_value=3
@@ -109,9 +112,9 @@ def generate_strange_register_maps(output_path):
         generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
     # Mode 'Read only' should give registers only in the 'up' direction'
-    create_packages(direction="up", mode="r")
+    create_packages(direction="up", mode=REGISTER_MODES["r"])
     # Mode 'Write only' should give registers only in the 'down' direction'
-    create_packages(direction="down", mode="w")
+    create_packages(direction="down", mode=REGISTER_MODES["w"])
 
     register_list = RegisterList(name="only_constants")
     register_list.add_constant(name="first", value=123, description="")

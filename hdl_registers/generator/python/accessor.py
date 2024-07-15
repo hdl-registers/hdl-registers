@@ -457,7 +457,7 @@ class {class_name}:
         result = ""
 
         for register, register_array in self.iterate_registers():
-            if register.is_bus_readable:
+            if register.mode.is_software_readable:
                 if register.fields:
                     result += self._get_register_read_as_class(
                         register=register, register_array=register_array
@@ -467,7 +467,7 @@ class {class_name}:
                         register=register, register_array=register_array
                     )
 
-            if register.is_bus_writeable:
+            if register.mode.is_software_writeable:
                 if register.fields:
                     result += self._get_register_write_as_class(
                         register=register, register_array=register_array
@@ -899,13 +899,13 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
         for register_object in self.register_list.register_objects:
             if isinstance(register_object, Register):
                 result += self._get_print_register(
-                    is_readable=register_object.is_bus_readable, register=register_object
+                    is_readable=register_object.mode.is_software_readable, register=register_object
                 )
             else:
                 for array_index in range(register_object.length):
                     for register in register_object.registers:
                         result += self._get_print_register(
-                            is_readable=register.is_bus_readable,
+                            is_readable=register.mode.is_software_readable,
                             register=register,
                             register_array=register_object,
                             register_array_index=array_index,

@@ -12,15 +12,20 @@ import pytest
 
 # First party libraries
 from hdl_registers.register_array import RegisterArray
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_registers_are_appended_properly_and_can_be_edited_in_place():
     register_array = RegisterArray(name="apa", base_index=0, length=4, description="")
 
-    register_hest = register_array.append_register(name="hest", mode="r", description="")
+    register_hest = register_array.append_register(
+        name="hest", mode=REGISTER_MODES["r"], description=""
+    )
     assert register_hest.index == 0
 
-    register_zebra = register_array.append_register(name="zebra", mode="r", description="")
+    register_zebra = register_array.append_register(
+        name="zebra", mode=REGISTER_MODES["r"], description=""
+    )
     assert register_zebra.index == 1
 
     register_hest.description = "new desc"
@@ -29,8 +34,8 @@ def test_registers_are_appended_properly_and_can_be_edited_in_place():
 
 def test_get_register():
     register_array = RegisterArray(name="apa", base_index=0, length=3, description="")
-    hest = register_array.append_register(name="hest", mode="w", description="")
-    zebra = register_array.append_register(name="zebra", mode="r", description="")
+    hest = register_array.append_register(name="hest", mode=REGISTER_MODES["w"], description="")
+    zebra = register_array.append_register(name="zebra", mode=REGISTER_MODES["r"], description="")
 
     assert register_array.get_register("hest") is hest
     assert register_array.get_register("zebra") is zebra
@@ -70,15 +75,15 @@ def test_repr_basic():
 
 def test_repr_with_registers_appended():
     register_array_a = RegisterArray(name="apa", base_index=0, length=4, description="")
-    register_array_a.append_register(name="hest", mode="r", description="")
+    register_array_a.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
 
     register_array_b = RegisterArray(name="apa", base_index=0, length=4, description="")
-    register_array_b.append_register(name="hest", mode="r", description="")
+    register_array_b.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
 
     assert repr(register_array_a) == repr(register_array_b)
 
-    register_array_a.append_register(name="zebra", mode="w", description="")
-    register_array_b.append_register(name="zebra", mode="r_w", description="")
+    register_array_a.append_register(name="zebra", mode=REGISTER_MODES["w"], description="")
+    register_array_b.append_register(name="zebra", mode=REGISTER_MODES["r_w"], description="")
 
     assert repr(register_array_a) != repr(register_array_b)
 
@@ -93,13 +98,13 @@ def test_invalid_length_should_raise_exception():
 
 def test_index():
     register_array = RegisterArray(name="apa", base_index=0, length=4, description="")
-    register_array.append_register(name="hest", mode="r", description="")
+    register_array.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
     assert register_array.index == 3
 
     register_array.length = 5
     assert register_array.index == 4
 
-    register_array.append_register(name="zebra", mode="r", description="")
+    register_array.append_register(name="zebra", mode=REGISTER_MODES["r"], description="")
     assert register_array.index == 9
 
 
@@ -113,12 +118,12 @@ def test_index_for_array_without_registers_should_raise_exception():
 
 def test_start_index():
     register_array = RegisterArray(name="apa", base_index=10, length=4, description="")
-    register_array.append_register(name="hest", mode="r", description="")
+    register_array.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
     assert register_array.get_start_index(0) == 10
     assert register_array.get_start_index(1) == 11
     assert register_array.get_start_index(2) == 12
 
-    register_array.append_register(name="zebra", mode="r", description="")
+    register_array.append_register(name="zebra", mode=REGISTER_MODES["r"], description="")
     assert register_array.get_start_index(0) == 10
     assert register_array.get_start_index(1) == 12
     assert register_array.get_start_index(2) == 14
@@ -126,7 +131,7 @@ def test_start_index():
 
 def test_start_index_with_argument_outside_of_length_should_raise_exception():
     register_array = RegisterArray(name="apa", base_index=0, length=4, description="")
-    register_array.append_register(name="hest", mode="r", description="")
+    register_array.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
 
     with pytest.raises(ValueError) as exception_info:
         register_array.get_start_index(4)

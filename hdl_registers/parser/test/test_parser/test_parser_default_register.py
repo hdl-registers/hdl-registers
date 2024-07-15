@@ -14,6 +14,7 @@ from tsfpga.system_utils import create_file
 # First party libraries
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register import Register
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_overriding_default_register(tmp_path):
@@ -29,7 +30,9 @@ description = "apa"
     register_list = from_toml(
         name="",
         toml_file=toml_path,
-        default_registers=[Register(name="config", index=0, mode="r_w", description="")],
+        default_registers=[
+            Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description="")
+        ],
     )
 
     assert register_list.get_register("config").description == "apa"
@@ -49,7 +52,9 @@ mode = "w"
         from_toml(
             name="",
             toml_file=toml_path,
-            default_registers=[Register(name="config", index=0, mode="r_w", description="")],
+            default_registers=[
+                Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description="")
+            ],
         )
     assert str(exception_info.value) == (
         f'Error while parsing register "config" in {toml_path}: '

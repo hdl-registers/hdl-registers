@@ -7,8 +7,16 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
+
+# Standard libraries
+from typing import TYPE_CHECKING
+
 # Local folder libraries
 from .register import Register
+
+if TYPE_CHECKING:
+    # First party libraries
+    from hdl_registers.register_mode import RegisterMode
 
 
 class RegisterArray:
@@ -43,13 +51,15 @@ class RegisterArray:
 
         self.registers: list[Register] = []
 
-    def append_register(self, name: str, mode: str, description: str) -> Register:
+    def append_register(self, name: str, mode: "RegisterMode", description: str) -> Register:
         """
         Append a register to this array.
 
         Arguments:
             name: The name of the register.
-            mode: A valid register mode.
+            mode: A mode that decides the behavior of the register.
+                See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
+                for more information about the different modes.
             description: Textual register description.
 
         Return:

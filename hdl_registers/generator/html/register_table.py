@@ -16,7 +16,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.register import REGISTER_MODES, Register
+from hdl_registers.register import Register
 
 # Local folder libraries
 from .html_generator_common import HtmlGeneratorCommon
@@ -142,7 +142,7 @@ repeated {register_object.length} times.
     <td><strong>{register.name}</strong></td>
     <td>{index}</td>
     <td>{address_readable}</td>
-    <td>{REGISTER_MODES[register.mode].mode_readable}</td>
+    <td>{register.mode.name}</td>
     <td>{self._to_hex_string(register.default_value, num_nibbles=1)}</td>
     <td>{description}</td>
   </tr>"""

@@ -14,6 +14,7 @@ from pathlib import Path
 # First party libraries
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def main(output_folder: Path):
@@ -23,7 +24,7 @@ def main(output_folder: Path):
     register_list = RegisterList(name="caesar")
 
     register = register_list.append_register(
-        name="config", mode="r_w", description="Configuration register."
+        name="config", mode=REGISTER_MODES["r_w"], description="Configuration register."
     )
 
     register.append_bit_vector(
@@ -42,7 +43,7 @@ def main(output_folder: Path):
     )
 
     register = register_list.append_register(
-        name="status", mode="r", description="General status register."
+        name="status", mode=REGISTER_MODES["r"], description="General status register."
     )
 
     VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_folder).create()

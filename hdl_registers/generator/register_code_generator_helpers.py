@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Iterator, Optional, Union
 # First party libraries
 from hdl_registers.register import Register
 from hdl_registers.register_array import RegisterArray
+from hdl_registers.register_modes import REGISTER_MODES
 
 if TYPE_CHECKING:
     # First party libraries
@@ -180,17 +181,21 @@ class RegisterCodeGeneratorHelpers:
         """
         Returns True if a field value setter should read-modify-write the register.
 
-        Is only true if the register is of a writeable type where the bus can also read back
+        Is only true if the register is of a writeable type where the software can also read back
         a previously-written value.
         Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
         it is a waste of CPU cycles.
         """
         assert register.fields, "Should not end up here if the register has no fields."
 
-        if register.mode == "r_w":
+        if register.mode == REGISTER_MODES["r_w"]:
             return len(register.fields) > 1
 
-        if register.mode in ["w", "wpulse", "r_wpulse"]:
+        if register.mode in [
+            REGISTER_MODES["w"],
+            REGISTER_MODES["wpulse"],
+            REGISTER_MODES["r_wpulse"],
+        ]:
             return False
 
         raise ValueError(f"Got non-writeable register: {register}")

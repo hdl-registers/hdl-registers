@@ -13,6 +13,7 @@ from tsfpga.system_utils import create_file
 
 # First party libraries
 from hdl_registers.parser.toml import from_toml
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_unknown_top_level_property_should_raise_exception(tmp_path):
@@ -148,14 +149,14 @@ default_value = "0000000000000011"
     registers = from_toml(name="sensor", toml_file=toml_file).register_objects
 
     assert registers[0].name == "data"
-    assert registers[0].mode == "w"
+    assert registers[0].mode == REGISTER_MODES["w"]
     assert registers[0].index == 0
     assert registers[0].description == ""
     assert registers[0].default_value == 0
     assert registers[0].fields == []
 
     assert registers[1].name == "status"
-    assert registers[1].mode == "r_w"
+    assert registers[1].mode == REGISTER_MODES["r_w"]
     assert registers[1].index == 1
     assert registers[1].description == "Status register"
 
@@ -212,7 +213,7 @@ default_value = "0000000000000011"
     assert len(registers[2].registers) == 2
 
     assert registers[2].registers[0].name == "input_settings"
-    assert registers[2].registers[0].mode == "r_w"
+    assert registers[2].registers[0].mode == REGISTER_MODES["r_w"]
     assert registers[2].registers[0].index == 0
     assert registers[2].registers[0].description == "Input configuration"
     assert registers[2].registers[0].fields[0].name == "enable"
@@ -236,7 +237,7 @@ default_value = "0000000000000011"
     )
 
     assert registers[2].registers[1].name == "output_settings"
-    assert registers[2].registers[1].mode == "w"
+    assert registers[2].registers[1].mode == REGISTER_MODES["w"]
     assert registers[2].registers[1].index == 1
     assert registers[2].registers[1].description == ""
     assert registers[2].registers[1].default_value == 3

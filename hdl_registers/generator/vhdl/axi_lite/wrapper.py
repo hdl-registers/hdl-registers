@@ -12,11 +12,8 @@ from pathlib import Path
 from typing import Any
 
 # First party libraries
-from hdl_registers.generator.vhdl.vhdl_generator_common import (
-    BUS_ACCESS_DIRECTIONS,
-    FABRIC_ACCESS_DIRECTIONS,
-    VhdlGeneratorCommon,
-)
+from hdl_registers.generator.vhdl.vhdl_generator_common import VhdlGeneratorCommon
+from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 
 class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
@@ -38,14 +35,14 @@ axi_lite_reg_file.vhd
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
 
     Note that the ``regs_up`` port is only available if there are any registers of a type where
-    fabric gives a value to the bus.
+    hardware gives a value to the bus.
     For example a "Read" register.
     If instead, for example, there are only "Write" registers, the ``regs_up`` port will not be
     available and the type for it is not available in the VHDL package.
 
     Same, but vice versa, for the ``regs_down`` port.
     Will only be available if there are any registers of a type where the bus provides a
-    value to the fabric, e.g. "Read, Write".
+    value to the hardware, e.g. "Read, Write".
 
     Similar concept for the ``reg_was_read`` and ``reg_was_written`` ports.
     They are only present if there are any readable/writeable registers in the register map.
@@ -78,12 +75,12 @@ axi_lite_reg_file.vhd
         entity_name = self.output_file.stem
 
         up_port = f"    regs_up : in {self.name}_regs_up_t := {self.name}_regs_up_init;\n"
-        has_any_up = self.has_any_fabric_accessible_register(FABRIC_ACCESS_DIRECTIONS["up"])
+        has_any_up = self.has_any_hardware_accessible_register(HardwareAccessDirection.UP)
 
         down_port = (
             f"    regs_down : out {self.name}_regs_down_t " f":= {self.name}_regs_down_init;\n"
         )
-        has_any_down = self.has_any_fabric_accessible_register(FABRIC_ACCESS_DIRECTIONS["down"])
+        has_any_down = self.has_any_hardware_accessible_register(HardwareAccessDirection.DOWN)
 
         was_read_port, was_written_port = self._get_was_accessed_ports()
 
@@ -223,9 +220,11 @@ end architecture;
         return vhdl
 
     def _get_was_accessed_ports(self) -> tuple[str, str]:
-        has_any_read = self.has_any_bus_accessible_register(direction=BUS_ACCESS_DIRECTIONS["read"])
-        has_any_write = self.has_any_bus_accessible_register(
-            direction=BUS_ACCESS_DIRECTIONS["write"]
+        has_any_read = self.has_any_software_accessible_register(
+            direction=SoftwareAccessDirection.READ
+        )
+        has_any_write = self.has_any_software_accessible_register(
+            direction=SoftwareAccessDirection.WRITE
         )
 
         # If present, is always the last port so no trailing semicolon needed.

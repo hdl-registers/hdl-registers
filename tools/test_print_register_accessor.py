@@ -32,6 +32,7 @@ from hdl_registers.generator.python.register_accessor_interface import (
 from hdl_registers.generator.python.test.accessor.conftest import add_test_registers
 from hdl_registers.generator.python.test.accessor.test_accessor_operations import a_value0_int
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 class RegisterAccessor(PythonRegisterAccessorInterface):
@@ -56,7 +57,7 @@ def main() -> None:
     register_list = RegisterList(name="caesar")
 
     add_test_registers(register_list_or_array=register_list)
-    register_list.append_register(name="reg_r_empty", mode="r", description="")
+    register_list.append_register(name="reg_r_empty", mode=REGISTER_MODES["r"], description="")
 
     this_file_name = Path(__file__).stem
     output_folder = hdl_registers.HDL_REGISTERS_GENERATED / this_file_name

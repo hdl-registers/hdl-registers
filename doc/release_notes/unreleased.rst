@@ -16,6 +16,23 @@ Breaking changes
 
 * Rename :meth:`.Enumeration.set_default_value` argument ``value`` to the more correct ``name``.
 
+* Rework register mode handling to use objects with properties instead of magic strings.
+
+  * Change :meth:`.Register.__init__`, :meth:`.RegisterList.append_register`, and
+    :meth:`.RegisterArray.append_register` arguments ``mode`` to be of type :class:`.RegisterMode`
+    instead of ``str``.
+
+  * Move :class:`.RegisterMode` to :mod:`.register_mode` and ``REGISTER_MODES``
+    to :mod:`.register_modes`.
+
+  * Rename :class:`.RegisterMode` property ``mode_readable`` to ``name``.
+
+  * Remove :class:`.Register` properties ``is_bus_readable`` and ``is_bus_writeable`` in favor
+    of :attr:`.Register.mode`.
+
+  * Use :attr:`.Register.mode` instead of generator-specific properties/checkers
+    in :class:`.VhdlGeneratorCommon`.
+
 * Rework the system for numerical interpretation of bit vector field values.
 
   * Remove ``field_type`` member from :class:`.Bit`, :class:`.Enumeration`, and :class:`.Integer`.

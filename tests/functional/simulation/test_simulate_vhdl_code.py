@@ -38,6 +38,7 @@ from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
     generate_strange_register_maps,
 )
 from hdl_registers.parser.toml import from_toml
+from hdl_registers.register_modes import REGISTER_MODES
 
 DOC_SIM_FOLDER = HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "sim"
 
@@ -206,7 +207,9 @@ def generate_toml_registers(output_path):
 
     # Add some bit vector fields with types.
     # This is not supported by the TOML parser at this point, so we do it manually.
-    register = register_list.append_register(name="field_test", mode="r_w", description="")
+    register = register_list.append_register(
+        name="field_test", mode=REGISTER_MODES["r_w"], description=""
+    )
     register.append_bit_vector(
         name="u0",
         description="",

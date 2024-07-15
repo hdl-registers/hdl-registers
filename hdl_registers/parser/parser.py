@@ -22,10 +22,12 @@ from tsfpga import DEFAULT_FILE_ENCODING
 from hdl_registers.about import WEBSITE_URL
 from hdl_registers.constant.bit_vector_constant import UnsignedVector
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 if TYPE_CHECKING:
     # First party libraries
     from hdl_registers.register import Register
+    from hdl_registers.register_mode import RegisterMode
 
 
 class RegisterParser:
@@ -238,12 +240,24 @@ ERROR: Please inspect that file and update your data file to the new format.
                 )
                 raise ValueError(message)
 
-            mode = items["mode"]
+            mode = self._get_mode(mode_name=items["mode"], register_name=name)
+
             register = self._register_list.append_register(
                 name=name, mode=mode, description=description
             )
 
         self._parse_register_fields(register=register, register_items=items, register_array_note="")
+
+    def _get_mode(self, mode_name: str, register_name: str) -> "RegisterMode":
+        if mode_name in REGISTER_MODES:
+            return REGISTER_MODES[mode_name]
+
+        valid_modes_str = ", ".join(f'"{mode_key}"' for mode_key in REGISTER_MODES)
+        message = (
+            f'Error while parsing register "{register_name}" in {self._source_definition_file}: '
+            f'Got unknown mode "{mode_name}". Expected one of {valid_modes_str}.'
+        )
+        raise ValueError(message)
 
     def _parse_register_fields(
         self,
@@ -345,7 +359,7 @@ ERROR: Please inspect that file and update your data file to the new format.
                     f"{self._source_definition_file}: "
                     f'Missing required property "mode".'
                 )
-            register_mode = item_value["mode"]
+            register_mode = self._get_mode(mode_name=item_value["mode"], register_name=item_name)
 
             register_description = item_value.get("description", "")
 

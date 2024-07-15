@@ -15,7 +15,7 @@ from pathlib import Path
 from tsfpga.system_utils import create_file
 
 # First party libraries
-from hdl_registers.register import REGISTER_MODES
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def main(output_folder: Path):
@@ -32,7 +32,7 @@ def main(output_folder: Path):
     for key, mode in REGISTER_MODES.items():
         rst += f"""\
    * - **{key}**
-     - {mode.mode_readable}
+     - {mode.name}
      - {mode.description}
 """
 

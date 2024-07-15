@@ -14,6 +14,7 @@ from tsfpga.system_utils import create_file
 # First party libraries
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register import Register
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_load_nonexistent_toml_file_should_raise_exception(tmp_path):
@@ -60,8 +61,8 @@ mode = "w"
         name="",
         toml_file=toml_path,
         default_registers=[
-            Register(name="config", index=0, mode="r_w", description=""),
-            Register(name="status", index=1, mode="r", description=""),
+            Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description=""),
+            Register(name="status", index=1, mode=REGISTER_MODES["r"], description=""),
         ],
     )
 

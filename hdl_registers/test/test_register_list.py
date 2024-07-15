@@ -17,11 +17,12 @@ import pytest
 # First party libraries
 from hdl_registers.register import Register
 from hdl_registers.register_list import RegisterList
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_from_default_registers():
-    register_a = Register(name="a", index=0, mode="r", description="AA")
-    register_b = Register(name="b", index=1, mode="w", description="BB")
+    register_a = Register(name="a", index=0, mode=REGISTER_MODES["r"], description="AA")
+    register_b = Register(name="b", index=1, mode=REGISTER_MODES["w"], description="BB")
     default_registers = [register_a, register_b]
 
     register_list = RegisterList.from_default_registers(
@@ -29,18 +30,23 @@ def test_from_default_registers():
     )
 
     # Change some things in the register objects to show that they are copied
-    default_registers.append(Register(name="c", index=2, mode="r_w", description="CC"))
-    register_a.mode = "w"
+    default_registers.append(
+        Register(name="c", index=2, mode=REGISTER_MODES["r_w"], description="CC")
+    )
+    register_a.mode = REGISTER_MODES["w"]
     register_b.name = "x"
 
+    print(register_list.get_register("a").mode)
+    print(REGISTER_MODES["r"])
+
     assert len(register_list.register_objects) == 2
-    assert register_list.get_register("a").mode == "r"
+    assert register_list.get_register("a").mode == REGISTER_MODES["r"]
     assert register_list.get_register("b").name == "b"
 
 
 def test_from_default_registers_with_bad_indexes_should_raise_exception():
-    register_a = Register(name="a", index=0, mode="r", description="")
-    register_b = Register(name="b", index=0, mode="w", description="")
+    register_a = Register(name="a", index=0, mode=REGISTER_MODES["r"], description="")
+    register_b = Register(name="b", index=0, mode=REGISTER_MODES["w"], description="")
     default_registers = [register_a, register_b]
 
     with pytest.raises(ValueError) as exception_info:
@@ -74,28 +80,17 @@ def test_header_constants():
     assert registers.get_constant("zebra").value == -5
 
 
-def test_invalid_register_mode_should_raise_exception():
-    registers = RegisterList(None, None)
-    registers.append_register(name="test", mode="r_w", description="")
-
-    with pytest.raises(ValueError) as exception_info:
-        registers.append_register(name="hest", mode="x", description="")
-    assert str(exception_info.value) == 'Invalid mode "x" for register "hest"'
-
-    register_array = registers.append_register_array("array", 2, "")
-    register_array.append_register(name="apa", mode="r", description="")
-    with pytest.raises(ValueError) as exception_info:
-        register_array.append_register(name="zebra", mode="y", description="")
-    assert str(exception_info.value) == 'Invalid mode "y" for register "zebra"'
-
-
 def test_registers_are_appended_properly_and_can_be_edited_in_place():
     register_array = RegisterList(name="apa", source_definition_file=Path("."))
 
-    register_hest = register_array.append_register(name="hest", mode="r", description="")
+    register_hest = register_array.append_register(
+        name="hest", mode=REGISTER_MODES["r"], description=""
+    )
     assert register_hest.index == 0
 
-    register_zebra = register_array.append_register(name="zebra", mode="r", description="")
+    register_zebra = register_array.append_register(
+        name="zebra", mode=REGISTER_MODES["r"], description=""
+    )
     assert register_zebra.index == 1
 
     register_hest.description = "new desc"
@@ -109,8 +104,8 @@ def test_register_arrays_are_appended_properly_and_can_be_edited_in_place():
         name="hest", length=4, description=""
     )
     assert register_array_hest.base_index == 0
-    register_array_hest.append_register(name="foo", mode="r", description="")
-    register_array_hest.append_register(name="bar", mode="w", description="")
+    register_array_hest.append_register(name="foo", mode=REGISTER_MODES["r"], description="")
+    register_array_hest.append_register(name="bar", mode=REGISTER_MODES["w"], description="")
 
     register_array_zebra = register_array.append_register_array(
         name="zebra", length=2, description=""
@@ -120,12 +115,12 @@ def test_register_arrays_are_appended_properly_and_can_be_edited_in_place():
 
 def test_get_register():
     register_list = RegisterList(name="apa", source_definition_file=None)
-    apa = register_list.append_register(name="apa", mode="r", description="")
-    hest = register_list.append_register(name="hest", mode="r", description="")
+    apa = register_list.append_register(name="apa", mode=REGISTER_MODES["r"], description="")
+    hest = register_list.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
     register_array = register_list.append_register_array(
         name="register_array", length=3, description=""
     )
-    zebra = register_array.append_register(name="zebra", mode="r", description="")
+    zebra = register_array.append_register(name="zebra", mode=REGISTER_MODES["r"], description="")
 
     assert register_list.get_register(register_name="apa") is apa
     assert register_list.get_register(register_name="hest") is hest
@@ -166,12 +161,12 @@ def test_get_register_array():
     register_list = RegisterList(name="apa", source_definition_file=None)
 
     hest = register_list.append_register_array(name="hest", length=3, description="")
-    hest.append_register(name="foo", mode="r", description="")
+    hest.append_register(name="foo", mode=REGISTER_MODES["r"], description="")
 
     zebra = register_list.append_register_array(name="zebra", length=2, description="")
-    zebra.append_register(name="bar", mode="r", description="")
+    zebra.append_register(name="bar", mode=REGISTER_MODES["r"], description="")
 
-    register_list.append_register(name="register", mode="r", description="")
+    register_list.append_register(name="register", mode=REGISTER_MODES["r"], description="")
 
     assert register_list.get_register_array("hest") is hest
     assert register_list.get_register_array("zebra") is zebra
@@ -195,12 +190,12 @@ def test_get_register_array():
 def test_get_register_index():
     register_list = RegisterList(name=None, source_definition_file=None)
 
-    register_list.append_register(name="apa", mode="r", description="")
-    register_list.append_register(name="hest", mode="r", description="")
+    register_list.append_register(name="apa", mode=REGISTER_MODES["r"], description="")
+    register_list.append_register(name="hest", mode=REGISTER_MODES["r"], description="")
 
     zebra = register_list.append_register_array(name="zebra", length=2, description="")
-    zebra.append_register(name="bar", mode="r", description="")
-    zebra.append_register(name="baz", mode="r", description="")
+    zebra.append_register(name="bar", mode=REGISTER_MODES["r"], description="")
+    zebra.append_register(name="baz", mode=REGISTER_MODES["r"], description="")
 
     assert register_list.get_register_index(register_name="apa") == 0
     assert register_list.get_register_index(register_name="hest") == 1
@@ -248,7 +243,7 @@ def test_repr_with_register_appended():
     register_list_b = RegisterList(name="apa", source_definition_file=Path("."))
     assert repr(register_list_a) == repr(register_list_b)
 
-    register_list_a.append_register(name="zebra", mode="w", description="")
+    register_list_a.append_register(name="zebra", mode=REGISTER_MODES["w"], description="")
 
     assert repr(register_list_a) != repr(register_list_b)
 
@@ -266,9 +261,13 @@ def test_repr_with_register_array_appended():
 def test_deep_copy_of_register_list_actually_copies_everything():
     original_list = RegisterList("original", Path("/original_file.txt"))
     original_list.add_constant("original_constant", value=2, description="original constant")
-    original_list.append_register("original_register", "w", description="original register")
+    original_list.append_register(
+        "original_register", REGISTER_MODES["w"], description="original register"
+    )
     original_array = original_list.append_register_array("original_array", length=4, description="")
-    original_array.append_register(name="original_register_in_array", mode="r", description="")
+    original_array.append_register(
+        name="original_register_in_array", mode=REGISTER_MODES["r"], description=""
+    )
 
     copied_list = copy.deepcopy(original_list)
 
@@ -282,7 +281,7 @@ def test_deep_copy_of_register_list_actually_copies_everything():
     assert copied_list.register_objects[0] is not original_list.register_objects[0]
 
     # Original register in position 0, original register array in position 1, new register in 2
-    copied_list.append_register(name="new_register", mode="r", description="")
+    copied_list.append_register(name="new_register", mode=REGISTER_MODES["r"], description="")
     assert len(copied_list.register_objects) == 3 and len(original_list.register_objects) == 2
 
     assert copied_list.register_objects[1] is not original_list.register_objects[1]
@@ -294,7 +293,7 @@ def test_deep_copy_of_register_list_actually_copies_everything():
         is not original_list.register_objects[1].registers[0]
     )
     copied_list.register_objects[1].append_register(
-        name="new_register_in_array", mode="r_w", description=""
+        name="new_register_in_array", mode=REGISTER_MODES["r_w"], description=""
     )
     assert len(copied_list.register_objects[1].registers) == 2
     assert len(original_list.register_objects[1].registers) == 1
