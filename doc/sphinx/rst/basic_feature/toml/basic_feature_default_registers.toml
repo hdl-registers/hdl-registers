@@ -1,10 +1,29 @@
+# Adapt the "interrupt_status" default register for the needs of this register list.
+[interrupt_status]
+
+# The "mode" property MUST NOT be present for a default register.
+# The mode of the register is set in the default register object in Python.
+
+# The "description" property is OPTIONAL for a default register.
+# If specified, it will only be set in this register list, not other register lists that also
+# use this default register.
+# If not specified, the description of the default register object in Python will be used.
+description = "Interrupt status for my module."
+
+# Register fields can be added freely to a default register.
+# Will only be added to this register list, not other register lists that also use
+# this default register.
+overflow.type = "bit"
+overflow.description = "Too high data rate."
+
+underflow.type = "bit"
+underflow.description = "Too low data rate."
+
+# Note that the "interrupt_mask" default register is not adapted here.
+# It will be included in this register list at its default configuration.
+
+# Further registers and register arrays can be added freely after the default registers.
 [config]
 
 mode = "r_w"
 description = "Generic configuration register."
-
-
-[status]
-
-mode = "r"
-description = "Generic status register."

@@ -58,11 +58,18 @@ def create_from_api() -> RegisterList:
         name="caesar", source_definition_file=None, default_registers=DEFAULT_REGISTERS
     )
 
+    interrupt_status = register_list.get_register(register_name="interrupt_status")
+    interrupt_status.description = "Interrupt status for my module."
+    interrupt_status.append_bit(
+        name="overflow", description="Too high data rate.", default_value="0"
+    )
+    interrupt_status.append_bit(
+        name="underflow", description="Too low data rate.", default_value="0"
+    )
+
     register_list.append_register(
         name="config", mode="r_w", description="Generic configuration register."
     )
-
-    register_list.append_register(name="status", mode="r", description="Generic status register.")
 
     return register_list
 
