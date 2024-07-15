@@ -174,10 +174,6 @@ class Enumeration(RegisterField):
         self._default_value = self.get_element_by_name(name=name)
 
     @property
-    def default_value_str(self) -> str:
-        return self.default_value.name
-
-    @property
     def default_value_uint(self) -> int:
         return self.default_value.value
 

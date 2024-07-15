@@ -11,6 +11,9 @@ Breaking changes
 
 * Rename :meth:`.RegisterList.get_register` argument ``name`` to ``register_name``.
 
+* Remove :class:`.RegisterField` attributes ``range_str`` and ``default_value_str``.
+  This information is now calculated internally in the HTML generator class.
+
 * Rename :meth:`.Enumeration.set_default_value` argument ``value`` to the more correct ``name``.
 
 * Rework the system for numerical interpretation of bit vector field values.
