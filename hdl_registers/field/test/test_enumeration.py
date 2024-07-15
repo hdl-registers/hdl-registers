@@ -52,7 +52,6 @@ def test_enumeration_basics():
 
     assert enumeration.default_value is enumeration.elements[2]
     assert enumeration.default_value_uint == 2
-    assert enumeration.default_value_str == "element2"
 
 
 def test_no_elements_should_raise_exception():

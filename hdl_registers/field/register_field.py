@@ -47,25 +47,6 @@ class RegisterField(ABC):
         return self._width
 
     @property
-    def range_str(self) -> str:
-        """
-        Return the bits that this field occupies in a readable format.
-        The way it shall appear in documentation.
-        """
-        if self.width == 1:
-            return f"{self.base_index}"
-
-        return f"{self.base_index + self.width - 1}:{self.base_index}"
-
-    @property
-    @abstractmethod
-    def default_value_str(self) -> str:
-        """
-        Return a formatted string of the default value. The way it shall appear
-        in documentation.
-        """
-
-    @property
     @abstractmethod
     def default_value_uint(self) -> int:
         """

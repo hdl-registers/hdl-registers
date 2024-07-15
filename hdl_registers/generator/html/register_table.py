@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
+from hdl_registers.field.bit import Bit
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.register import REGISTER_MODES, Register
@@ -184,13 +186,40 @@ repeated {register_object.length} times.
         html = f"""
   <tr>
     <td>&nbsp;&nbsp;<em>{field.name}</em></td>
-    <td>&nbsp;&nbsp;{field.range_str}</td>
+    <td>&nbsp;&nbsp;{self._field_range(field=field)}</td>
     <td></td>
     <td></td>
-    <td>{field.default_value_str}</td>
+    <td>{self._field_default_value(field=field)}</td>
     <td>
       {description}
     </td>
   </tr>"""
 
         return html
+
+    @staticmethod
+    def _field_range(field: "RegisterField") -> str:
+        """
+        Return the bits that this field occupies in a readable format.
+        The way it shall appear in documentation.
+        """
+        if field.width == 1:
+            return f"{field.base_index}"
+
+        return f"{field.base_index + field.width - 1}:{field.base_index}"
+
+    @staticmethod
+    def _field_default_value(field: "RegisterField") -> str:
+        """
+        A human-readable string representation of the default value.
+        """
+        if isinstance(field, (Bit, BitVector)):
+            return f"0b{field.default_value}"
+
+        if isinstance(field, Enumeration):
+            return field.default_value.name
+
+        if isinstance(field, Integer):
+            return str(field.default_value)
+
+        raise ValueError(f"Unknown field: {field}")

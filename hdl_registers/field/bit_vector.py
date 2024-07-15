@@ -154,10 +154,6 @@ class BitVector(RegisterField):
         return super().set_value(field_value=unsigned_value)
 
     @property
-    def default_value_str(self) -> str:
-        return f"0b{self.default_value}"
-
-    @property
     def default_value_uint(self) -> int:
         return int(self.default_value, base=2)
 

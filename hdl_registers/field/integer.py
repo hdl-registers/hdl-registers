@@ -165,10 +165,6 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         self._default_value = value
 
     @property
-    def default_value_str(self) -> str:
-        return str(self.default_value)
-
-    @property
     def default_value_uint(self) -> int:
         if self.default_value >= 0:
             return self.default_value
