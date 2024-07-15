@@ -34,18 +34,13 @@ Usage
 
 A minimal usage example:
 
-.. code-block:: python
-
-  from pathlib import Path
-
-  from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
-  from hdl_registers.parser.toml import from_toml
+..
+  Include a minimal usage example file that is generated and test run by the
+  script in the 'py' folder.
 
 
-  this_dir = Path(__file__).parent
-
-  register_list = from_toml(name="caesar", toml_file=this_dir / "caesar_registers.toml")
-  VhdlRegisterPackageGenerator(register_list=register_list, output_folder=this_dir).create_if_needed()
+.. literalinclude:: ../../../../generated/sphinx_rst/register_code/user_guide/minimal_usage_example/minimal_usage_example.py
+  :language: Python
 
 The basis of all register operations is the :class:`.RegisterList` class, which represents a
 register map, meaning, the registers of one module.
