@@ -1,7 +1,7 @@
 black
 GitPython
 PyYAML
-rtoml>= 0.9.0, < 0.10.0
+rtoml
 termcolor
 tomli-w
 tsfpga>= 12.3.2
