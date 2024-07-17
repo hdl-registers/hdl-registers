@@ -11,6 +11,8 @@ Breaking changes
 
 * Rename :meth:`.RegisterList.get_register` argument ``name`` to ``register_name``.
 
+Breaking internal API changes
+
 * Remove :class:`.RegisterField` attributes ``range_str`` and ``default_value_str``.
   This information is now calculated internally in the HTML generator class.
 
