@@ -77,7 +77,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             )
             cpp_code += "\n"
 
-            if register.mode.is_software_readable:
+            if register.mode.software_can_read:
                 cpp_code += self._register_getter_function(register, register_array)
 
                 for field in register.fields:
@@ -86,7 +86,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
                         register, register_array, field=field
                     )
 
-            if register.mode.is_software_writeable:
+            if register.mode.software_can_write:
                 cpp_code += self._register_setter_function(register, register_array)
 
                 for field in register.fields:

@@ -38,14 +38,38 @@ class HardwareAccessDirection(Enum):
 
 
 class RegisterMode:
+    """
+    Represents a mode of a register, which defines how the register can be accessed.
+    The terms "software"/"hardware", along with "register bus", "register file", "read", "write,
+    "up" and "down" are used in this class.
+    These terms are explained by the following diagram:
+
+    .. code-block:: none
+
+       ________________________________
+      |           "Software"           |
+      | E.g. CPU, PCIe interface, etc. |
+      |________________________________|
+                      ||
+                      ||         "Register bus"
+                      ||         E.g. AXI-Lite.
+                      || "read" or "write" transactions.
+                      ||
+            _______________________      "down"      ______________________________
+           |    "Register file"    |--------------->|          "Hardware"          |
+           | E.g. generic AXI-Lite |                |  Meaning, your application.  |
+           |     register file.    |      "up"      | In e.g. FPGA fabric or ASIC. |
+           |_______________________|<---------------|______________________________|
+    """
+
     def __init__(
         self,
         shorthand: str,
         name: str,
         description: str,
-        is_software_readable: bool,
-        is_software_writeable: bool,
-        has_hardware_up: bool,
+        software_can_read: bool,
+        software_can_write: bool,
+        hardware_has_up: bool,
     ):  # pylint: disable=too-many-arguments
         """
         Arguments:
@@ -53,30 +77,26 @@ class RegisterMode:
                 E.g. "r".
             name: A short but human-readable readable representation of this mode.
                 E.g. "Read".
-            description: Textual description of mode.
-            is_software_readable: True if registers of this mode are readable by software over the
-                register bus.
+            description: Textual description and explanation of this mode.
+            software_can_read: True if register is readable by software on the register bus.
                 I.e. if software accessors shall have a 'read' method for registers of this mode.
                 False otherwise.
 
                 Analogous the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
-            is_software_writeable: True if registers of this mode are writeable by software over the
-                register bus.
+            software_can_write: True if register is writeable by software on the register bus.
                 I.e. if software accessors shall have a 'write' method for registers of this mode.
                 False otherwise.
 
                 Analogous the ``reg_file.reg_file_pkg.is_write_type`` VHDL function.
-            has_hardware_up: True if registers of this mode get their software read value
-                from hardware.
-                I.e. if hardware register files shall have a 'up' input port for registers of
-                this mode.
+            hardware_has_up: True if register gets its software-read value from hardware.
+                I.e. if register file shall have an 'up' input port for registers of this mode.
 
                 False otherwise, which can be due to either
 
                 * mode is not software-readable, or
                 * mode loopbacks a software-written value to the software read value.
         """
-        assert is_software_readable or not has_hardware_up, (
+        assert software_can_read or not hardware_has_up, (
             f'Register mode "{shorthand}"" has hardware "up", but is not software readable. '
             "This does not make sense."
         )
@@ -84,40 +104,39 @@ class RegisterMode:
         self.shorthand = shorthand
         self.name = name
         self.description = description
-        self.is_software_readable = is_software_readable
-        self.is_software_writeable = is_software_writeable
-        self.has_hardware_up = has_hardware_up
+        self.software_can_read = software_can_read
+        self.software_can_write = software_can_write
+        self.hardware_has_up = hardware_has_up
 
     @property
-    def has_hardware_down(self) -> bool:
+    def hardware_has_down(self) -> bool:
         """
-        True if registers of this mode provide a value from software to hardware.
-        I.e. if hardware register files shall have a 'down' output port for registers of
-        this mode.
+        True if register provides a value from software to hardware.
+        I.e. if register file shall have a 'down' output port for registers of this mode.
 
         False otherwise, which is most likely due to the register being read-only.
         """
         # At the moment this is the same being software-writeable.
         # Might change in the future if we implement some exotic mode.
-        return self.is_software_writeable
+        return self.software_can_write
 
     def is_software_accessible(self, direction: SoftwareAccessDirection) -> bool:
         """
         Test if this mode is software-accessible in the given ``direction``.
         """
         if direction == SoftwareAccessDirection.READ:
-            return self.is_software_readable
+            return self.software_can_read
 
-        return self.is_software_writeable
+        return self.software_can_write
 
     def is_hardware_accessible(self, direction: HardwareAccessDirection) -> bool:
         """
         Test if this mode is hardware-accessible in the given ``direction``.
         """
         if direction == HardwareAccessDirection.UP:
-            return self.has_hardware_up
+            return self.hardware_has_up
 
-        return self.has_hardware_down
+        return self.hardware_has_down
 
     def __repr__(self) -> str:
         """

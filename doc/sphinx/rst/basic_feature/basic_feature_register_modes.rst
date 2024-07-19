@@ -6,10 +6,15 @@ Register modes
 Each register, whether plain or in a :ref:`register array <basic_feature_register_array>`,
 must have a specified *mode*.
 
-The available register modes are listed in the table below.
+The different modes are defined by the class :class:`.RegisterMode`.
+In the documentation of that class you will find a diagram that explains the terms used
+when describing a mode.
+
+The official register modes available in hdl-registers are defined by the ``REGISTER_MODES``
+constant in :mod:`.register_modes`.
+They are listed in the table below:
 
 .. include:: ../../../../generated/sphinx_rst/register_code/basic_feature/basic_feature_register_modes/modes_table.rst
-
 
 * The "Read", "Write" and "Read, Write" modes are well-known and self-explanatory.
 * The "Write-pulse" mode is a special mode suitable for "command"-style registers.

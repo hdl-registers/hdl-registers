@@ -72,7 +72,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 text=[description, "See interface header for documentation."]
             )
 
-            if register.mode.is_software_readable:
+            if register.mode.software_can_read:
                 signature = self._register_getter_function_signature(
                     register=register, register_array=register_array
                 )
@@ -99,7 +99,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                     )
                     cpp_code += function(return_type_name=field_type_name, signature=signature)
 
-            if register.mode.is_software_writeable:
+            if register.mode.software_can_write:
                 signature = self._register_setter_function_signature(
                     register=register, register_array=register_array
                 )
