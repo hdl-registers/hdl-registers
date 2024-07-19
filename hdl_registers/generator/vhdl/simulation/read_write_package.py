@@ -123,7 +123,7 @@ end package body;
             )
             declarations = []
 
-            if register.mode.is_software_readable:
+            if register.mode.software_can_read:
                 if register.fields:
                     # Read the register as a record.
                     signature = self._register_read_write_signature(
@@ -177,7 +177,7 @@ end package body;
                         )
                         declarations.append(f"{signature};\n")
 
-            if register.mode.is_software_writeable:
+            if register.mode.software_can_write:
                 if register.fields:
                     # Write the register as a record.
                     signature = self._register_read_write_signature(
@@ -349,7 +349,7 @@ end package body;
             )
             implementations = []
 
-            if register.mode.is_software_readable:
+            if register.mode.software_can_read:
                 if register.fields:
                     # Read the register as a record.
                     implementations.append(
@@ -408,7 +408,7 @@ end package body;
                             )
                         )
 
-            if register.mode.is_software_writeable:
+            if register.mode.software_can_write:
                 if register.fields:
                     # Write the register as a record.
                     implementations.append(

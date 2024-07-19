@@ -111,7 +111,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             cpp_code += self.comment(comment=description)
             cpp_code += "\n"
 
-            if register.mode.is_software_readable:
+            if register.mode.software_can_read:
                 cpp_code += self.comment(
                     "Getter that will read the whole register's value over the register bus."
                 )
@@ -120,7 +120,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += f"    virtual uint32_t {signature} const = 0;\n\n"
 
-            if register.mode.is_software_writeable:
+            if register.mode.software_can_write:
                 cpp_code += self.comment(
                     "Setter that will write the whole register's value over the register bus."
                 )
@@ -206,7 +206,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 register=register, register_array=register_array, field=field
             )
 
-            if register.mode.is_software_readable:
+            if register.mode.software_can_read:
                 comment = [
                     f"Getter for the {field_description},",
                     "which will read register value over the register bus.",
@@ -232,7 +232,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
                 cpp_code += function(return_type_name=field_type_name, signature=signature)
 
-            if register.mode.is_software_writeable:
+            if register.mode.software_can_write:
                 comment = [f"Setter for the {field_description},"]
                 if self.field_setter_should_read_modify_write(register=register):
                     comment.append("which will read-modify-write over the register bus.")

@@ -18,17 +18,17 @@ REGISTER_MODES = dict(
         shorthand="r",
         name="Read",
         description="Software can read a value that hardware provides.",
-        is_software_readable=True,
-        is_software_writeable=False,
-        has_hardware_up=True,
+        software_can_read=True,
+        software_can_write=False,
+        hardware_has_up=True,
     ),
     w=RegisterMode(
         shorthand="w",
         name="Write",
         description="Software can write a value that is available for hardware usage.",
-        is_software_readable=False,
-        is_software_writeable=True,
-        has_hardware_up=False,
+        software_can_read=False,
+        software_can_write=True,
+        hardware_has_up=False,
     ),
     r_w=RegisterMode(
         shorthand="r_w",
@@ -37,17 +37,17 @@ REGISTER_MODES = dict(
             "Software can write a value and read it back. "
             "The written value is available for hardware usage."
         ),
-        is_software_readable=True,
-        is_software_writeable=True,
-        has_hardware_up=False,
+        software_can_read=True,
+        software_can_write=True,
+        hardware_has_up=False,
     ),
     wpulse=RegisterMode(
         shorthand="wpulse",
         name="Write-pulse",
         description="Software can write a value that is asserted for one clock cycle in hardware.",
-        is_software_readable=False,
-        is_software_writeable=True,
-        has_hardware_up=False,
+        software_can_read=False,
+        software_can_write=True,
+        hardware_has_up=False,
     ),
     r_wpulse=RegisterMode(
         shorthand="r_wpulse",
@@ -56,8 +56,8 @@ REGISTER_MODES = dict(
             "Software can read a value that hardware provides. "
             "Software can write a value that is asserted for one clock cycle in hardware."
         ),
-        is_software_readable=True,
-        is_software_writeable=True,
-        has_hardware_up=True,
+        software_can_read=True,
+        software_can_write=True,
+        hardware_has_up=True,
     ),
 )
