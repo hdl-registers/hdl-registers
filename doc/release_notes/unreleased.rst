@@ -1,6 +1,6 @@
 Breaking changes
 
-* Update data file (TOML, JSON, etc) format in way that is not compatible with old files.
+* Update data file (TOML, JSON, etc) format in a way that is not compatible with old files.
   See :ref:`new_data_file_format`.
   Note that old files are automatically updated.
   This change enables:
