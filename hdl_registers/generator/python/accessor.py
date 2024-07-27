@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 
 class PythonAccessorGenerator(RegisterCodeGenerator):
     """
-    Generate a Python class to read/write/print register and field values.
+    Generate a Python class to read/write/print register and field values on a target device.
     Field and register values are represented using their native Python types, for easy handling.
     Meaning, no manual type casting back and forth for the user.
 
