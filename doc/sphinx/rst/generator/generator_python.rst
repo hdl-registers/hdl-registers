@@ -4,7 +4,7 @@ Python code generator
 =====================
 
 The Python code generator creates an accessor class for reading, writing and printing register and
-field values.
+field values on a target device.
 The class will have a named method for each of these operations on each register and field.
 The methods use native Python types (e.g. ``int``, ``float``, ``Enum``) to represent values that
 are read or written.
@@ -103,7 +103,7 @@ and field values:
 
 
 Note how only readable registers are printed.
-Field values are present firstly as their native type, but also as their decimal, hexadecimal and
+Field values are presented firstly as their native type, but also as their decimal, hexadecimal and
 binary encodings.
 
 
