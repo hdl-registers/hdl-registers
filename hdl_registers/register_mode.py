@@ -40,7 +40,7 @@ class HardwareAccessDirection(Enum):
 class RegisterMode:
     """
     Represents a mode of a register, which defines how the register can be accessed.
-    The terms "software"/"hardware", along with "register bus", "register file", "read", "write,
+    The terms "software"/"hardware", along with "register bus", "register file", "read", "write",
     "up" and "down" are used in this class.
     These terms are explained by the following diagram:
 
