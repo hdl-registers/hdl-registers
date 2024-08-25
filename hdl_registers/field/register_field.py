@@ -39,9 +39,8 @@ class RegisterField(ABC):
     def width(self) -> int:
         """
         The width, in number of bits, that this field occupies.
-        The index within the register for the lowest bit of this field.
-        Note that this (along with :attr:`.width`) decides the base index of upcoming fields, and
-        thus it may not be changed.
+        Note that this (along with :attr:`.base_index`) decides the base index of upcoming fields,
+        and thus it may not be changed.
         Hence this read-only property which is a getter for a private member.
         """
         return self._width
@@ -50,7 +49,7 @@ class RegisterField(ABC):
     @abstractmethod
     def default_value_uint(self) -> int:
         """
-        Return a the default value as an unsigned int.
+        Return a the default value of this field as an unsigned integer.
         """
 
     def get_value(self, register_value: int) -> int:
@@ -65,7 +64,7 @@ class RegisterField(ABC):
             The value of the field as an unsigned integer.
 
             Note that a subclass might have a different type for the resulting value.
-            Subclasses should call this super method and convert the numeric value to whatever
+            Subclasses should call this super method, and then convert the numeric value to whatever
             type is applicable for that field.
             Subclasses might also implement sanity checks of the value given the constraints
             of that field.

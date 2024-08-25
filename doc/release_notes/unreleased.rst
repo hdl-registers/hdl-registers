@@ -5,9 +5,9 @@ Breaking changes
   Note that old files are automatically updated.
   This change enables:
 
-  * Arbitrary ordering and grouping of registers and register arrays.
+  * Fully user-configurable ordering and grouping of registers and register arrays.
 
-  * Arbitrary ordering and grouping of fields in a register.
+  * Fully user-configurable ordering and grouping of fields in a register.
 
 * Rename :meth:`.RegisterList.get_register` argument ``name`` to ``register_name``.
 

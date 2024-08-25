@@ -303,7 +303,8 @@ class Fixed(NumericalInterpretation, ABC):
 
         self.integer_bit_width = self.max_bit_index + 1
         self.fraction_bit_width = -self.min_bit_index
-        # The total width. Use the same property name as the 'Unsigned' and 'Signed' classes.
+        # The total width.
+        # Note that this the same property name as the 'Unsigned' and 'Signed' classes.
         self.bit_width = self.integer_bit_width + self.fraction_bit_width
 
         self._is_signed = is_signed

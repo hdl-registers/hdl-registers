@@ -24,6 +24,8 @@ class SoftwareAccessDirection(Enum):
     The possible directions software can access registers.
     """
 
+    # The type of the enum values might change in the future.
+    # Should not make a difference for any user since the values are unique either way.
     READ = _SoftwareAccessDirection(name_past="read", name_adjective="readable")
     WRITE = _SoftwareAccessDirection(name_past="written", name_adjective="writeable")
 
@@ -33,6 +35,8 @@ class HardwareAccessDirection(Enum):
     The possible directions hardware can provide/read register values.
     """
 
+    # The type of the enum values might change in the future.
+    # Should not make a difference for any user since the values are unique either way.
     UP = auto()
     DOWN = auto()
 
@@ -46,20 +50,20 @@ class RegisterMode:
 
     .. code-block:: none
 
-       ________________________________
-      |           "Software"           |
-      | E.g. CPU, PCIe interface, etc. |
-      |________________________________|
-                      ||
-                      ||         "Register bus"
-                      ||         E.g. AXI-Lite.
-                      || "read" or "write" transactions.
-                      ||
-            _______________________      "down"      ______________________________
-           |    "Register file"    |--------------->|          "Hardware"          |
-           | E.g. generic AXI-Lite |                |  Meaning, your application.  |
-           |     register file.    |      "up"      | In e.g. FPGA fabric or ASIC. |
-           |_______________________|<---------------|______________________________|
+       ______________________
+      |      "Software"      |
+      | E.g. CPU, PCIe, etc. |
+      |______________________|
+                 ||
+                 ||         "Register bus"
+                 ||         E.g. AXI-Lite.
+                 || "read" or "write" transactions.
+                 ||
+       _______________________      "down"      ______________________________
+      |    "Register file"    |--------------->|          "Hardware"          |
+      | E.g. generic AXI-Lite |                |  Meaning, your application.  |
+      |     register file.    |      "up"      | In e.g. FPGA fabric or ASIC. |
+      |_______________________|<---------------|______________________________|
     """
 
     def __init__(
@@ -117,12 +121,13 @@ class RegisterMode:
         False otherwise, which is most likely due to the register being read-only.
         """
         # At the moment this is the same being software-writeable.
-        # Might change in the future if we implement some exotic mode.
+        # Might change in the future if we implement some exotic cool mode.
         return self.software_can_write
 
     def is_software_accessible(self, direction: SoftwareAccessDirection) -> bool:
         """
         Test if this mode is software-accessible in the given ``direction``.
+        Method is just a simple wrapper around the already-existing attributes.
         """
         if direction == SoftwareAccessDirection.READ:
             return self.software_can_read
@@ -132,6 +137,7 @@ class RegisterMode:
     def is_hardware_accessible(self, direction: HardwareAccessDirection) -> bool:
         """
         Test if this mode is hardware-accessible in the given ``direction``.
+        Method is just a simple wrapper around the already-existing attributes.
         """
         if direction == HardwareAccessDirection.UP:
             return self.hardware_has_up
@@ -153,4 +159,5 @@ class RegisterMode:
         if not isinstance(other, self.__class__):
             return False
 
+        # Same logic as in __repr__.
         return self.shorthand == other.shorthand
