@@ -45,7 +45,10 @@ class Register:
         if not isinstance(mode, RegisterMode):
             # This check should be removed eventually.
             # It is only here to help users during the transition period.
-            raise ValueError(f"Invalid mode: {mode}")
+            raise ValueError(
+                f'Invalid mode: "{mode}". '
+                "Since version 6.0.0, the mode should be a 'RegisterMode' object, not a string."
+            )
 
         self.name = name
         self.index = index

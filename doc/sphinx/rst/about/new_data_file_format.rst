@@ -4,7 +4,7 @@ New data file format in version 6.0.0
 =====================================
 
 In version 6.0.0 of hdl-registers, the data file (TOML, JSON, etc) format is updated in a way
-that is non-compatible with older files.
+that is not compatible with older files.
 This is done to enable the most requested feature in the history of the tool:
 The ability to group register fields arbitrarily, and not by field type.
 This is discussed in `#116 <https://github.com/hdl-registers/hdl-registers/issues/116>`__.

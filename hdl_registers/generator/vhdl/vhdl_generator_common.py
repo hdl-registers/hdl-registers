@@ -80,9 +80,12 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
             raise ValueError(f"Unknown bit vector field: {field}")
 
-        # Our own conversion function.
-        to_slv = self.field_to_slv_function_name(field=field, field_name=field_name)
-        return f"{to_slv}({value})"
+        if isinstance(field, (Enumeration, Integer)):
+            # Our own conversion functions.
+            to_slv = self.field_to_slv_function_name(field=field, field_name=field_name)
+            return f"{to_slv}({value})"
+
+        raise ValueError(f"Unknown field: {field}")
 
     def field_type_name(
         self,
@@ -96,10 +99,13 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         if isinstance(field, Bit):
             return "std_ulogic"
 
-        field_name = self.qualified_field_name(
-            register=register, register_array=register_array, field=field
-        )
-        return f"{field_name}_t"
+        if isinstance(field, (BitVector, Enumeration, Integer)):
+            field_name = self.qualified_field_name(
+                register=register, register_array=register_array, field=field
+            )
+            return f"{field_name}_t"
+
+        raise ValueError(f"Unknown field: {field}")
 
     def has_any_software_accessible_register(self, direction: SoftwareAccessDirection) -> bool:
         """

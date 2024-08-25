@@ -59,7 +59,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
     def _check_range(self, min_value: int, max_value: int) -> None:
         """
         Perform some sanity checks on user-supplied values.
-        Will raise exception if something is wrong,.
+        Will raise exception if something is wrong.
         """
         if not isinstance(min_value, int):
             message = (
@@ -90,7 +90,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         )
 
         if self._min_value >= 0:
-            # The number of bits needed to represent UNSIGNED numbers [0, max_value].
+            # Calculate the number of bits needed to represent UNSIGNED numbers [0, max_value].
             num_bits = self._max_value.bit_length()
 
             if num_bits > 32:
@@ -98,6 +98,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
 
             return num_bits
 
+        # Calculate the number of bits needed to represent SIGNED numbers [min_value, max_value].
         for num_bits in range(1, 33):
             # Two's complement range for signed numbers.
             min_range = -(2 ** (num_bits - 1))
