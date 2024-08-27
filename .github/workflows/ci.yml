@@ -233,3 +233,31 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+
+
+  # ------------------------------------------------------------------------------
+  # Test that the latest PyPI release can be installed.
+
+  test_pypi:
+    name: Test latest PyPI release
+    # Run only on main branch.
+    # Nightly or when triggered manually.
+    # We don't want to waste CI time by running this to often.
+    if: |
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+
+      - name: Install latest release
+        run: python3 -m pip install hdl-registers
+
+      - name: Run test script
+        # 'cd' into the folder to guarantee that hdl-registers from PyPI is used.
+        run: cd tools && python3 pypi_test_script.py
