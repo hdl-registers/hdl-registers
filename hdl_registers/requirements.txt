@@ -4,4 +4,4 @@ PyYAML
 rtoml
 termcolor
 tomli-w
-tsfpga>= 12.3.2
+tsfpga>= 12.3.6
