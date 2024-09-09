@@ -144,7 +144,7 @@ class RegisterCodeGeneratorHelpers:
 
     def comment_block(self, text: list[str], indent: Optional[int] = None) -> str:
         """
-        Create a comment block from a string with newlines.
+        Create a comment block from a list of text lines.
         """
         return "".join(self.comment(comment=line, indent=indent) for line in text)
 
