@@ -131,7 +131,7 @@ device setup is so different in different projects.
 The :ref:`class constructor <python_accessor_code>` takes a ``register_accessor`` argument of type
 :class:`.PythonRegisterAccessorInterface`.
 This object must be constructed by the user, must inherit the
-:class:`.PythonRegisterAccessorInterface`, and must implement the ``read_register`` and
+:class:`.PythonRegisterAccessorInterface` class, and must implement the ``read_register`` and
 ``write_register`` methods.
 See the :class:`API documentation <.PythonRegisterAccessorInterface>` for more details.
 
