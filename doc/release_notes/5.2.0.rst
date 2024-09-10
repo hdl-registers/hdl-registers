@@ -1,6 +1,6 @@
 Added
 
-* Add Python generator to read/write/print register and field field values on a target device.
+* Add Python generator to read/write/print register and field values on a target device.
   See usage instructions :ref:`here <generator_python>`.
 
 Requires tsfpga version 12.3.2 or later.
