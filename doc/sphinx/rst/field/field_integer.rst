@@ -97,8 +97,8 @@ Some interesting things to notice:
 
  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/field/field_integer/api/caesar_regs_pkg.vhd
     :caption: Generated VHDL register package.
-     :language: VHDL
-     :linenos:
+    :language: VHDL
+    :linenos:
 
 |
 
