@@ -27,3 +27,12 @@ class Constant(ABC):
         """
         The value of the constant. Return type depends on the subclass.
         """
+
+    @value.setter
+    @abstractmethod
+    def value(self, value: Any) -> None:
+        """
+        Setter to update the constant value.
+        Argument type depends on the subclass.
+        Subclasses should perform sanity checks.
+        """
