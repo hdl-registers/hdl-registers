@@ -118,19 +118,25 @@ end package body;
         ):
             declarations = []
 
-            for field in register.fields:
-                signature = self._field_check_signature(
-                    register=register,
-                    register_array=register_array,
-                    field=field,
-                )
-                declarations.append(f"{signature};\n")
+            if register.fields:
+                # Check register value as a record.
 
-            if declarations:
-                vhdl += separator
-                vhdl += "\n".join(declarations)
-                vhdl += separator
-                vhdl += "\n"
+                for field in register.fields:
+                    signature = self._field_check_signature(
+                        register=register,
+                        register_array=register_array,
+                        field=field,
+                    )
+                    declarations.append(f"{signature};\n")
+
+            else:
+                # Check register value as reg_t and integer.
+                pass
+
+            vhdl += separator
+            vhdl += "\n".join(declarations)
+            vhdl += separator
+            vhdl += "\n"
 
         return vhdl
 
