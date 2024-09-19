@@ -942,7 +942,7 @@ print(
     colored("Register", color="light_yellow", no_color=no_color)
     + " '{name}' "
     + colored("." * {67 - len(name)}, color="dark_grey", no_color=no_color)
-    + " (index {index}, address {4 *index}):"
+    + " (index {index}, address {4 * index}):"
 )
 """
 
