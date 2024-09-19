@@ -120,6 +120,18 @@ def test_running_simulation(tmp_path):
     check_failed_tests(
         xml_report_file=tmp_path / "failing.xml",
         test_outputs={
+            f"{tb_check}test_check_register_equal_fail_0": (
+                "ERROR - Checking the 'first' register within the 'dummies[1]' register array. "
+                "- Got -----------------101100010000000. Expected -----------------011001100100001."
+            ),
+            f"{tb_check}test_check_register_equal_fail_1": (
+                "Checking the 'current_timestamp' register (at base address x\"00050000\"). "
+                "Alarming error!. - Got 0000_0000_0000_0000_0000_0000_0000_0000 (0). "
+                "Expected 0000_0000_0000_0000_0000_0000_0000_1110 (14)."
+            ),
+            f"{tb_check}test_check_register_equal_fail_2": (
+                "ERROR - Checking the 'current_timestamp' register. - Got 0. Expected 44."
+            ),
             f"{tb_check}test_check_equal_fail_for_array_register_field_at_a_base_address": (
                 "ERROR - Checking the 'array_bit_vector' field in the 'first' register within "
                 "the 'dummies[1]' register array (at base address x\"00050000\"). "
