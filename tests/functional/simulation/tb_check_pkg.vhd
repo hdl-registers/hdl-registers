@@ -9,6 +9,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library vunit_lib;
 use vunit_lib.com_pkg.net;
@@ -18,6 +19,9 @@ library axi_lite;
 use axi_lite.axi_lite_pkg.all;
 
 library bfm;
+
+library reg_file;
+use reg_file.reg_file_pkg.all;
 
 use work.caesar_simulation_test_pkg.all;
 
@@ -51,6 +55,7 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
+    variable reg_value : reg_t := reg_init;
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -69,6 +74,18 @@ begin
 
       check_caesar_field_test_ufixed0_equal(net=>net, expected=>"11111111");
       check_caesar_field_test_sfixed0_equal(net=>net, expected=>"111111");
+
+    elsif run("test_check_equal_of_plain_register_as_record") then
+      check_caesar_config_equal(net=>net, expected=>caesar_config_init);
+
+    elsif run("test_check_equal_of_plain_register_as_reg_t") then
+      reg_value := std_ulogic_vector(to_unsigned(14, 32));
+      regs_up.current_timestamp <= reg_value;
+      check_caesar_current_timestamp_equal(net=>net, expected=>reg_value);
+
+    elsif run("test_check_equal_of_plain_register_as_integer") then
+      regs_up.current_timestamp <= std_ulogic_vector(to_unsigned(14, 32));
+      check_caesar_current_timestamp_equal(net=>net, expected=>14);
 
     elsif run("test_check_equal_of_array_register_fields") then
       -- Write a non-init value to one of the array indexes, to show that the array index argument
@@ -90,6 +107,46 @@ begin
       check_caesar_dummies_first_array_integer_equal(
         net=>net, array_index=>1, expected=>caesar_dummies_first_non_init.array_integer
       );
+
+    elsif run("test_check_equal_of_array_register_as_record") then
+      -- Write a non-init value to one of the array indexes, to show that the array index argument
+      -- is propagated.
+      write_caesar_dummies_first(net=>net, array_index=>1, value=>caesar_dummies_first_non_init);
+
+      check_caesar_dummies_first_equal(
+        net=>net, array_index=>1, expected=>caesar_dummies_first_non_init
+      );
+
+    elsif run("test_check_equal_of_array_register_as_reg_t") then
+      reg_value := std_ulogic_vector(to_unsigned(127, 32));
+      regs_up.dummies3(0).status <= reg_value;
+
+      check_caesar_dummies3_status_equal(net=>net, array_index=>0, expected=>reg_value);
+
+    elsif run("test_check_equal_of_array_register_as_integer") then
+      regs_up.dummies3(0).status <= std_ulogic_vector(to_unsigned(127, 32));
+
+      check_caesar_dummies3_status_equal(net=>net, array_index=>0, expected=>127);
+
+    elsif run("test_check_register_equal_fail_0") then
+      -- vunit: .expected_failure
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      check_caesar_dummies_first_equal(
+        net=>net, array_index=>1, expected=>caesar_dummies_first_non_init
+      );
+
+    elsif run("test_check_register_equal_fail_1") then
+      -- vunit: .expected_failure
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      reg_value := std_ulogic_vector(to_unsigned(14, 32));
+      check_caesar_current_timestamp_equal(
+        net=>net, expected=>reg_value, base_address=>x"00050000", message=>"Alarming error!"
+      );
+
+    elsif run("test_check_register_equal_fail_2") then
+      -- vunit: .expected_failure
+      -- Should fail. Inspect the console output to see that error message is constructed correctly.
+      check_caesar_current_timestamp_equal(net=>net, expected=>44);
 
     elsif run("test_check_equal_fail_for_bit_field") then
       -- vunit: .expected_failure
