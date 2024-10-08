@@ -142,9 +142,10 @@ jobs:
           rtoml \
           setuptools \
           sphinx \
-          sphinx-rtd-theme \
           sphinx_sitemap \
+          sphinx-rtd-theme \
           sphinx-toolbox \
+          sphinxcontrib-googleanalytics \
           sphinxext-opengraph \
           termcolor \
           tomli_w
