@@ -186,7 +186,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         # We know that this is an integer (not a float) since there are no fractional bits set.
         result: int = self._numerical_interpretation.convert_from_unsigned_binary(
             unsigned_binary=unsigned_value
-        )  # type: ignore[assignment]
+        )
 
         if self.min_value <= result <= self.max_value:
             return result
