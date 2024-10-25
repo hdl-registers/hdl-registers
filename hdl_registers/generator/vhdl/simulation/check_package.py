@@ -32,6 +32,11 @@ class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
     Generate VHDL code with simulation procedures to check the values of registers and fields.
     See the :ref:`generator_vhdl` article for usage details.
 
+    * For each readable register, a procedure that checks that the register's current value is equal
+      to a given expected value.
+      Expected value can be provided as a ``reg_t``, or an ``integer``, or a native VHDL record
+      type as given by :class:`.VhdlRecordPackageGenerator`.
+
     * For each field in each readable register, a procedure that checks that the register field's
       current value is equal to a given expected value.
 
