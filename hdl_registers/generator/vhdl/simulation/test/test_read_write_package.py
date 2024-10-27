@@ -100,24 +100,41 @@ def test_read_write_as_integer(tmp_path):
 
     vhdl = read_file(VhdlSimulationReadWritePackageGenerator(register_list, tmp_path).create())
 
-    def check_access_as_integer(direction: str, name: str) -> None:
+    def check_access_as_named_type(direction: str, type_name: str, name: str) -> None:
         assert direction in ["read", "write"]
         in_or_out = "in" if direction == "write" else "out"
         expected = f"""
   procedure {direction}_caesar_{name}(
     signal net : inout network_t;
-    value : {in_or_out} integer;
+    value : {in_or_out} {type_name};
 """
         return expected in vhdl
 
+    def check_access_as_integer(direction: str, name: str) -> None:
+        return check_access_as_named_type(direction=direction, type_name="integer", name=name)
+
+    def check_access_as_slv(direction: str, name: str) -> None:
+        return check_access_as_named_type(direction=direction, type_name="reg_t", name=name)
+
+    def check_access_as_native(direction: str, name: str) -> None:
+        return check_access_as_named_type(
+            direction=direction, type_name=f"caesar_{name}_t", name=name
+        )
+
     for direction in ["read", "write"]:
-        # Empty register should have a method to access it as an integer.
+        # Register with or without fields should have a method to access both as integers and SLVs.
         assert check_access_as_integer(direction=direction, name="empty")
-        # Not a registers with fields though.
-        assert not check_access_as_integer(direction=direction, name="full")
+        assert check_access_as_slv(direction=direction, name="empty")
+        # Empty register does not have a native record type.
+        assert not check_access_as_native(direction=direction, name="empty")
+
+        assert check_access_as_integer(direction=direction, name="full")
+        assert check_access_as_slv(direction=direction, name="full") == (direction == "read")
+        assert check_access_as_native(direction=direction, name="full")
 
         # Only non-fractional vector types shall have the possibility of accessing as integer.
         assert check_access_as_integer(direction=direction, name="full_my_signed_bit_vector")
+        assert check_access_as_native(direction=direction, name="full_my_signed_bit_vector")
         assert check_access_as_integer(direction=direction, name="full_my_unsigned_bit_vector")
         assert not check_access_as_integer(direction=direction, name="full_my_ufixed_bit_vector")
         assert not check_access_as_integer(direction=direction, name="full_my_sfixed_bit_vector")

@@ -32,13 +32,18 @@ class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
     Generate VHDL code with simulation procedures to check the values of registers and fields.
     See the :ref:`generator_vhdl` article for usage details.
 
-    * For each readable register, a procedure that checks that the register's current value is equal
+    * For each readable register, procedures that check that the register's current value is equal
       to a given expected value.
-      Expected value can be provided as a ``reg_t``, or an ``integer``, or a native VHDL record
-      type as given by :class:`.VhdlRecordPackageGenerator`.
+      Expected value can be provided as
+
+      1. bit vector,
+
+      2. integer, or
+
+      3. native VHDL record type as given by :class:`.VhdlRecordPackageGenerator`.
 
     * For each field in each readable register, a procedure that checks that the register field's
-      current value is equal to a given expected value.
+      current value is equal to a given natively-typed value.
 
     Uses VUnit Verification Component calls, via the procedures from
     :class:`.VhdlSimulationReadWritePackageGenerator`.
@@ -47,7 +52,7 @@ class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.2.0"
 
     SHORT_DESCRIPTION = "VHDL simulation check package"
 
@@ -127,6 +132,18 @@ end package body;
             )
             declarations = []
 
+            # Check the register value as a plain SLV.
+            signature = self._register_check_signature(
+                register=register, register_array=register_array, value_type="reg_t"
+            )
+            declarations.append(f"{signature};\n")
+
+            # Check the register value as a plain SLV casted to integer.
+            signature = self._register_check_signature(
+                register=register, register_array=register_array, value_type="integer"
+            )
+            declarations.append(f"{signature};\n")
+
             if register.fields:
                 # Check the register value as a record.
                 signature = self._register_check_signature(
@@ -136,25 +153,12 @@ end package body;
                 )
                 declarations.append(f"{signature};\n")
 
-                for field in register.fields:
-                    # Check the value of each field.
-                    signature = self._field_check_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                    )
-                    declarations.append(f"{signature};\n")
-
-            else:
-                # Check the register value as a plain 'reg_t'.
-                signature = self._register_check_signature(
-                    register=register, register_array=register_array, value_type="reg_t"
-                )
-                declarations.append(f"{signature};\n")
-
-                # Check the register value as an 'integer'.
-                signature = self._register_check_signature(
-                    register=register, register_array=register_array, value_type="integer"
+            for field in register.fields:
+                # Check the value of each field.
+                signature = self._field_check_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
                 )
                 declarations.append(f"{signature};\n")
 
@@ -180,9 +184,9 @@ end package body;
         # If it is not either of these, then it is the native type which shall not have a comment
         # since it is the default.
         type_comment = (
-            " as a plain 'reg_t'"
+            " as a plain SLV"
             if value_type == "reg_t"
-            else " as an 'integer'" if value_type == "integer" else ""
+            else " as a plain SLV casted to integer" if value_type == "integer" else ""
         )
 
         return f"""\
@@ -246,6 +250,20 @@ end package body;
             )
             implementations = []
 
+            # Check the register value as a plain SLV.
+            implementations.append(
+                self._register_check_implementation(
+                    register=register, register_array=register_array, value_type="reg_t"
+                )
+            )
+
+            # Check the register value as a plain SLV casted to integer.
+            implementations.append(
+                self._register_check_implementation(
+                    register=register, register_array=register_array, value_type="integer"
+                )
+            )
+
             if register.fields:
                 # Check the register value as a record.
                 implementations.append(
@@ -256,24 +274,11 @@ end package body;
                     )
                 )
 
-                for field in register.fields:
-                    implementations.append(
-                        self._field_check_implementation(
-                            register=register, register_array=register_array, field=field
-                        )
-                    )
-            else:
-                # Check the register value as a plain 'reg_t'.
+            # Check the value of each field.
+            for field in register.fields:
                 implementations.append(
-                    self._register_check_implementation(
-                        register=register, register_array=register_array, value_type="reg_t"
-                    )
-                )
-
-                # Check the register value as an 'integer'.
-                implementations.append(
-                    self._register_check_implementation(
-                        register=register, register_array=register_array, value_type="integer"
+                    self._field_check_implementation(
+                        register=register, register_array=register_array, field=field
                     )
                 )
 

@@ -30,15 +30,27 @@ class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
     Generate VHDL code with register read/write procedures that simplify simulation.
     See the :ref:`generator_vhdl` article for usage details.
 
-    * For each readable register, a procedure that reads the register and converts the value to the
-      natively-typed record.
+    * For each readable register, procedures that read the register value.
+      Value can be read as:
+
+      1. bit vector,
+
+      2. integer, or
+
+      3. native VHDL record type as given by :class:`.VhdlRecordPackageGenerator`.
 
     * For each field in each readable register, a procedure that reads the natively-typed value of
       the field.
 
-    * For each writeable register, a procedure that writes a given natively-typed record value.
+    * For each writeable register, a procedure that writes the register value.
+      Value can be written as:
 
-    * For each field in each writeable register, a procedure that writes a given field value.
+      1. bit vector, or
+
+      2. native VHDL record type as given by :class:`.VhdlRecordPackageGenerator`.
+
+    * For each field in each writeable register, a procedure that writes a given
+      natively-typed field value.
 
     Uses VUnit Verification Component calls to create bus read/write operations.
 
@@ -46,7 +58,7 @@ class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.1.0"
 
     SHORT_DESCRIPTION = "VHDL simulation read/write package"
 
@@ -124,6 +136,24 @@ end package body;
             declarations = []
 
             if register.mode.software_can_read:
+                # Read the register as a plain SLV.
+                signature = self._register_read_write_signature(
+                    is_read_not_write=True,
+                    register=register,
+                    register_array=register_array,
+                    value_type="reg_t",
+                )
+                declarations.append(f"{signature};\n")
+
+                # Read the register as a plain SLV casted to integer.
+                signature = self._register_read_write_signature(
+                    is_read_not_write=True,
+                    register=register,
+                    register_array=register_array,
+                    value_type="integer",
+                )
+                declarations.append(f"{signature};\n")
+
                 if register.fields:
                     # Read the register as a record.
                     signature = self._register_read_write_signature(
@@ -131,24 +161,6 @@ end package body;
                         register=register,
                         register_array=register_array,
                         value_type=f"{register_name}_t",
-                    )
-                    declarations.append(f"{signature};\n")
-                else:
-                    # Read the register as a plain SLV, since it has no fields.
-                    signature = self._register_read_write_signature(
-                        is_read_not_write=True,
-                        register=register,
-                        register_array=register_array,
-                        value_type="reg_t",
-                    )
-                    declarations.append(f"{signature};\n")
-
-                    # Read the register as a plain SLV casted to integer.
-                    signature = self._register_read_write_signature(
-                        is_read_not_write=True,
-                        register=register,
-                        register_array=register_array,
-                        value_type="integer",
                     )
                     declarations.append(f"{signature};\n")
 
@@ -178,6 +190,15 @@ end package body;
                         declarations.append(f"{signature};\n")
 
             if register.mode.software_can_write:
+                # Write the register as an integer.
+                signature = self._register_read_write_signature(
+                    is_read_not_write=False,
+                    register=register,
+                    register_array=register_array,
+                    value_type="integer",
+                )
+                declarations.append(f"{signature};\n")
+
                 if register.fields:
                     # Write the register as a record.
                     signature = self._register_read_write_signature(
@@ -188,21 +209,19 @@ end package body;
                     )
                     declarations.append(f"{signature};\n")
                 else:
-                    # Write the register as a plain SLV, since it has no fields.
+                    # Write the register as a plain SLV.
+                    # This one is made available only if there are no fields.
+                    # This is because there can be a signature ambiguity if both are available
+                    # that some compilers can not resolve.
+                    # Namely e.g. value=>(field_name => '1').
+                    # Where the field is a std_logic.
+                    # GHDL gets confused in this case between using the signature with the record
+                    # or the one with SLV.
                     signature = self._register_read_write_signature(
                         is_read_not_write=False,
                         register=register,
                         register_array=register_array,
                         value_type="reg_t",
-                    )
-                    declarations.append(f"{signature};\n")
-
-                    # Write the register as an integer.
-                    signature = self._register_read_write_signature(
-                        is_read_not_write=False,
-                        register=register,
-                        register_array=register_array,
-                        value_type="integer",
                     )
                     declarations.append(f"{signature};\n")
 
@@ -350,6 +369,26 @@ end package body;
             implementations = []
 
             if register.mode.software_can_read:
+                # Read the register as a plain SLV.
+                implementations.append(
+                    self._register_read_implementation(
+                        register=register,
+                        register_array=register_array,
+                        value_type="reg_t",
+                        value_conversion="reg_value",
+                    )
+                )
+
+                # Read the register as a plain SLV casted to integer.
+                implementations.append(
+                    self._register_read_implementation(
+                        register=register,
+                        register_array=register_array,
+                        value_type="integer",
+                        value_conversion="to_integer(unsigned(reg_value))",
+                    )
+                )
+
                 if register.fields:
                     # Read the register as a record.
                     implementations.append(
@@ -358,26 +397,6 @@ end package body;
                             register_array=register_array,
                             value_type=f"{register_name}_t",
                             value_conversion=f"to_{register_name}(reg_value)",
-                        )
-                    )
-                else:
-                    # Read the register as a plain SLV, since it has no fields.
-                    implementations.append(
-                        self._register_read_implementation(
-                            register=register,
-                            register_array=register_array,
-                            value_type="reg_t",
-                            value_conversion="reg_value",
-                        )
-                    )
-
-                    # Read the register as a plain SLV casted to integer.
-                    implementations.append(
-                        self._register_read_implementation(
-                            register=register,
-                            register_array=register_array,
-                            value_type="integer",
-                            value_conversion="to_integer(unsigned(reg_value))",
                         )
                     )
 
@@ -409,6 +428,16 @@ end package body;
                         )
 
             if register.mode.software_can_write:
+                # Write the register as an integer.
+                implementations.append(
+                    self._register_write_implementation(
+                        register=register,
+                        register_array=register_array,
+                        value_type="integer",
+                        value_conversion="std_ulogic_vector(to_unsigned(value, reg_width))",
+                    )
+                )
+
                 if register.fields:
                     # Write the register as a record.
                     implementations.append(
@@ -420,23 +449,15 @@ end package body;
                         )
                     )
                 else:
-                    # Write the register as a plain SLV, since it has no fields.
+                    # Write the register as a plain SLV.
+                    # Only if there are no fields.
+                    # See the signatures method for more info.
                     implementations.append(
                         self._register_write_implementation(
                             register=register,
                             register_array=register_array,
                             value_type="reg_t",
                             value_conversion="value",
-                        )
-                    )
-
-                    # Write the register as an integer.
-                    implementations.append(
-                        self._register_write_implementation(
-                            register=register,
-                            register_array=register_array,
-                            value_type="integer",
-                            value_conversion="std_ulogic_vector(to_unsigned(value, reg_width))",
                         )
                     )
 
