@@ -172,6 +172,8 @@ begin
     elsif run("test_integer_to_slv_out_of_range") then
       -- vunit: .expected_failure
       -- Is outside of the numeric range of the field.
+      -- Aldec Riviera-PRO catches this error during compilation, so if you are running
+      -- these functional tests with that simulator, this needs to be commented out.
       check_equal(to_caesar_config_plain_integer_slv(127), std_logic_vector'("01111111"));
 
     elsif run("test_integer_from_slv") then
