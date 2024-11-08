@@ -259,7 +259,7 @@ def generate_toml_registers(output_path):
 
 
 def generate_doc_registers(output_path):
-    register_list = from_toml(name="counter", toml_file=DOC_SIM_FOLDER / "regs_counter.toml")
+    register_list = from_toml(name="receiver", toml_file=DOC_SIM_FOLDER / "regs_counter.toml")
 
     generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 

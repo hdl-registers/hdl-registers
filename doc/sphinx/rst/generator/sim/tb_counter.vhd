@@ -21,11 +21,11 @@ library bfm;
 
 library reg_file;
 
-use work.counter_register_record_pkg.all;
-use work.counter_register_check_pkg.all;
-use work.counter_register_read_write_pkg.all;
-use work.counter_register_wait_until_pkg.all;
-use work.counter_regs_pkg.all;
+use work.receiver_register_record_pkg.all;
+use work.receiver_register_check_pkg.all;
+use work.receiver_register_read_write_pkg.all;
+use work.receiver_register_wait_until_pkg.all;
+use work.receiver_regs_pkg.all;
 
 
 entity tb_counter is
@@ -51,43 +51,22 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
-    variable config : counter_config_t := counter_config_init;
   begin
     test_runner_setup(runner, runner_cfg);
 
-    -- Check initial state.
-    check_counter_status_enabled_equal(net=>net, expected=>'0');
-    check_counter_status_pulse_count_equal(net=>net, expected=>0);
 
-    if run("test_count_clock_cycles") then
-      config.condition := condition_clock_cycles;
-      config.increment := 13;
+    check_receiver_status_equal(net=>net, expected=>0);
 
-    elsif run("test_count_clock_cycles_with_enable") then
-      config.condition := condition_clock_cycles_with_enable;
-      config.increment := 8;
+    check_receiver_status_equal(
+      net=>net,
+      expected=>(
+        enabled=>'1',
+        calibration_offset=>-18,
+        tdata=>"0111",
+        state=>state_idle
+      )
+    );
 
-      clock_enable <= '1';
-    end if;
-
-    -- Set configuration, which depends on test case.
-    write_counter_config(net=>net, value=>config);
-
-    -- Enable the operation.
-    write_counter_command_start(net=>net, value=>'1');
-
-    -- Check updated status.
-    check_counter_status_enabled_equal(net=>net, expected=>'1');
-    check_counter_status_pulse_count_equal(net=>net, expected=>0);
-
-    -- Wait until a number of pulses have passed.
-    wait_until_counter_status_pulse_count_equals(net=>net, value=>10);
-
-    -- Stop the operation.
-    write_counter_command_stop(net=>net, value=>'1');
-
-    -- Make sure that status is updated.
-    check_counter_status_enabled_equal(net=>net, expected=>'0');
 
     test_runner_cleanup(runner);
   end process;

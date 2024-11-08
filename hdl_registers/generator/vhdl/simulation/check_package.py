@@ -36,11 +36,9 @@ class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
       to a given expected value.
       Expected value can be provided as
 
-      1. bit vector,
+      1. integer, or
 
-      2. integer, or
-
-      3. native VHDL record type as given by :class:`.VhdlRecordPackageGenerator`.
+      2. native VHDL record type as given by :class:`.VhdlRecordPackageGenerator`.
 
     * For each field in each readable register, a procedure that checks that the register field's
       current value is equal to a given natively-typed value.
@@ -132,12 +130,6 @@ end package body;
             )
             declarations = []
 
-            # Check the register value as a plain SLV.
-            signature = self._register_check_signature(
-                register=register, register_array=register_array, value_type="reg_t"
-            )
-            declarations.append(f"{signature};\n")
-
             # Check the register value as a plain SLV casted to integer.
             signature = self._register_check_signature(
                 register=register, register_array=register_array, value_type="integer"
@@ -150,6 +142,12 @@ end package body;
                     register=register,
                     register_array=register_array,
                     value_type=f"{register_name}_t",
+                )
+                declarations.append(f"{signature};\n")
+            else:
+                # Check the register value as a plain SLV.
+                signature = self._register_check_signature(
+                    register=register, register_array=register_array, value_type="reg_t"
                 )
                 declarations.append(f"{signature};\n")
 
@@ -250,13 +248,6 @@ end package body;
             )
             implementations = []
 
-            # Check the register value as a plain SLV.
-            implementations.append(
-                self._register_check_implementation(
-                    register=register, register_array=register_array, value_type="reg_t"
-                )
-            )
-
             # Check the register value as a plain SLV casted to integer.
             implementations.append(
                 self._register_check_implementation(
@@ -271,6 +262,13 @@ end package body;
                         register=register,
                         register_array=register_array,
                         value_type=f"{register_name}_t",
+                    )
+                )
+            else:
+                # Check the register value as a plain SLV.
+                implementations.append(
+                    self._register_check_implementation(
+                        register=register, register_array=register_array, value_type="reg_t"
                     )
                 )
 

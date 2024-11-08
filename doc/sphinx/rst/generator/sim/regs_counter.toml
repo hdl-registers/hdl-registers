@@ -38,10 +38,20 @@ mode = "r"
 enabled.type = "bit"
 enabled.description = "Reads as '1' if operation is enabled."
 
-pulse_count.type = "integer"
-pulse_count.max_value = 255
-pulse_count.description = """
+calibration_offset.type = "integer"
+calibration_offset.min_value = -255
+calibration_offset.max_value = 255
+calibration_offset.description = """
 Number of pulses that have been sent.
 Will wrap around.
 Value will be cleared to zero when **config** register is written.
 """
+
+tdata.type = "bit_vector"
+tdata.width = 4
+
+state.type = "enumeration"
+state.element.idle = "Informational message. Is not considered an error."
+state.element.warning = "Warning message. Is not considered an error."
+state.element.error = "Error message. Is considered an error."
+state.element.failure = "Failure message. Is considered an error."
