@@ -28,6 +28,10 @@ start.description = "Write '1' to start operation."
 
 stop.type = "bit"
 stop.description = "Write '1' to stop operation."
+################################################################################
+[interrupt_status]
+
+mode = "r"
 
 
 ################################################################################

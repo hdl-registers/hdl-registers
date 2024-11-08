@@ -55,8 +55,10 @@ begin
     test_runner_setup(runner, runner_cfg);
 
 
-    check_receiver_status_equal(net=>net, expected=>0);
+    -- Check register value as an integer.
+    check_receiver_interrupt_status_equal(net=>net, expected=>0);
 
+    -- Check native value of each field.
     check_receiver_status_equal(
       net=>net,
       expected=>(
