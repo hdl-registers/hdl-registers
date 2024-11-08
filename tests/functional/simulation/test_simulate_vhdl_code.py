@@ -49,13 +49,16 @@ def test_running_simulation(tmp_path):
     Contains assertions on types and type conversions.
     Shows that the files can be compiled and that the information is correct.
     """
+    vunit_out_path = tmp_path
+    generated_register_path = vunit_out_path / "generated_register"
+
     # Remove any previously-generated register files before the test.
-    for vhd_file in tmp_path.glob("*.vhd"):
+    for vhd_file in generated_register_path.glob("*.vhd"):
         vhd_file.unlink()
 
-    generate_toml_registers(output_path=tmp_path)
-    generate_strange_register_maps(output_path=tmp_path)
-    generate_doc_registers(output_path=tmp_path)
+    generate_toml_registers(output_path=generated_register_path)
+    generate_strange_register_maps(output_path=generated_register_path)
+    generate_doc_registers(output_path=generated_register_path)
 
     def run(args: list[str], exit_code: int, xml_report_path: Path) -> None:
         argv = [
@@ -63,7 +66,7 @@ def test_running_simulation(tmp_path):
             "--num-threads",
             "10",
             "--output-path",
-            str(tmp_path),
+            str(vunit_out_path),
             "--xunit-xml",
             str(xml_report_path),
         ] + args
@@ -79,10 +82,10 @@ def test_running_simulation(tmp_path):
         for vhd_file in DOC_SIM_FOLDER.glob("*.vhd"):
             library.add_source_file(vhd_file)
 
-        for vhd_file in tmp_path.glob("*.vhd"):
+        for vhd_file in generated_register_path.glob("*.vhd"):
             library.add_source_file(vhd_file)
 
-        for module in get_hdl_modules():
+        for module in get_hdl_modules(names_avoid={"hard_fifo"}):
             vunit_library = vunit_proj.add_library(library_name=module.library_name)
             for hdl_file in module.get_simulation_files(include_tests=False):
                 vunit_library.add_source_file(hdl_file.path)
@@ -96,14 +99,14 @@ def test_running_simulation(tmp_path):
     run(
         args=["--without-attribute", ".expected_failure"],
         exit_code=0,
-        xml_report_path=tmp_path / "passing.xml",
+        xml_report_path=vunit_out_path / "passing.xml",
     )
 
     # All these should fail.
     run(
         args=["--with-attribute", ".expected_failure"],
         exit_code=1,
-        xml_report_path=tmp_path / "failing.xml",
+        xml_report_path=vunit_out_path / "failing.xml",
     )
 
     tb_check = "example.tb_check_pkg."
@@ -118,7 +121,7 @@ def test_running_simulation(tmp_path):
     )
 
     check_failed_tests(
-        xml_report_file=tmp_path / "failing.xml",
+        xml_report_file=vunit_out_path / "failing.xml",
         test_outputs={
             f"{tb_check}test_check_register_equal_fail_0": (
                 "ERROR - Checking the 'first' register within the 'dummies[1]' register array. "
@@ -295,5 +298,8 @@ def check_failed_tests(xml_report_file: Path, test_outputs: dict[str, str]) -> N
 
 
 if __name__ == "__main__":
-    vunit_output_path = create_directory(HDL_REGISTERS_GENERATED / "vunit_out", empty=False)
-    test_running_simulation(tmp_path=vunit_output_path)
+    # This file is primarily meant to be run with the 'pytest' runner, but it can also be run
+    # manually as a script.
+    test_running_simulation(
+        tmp_path=create_directory(HDL_REGISTERS_GENERATED / "vunit_out", empty=False)
+    )
