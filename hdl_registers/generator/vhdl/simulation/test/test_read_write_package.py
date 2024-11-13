@@ -122,13 +122,13 @@ def test_read_write_as_integer(tmp_path):
         )
 
     for direction in ["read", "write"]:
-        # Register with or without fields should have a method to access both as integers and SLVs.
         assert check_access_as_integer(direction=direction, name="empty")
         assert check_access_as_slv(direction=direction, name="empty")
         # Empty register does not have a native record type.
         assert not check_access_as_native(direction=direction, name="empty")
 
         assert check_access_as_integer(direction=direction, name="full")
+        # Register with fields does not have a write as SLV function.
         assert check_access_as_slv(direction=direction, name="full") == (direction == "read")
         assert check_access_as_native(direction=direction, name="full")
 
