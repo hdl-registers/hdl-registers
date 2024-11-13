@@ -132,12 +132,6 @@ end package body;
             )
             declarations = []
 
-            # Check the register value as a plain SLV.
-            signature = self._register_check_signature(
-                register=register, register_array=register_array, value_type="reg_t"
-            )
-            declarations.append(f"{signature};\n")
-
             # Check the register value as a plain SLV casted to integer.
             signature = self._register_check_signature(
                 register=register, register_array=register_array, value_type="integer"
@@ -150,6 +144,19 @@ end package body;
                     register=register,
                     register_array=register_array,
                     value_type=f"{register_name}_t",
+                )
+                declarations.append(f"{signature};\n")
+            else:
+                # Check the register value as a plain SLV.
+                # This one is made available only if there are no fields.
+                # This is because there can be a signature ambiguity if both are available
+                # that some compilers can not resolve.
+                # Namely e.g. value=>(field_name => '1').
+                # Where the field is a std_logic.
+                # GHDL gets confused in this case between using the signature with the record
+                # or the one with SLV.
+                signature = self._register_check_signature(
+                    register=register, register_array=register_array, value_type="reg_t"
                 )
                 declarations.append(f"{signature};\n")
 
@@ -250,13 +257,6 @@ end package body;
             )
             implementations = []
 
-            # Check the register value as a plain SLV.
-            implementations.append(
-                self._register_check_implementation(
-                    register=register, register_array=register_array, value_type="reg_t"
-                )
-            )
-
             # Check the register value as a plain SLV casted to integer.
             implementations.append(
                 self._register_check_implementation(
@@ -271,6 +271,13 @@ end package body;
                         register=register,
                         register_array=register_array,
                         value_type=f"{register_name}_t",
+                    )
+                )
+            else:
+                # Check the register value as a plain SLV.
+                implementations.append(
+                    self._register_check_implementation(
+                        register=register, register_array=register_array, value_type="reg_t"
                     )
                 )
 
