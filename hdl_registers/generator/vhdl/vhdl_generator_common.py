@@ -72,7 +72,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
             if isinstance(field.numerical_interpretation, (Signed, Unsigned)):
                 # Plain unsigned/signed vector is a subtype of std_logic_vector.
                 # Hence we can just cast it.
-                return f"std_logic_vector({value})"
+                return f"std_ulogic_vector({value})"
 
             if isinstance(field.numerical_interpretation, Fixed):
                 # Casting function built into ieee.fixed_pkg.
