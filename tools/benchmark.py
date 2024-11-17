@@ -202,7 +202,7 @@ def benchmark_corsair() -> tuple[float, int, str]:
 def benchmark_cheby() -> tuple[float, int, str]:
     """
     Benchmark the "cheby" tool from https://gitlab.cern.ch/be-cem-edl/common/cheby
-    Need to run "python setup.py install --user" in the repo root before.
+    Need to run "python3 setup.py install --user" in the repo root before.
 
     Based on the documentation and the code, this tool is clearly made to be used as a command-line
     program.
