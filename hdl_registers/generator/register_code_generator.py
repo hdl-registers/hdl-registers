@@ -70,6 +70,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
           COMMENT_START = "#"
 
         as a static class member at the top of the class.
+        Note that for some languages you might have to set :attr:`.COMMENT_END` as well.
         """
 
     @property
