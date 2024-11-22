@@ -112,11 +112,12 @@ def profile_generate(output_folder: Path) -> cProfile.Profile:
 
 
 def run_profiling(verbose: bool) -> None:
-    for test_function, name in [
+    tests = [
         (profile_generate, "generate"),
         (profile_parse_json, "parse_json"),
         (profile_parse_toml, "parse_toml"),
-    ]:
+    ]
+    for test_function, name in tests:
         output_folder = create_directory(OUTPUT_FOLDER / name, empty=False)
 
         profiler = test_function(output_folder=output_folder / "files")

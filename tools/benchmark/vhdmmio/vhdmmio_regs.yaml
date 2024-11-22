@@ -4,264 +4,221 @@ metadata:
 fields:
 
 - address: 0
-  name: ctrl
+  name: dummy_reg0
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_1
+  - bitrange: 7..0
+    name: dummy_field0
 
-  - bitrange: 8..1
-    name: dummy_field_2
-
-  - bitrange: 17..9
-    name: dummy_field_3
+  - bitrange: 15..8
+    name: dummy_field1
 
 - address: 4
-  name: stat
-  behavior: status
+  name: dummy_reg1
+  behavior: control
+  bus-write: enabled
+  subfields:
+  - bitrange: 7..0
+    name: dummy_field2
+
+  - bitrange: 15..8
+    name: dummy_field3
 
 - address: 8
-  name: dummy1
+  name: dummy_reg2
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_4
+  - bitrange: 7..0
+    name: dummy_field4
 
-  - bitrange: 8..1
-    name: dummy_field_5
-
-  - bitrange: 17..9
-    name: dummy_field_6
+  - bitrange: 15..8
+    name: dummy_field5
 
 - address: 12
-  name: dummy2
+  name: dummy_reg3
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_7
+  - bitrange: 7..0
+    name: dummy_field6
 
-  - bitrange: 8..1
-    name: dummy_field_8
-
-  - bitrange: 17..9
-    name: dummy_field_9
+  - bitrange: 15..8
+    name: dummy_field7
 
 - address: 16
-  name: dummy3
+  name: dummy_reg4
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_10
+  - bitrange: 7..0
+    name: dummy_field8
 
-  - bitrange: 8..1
-    name: dummy_field_11
-
-  - bitrange: 17..9
-    name: dummy_field_12
+  - bitrange: 15..8
+    name: dummy_field9
 
 - address: 20
-  name: dummy4
+  name: dummy_reg5
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_13
+  - bitrange: 7..0
+    name: dummy_field10
 
-  - bitrange: 8..1
-    name: dummy_field_14
-
-  - bitrange: 17..9
-    name: dummy_field_15
+  - bitrange: 15..8
+    name: dummy_field11
 
 - address: 24
-  name: dummy5
+  name: dummy_reg6
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_16
+  - bitrange: 7..0
+    name: dummy_field12
 
-  - bitrange: 8..1
-    name: dummy_field_17
-
-  - bitrange: 17..9
-    name: dummy_field_18
+  - bitrange: 15..8
+    name: dummy_field13
 
 - address: 28
-  name: dummy6
+  name: dummy_reg7
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_19
+  - bitrange: 7..0
+    name: dummy_field14
 
-  - bitrange: 8..1
-    name: dummy_field_20
-
-  - bitrange: 17..9
-    name: dummy_field_21
+  - bitrange: 15..8
+    name: dummy_field15
 
 - address: 32
-  name: dummy7
+  name: dummy_reg8
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_22
+  - bitrange: 7..0
+    name: dummy_field16
 
-  - bitrange: 8..1
-    name: dummy_field_23
-
-  - bitrange: 17..9
-    name: dummy_field_24
-
+  - bitrange: 15..8
+    name: dummy_field17
 
 - address: 36
-  name: dummy8
+  name: dummy_reg9
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_25
+  - bitrange: 7..0
+    name: dummy_field18
 
-  - bitrange: 8..1
-    name: dummy_field_26
-
-  - bitrange: 17..9
-    name: dummy_field_27
-
+  - bitrange: 15..8
+    name: dummy_field19
 
 - address: 40
-  name: dummy9
+  name: dummy_reg10
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_28
+  - bitrange: 7..0
+    name: dummy_field20
 
-  - bitrange: 8..1
-    name: dummy_field_29
-
-  - bitrange: 17..9
-    name: dummy_field_30
-
+  - bitrange: 15..8
+    name: dummy_field21
 
 - address: 44
-  name: dummy10
+  name: dummy_reg11
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_31
+  - bitrange: 7..0
+    name: dummy_field22
 
-  - bitrange: 8..1
-    name: dummy_field_32
-
-  - bitrange: 17..9
-    name: dummy_field_33
-
+  - bitrange: 15..8
+    name: dummy_field23
 
 - address: 48
-  name: dummy11
+  name: dummy_reg12
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_34
+  - bitrange: 7..0
+    name: dummy_field24
 
-  - bitrange: 8..1
-    name: dummy_field_35
-
-  - bitrange: 17..9
-    name: dummy_field_36
-
+  - bitrange: 15..8
+    name: dummy_field25
 
 - address: 52
-  name: dummy12
+  name: dummy_reg13
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_37
+  - bitrange: 7..0
+    name: dummy_field26
 
-  - bitrange: 8..1
-    name: dummy_field_38
-
-  - bitrange: 17..9
-    name: dummy_field_39
-
+  - bitrange: 15..8
+    name: dummy_field27
 
 - address: 56
-  name: dummy13
+  name: dummy_reg14
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_40
+  - bitrange: 7..0
+    name: dummy_field28
 
-  - bitrange: 8..1
-    name: dummy_field_41
-
-  - bitrange: 17..9
-    name: dummy_field_42
-
+  - bitrange: 15..8
+    name: dummy_field29
 
 - address: 60
-  name: dummy14
+  name: dummy_reg15
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_43
+  - bitrange: 7..0
+    name: dummy_field30
 
-  - bitrange: 8..1
-    name: dummy_field_44
-
-  - bitrange: 17..9
-    name: dummy_field_45
-
+  - bitrange: 15..8
+    name: dummy_field31
 
 - address: 64
-  name: dummy15
+  name: dummy_reg16
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_46
+  - bitrange: 7..0
+    name: dummy_field32
 
-  - bitrange: 8..1
-    name: dummy_field_47
-
-  - bitrange: 17..9
-    name: dummy_field_48
-
+  - bitrange: 15..8
+    name: dummy_field33
 
 - address: 68
-  name: dummy16
+  name: dummy_reg17
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_49
+  - bitrange: 7..0
+    name: dummy_field34
 
-  - bitrange: 8..1
-    name: dummy_field_50
-
-  - bitrange: 17..9
-    name: dummy_field_51
-
+  - bitrange: 15..8
+    name: dummy_field35
 
 - address: 72
-  name: dummy17
+  name: dummy_reg18
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_52
+  - bitrange: 7..0
+    name: dummy_field36
 
-  - bitrange: 8..1
-    name: dummy_field_53
-
-  - bitrange: 17..9
-    name: dummy_field_54
-
+  - bitrange: 15..8
+    name: dummy_field37
 
 - address: 76
-  name: dummy18
+  name: dummy_reg19
   behavior: control
+  bus-write: enabled
   subfields:
-  - bitrange: 0
-    name: dummy_field_55
+  - bitrange: 7..0
+    name: dummy_field38
 
-  - bitrange: 8..1
-    name: dummy_field_56
-
-- address: 80
-  name: dummy19
-  behavior: control
+  - bitrange: 15..8
+    name: dummy_field39

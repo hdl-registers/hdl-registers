@@ -3,181 +3,141 @@
     byte_size: 128
 
   - register:
-    - name: dummy0
+    - name: dummy_reg0
       offset_address: 0
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy1
+    - name: dummy_reg1
       offset_address: 4
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy2
+    - name: dummy_reg2
       offset_address: 8
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy3
+    - name: dummy_reg3
       offset_address: 12
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy4
+    - name: dummy_reg4
       offset_address: 16
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy5
+    - name: dummy_reg5
       offset_address: 20
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy6
+    - name: dummy_reg6
       offset_address: 24
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy7
+    - name: dummy_reg7
       offset_address: 28
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy8
+    - name: dummy_reg8
       offset_address: 32
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy9
+    - name: dummy_reg9
       offset_address: 36
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy10
+    - name: dummy_reg10
       offset_address: 40
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy11
+    - name: dummy_reg11
       offset_address: 44
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy12
+    - name: dummy_reg12
       offset_address: 48
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy13
+    - name: dummy_reg13
       offset_address: 52
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy14
+    - name: dummy_reg14
       offset_address: 56
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy15
+    - name: dummy_reg15
       offset_address: 60
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy16
+    - name: dummy_reg16
       offset_address: 64
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy17
+    - name: dummy_reg17
       offset_address: 68
       bit_fields:
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0}
-      - {name: dummy3, bit_assignment: {lsb: 9, width: 1}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy18
+    - name: dummy_reg18
       offset_address: 72
       bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
 
   - register:
-    - name: dummy19
+    - name: dummy_reg19
       offset_address: 76
       bit_fields:
-      - {name: dummy2, bit_assignment: {lsb: 8, width: 1}, type: rw, initial_value: 0,}
-
-
-  - register:
-    - name: dummy20
-      offset_address: 80
-      bit_fields:
-      - {name: dummy1, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0,}
-
+      - {name: dummy_field0, bit_assignment: {lsb: 0, width: 8}, type: rw, initial_value: 0}
+      - {name: dummy_field1, bit_assignment: {lsb: 8, width: 8}, type: rw, initial_value: 0}
