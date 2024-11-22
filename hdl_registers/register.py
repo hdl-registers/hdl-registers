@@ -57,6 +57,13 @@ class Register:
         self.fields: list["RegisterField"] = []
         self.bit_index = 0
 
+    @property
+    def width(self) -> int:
+        if not self.fields:
+            return 32
+
+        return self.fields[-1].base_index + self.fields[-1].width
+
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """
         Append a bit field to this register.
