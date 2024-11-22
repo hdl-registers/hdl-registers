@@ -1,0 +1,258 @@
+################################################################################
+[dummy_reg0]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg1]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg2]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg3]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg4]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg5]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg6]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg7]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg8]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg9]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg10]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg11]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg12]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg13]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg14]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg15]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg16]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg17]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg18]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8
+
+
+################################################################################
+[dummy_reg19]
+
+mode = "r_w"
+description = "A plain **dummy** register."
+
+dummy_field0.type = "bit_vector"
+dummy_field0.width = 8
+
+dummy_field1.type = "bit_vector"
+dummy_field1.width = 8

@@ -7,408 +7,262 @@ addrmap atxmega_spi {
     default hw = r;
 
     reg {
-        name = "Control Register";
+        desc = "Dummy register";
 
         field {
-            desc = "Controls the SPI clock rate when configured in master mode";
-        } PRESCALER[1:0] = 0;
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            desc = "These bits select the transfer mode";
-        } MODE[3:2] = 0;
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-        field {
-            desc = "Selects master mode when written to one, and slave mode when
-            written to zero. If SS is configured as an input and driven low while
-            master mode is set, master mode will be cleared";
-
-            hw=rw; we;
-        } MASTER[4:4] = 0;
-
-        field {
-            desc = "DORD decides the data order when a byte is shifted out from
-            the DATA register. When DORD is written to one, the least-significant
-            bit (lsb) of the data byte is transmitted first, and when DORD is
-            written to zero, the most-significant bit (msb) of the data byte is
-            transmitted first";
-        } DORD[5:5] = 0;
-
-        field {
-            desc = "Setting this bit enables the SPI module. This bit must be
-            set to enable any SPI operations";
-        } ENABLE[6:6] = 0;
-
-        field {
-            desc = "When this bit is set, the SPI speed (SCK frequency) will be
-            doubled in master mode";
-        } CLK2X[7:7] = 0;
-    } CTRL;
+    } dummy_reg0;
 
     reg {
-        name = "Interrupt Control";
+        desc = "Dummy register";
 
         field {
-            desc = "These bits enable the SPI interrupt and select the interrupt level";
-        } INTLVL[1:0] = 0;
-    } INTCTRL;
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
+
+        field {
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
+
+    } dummy_reg1;
 
     reg {
-        field {
-            sw=r; hw=rw; we;
-        } WRCOL[6:6] = 0;
+        desc = "Dummy register";
 
         field {
-            sw=r; hw=rw; we;
-        } IF[7:7] = 0;
-    } STATUS;
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
+
+        field {
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
+
+    } dummy_reg2;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA;
+    } dummy_reg3;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA2;
+    } dummy_reg4;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA3;
+    } dummy_reg5;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA4;
+    } dummy_reg6;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA5;
+    } dummy_reg7;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA6;
+    } dummy_reg8;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA7;
+    } dummy_reg9;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA8;
+    } dummy_reg10;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA9;
+    } dummy_reg11;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA10;
+    } dummy_reg12;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA11;
+    } dummy_reg13;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA12;
+    } dummy_reg14;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA13;
+    } dummy_reg15;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA14;
+    } dummy_reg16;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA15;
+    } dummy_reg17;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA16;
+    } dummy_reg18;
 
     reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
+        desc = "Dummy register";
 
         field {
-            sw=w; hw=r;
-        } WDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field0[7:0];
 
         field {
-            sw=r; hw=w;
-        } RDATA[7:0];
+            sw=rw; hw=r;
+        } dummy_field1[15:8];
 
-    } DATA17;
-
-    reg {
-        desc = "The DATA register is used for sending and receiving data.
-        Writing to the register initiates the data transmission, and the byte
-        written to the register will be shifted out on the SPI output line.
-        Reading the register causes the shift register receive buffer to be read,
-        returning the last byte successfully received";
-
-        field {
-            sw=w; hw=r;
-        } WDATA[7:0];
-
-        field {
-            sw=r; hw=w;
-        } RDATA[7:0];
-
-        field {
-            sw=r; hw=w;
-        } RDATA2[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA3[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA4[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA5[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA6[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA7[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA8[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA9[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA10[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA11[2];
-
-        field {
-            sw=r; hw=w;
-        } RDATA12[2];
-
-    } DATA18;
+    } dummy_reg19;
 };
