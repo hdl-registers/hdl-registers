@@ -198,6 +198,25 @@ def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
         assert "Assertion `field_value >= -51' failed." in result.stderr, result.stderr
 
 
+def test_setting_cpp_bit_field_out_of_range_should_crash(base_cpp_test):
+    test_code = """\
+  caesar.set_config_plain_bit_a(1);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  caesar.set_config_plain_bit_a(2);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError):
+        result = run_command(cmd=cmd, capture_output=True)
+        assert result.stdout == ""
+        assert (
+            "Assertion `field_value & mask_at_base_inverse == 0' failed." in result.stderr
+        ), result.stderr
+
+
 def test_setting_cpp_bit_vector_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
   caesar.set_config_plain_bit_vector(15);
