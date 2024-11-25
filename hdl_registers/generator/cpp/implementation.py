@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 # First party libraries
+from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
@@ -229,7 +230,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
 """
 
-        if isinstance(field, BitVector):
+        if isinstance(field, (Bit, BitVector)):
             return f"""\
     {comment}
     const uint32_t mask_at_base_inverse = ~mask_at_base;
