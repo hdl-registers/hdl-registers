@@ -168,30 +168,32 @@ def test_ufixed(max_bit_index, min_bit_index, value, exp_uint, exp_return):
 
 
 @pytest.mark.parametrize(
-    "max_bit_index, min_bit_index, value, expected",
+    "max_bit_index, min_bit_index, value, expected, expected_restored",
     [
-        (-1, -2, -0.25, 0b11),
-        (-1, -2, 0.25, 0b01),
-        (4, -4, 9.75, 0b010011100),
-        (5, -4, -13.8125, 0b1100100011),
-        (9, 8, 256.0, 0b01),
-        (9, 8, -256.0, 0b11),
-        (-2, -3, -0.125, 0b11),
-        (-3, -4, -0.0625, 0b11),
-        (4, -5, -6.5, 0b1100110000),
+        (-1, -2, -0.25, 0b11, -0.25),
+        (-1, -2, 0.25, 0b01, 0.25),
+        (4, -4, 9.75, 0b010011100, 9.75),
+        (5, -4, -13.8125, 0b1100100011, -13.8125),
+        (9, 8, 256.0, 0b01, 256.0),
+        (9, 8, -256.0, 0b11, -256.0),
+        (-2, -3, -0.125, 0b11, -0.125),
+        (-3, -4, -0.0625, 0b11, -0.0625),
+        (4, -5, -6.5, 0b1100110000, -6.5),
+        (8, -3, -0.01, 0, 0.0),
     ],
 )
-def test_sfixed(max_bit_index, min_bit_index, value, expected):
+def test_sfixed(max_bit_index, min_bit_index, value, expected, expected_restored):
     numerical_interpretation = SignedFixedPoint(
         max_bit_index=max_bit_index, min_bit_index=min_bit_index
     )
     numerical_interpretation._check_native_value_in_range(value)
 
     unsigned = numerical_interpretation.convert_to_unsigned_binary(value)
+    assert unsigned.bit_length() <= numerical_interpretation.bit_width
     assert unsigned == expected
 
     restored = numerical_interpretation.convert_from_unsigned_binary(unsigned)
-    assert restored == value
+    assert restored == expected_restored
 
 
 @pytest.mark.parametrize(

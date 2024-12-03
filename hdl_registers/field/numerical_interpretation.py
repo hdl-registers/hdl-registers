@@ -107,7 +107,7 @@ def to_unsigned_binary(
         raise ValueError("Inconsistent bit width")
 
     binary_value: int = round(value * 2**num_fractional_bits)
-    if value < 0:
+    if binary_value < 0:
         if is_signed:
             binary_value += 1 << num_bits
         else:
