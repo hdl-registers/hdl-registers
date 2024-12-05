@@ -19,12 +19,11 @@ While there have always been :ref:`other tools <similar_tools>` available, the a
 clear list of requirements that was not, and is not, fulfilled by any other project.
 
 1. Very fast.
-   So that HDL register code generation can be done automatically before each simulation or build,
+   So that HDL code generation can be done automatically before each simulation or build,
    not as a separate step.
 2. No hard-coded numbers done by hand.
    Everything should be calculated or inferred:
-   Register addresses, field bit indexes, integer/enumeration field widths,
-   enumeration element encodings, etc.
+   Register addresses, field bit indexes, integer/enumeration widths, enumeration encodings, etc.
 3. Bloat-free.
    Meaning, well-scoped and focused on the important features.
 4. Clean, intuitive, well-documented and easy-to-use API.

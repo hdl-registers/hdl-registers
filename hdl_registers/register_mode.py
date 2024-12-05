@@ -79,7 +79,7 @@ class RegisterMode:
         Arguments:
             shorthand: A short string that can be used to refer to this mode.
                 E.g. "r".
-            name: A short but human-readable readable representation of this mode.
+            name: A short but human-readable representation of this mode.
                 E.g. "Read".
             description: Textual description and explanation of this mode.
             software_can_read: True if register is readable by software on the register bus.
