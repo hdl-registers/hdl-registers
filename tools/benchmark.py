@@ -11,7 +11,6 @@
 #                       Tool | Generate time | Time relative (lower is better) |
 # ---------------------------+---------------+---------------------------------+
 #  hdl-registers (6.2.1-dev) |       12.1 ms |                   1x (baseline) |
-# hdl-registers2 (6.2.1-dev) |       18.7 ms |                              1x |
 #           cheby (1.6.dev0) |       1.96  s |                            161x |
 #            corsair (1.0.4) |       2.36  s |                            194x |
 #            PeakRDL (1.1.0) |       7.05  s |                            582x |
@@ -22,12 +21,119 @@
 #    LUT |   FF | LUT+FF relative (lower is better)
 # -------+------+----------------------------------
 #    259 |  713 |                     1x (baseline)
-#    411 |  742 |                              1.2x
 #    136 |  428 |                             0.58x
 #    168 |  409 |                             0.59x
 #    383 |  392 |                              0.8x
 #    628 |  372 |                                1x
 #    304 |  440 |                             0.77x
+#
+#
+# With only two registers:
+#
+#  hdl-registers (6.2.1-dev) |    33 |  113 |
+#           cheby (1.6.dev0) |    24 |  110 |
+#            corsair (1.0.4) |    43 |  121 |
+#
+# With four registers and optimization:
+#
+# -----------------------------------------------------------------------------
+#                       Tool |   LUT |   FF | LUT+FF relative (lower is better)
+# ---------------------------+-------+------+----------------------------------
+#  hdl-registers (6.2.1-dev) |    33 |   81 |                     1x (baseline)
+#           cheby (1.6.dev0) |    37 |  147 |                              1.6x
+#            corsair (1.0.4) |    66 |  153 |                              1.9x
+#
+# With 8 registers and optimization:
+#
+# hdl-registers (6.2.1-dev) |    56 |  151 |                     1x (baseline)
+#          cheby (1.6.dev0) |    60 |  218 |                              1.3x
+#           corsair (1.0.4) |    91 |  217 |                              1.5x
+#
+# LUT increase 4-8:
+# hdl-registers: 23
+# cheby: 23
+# corsair: 25
+#
+# FF overhead increase 4->8 (FF_8 - FF_4 - 4 * 16):
+# hdl-registers: 6
+# cheby: 7
+# corsair: 0
+#
+# With 20 registers and optimization:
+#
+# -----------------------------------------------------------------------------
+#                       Tool |   LUT |   FF | LUT+FF relative (lower is better)
+# ---------------------------+-------+------+----------------------------------
+#  hdl-registers (6.2.1-dev) |   148 |  360 |                     1x (baseline)
+#           cheby (1.6.dev0) |   136 |  428 |                              1.1x
+#            corsair (1.0.4) |   168 |  409 |                              1.1x
+#
+# LUT increase 8->20:
+# hdl-registers: 92
+# cheby: 76
+# corsair: 77
+#
+# FF overhead increase 8->20 (FF_20 - FF_8 - 12 * 16):
+# hdl-registers: 17
+# cheby: 18
+# corsair: 0
+#
+# With 8 registers and optimization, and no reg_was_accessed:
+#  hdl-registers (6.2.1-dev) |    52 |  143 |                     1x (baseline)
+#
+# With 20 registers and optimization, and no reg_was_accessed:
+#  hdl-registers (6.2.1-dev) |   128 |  340 |                     1x (baseline)
+#
+# With 20 registers, no optimization, and no reg_was_accessed:
+#  hdl-registers (6.2.1-dev) |   231 |  693 |                     1x (baseline)
+# No reg_was_accessed saves 28 LUTs and 20 FFs.
+#
+# With 20 registers, optimization, no reg_was_accessed, and read default value 0:
+#  hdl-registers (6.2.1-dev) |   128 |  340 |                     1x (baseline)
+# I.e. no change. I.e. it is safe to set to 0.
+#
+# Assigning only the parts of regs_down that are actually used yielded no difference.
+#
+# 20, optimization, no reg_was_accessed:
+# -----------------------------------------------------------------------------
+#                       Tool |   LUT |   FF | LUT+FF relative (lower is better)
+# ---------------------------+-------+------+----------------------------------
+#  hdl-registers (6.2.1-dev) |   128 |  340 |                     1x (baseline)
+#           cheby (1.6.dev0) |   136 |  428 |                              1.2x
+#            corsair (1.0.4) |   168 |  409 |                              1.2x
+#            PeakRDL (1.1.0) |   383 |  392 |                              1.7x
+#               rggen (0.33) |   628 |  372 |                              2.1x
+#            vhdmmio (0.0.3) |   304 |  440 |                              1.6x
+#
+# 16 reg, 16 bit, optimization, no:
+#  hdl-registers (6.2.1-dev) |       10.5 ms |                   1x (baseline) |
+#           cheby (1.6.dev0) |       1.88  s |                            178x |
+#            corsair (1.0.4) |       2.34  s |                            223x |
+#            PeakRDL (1.1.0) |        6.9  s |                            657x |
+#               rggen (0.33) |       7.31  s |                            696x |
+#            vhdmmio (0.0.3) |        9.4  s |                            896x |
+#
+#    89 |  273 |                     1x (baseline)
+#    98 |  357 |                              1.3x
+#   136 |  345 |                              1.3x
+#   341 |  326 |                              1.8x
+#   497 |  308 |                              2.2x
+#   262 |  376 |                              1.8x
+#
+# 16 reg, 18 bit, optimization, no:
+# hdl-registers (6.2.1-dev) |       10.5 ms |                   1x (baseline) |
+#          cheby (1.6.dev0) |       1.88  s |                            179x |
+#           corsair (1.0.4) |       2.34  s |                            222x |
+#           PeakRDL (1.1.0) |        6.9  s |                            657x |
+#              rggen (0.33) |       7.34  s |                            699x |
+#           vhdmmio (0.0.3) |        9.4  s |                            895x |
+#
+#    97 |  305 |                     1x (baseline)
+#   106 |  397 |                              1.3x
+#   175 |  385 |                              1.4x
+#   376 |  365 |                              1.8x
+#   594 |  344 |                              2.3x
+#   285 |  416 |                              1.7x
 # --------------------------------------------------------------------------------------------------
 
 # Standard libraries
