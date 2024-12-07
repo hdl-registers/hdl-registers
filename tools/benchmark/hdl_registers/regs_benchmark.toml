@@ -5,10 +5,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -18,10 +18,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -31,10 +31,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -44,10 +44,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -57,10 +57,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -70,10 +70,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -83,10 +83,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -96,10 +96,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -109,10 +109,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -122,10 +122,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -135,10 +135,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -148,10 +148,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -161,10 +161,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -174,10 +174,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -187,10 +187,10 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9
 
 
 ################################################################################
@@ -200,59 +200,7 @@ mode = "r_w"
 description = "A plain **dummy** register."
 
 dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
+dummy_field0.width = 9
 
 dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
-
-
-################################################################################
-[dummy_reg16]
-
-mode = "r_w"
-description = "A plain **dummy** register."
-
-dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
-
-dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
-
-
-################################################################################
-[dummy_reg17]
-
-mode = "r_w"
-description = "A plain **dummy** register."
-
-dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
-
-dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
-
-
-################################################################################
-[dummy_reg18]
-
-mode = "r_w"
-description = "A plain **dummy** register."
-
-dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
-
-dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
-
-
-################################################################################
-[dummy_reg19]
-
-mode = "r_w"
-description = "A plain **dummy** register."
-
-dummy_field0.type = "bit_vector"
-dummy_field0.width = 8
-
-dummy_field1.type = "bit_vector"
-dummy_field1.width = 8
+dummy_field1.width = 9

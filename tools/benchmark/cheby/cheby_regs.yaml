@@ -12,12 +12,12 @@ memory-map:
       - field:
           name: dummy_field0
           comment: Dummy field
-          range: 7-0
+          range: 8-0
 
       - field:
           name: dummy_field1
           comment: Dummy field
-          range: 15-8
+          range: 17-9
   - reg:
       name: dummy_reg1
       comment: Counter control
@@ -27,12 +27,12 @@ memory-map:
       - field:
           name: dummy_field0
           comment: Dummy field
-          range: 7-0
+          range: 8-0
 
       - field:
           name: dummy_field1
           comment: Dummy field
-          range: 15-8
+          range: 17-9
   - reg:
       name: dummy_reg2
       comment: Counter control
@@ -42,12 +42,12 @@ memory-map:
       - field:
           name: dummy_field0
           comment: Dummy field
-          range: 7-0
+          range: 8-0
 
       - field:
           name: dummy_field1
           comment: Dummy field
-          range: 15-8
+          range: 17-9
   - reg:
         name: dummy_reg3
         comment: Counter control
@@ -57,12 +57,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg4
         comment: Counter control
@@ -72,12 +72,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg5
         comment: Counter control
@@ -87,12 +87,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg6
         comment: Counter control
@@ -102,12 +102,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg7
         comment: Counter control
@@ -117,12 +117,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg8
         comment: Counter control
@@ -132,12 +132,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg9
         comment: Counter control
@@ -147,12 +147,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg10
         comment: Counter control
@@ -162,12 +162,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg11
         comment: Counter control
@@ -177,12 +177,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
 
   - reg:
         name: dummy_reg12
@@ -193,12 +193,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg13
         comment: Counter control
@@ -208,12 +208,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg14
         comment: Counter control
@@ -223,12 +223,12 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
+            range: 17-9
   - reg:
         name: dummy_reg15
         comment: Counter control
@@ -238,69 +238,9 @@ memory-map:
         - field:
             name: dummy_field0
             comment: Dummy field
-            range: 7-0
+            range: 8-0
 
         - field:
             name: dummy_field1
             comment: Dummy field
-            range: 15-8
-  - reg:
-        name: dummy_reg16
-        comment: Counter control
-        width: 32
-        access: rw
-        children:
-        - field:
-            name: dummy_field0
-            comment: Dummy field
-            range: 7-0
-
-        - field:
-            name: dummy_field1
-            comment: Dummy field
-            range: 15-8
-  - reg:
-        name: dummy_reg17
-        comment: Counter control
-        width: 32
-        access: rw
-        children:
-        - field:
-            name: dummy_field0
-            comment: Dummy field
-            range: 7-0
-
-        - field:
-            name: dummy_field1
-            comment: Dummy field
-            range: 15-8
-  - reg:
-        name: dummy_reg18
-        comment: Counter control
-        width: 32
-        access: rw
-        children:
-        - field:
-            name: dummy_field0
-            comment: Dummy field
-            range: 7-0
-
-        - field:
-            name: dummy_field1
-            comment: Dummy field
-            range: 15-8
-  - reg:
-        name: dummy_reg19
-        comment: Counter control
-        width: 32
-        access: rw
-        children:
-        - field:
-            name: dummy_field0
-            comment: Dummy field
-            range: 7-0
-
-        - field:
-            name: dummy_field1
-            comment: Dummy field
-            range: 15-8
+            range: 17-9

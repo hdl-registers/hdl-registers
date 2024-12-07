@@ -115,7 +115,7 @@ def main():  # pylint: disable=too-many-locals
         )
 
         # Equivalent time for the pre-defined number of runs.
-        time_for_runs_s = time_per_run_s * NUM_RUNS
+        time_for_runs_s = NUM_RUNS * time_per_run_s
 
         tool = f"{name} ({tool_version})"
 
@@ -140,7 +140,7 @@ def main():  # pylint: disable=too-many-locals
 
         print(
             f"{tool:>26} | {execution_time:>13} | {relative_time:>31} | "
-            f"{lut:>5} | {ff:>4} | {relative_usage:>33}"
+            f"{NUM_RUNS * lut:>5} | {NUM_RUNS * ff:>4} | {relative_usage:>33}"
         )
 
 
@@ -227,7 +227,7 @@ def build(registers_folder: Path, build_folder: Path, top: str) -> tuple[int, in
 def benchmark_hdl_registers(  # pylint: disable=too-many-locals
     toml_file: Path,
     output_folder: Path,
-    generate_all: bool,
+    test_comparable: bool,
     skip_time: bool,
     skip_resource_usage: bool,
 ) -> tuple[str, float, int, int]:
@@ -287,7 +287,7 @@ def benchmark_hdl_registers(  # pylint: disable=too-many-locals
             register_list=register_list, output_folder=registers_folder
         ).create_if_needed()
 
-    run_test = run_test_all if generate_all else run_test_comparable
+    run_test = run_test_comparable if test_comparable else run_test_all
 
     # Run once initially so that artifacts are created.
     # Suppress the printouts, so this script prints only a nice table.
@@ -308,9 +308,19 @@ def benchmark_hdl_registers(  # pylint: disable=too-many-locals
     if skip_resource_usage:
         (lut, ff) = (1, 1)
     else:
-        lut, ff = build(
-            registers_folder=registers_folder, build_folder=build_folder, top="test_reg_file"
-        )
+        if test_comparable:
+            # Use a register file wrapper that does not route the 'reg_was_read' and
+            # 'reg_was_written' signals.
+            # Since (most of) the other tools do not have this feature, excluding these
+            # signals makes the comparison more fair.
+            top = "test_reg_file_wrapper"
+            copy2(
+                BENCHMARK_FOLDER / "hdl_registers" / f"{top}.vhd", registers_folder / f"{top}.vhd"
+            )
+        else:
+            top = "test_reg_file"
+
+        lut, ff = build(registers_folder=registers_folder, build_folder=build_folder, top=top)
 
     return __version__, time_s, lut, ff
 
@@ -324,7 +334,7 @@ def benchmark_hdl_registers_comparable(
     return benchmark_hdl_registers(
         toml_file=BENCHMARK_FOLDER / "hdl_registers" / "regs_benchmark.toml",
         output_folder=output_folder,
-        generate_all=False,
+        test_comparable=True,
         skip_time=skip_time,
         skip_resource_usage=skip_resource_usage,
     )
@@ -347,7 +357,7 @@ def benchmark_hdl_registers_typical(
     return benchmark_hdl_registers(
         toml_file=HDL_REGISTERS_TESTS / "regs_test.toml",
         output_folder=output_folder,
-        generate_all=True,
+        test_comparable=False,
         skip_time=skip_time,
         skip_resource_usage=skip_resource_usage,
     )
@@ -533,7 +543,7 @@ def benchmark_vhdmmio(
         time_s = 1
     else:
         # A decent number of runs that gives representative data.
-        num_iterations = 10
+        num_iterations = 15
 
         # Suppress the printouts so this script prints only a nice table.
         with contextlib.redirect_stdout(None):
