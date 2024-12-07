@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        py: ['3.9', '3.10', '3.11', '3.12']
+        py: ['3.9', '3.10', '3.11', '3.12', '3.13']
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -66,18 +66,18 @@ jobs:
     # Run only the UNIT tests on most Python versions in the matrix.
     # This is very fast (2-3 s).
     - name: Run unit tests
-      if: matrix.os != 'ubuntu-latest' || matrix.py != '3.9'
+      if: matrix.os != 'ubuntu-latest' || matrix.py != '3.13'
       run: |
         python3 -m pytest --verbose hdl_registers
 
     # On one Python version however, we run ALL the Python-based tests, which requires a few more
     # dependencies, and then we collect coverage from this run.
     - name: Setup GHDL
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
       uses: ghdl/setup-ghdl-ci@nightly
 
     - name: Install further Python packages
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
       run: |
         python3 -m pip install \
           black \
@@ -94,7 +94,7 @@ jobs:
     # Run ALL tests, including unit, lint and functional ones.
     # The execution time goes from 1:13 -> 0:50 when two threads are used.
     - name: Run all tests
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
       run: |
         python3 -m pytest \
           --verbose \
@@ -106,7 +106,7 @@ jobs:
           tests
 
     - name: Upload coverage artifacts
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.9'
+      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
       uses: actions/upload-artifact@v3
       with:
         name: coverage
@@ -128,7 +128,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.12
+        python-version: 3.13
         cache: pip
         cache-dependency-path: hdl_registers/requirements_develop.txt
 
@@ -219,7 +219,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: pip
           cache-dependency-path: hdl_registers/requirements_develop.txt
 
