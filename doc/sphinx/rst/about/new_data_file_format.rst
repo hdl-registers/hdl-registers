@@ -3,8 +3,8 @@
 New data file format in version 6.0.0
 =====================================
 
-In version 6.0.0 of hdl-registers, the data file (TOML, JSON, etc) format is updated in a way
-that is not compatible with older files.
+In version 6.0.0 of hdl-registers (released 2024-08-25), the data file
+(TOML, JSON, etc) format is updated in a way that is not compatible with older files.
 This is done to enable the most requested feature in the history of the tool:
 The ability to group register fields arbitrarily, and not by field type.
 This is discussed in `#116 <https://github.com/hdl-registers/hdl-registers/issues/116>`__.
@@ -13,7 +13,7 @@ When the register parser in hdl-registers encounters an old data file, it will b
 upgraded to the new format.
 The updated file will be saved next to the old file so that the user can inspect all changes
 that were made.
-Note that any comments or manual editing of the data file will be lost.
+Note that any comments or manual formatting in the original data file will be lost.
 
 
 
@@ -30,7 +30,7 @@ You can right-click and open to view in full size.
 Background
 ----------
 
-Before version 6.0.0 and since 2017, data was formatted like this:
+Before version 6.0.0 and since 2017, data was formatted e.g. like this:
 
   **register**.register_name.\ **mode**
 
