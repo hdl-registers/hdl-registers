@@ -75,7 +75,75 @@ read back over the bus and then modified: "write only", "write pulse", and "read
 The field setters for registers of this mode will write all bits outside of the current field
 as zero.
 This can for example be seen in the setter ``set_channels_configuration_enable()`` in the generated
-code below.
+code :ref:`below <cpp_implementation>`.
+
+
+.. _cpp_assertion_macros:
+
+Assertion macros
+----------------
+
+There are a few register-related things that can go wrong in an embedded system:
+
+1. An error in hardware might result in the reading of a field value that is out of bounds.
+   This is mostly possible for :ref:`enumeration <field_enumeration>` and
+   :ref:`integer <field_integer>` fields.
+
+2. An error in software might result in the writing of a field value that is out of bounds.
+
+3. An error in the software might result in a :ref:`register array <basic_feature_register_array>`
+   read/write with an index that is out of bounds.
+
+The generated C++ checks all these things using custom assertion macros.
+Meaning, these errors can be detected at runtime as well as in unit tests.
+The details of these macros can be seen at the top of the
+:ref:`C++ implementation file <cpp_implementation>`.
+
+All three of these error conditions will call a user-specified handler function, which must be
+implemented by the user.
+One argument is provided that contains a descriptive error message.
+All these functions must return a boolean ``true``.
+
+1. If an out-of-bounds field value is read, the ``register_setter_assert_fail`` function is called.
+2. If an out-of-bounds field value is written, the ``register_getter_assert_fail`` function
+   is called.
+3. If an out-of-bounds array index is used, the ``register_array_index_assert_fail`` function
+   is called.
+
+In these functions, the user could e.g. perform a controlled shutdown, call a custom logger,
+throw exceptions, etc.
+
+
+Minimal example
+_______________
+
+A minimal and somewhat unrealistic handler function is shown below.
+More advanced handler functions are left to the user.
+
+.. code-block:: C++
+
+  bool register_getter_assert_fail(std::string diagnostic_message)
+  {
+    std::cerr << diagnostic_message << std::endl;
+    std::exit(EXIT_FAILURE);
+    return true;
+  }
+
+
+Disabling assertions
+____________________
+
+The assertions add to the binary size and to the runtime.
+The user can disable the assertions by defining the following macros
+(usually with the ``-D`` compiler flag):
+
+1. ``NO_REGISTER_GETTER_ASSERT``
+
+2. ``NO_REGISTER_SETTER_ASSERT``
+
+3. ``NO_REGISTER_ARRAY_INDEX_ASSERT``
+
+This should result in no overhead.
 
 
 .. _interface_header:
@@ -103,6 +171,9 @@ Below is the generated class header:
   :language: C++
   :linenos:
 
+
+
+.. _cpp_implementation:
 
 Implementation
 --------------

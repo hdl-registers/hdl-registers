@@ -35,6 +35,29 @@ class BaseCppTest(CompileAndRunTest):
 
 {includes}
 
+namespace fpga_regs {{
+  bool register_getter_assert_fail(std::string diagnostic_message)
+  {{
+    std::cerr << "getter: " << diagnostic_message << std::endl;
+    std::exit(EXIT_FAILURE);
+    return true;
+  }}
+
+  bool register_setter_assert_fail(std::string diagnostic_message)
+  {{
+    std::cerr << "setter: " << diagnostic_message << std::endl;
+    std::exit(EXIT_FAILURE);
+    return true;
+  }}
+
+  bool register_array_index_assert_fail(std::string diagnostic_message)
+  {{
+    std::cerr << "array_index: " << diagnostic_message << std::endl;
+    std::exit(EXIT_FAILURE);
+    return true;
+  }}
+}}
+
 int main()
 {{
   uint32_t memory[fpga_regs::Caesar::num_registers];
@@ -47,9 +70,26 @@ int main()
 }}
 """
 
-    def compile(self, test_code, include_directories=None, source_files=None, includes=""):
+    def compile(  # pylint: disable=too-many-arguments
+        self,
+        test_code,
+        include_directories=None,
+        source_files=None,
+        includes="",
+        no_getter_assert=False,
+        no_setter_assert=False,
+        no_array_index_assert=False,
+    ):
         include_directories = [] if include_directories is None else include_directories
         source_files = [] if source_files is None else source_files
+
+        defines = []
+        if no_getter_assert:
+            defines.append("-DNO_REGISTER_GETTER_ASSERT")
+        if no_setter_assert:
+            defines.append("-DNO_REGISTER_SETTER_ASSERT")
+        if no_array_index_assert:
+            defines.append("-DNO_REGISTER_ARRAY_INDEX_ASSERT")
 
         CppInterfaceGenerator(self.register_list, self.include_dir).create()
         CppHeaderGenerator(self.register_list, self.include_dir).create()
@@ -70,6 +110,7 @@ int main()
             ]
             + [f"-I{path}" for path in include_directories]
             + source_files
+            + defines
         )
 
         create_file(file=main_file, contents=self.get_main(includes=includes, test_code=test_code))
@@ -115,58 +156,96 @@ def cpp_test(tmp_path):
     return CppTest(tmp_path=tmp_path)
 
 
-def test_cpp_with_registers_and_constants(cpp_test):
+def test_registers_and_constants(cpp_test):
     cpp_test.compile_and_run(test_registers=True, test_constants=True)
 
 
-def test_cpp_with_only_registers(cpp_test):
+def test_only_registers(cpp_test):
     cpp_test.register_list.constants = []
     cpp_test.compile_and_run(test_registers=True, test_constants=False)
 
 
-def test_cpp_with_only_constants(cpp_test):
+def test_only_constants(cpp_test):
     cpp_test.register_list.register_objects = []
     cpp_test.compile_and_run(test_registers=False, test_constants=True)
 
 
-def test_setting_cpp_register_array_out_of_bounds_should_crash(base_cpp_test):
+def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
     test_code = """\
   // Index 3 is out of bounds (should be less than 3)
   caesar.set_dummies_first(3, 1337);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "array_index: Provided array index out of range in "
+        f"{base_cpp_test.working_dir}/caesar.cpp:1278, message: "
+        "'dummies' array index out of range, got '3'.\n"
+    )
+
+
+def test_setting_register_array_out_of_bounds_should_not_crash_if_no_assertion(base_cpp_test):
+    test_code = """\
+  // Index 3 is out of bounds (should be less than 3)
+  caesar.set_dummies_first(3, 1337);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
     with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert (
-            "Assertion `array_index < caesar::dummies::array_length' failed" in result.stderr
-        ), result.stderr
+        run_command(cmd=cmd)
+
+    cmd = base_cpp_test.compile(test_code=test_code, no_array_index_assert=True)
+    run_command(cmd=cmd)
 
 
-def test_setting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
+def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
   caesar.set_config_plain_integer(-1024);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
-    with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert "Assertion `field_value >= -50' failed." in result.stderr, result.stderr
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        f"setter: Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:356, "
+        "message: 'plain_integer' value too small, got '-1024'.\n"
+    )
 
     test_code = """\
   caesar.set_config_plain_integer(110);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        f"setter: Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:360, "
+        "message: 'plain_integer' value too large, got '110'.\n"
+    )
+
+
+def test_setting_integer_field_out_of_range_should_not_crash_if_no_assertion(base_cpp_test):
+    test_code = """\
+  caesar.set_config_plain_integer(-1024);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
     with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert "Assertion `field_value <= 100' failed." in result.stderr, result.stderr
+        run_command(cmd=cmd)
+
+    cmd = base_cpp_test.compile(test_code=test_code, no_setter_assert=True)
+    run_command(cmd=cmd)
 
 
-def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
+def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
     # 'config' register is index 0 and 'plain_integer' field starts at bit 9.
     test_code = """\
   memory[0] = 100 << 5;
@@ -181,10 +260,14 @@ def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
-    with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert "Assertion `field_value <= 100' failed." in result.stderr, result.stderr
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        f"getter: Got read value out of range in {base_cpp_test.working_dir}/caesar.cpp:195, "
+        "message: 'plain_integer' value too large, got '101'.\n"
+    )
 
     test_code = """\
   memory[0] = -51 << 5;
@@ -192,13 +275,31 @@ def test_getting_cpp_integer_field_out_of_range_should_crash(base_cpp_test):
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        f"getter: Got read value out of range in {base_cpp_test.working_dir}/caesar.cpp:191, "
+        "message: 'plain_integer' value too small, got '-51'.\n"
+    )
+
+
+def test_getting_integer_field_out_of_range_should_not_crash_if_no_assertion(base_cpp_test):
+    test_code = """\
+  memory[0] = 101 << 5;
+  caesar.get_config_plain_integer();
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
     with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert "Assertion `field_value >= -51' failed." in result.stderr, result.stderr
+        run_command(cmd=cmd)
+
+    cmd = base_cpp_test.compile(test_code=test_code, no_getter_assert=True)
+    run_command(cmd=cmd)
 
 
-def test_setting_cpp_bit_field_out_of_range_should_crash(base_cpp_test):
+def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
   caesar.set_config_plain_bit_a(1);
 """
@@ -209,15 +310,17 @@ def test_setting_cpp_bit_field_out_of_range_should_crash(base_cpp_test):
   caesar.set_config_plain_bit_a(2);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
-    with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert (
-            "Assertion `field_value & mask_at_base_inverse == 0' failed." in result.stderr
-        ), result.stderr
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        f"setter: Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:285, "
+        "message: 'plain_bit_a' value too many bits used, got '2'.\n"
+    )
 
 
-def test_setting_cpp_bit_vector_field_out_of_range_should_crash(base_cpp_test):
+def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
   caesar.set_config_plain_bit_vector(15);
 """
@@ -228,9 +331,11 @@ def test_setting_cpp_bit_vector_field_out_of_range_should_crash(base_cpp_test):
   caesar.set_config_plain_bit_vector(16);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
-    with pytest.raises(subprocess.CalledProcessError):
-        result = run_command(cmd=cmd, capture_output=True)
-        assert result.stdout == ""
-        assert (
-            "Assertion `field_value & mask_at_base_inverse == 0' failed." in result.stderr
-        ), result.stderr
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        f"setter: Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:321, "
+        "message: 'plain_bit_vector' value too many bits used, got '16'.\n"
+    )
