@@ -44,7 +44,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         depending on the mode of the register.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "2.0.0"
 
     SHORT_DESCRIPTION = "C++ implementation"
 
@@ -61,11 +61,21 @@ class CppImplementationGenerator(CppGeneratorCommon):
         """
         Get a complete C++ class implementation with all methods.
         """
-        cpp_code = f"  {self._class_name}::{self._constructor_signature()}\n"
-        cpp_code += "      : m_registers(reinterpret_cast<volatile uint32_t *>(base_address))\n"
-        cpp_code += "  {\n"
-        cpp_code += "    // Empty\n"
-        cpp_code += "  }\n\n"
+        cpp_code = f"""\
+{self._macros()}\
+  {self._class_name}::{self._constructor_signature()}
+      : m_registers(reinterpret_cast<volatile uint32_t *>(base_address)),
+        m_assertion_handler(assertion_handler)
+  {{
+    // Empty
+  }}
+
+  void {self._class_name}::_assert_failed(const std::string *message) const
+  {{
+    m_assertion_handler(message);
+  }}
+
+"""
 
         for register, register_array in self.iterate_registers():
             cpp_code += f"{self.get_separator_line(indent=2)}"
@@ -101,6 +111,51 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return cpp_code_top + self._with_namespace(cpp_code)
 
+    def _macros(self) -> str:
+        def get_macro(name: str, message: str) -> str:
+            macro_name = f"_{name}_ASSERT_TRUE"
+            guard_name = f"NO_REGISTER_{name}_ASSERT"
+            name_space = " " * (38 - len(name))
+            message_space = " " * (21 - len(message))
+            base = """\
+#ifdef {guard_name}
+
+#define {macro_name}(expression, message) ((void)0)
+
+#else // Not {guard_name}.
+
+// This macro is called by the register code to check for runtime errors.
+#define {macro_name}(expression, message) {name_space}\\
+  {{                                                                              \\
+    if (!static_cast<bool>(expression)) {{                                        \\
+      std::ostringstream diagnostics;                                            \\
+      diagnostics << "{message} out of range in " << __FILE__ << ":" {message_space}\\
+                  << __LINE__ << ", message: " << message << ".";                \\
+      std::string diagnostic_message = diagnostics.str();                        \\
+      _assert_failed(&diagnostic_message);                                       \\
+    }}                                                                            \\
+  }}
+
+#endif // {guard_name}.
+"""
+            return base.format(
+                guard_name=guard_name,
+                macro_name=macro_name,
+                name=name,
+                name_space=name_space,
+                message=message,
+                message_space=message_space,
+            )
+
+        setter_assert = get_macro(name="SETTER", message="Tried to set value")
+        getter_assert = get_macro(name="GETTER", message="Got read value")
+        array_index_assert = get_macro(name="ARRAY_INDEX", message="Provided array index")
+        return f"""\
+{setter_assert}
+{getter_assert}
+{array_index_assert}
+"""
+
     def _register_setter_function(
         self, register: "Register", register_array: Optional["RegisterArray"]
     ) -> str:
@@ -111,9 +166,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += "  {\n"
 
         if register_array:
-            cpp_code += (
-                f"    assert(array_index < {self.name}::{register_array.name}::array_length);\n"
-            )
+            cpp_code += f"""\
+    _ARRAY_INDEX_ASSERT_TRUE(
+      array_index < {self.name}::{register_array.name}::array_length,
+      "'{register_array.name}' array index out of range, got '" << array_index << "'"
+    );
+"""
             cpp_code += (
                 f"    const size_t index = {register_array.base_index} "
                 f"+ array_index * {len(register_array.registers)} + {register.index};\n"
@@ -196,7 +254,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
   uint32_t {self._class_name}::{signature} const\
   {{
 {self._get_field_shift_and_mask(field=field)}\
-{self._get_field_setter_value_checker(field=field)}\
+{self._get_field_value_checker(field=field, setter_or_getter="setter")}\
     const uint32_t field_value_masked = field_value & mask_at_base;
     const uint32_t field_value_masked_and_shifted = field_value_masked << shift;
 
@@ -220,13 +278,21 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
     @staticmethod
-    def _get_field_setter_value_checker(field: "RegisterField") -> str:
+    def _get_field_value_checker(field: "RegisterField", setter_or_getter: str) -> str:
         comment = "// Check that field value is within the legal range."
+        assertion = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
+
         if isinstance(field, Integer):
             return f"""\
     {comment}
-    assert(field_value >= {field.min_value});
-    assert(field_value <= {field.max_value});
+    {assertion}(
+      field_value >= {field.min_value},
+      "'{field.name}' value too small, got '" << field_value << "'"
+    );
+    {assertion}(
+      field_value <= {field.max_value},
+      "'{field.name}' value too large, got '" << field_value << "'"
+    );
 
 """
 
@@ -234,7 +300,10 @@ class CppImplementationGenerator(CppGeneratorCommon):
             return f"""\
     {comment}
     const uint32_t mask_at_base_inverse = ~mask_at_base;
-    assert((field_value & mask_at_base_inverse) == 0);
+    {assertion}(
+      (field_value & mask_at_base_inverse) == 0,
+      "'{field.name}' value too many bits used, got '" << field_value << "'"
+    );
 
 """
 
@@ -242,7 +311,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
     def _get_field_getter_value_checker(self, field: "RegisterField") -> str:
         if isinstance(field, Integer):
-            return self._get_field_setter_value_checker(field=field)
+            return self._get_field_value_checker(field=field, setter_or_getter="getter")
 
         return ""
 
@@ -256,9 +325,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += "  {\n"
 
         if register_array:
-            cpp_code += (
-                f"    assert(array_index < {self.name}::{register_array.name}::array_length);\n"
-            )
+            cpp_code += f"""
+    _ARRAY_INDEX_ASSERT_TRUE(
+      array_index < {self.name}::{register_array.name}::array_length,
+      "'{register_array.name}' array index out of range, got '" << array_index << "'"
+    );
+"""
             cpp_code += (
                 f"    const size_t index = {register_array.base_index} "
                 f"+ array_index * {len(register_array.registers)} + {register.index};\n"

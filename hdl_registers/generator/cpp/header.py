@@ -49,15 +49,28 @@ class CppHeaderGenerator(CppGeneratorCommon):
         """
         Get a complete C++ class header with methods for accessing registers and fields.
         """
-        cpp_code = f"  class {self._class_name} : public I{self._class_name}\n"
-        cpp_code += "  {\n"
+        cpp_code = f"""\
+  class {self._class_name} : public I{self._class_name}
+  {{
+  private:
+    volatile uint32_t *m_registers;
+    bool (*m_assertion_handler) (const std::string*);
 
-        cpp_code += "  private:\n"
-        cpp_code += "    volatile uint32_t *m_registers;\n\n"
+    void _assert_failed(const std::string *message) const;
 
-        cpp_code += "  public:\n"
-        cpp_code += f"    {self._constructor_signature()};\n\n"
-        cpp_code += f"    virtual ~{self._class_name}() {{}}\n"
+  public:
+    /**
+     * Class constructor.
+     * @param base_address Pointer to where these registers are memory mapped.
+     *                     When using an operating system, care must be taken to pass the
+     *                     physical address, not the virtual address.
+     *                     When using bare metal, these are the same.
+     * @param assertion_handler Function to call when an assertion fails.
+     */
+    {self._constructor_signature()};
+
+    virtual ~{self._class_name}() {{}}
+"""
 
         def function(return_type_name: str, signature: str) -> str:
             return f"    virtual {return_type_name} {signature} const override;\n"

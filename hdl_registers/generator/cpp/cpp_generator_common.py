@@ -45,7 +45,10 @@ class CppGeneratorCommon(RegisterCodeGenerator):
         return cpp_code
 
     def _constructor_signature(self) -> str:
-        return f"{self._class_name}(volatile uint8_t *base_address)"
+        return (
+            f"{self._class_name}(volatile uint8_t *base_address, "
+            "bool (*assertion_handler) (const std::string*))"
+        )
 
     def _get_methods_description(
         self, register: "Register", register_array: Optional["RegisterArray"]
