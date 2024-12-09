@@ -75,7 +75,71 @@ read back over the bus and then modified: "write only", "write pulse", and "read
 The field setters for registers of this mode will write all bits outside of the current field
 as zero.
 This can for example be seen in the setter ``set_channels_configuration_enable()`` in the generated
-code below.
+code :ref:`below <cpp_implementation>`.
+
+
+.. _cpp_assertion_macros:
+
+Assertion macros
+----------------
+
+There are a few register-related things that can go wrong in an embedded system:
+
+1. An error in hardware might result in reading a field value that is out of bounds.
+   This is mostly possible for :ref:`enumeration <field_enumeration>` and
+   :ref:`integer <field_integer>` fields.
+
+2. Conversely, an error in software might result in writing a field value that is out of bounds.
+
+3. An error in software might result in a :ref:`register array <basic_feature_register_array>`
+   read/write with an index that is out of bounds.
+
+The generated C++ implementation checks for these errors using custom assertion macros.
+Meaning, they can be detected at runtime as well as in unit tests.
+
+If an assertion fails a user-specified handler function is called.
+In this function, the user could e.g. call a custom logger, perform a controlled shutdown,
+throw exceptions, etc.
+One argument is provided that contains a descriptive error message.
+The function must return a boolean ``true``.
+
+This error handler function must be provided to the constructor of the generated class.
+
+
+Minimal example
+_______________
+
+A minimal and somewhat unrealistic handler function is shown below.
+More advanced handler functions are left to the user.
+
+.. code-block:: C++
+
+  volatile uint8_t *base_address = reinterpret_cast<volatile uint8_t*>(0x43C00000);
+
+  bool register_assert_fail_handler(const std::string *diagnostic_message)
+  {
+    std::cerr << *diagnostic_message << std::endl;
+    std::exit(EXIT_FAILURE);
+    return true;
+  }
+
+  fpga_regs::Example example(base_address, register_assert_fail_handler);
+
+
+Disabling assertions
+____________________
+
+The assertions add to the binary size and to the runtime of the program.
+The user can disable the assertions by defining the following macros
+(usually with the ``-D`` compiler flag):
+
+1. ``NO_REGISTER_GETTER_ASSERT``
+
+2. ``NO_REGISTER_SETTER_ASSERT``
+
+3. ``NO_REGISTER_ARRAY_INDEX_ASSERT``
+
+This should result in no overhead.
 
 
 .. _interface_header:
@@ -103,6 +167,9 @@ Below is the generated class header:
   :language: C++
   :linenos:
 
+
+
+.. _cpp_implementation:
 
 Implementation
 --------------

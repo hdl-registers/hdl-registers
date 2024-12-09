@@ -137,7 +137,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {self.header}
 #pragma once
 
-#include <cassert>
+#include <sstream>
 #include <cstdint>
 #include <cstdlib>
 
