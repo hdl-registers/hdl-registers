@@ -66,10 +66,12 @@ the :ref:`generator_html` article.
 
 
 
+.. _json_data_file:
+
 Using JSON data file
 --------------------
 
-The TOML format is highly recommended due to the benefits it offers, listed above.
+The TOML format is highly recommended due to the benefits it offers, :ref:`listed above <why_toml>`.
 Also all the examples on this website use TOML.
 However, the tool also supports using JSON data files if that is desired.
 
@@ -85,10 +87,12 @@ Below is an example JSON snippet that sets up some register data:
 
 
 
+.. _yaml_data_file:
+
 Using YAML data file
 --------------------
 
-The TOML format is highly recommended due to the benefits it offers, listed above.
+The TOML format is highly recommended due to the benefits it offers, :ref:`listed above <why_toml>`.
 Also all the examples on this website use TOML.
 However, the tool also supports using YAML data files if that is desired.
 
@@ -108,7 +112,7 @@ Other data file formats
 -----------------------
 
 The TOML format is highly recommended due to the benefits it offers, :ref:`listed above <why_toml>`.
-We also officially support parsing JSON and YAML, see above.
+We also officially support parsing :ref:`JSON <json_data_file>` and :ref:`YAML <yaml_data_file>`.
 However, if you want to parse some other exotic data file format then that is also possible.
 
 The parser functions, e.g. :func:`.from_toml`, are just very thin wrappers around the
