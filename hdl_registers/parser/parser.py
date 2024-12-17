@@ -472,6 +472,16 @@ ERROR: Please inspect that file and update your data file to the new format.
         # Python 3.7.
         default_value = field_items.get("default_value", list(elements)[0])
 
+        if default_value not in elements:
+            valid_elements_str = ", ".join([f'"{element_name}"' for element_name in elements])
+            message = (
+                f'Error while parsing enumeration "{field_name}" in register "{register.name}" in '
+                f"{self._source_definition_file}: "
+                f'Invalid default value "{default_value}". '
+                f"Expected one of {valid_elements_str}."
+            )
+            raise ValueError(message)
+
         register.append_enumeration(
             name=field_name,
             description=description,
