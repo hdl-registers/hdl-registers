@@ -170,6 +170,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
       array_index < {self.name}::{register_array.name}::array_length,
       "'{register_array.name}' array index out of range, got '" << array_index << "'"
     );
+
 """
             cpp_code += (
                 f"    const size_t index = {register_array.base_index} "
@@ -324,11 +325,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += "  {\n"
 
         if register_array:
-            cpp_code += f"""
+            cpp_code += f"""\
     _ARRAY_INDEX_ASSERT_TRUE(
       array_index < {self.name}::{register_array.name}::array_length,
       "'{register_array.name}' array index out of range, got '" << array_index << "'"
     );
+
 """
             cpp_code += (
                 f"    const size_t index = {register_array.base_index} "
