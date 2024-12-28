@@ -137,7 +137,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         """
         return self._numerical_interpretation.is_signed
 
-    @property  # type: ignore[override]
+    @property
     def default_value(self) -> int:
         """
         Getter for private member.

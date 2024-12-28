@@ -91,7 +91,7 @@ class BitVector(RegisterField):
                 f'"{self.numerical_interpretation.bit_width}".'
             )
 
-    @property  # type: ignore[override]
+    @property
     def default_value(self) -> str:
         """
         Getter for private member.
