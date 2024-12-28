@@ -80,7 +80,6 @@ jobs:
       if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
       run: |
         python3 -m pip install \
-          black \
           flake8 \
           GitPython \
           mypy \
