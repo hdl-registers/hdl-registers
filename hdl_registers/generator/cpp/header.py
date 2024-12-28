@@ -139,7 +139,6 @@ class CppHeaderGenerator(CppGeneratorCommon):
         cpp_code += "  };\n"
 
         cpp_code_top = f"""\
-{self.header}
 #pragma once
 
 #include "i_{self.name}.h"

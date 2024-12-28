@@ -157,9 +157,10 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         self._sanity_check()
 
         code = self.get_code(**kwargs)
+        result = f"{self.header}\n{code}"
 
         # Will create the containing folder unless it already exists.
-        create_file(file=output_file, contents=code)
+        create_file(file=output_file, contents=result)
 
         return output_file
 
@@ -316,7 +317,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         In general, the user will know if these errors are present when the generated code is
         compiled/used since it will probably crash.
         But it is better to warn early, rather than the user finding out when compiling headers
-        after a 1 hour FPGA build.
+        after a 1-hour FPGA build.
 
         We run this check at creation time, always and for every single generator.
         Hence the user will hopefully get warned when they generate e.g. a VHDL package at the start

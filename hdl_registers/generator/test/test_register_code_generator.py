@@ -34,11 +34,8 @@ class CustomGenerator(RegisterCodeGenerator):
     def output_file(self):
         return self.output_folder / f"{self.name}.x"
 
-    def get_code(self, before_header="", **kwargs) -> str:
-        return f"""\
-{before_header}{self.header}
-Nothing else, its a stupid generator.
-"""
+    def get_code(self, **kwargs) -> str:
+        return "Nothing, its a stupid generator."
 
 
 @pytest.fixture

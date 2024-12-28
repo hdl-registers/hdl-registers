@@ -133,8 +133,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         cpp_code += "  };\n\n"
 
-        cpp_code_top = f"""\
-{self.header}
+        cpp_code_top = """\
 #pragma once
 
 #include <sstream>

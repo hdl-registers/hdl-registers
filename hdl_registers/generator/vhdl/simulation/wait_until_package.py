@@ -68,7 +68,6 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
         package_name = self.output_file.stem
 
         vhdl = f"""\
-{self.header}
 library ieee;
 use ieee.fixed_pkg.all;
 use ieee.std_logic_1164.all;

@@ -43,7 +43,6 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
         """
         title = f"Documentation of {self.name} registers"
         html = f"""\
-{self.header}
 <!DOCTYPE html>
 <html>
 <head>

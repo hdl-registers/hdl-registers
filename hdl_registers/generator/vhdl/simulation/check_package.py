@@ -79,7 +79,6 @@ class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
         package_name = self.output_file.stem
 
         vhdl = f"""\
-{self.header}
 library ieee;
 use ieee.fixed_pkg.all;
 use ieee.numeric_std.all;

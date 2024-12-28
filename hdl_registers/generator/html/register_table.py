@@ -55,8 +55,7 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
         if not self.register_list.register_objects:
             return ""
 
-        html = f"""\
-{self.header}
+        html = """\
 <table>
 <thead>
   <tr>

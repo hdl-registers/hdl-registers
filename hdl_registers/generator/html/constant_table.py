@@ -57,8 +57,7 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
         if not self.register_list.constants:
             return ""
 
-        html = f"""\
-{self.header}
+        html = """\
 <table>
 <thead>
   <tr>

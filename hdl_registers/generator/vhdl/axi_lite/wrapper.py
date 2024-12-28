@@ -160,8 +160,6 @@ are present.
 --
 -- Sets correct generics, and performs conversion to the easy-to-use register record types.
 -- -----------------------------------------------------------------------------
-{self.header}\
--- -----------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
