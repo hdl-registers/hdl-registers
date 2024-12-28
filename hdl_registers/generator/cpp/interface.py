@@ -186,7 +186,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         if self.register_list.register_objects:
             num_registers = self.register_list.register_objects[-1].index + 1
 
-        cpp_code = self.comment("Number of registers within this register map.")
+        cpp_code = self.comment("Number of registers within this register list.")
         cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
 

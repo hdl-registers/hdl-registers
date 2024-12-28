@@ -105,7 +105,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
         register_struct_type = f"{self.name}_regs_t"
 
-        register_struct = self.comment("Type for this register map.")
+        register_struct = self.comment("Type for this register list.")
         register_struct += f"typedef struct {register_struct_type}\n"
         register_struct += "{\n"
 
@@ -141,7 +141,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
         if self.register_list.register_objects:
             num_regs = self.register_list.register_objects[-1].index + 1
 
-        c_code = self.comment("Number of registers within this register map.")
+        c_code = self.comment("Number of registers within this register list.")
         c_code += f"#define {self.name.upper()}_NUM_REGS ({num_regs}u)\n"
 
         return c_code
