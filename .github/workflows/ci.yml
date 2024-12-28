@@ -106,7 +106,7 @@ jobs:
 
     - name: Upload coverage artifacts
       if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage
         path: generated/python_coverage*
@@ -155,7 +155,7 @@ jobs:
           https://github.com/tsfpga/tsfpga.git ../../tsfpga/tsfpga
 
     - name: Download coverage artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: coverage
         path: generated
@@ -169,11 +169,11 @@ jobs:
 
     - name: Configure Pages
       if: github.ref == 'refs/heads/main'
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
 
     - name: Upload Pages Artifact
       if: github.ref == 'refs/heads/main'
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
         path: generated/sphinx_html
 
@@ -197,7 +197,7 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
 
 
   # ------------------------------------------------------------------------------
