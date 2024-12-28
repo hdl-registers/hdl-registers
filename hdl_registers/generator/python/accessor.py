@@ -76,7 +76,6 @@ class PythonAccessorGenerator(RegisterCodeGenerator):
         register_value_types = self._get_register_value_types()
 
         result = f'''\
-{self.header}
 # Standard libraries
 import pickle
 from dataclasses import dataclass

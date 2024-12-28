@@ -36,7 +36,7 @@ class TxtRegisterListGenerator(RegisterCodeGenerator):
         """
         Generate a textual list of all registers and register arrays.
         """
-        txt = f'{self.header}\nAvailable registers in the "{self.name}" register list:\n\n'
+        txt = f'Available registers in the "{self.name}" register list:\n\n'
 
         for register, register_array in self.iterate_registers():
             if register_array:

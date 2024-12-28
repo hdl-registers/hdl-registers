@@ -89,7 +89,6 @@ class CHeaderGenerator(RegisterCodeGenerator):
         define_name = f"{self.name.upper()}_REGS_H"
 
         c_code = f"""\
-{self.header}
 #ifndef {define_name}
 #define {define_name}
 

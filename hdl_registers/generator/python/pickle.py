@@ -69,7 +69,6 @@ class PythonPickleGenerator(RegisterCodeGenerator):
         class_name = self.to_pascal_case(self.name)
 
         return f'''\
-{self.header}
 # Standard libraries
 import pickle
 from pathlib import Path

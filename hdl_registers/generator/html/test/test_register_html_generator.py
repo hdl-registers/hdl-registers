@@ -253,19 +253,17 @@ def test_constants_and_no_registers(html_test):
     html_test.check_constant(name="decrement", value=-8, html=html)
 
 
-def test_register_table_is_empty_string_if_no_registers_are_available(html_test):
+def test_register_table_is_empty_file_if_no_registers_are_available(html_test):
     html_test.register_list.register_objects = []
 
-    html = read_file(
-        HtmlRegisterTableGenerator(html_test.register_list, html_test.tmp_path).create()
-    )
-    assert html == "", html
+    generator = HtmlRegisterTableGenerator(html_test.register_list, html_test.tmp_path)
+    html = read_file(generator.create())
+    assert html == generator.header + "\n", html
 
 
-def test_constant_table_is_empty_string_if_no_constants_are_available(html_test):
+def test_constant_table_is_empty_file_if_no_constants_are_available(html_test):
     html_test.register_list.constants = []
 
-    html = read_file(
-        HtmlConstantTableGenerator(html_test.register_list, html_test.tmp_path).create()
-    )
-    assert html == "", html
+    generator = HtmlConstantTableGenerator(html_test.register_list, html_test.tmp_path)
+    html = read_file(generator.create())
+    assert html == generator.header + "\n", html

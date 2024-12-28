@@ -72,7 +72,6 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
         pkg_name = f"{self.name}_regs_pkg"
 
         vhdl = f"""\
-{self.header}
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
