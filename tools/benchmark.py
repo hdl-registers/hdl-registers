@@ -63,7 +63,7 @@ BENCHMARK_FOLDER = THIS_FOLDER / "benchmark"
 
 OUTPUT_FOLDER = HDL_REGISTERS_GENERATED / "benchmark"
 
-# Parse and generate this many register maps.
+# Parse and generate this many register lists.
 # Similar to a medium-sized FPGA project.
 NUM_RUNS = 20
 

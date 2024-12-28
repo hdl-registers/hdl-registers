@@ -43,14 +43,14 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
     See the :ref:`generator_vhdl` article for usage details.
 
     * For each register constant, the value as a native VHDL constant.
-    * For each register, the index within the register map.
+    * For each register, the index within the register list.
     * For each field in each register
 
       * Register bit index range definitions.
       * Native VHDL type corresponding to the field type.
       * Conversion of a field value to/from SLV.
 
-    Also produces a register map constant, mapping indexes to modes, suitable for use with
+    Also produces a constant that maps indexes to modes, suitable for use with
     :ref:`reg_file.axi_lite_reg_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
     """
 

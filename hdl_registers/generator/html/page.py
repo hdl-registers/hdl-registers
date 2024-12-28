@@ -71,7 +71,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
                 register_list=self.register_list, output_folder=self.output_folder
             )
             html += f"""
-  <p>The following registers make up the register map.</p>
+  <p>The following registers make up the register list.</p>
 {register_table_generator.get_code()}
 """
         else:

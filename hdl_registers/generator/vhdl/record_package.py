@@ -219,7 +219,7 @@ return {self.name}_regs_{direction.name.lower()}_t;
         * Default value constant for the above record.
         * VHDL vector type of the above record, ranged per the range of the register array.
 
-        This function assumes that the register map has registers in the given direction.
+        This function assumes that the register last has registers in the given direction.
         """
         vhdl = ""
 
@@ -276,7 +276,7 @@ the '{direction.name.lower()}' direction.
         Get the record that contains all registers and arrays in the specified direction.
         Also default value constant for this record.
 
-        This function assumes that the register map has registers in the given direction.
+        This function assumes that the register list has registers in the given direction.
         """
         record_init = []
         vhdl = f"""\
@@ -348,7 +348,7 @@ the '{direction.name.lower()}' direction.
         vhdl = f"""\
   -- ---------------------------------------------------------------------------
   -- Below is a record with a status bit for each {direction.value.name_adjective} register in the \
-register map.
+register list.
   -- It can be used for the 'reg_was_{direction.value.name_past}' port of a register file wrapper.
 """
 
@@ -498,7 +498,7 @@ to the record above.
         Conversion function implementation for converting a record of all the 'up' registers
         to a register SLV list.
 
-        This function assumes that the register map has registers in the given direction.
+        This function assumes that the register list has registers in the given direction.
         """
         to_slv = ""
 
@@ -543,7 +543,7 @@ to the record above.
         Conversion function implementation for converting all the 'down' registers
         in a register SLV list to record.
 
-        This function assumes that the register map has registers in the given direction.
+        This function assumes that the register list has registers in the given direction.
         """
         to_record = ""
 

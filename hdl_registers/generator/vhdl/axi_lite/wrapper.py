@@ -45,7 +45,7 @@ axi_lite_reg_file.vhd
     value to the hardware, e.g. "Read, Write".
 
     Similar concept for the ``reg_was_read`` and ``reg_was_written`` ports.
-    They are only present if there are any readable/writeable registers in the register map.
+    They are only present if there are any readable/writeable registers in the register list.
     """
 
     __version__ = "1.0.0"
