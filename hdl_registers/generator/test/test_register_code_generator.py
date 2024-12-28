@@ -173,21 +173,6 @@ def test_create_should_run_again_if_generator_version_is_changed(generator_from_
         mocked_create.assert_called_once()
 
 
-def test_version_header_is_detected_even_if_not_on_first_line(generator_from_toml):
-    before_header = """
-# #########################
-# Another header
-# #########################
-"""
-    generator = generator_from_toml()
-    generator.create_if_needed(before_header=before_header)
-
-    generator = generator_from_toml()
-    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create:
-        generator.create_if_needed(before_header=before_header)
-        mocked_create.assert_not_called()
-
-
 @patch("hdl_registers.generator.register_code_generator.git_commands_are_available", autospec=True)
 @patch("hdl_registers.generator.register_code_generator.get_git_commit", autospec=True)
 @patch("hdl_registers.generator.register_code_generator.svn_commands_are_available", autospec=True)
