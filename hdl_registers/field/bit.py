@@ -34,7 +34,7 @@ class Bit(RegisterField):
         # Assign self._default_value via setter
         self.default_value = default_value
 
-    @property  # type: ignore[override]
+    @property
     def default_value(self) -> str:
         """
         Getter for private member.
