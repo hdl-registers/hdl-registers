@@ -272,7 +272,9 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         Get file header informing the user that the file is automatically generated.
         Basically the information from :meth:`.generated_source_info` formatted as a comment block.
         """
-        return self.comment_block(text=self.generated_source_info, indent=0)
+        generated_source_info = self.comment_block(text=self.generated_source_info, indent=0)
+        separator_line = self.get_separator_line(indent=0)
+        return f"{separator_line}{generated_source_info}{separator_line}"
 
     @property
     def generated_source_info(self) -> list[str]:
