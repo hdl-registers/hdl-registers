@@ -31,6 +31,29 @@ if TYPE_CHECKING:
 
 
 class RegisterParser:
+    """
+    Parse register data in the form of a dictionary into a :class:`.RegisterList` object.
+    See :ref:`toml_format` for further documentation.
+
+    A note on sanity check strategy:
+    The parser performs only the basic sanity checks related to the data file format.
+    For example, missing properties, unknown properties, etc.
+    A lot of other sanity checks are performed in the :class:`.Register`, :class:`.RegisterArray`,
+    :class:`.RegisterField`, etc, classes themselves.
+
+    For example, the default value of a bit field should be a string with the value "0" or "1".
+    This is checked in the constructor of the :class:`.Bit` class, not here in the parser.
+    Similar for a lot of other things.
+
+    This is because these objects can be created from the Python API also, without involving
+    the parser.
+    Hence these sanity checks have to be present there.
+    Having them also in the parser would enable better error messages, but would be redundant
+    and would slow down the parser.
+    Since the parser is run in real time, the performance is critical, and we can not afford
+    to slow it down.
+    """
+
     # Attributes of the constant.
     recognized_constant_items = {"type", "value", "description", "data_type"}
     # Note that "type" being present is implied. We would not be parsing a constant unless we
@@ -123,6 +146,8 @@ class RegisterParser:
 
         Arguments:
             register_data: Register data as a dictionary.
+                Preferably read by the :func:`.from_toml`, :func:`.from_json` or
+                :func:`.from_yaml` functions.
 
         Return:
             The resulting register list.

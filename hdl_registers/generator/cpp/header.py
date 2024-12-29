@@ -66,6 +66,8 @@ class CppHeaderGenerator(CppGeneratorCommon):
      *                     physical address, not the virtual address.
      *                     When using bare metal, these are the same.
      * @param assertion_handler Function to call when an assertion fails.
+     *                          Function takes a string pointer as an argument and must return a
+     *                          boolean 'true'.
      */
     {self._constructor_signature()};
 
