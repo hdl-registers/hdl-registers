@@ -30,7 +30,11 @@ from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-class RegisterConfiguration:
+def get_package(register_list, output_folder):
+    return read_file(VhdlRegisterPackageGenerator(register_list, output_folder).create())
+
+
+class RegisterConfigurationTest:
     def __init__(self, name, source_toml_file):
         self.register_list = from_toml(name=name, toml_file=source_toml_file)
 
@@ -40,7 +44,7 @@ class RegisterConfiguration:
         self.register_list.add_constant(name="string_constant", value="apa", description="")
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
-        vhdl = read_file(VhdlRegisterPackageGenerator(self.register_list, output_path).create())
+        vhdl = get_package(register_list=self.register_list, output_folder=output_path)
 
         if test_registers:
             assert "constant test_reg_map : " in vhdl, vhdl
@@ -69,7 +73,7 @@ class RegisterConfiguration:
 
 @pytest.fixture
 def register_configuration():
-    return RegisterConfiguration("test", HDL_REGISTERS_TESTS / "regs_test.toml")
+    return RegisterConfigurationTest("test", HDL_REGISTERS_TESTS / "regs_test.toml")
 
 
 # False positive for pytest fixtures
@@ -179,3 +183,27 @@ def test_vhdl_typedef(tmp_path):
     assert "subtype test_number_sfixed1_t is sfixed(5 downto 0);" in vhdl, vhdl
 
     assert "subtype test_number_integer0_t is integer range 1 to 3;" in vhdl, vhdl
+
+
+def test_address_width(tmp_path):
+    register_list = RegisterList(name="apa", source_definition_file=None)
+    constant_name = "apa_address_width"
+
+    def check(num_addressing_bits):
+        assert f"{constant_name} : positive := {num_addressing_bits + 2}" in get_package(
+            register_list, tmp_path
+        )
+
+    assert constant_name not in get_package(register_list, tmp_path)
+
+    register_list.append_register("a", REGISTER_MODES["r"], "")
+    check(1)
+
+    register_list.append_register("b", REGISTER_MODES["r"], "")
+    check(1)
+
+    register_list.append_register("c", REGISTER_MODES["r"], "")
+    check(2)
+
+    register_list.append_register_array("d", 2, "").append_register("e", REGISTER_MODES["r"], "")
+    check(3)
