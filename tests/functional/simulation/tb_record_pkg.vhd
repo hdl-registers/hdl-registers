@@ -15,8 +15,8 @@ use ieee.fixed_pkg.all;
 library vunit_lib;
 use vunit_lib.run_pkg.all;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
+library register_file;
+use register_file.register_file_pkg.all;
 
 use work.caesar_regs_pkg.all;
 use work.caesar_register_record_pkg.all;
@@ -37,7 +37,7 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
-  variable reg : reg_t := (others => '0');
+  variable reg : register_t := (others => '0');
     variable test : caesar_field_test_t := caesar_field_test_init;
   begin
     test_runner_setup(runner, runner_cfg);

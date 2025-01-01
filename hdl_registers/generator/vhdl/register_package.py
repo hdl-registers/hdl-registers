@@ -51,7 +51,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
       * Conversion of a field value to/from SLV.
 
     Also produces a constant that maps indexes to modes, suitable for use with
-    :ref:`reg_file.axi_lite_reg_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
+    :ref:`register_file.axi_lite_register_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
     """
 
     __version__ = "2.0.0"
@@ -77,8 +77,8 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.fixed_pkg.all;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
+library register_file;
+use register_file.register_file_pkg.all;
 
 
 package {pkg_name} is
@@ -251,15 +251,15 @@ end package body;
   -- So that functions have been elaborated when they are called.
   -- Needed for ModelSim compilation to pass.
 
-  -- To be used as the 'regs' generic of 'axi_lite_reg_file.vhd'.
-  constant {map_name} : reg_definition_vec_t({self._register_range_type_name});
+  -- To be used as the 'regs' generic of 'axi_lite_register_file.vhd'.
+  constant {map_name} : register_definition_vec_t({self._register_range_type_name});
 
-  -- To be used for the 'regs_up' and 'regs_down' ports of 'axi_lite_reg_file.vhd'.
-  subtype {self.name}_regs_t is reg_vec_t({self._register_range_type_name});
-  -- To be used as the 'default_values' generic of 'axi_lite_reg_file.vhd'.
+  -- To be used for the 'regs_up' and 'regs_down' ports of 'axi_lite_register_file.vhd'.
+  subtype {self.name}_regs_t is register_vec_t({self._register_range_type_name});
+  -- To be used as the 'default_values' generic of 'axi_lite_register_file.vhd'.
   constant {self.name}_regs_init : {self.name}_regs_t;
 
-  -- To be used for the 'reg_was_read' and 'reg_was_written' ports of 'axi_lite_reg_file.vhd'.
+  -- To be used for the 'reg_was_read' and 'reg_was_written' ports of 'axi_lite_register_file.vhd'.
   subtype {self.name}_reg_was_accessed_t is \
 std_ulogic_vector({self._register_range_type_name});
 
@@ -422,7 +422,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
   -- Cast a '{field.name}' field value to SLV.
   function {to_slv_name}(data : {field_name}_t) return {field_name}_slv_t;
   -- Get a '{field.name}' field value from a register value.
-  function to_{field_name}(data : reg_t) return {field_name}_t;
+  function to_{field_name}(data : register_t) return {field_name}_t;
 """
 
         raise TypeError(f'Got unexpected type for field: "{field}".')
@@ -455,42 +455,37 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         register_definitions = []
         default_values = []
-        vhdl_array_index = 0
+        index = 0
+
+        def add(register: Register, index_name: str) -> None:
+            register_definitions.append(
+                f"{index} => (index => {index_name}, "
+                f"mode => {register.mode.shorthand}, "
+                f"utilized_width => {register.utilized_width})"
+            )
+            default_values.append(f'{index} => "{register.default_value:032b}"')
+
         for register_object in self.iterate_register_objects():
             if isinstance(register_object, Register):
-                register_idx = self.qualified_register_name(register=register_object)
-                register_width = register_object.width
-                opening = f"{vhdl_array_index} => "
-
-                register_definitions.append(
-                    f"{opening}(idx => {register_idx}, "
-                    f"reg_type => {register_object.mode.shorthand}, width => {register_width})"
+                add(
+                    register=register_object,
+                    index_name=self.qualified_register_name(register=register_object),
                 )
-                default_values.append(f'{opening}"{register_object.default_value:032b}"')
-
-                vhdl_array_index = vhdl_array_index + 1
-
+                index += 1
             else:
                 for array_index in range(register_object.length):
                     for register in register_object.registers:
                         register_name = self.qualified_register_name(
                             register=register, register_array=register_object
                         )
-                        register_idx = f"{register_name}({array_index})"
-                        register_width = register.width
-                        opening = f"{vhdl_array_index} => "
+                        index_name = f"{register_name}({array_index})"
 
-                        register_definitions.append(
-                            f"{opening}(idx => {register_idx}, "
-                            f"reg_type => {register.mode.shorthand}, width => {register_width})"
-                        )
-                        default_values.append(f'{opening}"{register.default_value:032b}"')
-
-                        vhdl_array_index = vhdl_array_index + 1
+                        add(register=register, index_name=index_name)
+                        index += 1
 
         array_element_separator = ",\n    "
         vhdl = f"""\
-  constant {map_name} : reg_definition_vec_t({range_name}) := (
+  constant {map_name} : register_definition_vec_t({range_name}) := (
     {array_element_separator.join(register_definitions)}
   );
 
@@ -553,7 +548,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
   end function;
 
   -- Get a '{field.name}' field value from a register value.
-  function to_{name}(data : reg_t) return {name}_t is
+  function to_{name}(data : register_t) return {name}_t is
 {from_slv}\
   begin
     return result;

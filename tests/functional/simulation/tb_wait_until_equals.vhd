@@ -19,9 +19,9 @@ use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
-use reg_file.reg_operations_pkg.write_reg;
+library register_file;
+use register_file.register_file_pkg.all;
+use register_file.register_operations_pkg.write_reg;
 
 use work.caesar_regs_pkg.all;
 use work.caesar_register_record_pkg.all;
@@ -58,7 +58,7 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
-    variable reg : reg_t := (others => '0');
+    variable reg : register_t := (others => '0');
   begin
     test_runner_setup(runner, runner_cfg);
 

@@ -23,9 +23,9 @@ use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
-use reg_file.reg_operations_pkg.regs_bus_master;
+library register_file;
+use register_file.register_file_pkg.all;
+use register_file.register_operations_pkg.register_bus_master;
 
 use work.caesar_regs_pkg.all;
 use work.caesar_register_record_pkg.all;
@@ -59,10 +59,10 @@ begin
   main : process
     procedure wait_for_write is
     begin
-      wait_until_idle(net, as_sync(regs_bus_master));
+      wait_until_idle(net, as_sync(register_bus_master));
     end procedure;
 
-    variable reg, reg2 : reg_t := (others => '0');
+    variable reg, reg2 : register_t := (others => '0');
     variable int : integer := 0;
     variable s0 : caesar_field_test_s0_t := caesar_field_test_s0_init;
     variable u0 : caesar_field_test_u0_t := caesar_field_test_u0_init;

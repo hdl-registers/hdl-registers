@@ -79,8 +79,8 @@ use ieee.fixed_pkg.all;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library reg_file;
-use reg_file.reg_file_pkg.reg_t;
+library register_file;
+use register_file.register_file_pkg.register_t;
 
 use work.{self.name}_regs_pkg.all;
 
@@ -161,9 +161,9 @@ end package body;
 {init_str}
   );
   -- Convert a record of the {register_description} to SLV.
-  function to_slv(data : {register_name}_t) return reg_t;
+  function to_slv(data : {register_name}_t) return register_t;
   -- Convert an SLV register value to the record for the {register_description}.
-  function to_{register_name}(data : reg_t) return {register_name}_t;
+  function to_{register_name}(data : register_t) return {register_name}_t;
 
 """
 
@@ -326,7 +326,7 @@ the '{direction.name.lower()}' direction.
         if register.fields:
             return f"    {register.name} : {register_name}_t;\n"
 
-        return f"    {register.name} : reg_t;\n"
+        return f"    {register.name} : register_t;\n"
 
     def _register_was_accessed(self) -> str:
         """
@@ -456,14 +456,14 @@ to the record above.
             # Set "don't care" on the bits that have no field, so that a register value comparison
             # can be true even if there is junk in the unused bits.
             return f"""\
-  function to_slv(data : {register_name}_t) return reg_t is
-    variable result : reg_t := (others => '-');
+  function to_slv(data : {register_name}_t) return register_t is
+    variable result : register_t := (others => '-');
   begin
 {to_slv}
     return result;
   end function;
 
-  function to_{register_name}(data : reg_t) return {register_name}_t is
+  function to_{register_name}(data : register_t) return {register_name}_t is
     variable result : {register_name}_t := {register_name}_init;
   begin
 {to_record}

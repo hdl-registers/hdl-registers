@@ -86,12 +86,12 @@ class RegisterMode:
                 I.e. if software accessors shall have a 'read' method for registers of this mode.
                 False otherwise.
 
-                Analogous the ``reg_file.reg_file_pkg.is_read_type`` VHDL function.
+                Analogous the ``register_file.register_file_pkg.is_read_mode`` VHDL function.
             software_can_write: True if register is writeable by software on the register bus.
                 I.e. if software accessors shall have a 'write' method for registers of this mode.
                 False otherwise.
 
-                Analogous the ``reg_file.reg_file_pkg.is_write_type`` VHDL function.
+                Analogous the ``register_file.register_file_pkg.is_write_mode`` VHDL function.
             hardware_has_up: True if register gets its software-read value from hardware.
                 I.e. if register file shall have an 'up' input port for registers of this mode.
 

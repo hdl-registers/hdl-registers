@@ -26,11 +26,11 @@ library bfm;
 library common;
 use common.types_pkg.all;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
-use reg_file.reg_operations_pkg.read_reg;
-use reg_file.reg_operations_pkg.regs_bus_master;
-use reg_file.reg_operations_pkg.write_reg;
+library register_file;
+use register_file.register_file_pkg.all;
+use register_file.register_operations_pkg.read_reg;
+use register_file.register_operations_pkg.register_bus_master;
+use register_file.register_operations_pkg.write_reg;
 
 use work.caesar_simulation_test_pkg.all;
 
@@ -82,7 +82,7 @@ begin
   main : process
     procedure wait_for_write is
     begin
-      wait_until_idle(net, as_sync(regs_bus_master));
+      wait_until_idle(net, as_sync(register_bus_master));
     end procedure;
 
     procedure check_irq_status_default_values(value : caesar_irq_status_t) is
@@ -534,7 +534,7 @@ begin
     variable dummies_first, dummies_first2 : caesar_dummies_first_t;
     variable dummies2_dummy : caesar_dummies2_dummy_t;
 
-    variable reg : reg_t := (others => '0');
+    variable reg : register_t := (others => '0');
     variable bit_1, bit_2 : std_ulogic := '0';
 
     variable check_register_access_counts : boolean := true;

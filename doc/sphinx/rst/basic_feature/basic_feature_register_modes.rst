@@ -20,7 +20,7 @@ They are listed in the table below:
 * The "Write-pulse" mode is a special mode suitable for "command"-style registers.
 * The "Read, Write-pulse" mode is a special mode suitable for interrupt status registers, where a
   read shall show the current status and a write shall clear interrupts.
-  Suitable for usage with :ref:`reg_file.interrupt_register`.
+  Suitable for usage with :ref:`register_file.interrupt_register`.
 
 
 Generated code

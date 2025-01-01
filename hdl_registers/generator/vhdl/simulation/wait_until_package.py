@@ -84,9 +84,9 @@ library common;
 use common.addr_pkg.addr_t;
 use common.addr_pkg.addr_width;
 
-library reg_file;
-use reg_file.reg_file_pkg.reg_t;
-use reg_file.reg_operations_pkg.regs_bus_master;
+library register_file;
+use register_file.register_file_pkg.register_t;
+use register_file.register_operations_pkg.register_bus_master;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -152,7 +152,7 @@ end package body;
             value_type = f"{register_name}_t"
             slv_comment = ""
         else:
-            value_type = "reg_t"
+            value_type = "register_t"
             slv_comment = (
                 "  -- Note that '-' can be used as a wildcard in 'value' since 'check_match' is \n"
                 "  -- used to check for equality.\n"
@@ -166,7 +166,7 @@ end package body;
 {self.get_array_index_port(register_array=register_array)}\
     value : in {value_type};
     base_address : in addr_t := (others => '0');
-    bus_handle : in bus_master_t := regs_bus_master;
+    bus_handle : in bus_master_t := register_bus_master;
     timeout : delay_length := max_timeout;
     message : string := ""
   )\
@@ -199,7 +199,7 @@ end package body;
 {self.get_array_index_port(register_array=register_array)}\
     value : in {value_type};
     base_address : in addr_t := (others => '0');
-    bus_handle : in bus_master_t := regs_bus_master;
+    bus_handle : in bus_master_t := register_bus_master;
     timeout : delay_length := max_timeout;
     message : string := ""
   )\
@@ -251,7 +251,7 @@ end package body;
 
         return f"""\
 {signature} is
-    constant reg_value : reg_t := {conversion};
+    constant reg_value : register_t := {conversion};
 
 {self._get_common_constants(register=register, register_array=register_array, field=None)}\
   begin
@@ -285,7 +285,7 @@ end package body;
 
         return f"""\
 {signature} is
-    constant reg_value : reg_t := (
+    constant reg_value : register_t := (
       {field_name} => {field_to_slv},
       others => '-'
     );

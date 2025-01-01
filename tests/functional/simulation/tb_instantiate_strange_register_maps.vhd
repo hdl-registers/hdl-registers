@@ -21,7 +21,7 @@ use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 
-library reg_file;
+library register_file;
 
 use work.array_only_up_regs_pkg.all;
 use work.array_only_up_register_record_pkg.all;

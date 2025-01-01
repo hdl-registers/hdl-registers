@@ -20,8 +20,8 @@ use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
+library register_file;
+use register_file.register_file_pkg.all;
 
 use work.caesar_simulation_test_pkg.all;
 
@@ -55,7 +55,7 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
-    variable reg_value : reg_t := reg_init;
+    variable reg_value : register_t := register_init;
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -78,7 +78,7 @@ begin
     elsif run("test_check_equal_of_plain_register_as_record") then
       check_caesar_config_equal(net=>net, expected=>caesar_config_init);
 
-    elsif run("test_check_equal_of_plain_register_as_reg_t") then
+    elsif run("test_check_equal_of_plain_register_as_slv") then
       reg_value := std_ulogic_vector(to_unsigned(14, 32));
       regs_up.current_timestamp <= reg_value;
       check_caesar_current_timestamp_equal(net=>net, expected=>reg_value);
@@ -117,7 +117,7 @@ begin
         net=>net, array_index=>1, expected=>caesar_dummies_first_non_init
       );
 
-    elsif run("test_check_equal_of_array_register_as_reg_t") then
+    elsif run("test_check_equal_of_array_register_as_slv") then
       reg_value := std_ulogic_vector(to_unsigned(127, 32));
       regs_up.dummies3(0).status <= reg_value;
 

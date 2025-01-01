@@ -19,7 +19,7 @@ use axi_lite.axi_lite_pkg.all;
 
 library bfm;
 
-library reg_file;
+library register_file;
 
 use work.counter_register_record_pkg.all;
 use work.counter_register_check_pkg.all;

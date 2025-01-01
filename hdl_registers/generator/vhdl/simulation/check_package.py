@@ -94,9 +94,9 @@ use vunit_lib.string_ops.hex_image;
 library common;
 use common.addr_pkg.addr_t;
 
-library reg_file;
-use reg_file.reg_file_pkg.reg_t;
-use reg_file.reg_operations_pkg.regs_bus_master;
+library register_file;
+use register_file.register_file_pkg.register_t;
+use register_file.register_operations_pkg.register_bus_master;
 
 use work.{self.name}_register_read_write_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -155,7 +155,7 @@ end package body;
                 # GHDL gets confused in this case between using the signature with the record
                 # or the one with SLV.
                 signature = self._register_check_signature(
-                    register=register, register_array=register_array, value_type="reg_t"
+                    register=register, register_array=register_array, value_type="register_t"
                 )
                 declarations.append(f"{signature};\n")
 
@@ -191,7 +191,7 @@ end package body;
         # since it is the default.
         type_comment = (
             " as a plain SLV"
-            if value_type == "reg_t"
+            if value_type == "register_t"
             else " as a plain SLV casted to integer" if value_type == "integer" else ""
         )
 
@@ -203,7 +203,7 @@ end package body;
 {self.get_array_index_port(register_array=register_array)}\
     expected : in {value_type};
     base_address : in addr_t := (others => '0');
-    bus_handle : in bus_master_t := regs_bus_master;
+    bus_handle : in bus_master_t := register_bus_master;
     message : in string := ""
   )\
 """
@@ -236,7 +236,7 @@ end package body;
 {self.get_array_index_port(register_array=register_array)}\
     expected : in {value_type};
     base_address : in addr_t := (others => '0');
-    bus_handle : in bus_master_t := regs_bus_master;
+    bus_handle : in bus_master_t := register_bus_master;
     message : in string := ""
   )\
 """
@@ -276,7 +276,7 @@ end package body;
                 # Check the register value as a plain SLV.
                 implementations.append(
                     self._register_check_implementation(
-                        register=register, register_array=register_array, value_type="reg_t"
+                        register=register, register_array=register_array, value_type="register_t"
                     )
                 )
 
@@ -309,7 +309,7 @@ end package body;
             register=register, register_array=register_array
         )
 
-        if value_type not in ["reg_t", "integer"]:
+        if value_type not in ["register_t", "integer"]:
             # These value types do not work with the standard VUnit check procedures, because
             # they are custom types.
             # They also can not be casted to string directly.

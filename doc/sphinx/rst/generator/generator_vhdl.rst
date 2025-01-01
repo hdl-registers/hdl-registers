@@ -300,13 +300,13 @@ Most of the generated code depends on VHDL packages from `hdl-modules <https://h
 version 4.0.0 or greater.
 
 The :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator` packages
-depend on :ref:`reg_file.reg_file_pkg`.
+depend on :ref:`register_file.register_file_pkg`.
 Can be downloaded from GitHub here:
-https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/reg_file_pkg.vhd
+https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/src/register_file_pkg.vhd
 
 The :class:`.VhdlSimulationReadWritePackageGenerator` and
 :class:`.VhdlSimulationWaitUntilPackageGenerator` packages
-furthermore depend on :ref:`reg_file.reg_operations_pkg` and :ref:`common.addr_pkg`.
+furthermore depend on :ref:`register_file.register_operations_pkg` and :ref:`common.addr_pkg`.
 
 The :class:`.VhdlAxiLiteWrapperGenerator` package also depends on :ref:`axi_lite.axi_lite_pkg`.
 
@@ -342,5 +342,5 @@ the register bus:
 * AXI-Lite clock domain crossing: :ref:`axi_lite.axi_lite_cdc`,
 * etc...
 
-See the :ref:`reg_file library <module_reg_file>`, :ref:`axi library <module_axi>` and
+See the :ref:`register_file library <module_register_file>`, :ref:`axi library <module_axi>` and
 :ref:`axi_lite library <module_axi_lite>` for more details.

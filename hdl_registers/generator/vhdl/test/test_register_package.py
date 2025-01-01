@@ -105,8 +105,8 @@ def test_vhdl_package_with_only_one_register(tmp_path):
     vhdl = read_file(VhdlRegisterPackageGenerator(register_list, tmp_path).create())
 
     expected = """
-  constant apa_reg_map : reg_definition_vec_t(apa_reg_range) := (
-    0 => (idx => apa_hest, reg_type => r)
+  constant apa_reg_map : register_definition_vec_t(apa_reg_range) := (
+    0 => (index => apa_hest, mode => r, utilized_width => 32)
   );
 
   constant apa_regs_init : apa_regs_t := (

@@ -15,8 +15,8 @@ library vunit_lib;
 use vunit_lib.check_pkg.all;
 use vunit_lib.run_pkg.all;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
+library register_file;
+use register_file.register_file_pkg.all;
 
 use work.caesar_regs_pkg.all;
 
@@ -35,7 +35,7 @@ begin
   main : process
     constant expected_base_address : unsigned(35 downto 0) := x"8_0000_0000";
 
-    variable reg : reg_t := (others => '0');
+    variable reg : register_t := (others => '0');
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -56,18 +56,18 @@ begin
       check_equal(caesar_dummies2_dummy(0), 13);
 
     elsif run("test_register_modes") then
-      assert caesar_reg_map(caesar_config).reg_type = r_w;
-      assert caesar_reg_map(caesar_status).reg_type = r;
-      assert caesar_reg_map(caesar_command).reg_type = wpulse;
-      assert caesar_reg_map(caesar_irq_status).reg_type = r_wpulse;
-      assert caesar_reg_map(caesar_address).reg_type = w;
+      assert caesar_reg_map(caesar_config).mode = r_w;
+      assert caesar_reg_map(caesar_status).mode = r;
+      assert caesar_reg_map(caesar_command).mode = wpulse;
+      assert caesar_reg_map(caesar_irq_status).mode = r_wpulse;
+      assert caesar_reg_map(caesar_address).mode = w;
 
-      assert caesar_reg_map(caesar_dummies_first(0)).reg_type = r_w;
-      assert caesar_reg_map(caesar_dummies_second(0)).reg_type = r;
-      assert caesar_reg_map(caesar_dummies_first(1)).reg_type = r_w;
-      assert caesar_reg_map(caesar_dummies_second(1)).reg_type = r;
-      assert caesar_reg_map(caesar_dummies_first(2)).reg_type = r_w;
-      assert caesar_reg_map(caesar_dummies_second(2)).reg_type = r;
+      assert caesar_reg_map(caesar_dummies_first(0)).mode = r_w;
+      assert caesar_reg_map(caesar_dummies_second(0)).mode = r;
+      assert caesar_reg_map(caesar_dummies_first(1)).mode = r_w;
+      assert caesar_reg_map(caesar_dummies_second(1)).mode = r;
+      assert caesar_reg_map(caesar_dummies_first(2)).mode = r_w;
+      assert caesar_reg_map(caesar_dummies_second(2)).mode = r;
 
     elsif run("test_register_field_indexes") then
       -- Generated field indexes should match the order and widths in the TOML

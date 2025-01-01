@@ -42,7 +42,7 @@ Added
 
     * Wait until field equals for each register.
 
-* Add generation of a wrapper around :ref:`reg_file.axi_lite_reg_file` to
+* Add generation of a wrapper around :ref:`register_file.axi_lite_register_file` to
   :class:`.VhdlAxiLiteWrapperGenerator`.
 
   * Sets correct generics and uses the natively typed records from
