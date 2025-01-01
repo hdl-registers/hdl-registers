@@ -54,7 +54,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
     :ref:`reg_file.axi_lite_reg_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "2.0.0"
 
     SHORT_DESCRIPTION = "VHDL register package"
 
@@ -458,11 +458,13 @@ range {field.width + field.base_index - 1} downto {field.base_index};
         vhdl_array_index = 0
         for register_object in self.iterate_register_objects():
             if isinstance(register_object, Register):
-                idx = self.qualified_register_name(register_object)
+                register_idx = self.qualified_register_name(register=register_object)
+                register_width = register_object.width
                 opening = f"{vhdl_array_index} => "
 
                 register_definitions.append(
-                    f"{opening}(idx => {idx}, reg_type => {register_object.mode.shorthand})"
+                    f"{opening}(idx => {register_idx}, "
+                    f"reg_type => {register_object.mode.shorthand}, width => {register_width})"
                 )
                 default_values.append(f'{opening}"{register_object.default_value:032b}"')
 
@@ -471,12 +473,16 @@ range {field.width + field.base_index - 1} downto {field.base_index};
             else:
                 for array_index in range(register_object.length):
                     for register in register_object.registers:
-                        register_name = self.qualified_register_name(register, register_object)
-                        idx = f"{register_name}({array_index})"
+                        register_name = self.qualified_register_name(
+                            register=register, register_array=register_object
+                        )
+                        register_idx = f"{register_name}({array_index})"
+                        register_width = register.width
                         opening = f"{vhdl_array_index} => "
 
                         register_definitions.append(
-                            f"{opening}(idx => {idx}, reg_type => {register.mode.shorthand})"
+                            f"{opening}(idx => {register_idx}, "
+                            f"reg_type => {register.mode.shorthand}, width => {register_width})"
                         )
                         default_values.append(f'{opening}"{register.default_value:032b}"')
 
