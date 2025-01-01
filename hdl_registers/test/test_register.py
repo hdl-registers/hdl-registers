@@ -178,3 +178,23 @@ def test_get_field():
     with pytest.raises(ValueError) as exception_info:
         assert register.get_field("non existing") is None
     assert str(exception_info.value) == 'Could not find field "non existing" within register "apa"'
+
+
+def test_utilized_width():
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
+
+    assert register.utilized_width == 32
+
+    register.append_bit(name="a", description="", default_value="1")
+    assert register.utilized_width == 1
+
+    register.append_bit_vector(name="b", description="", width=2, default_value="11")
+    assert register.utilized_width == 3
+
+    register.append_enumeration(
+        name="c", description="", elements={"d": "", "e": "", "f": ""}, default_value="d"
+    )
+    assert register.utilized_width == 5
+
+    register.append_integer(name="g", description="", min_value=0, max_value=10, default_value=0)
+    assert register.utilized_width == 9

@@ -57,6 +57,22 @@ class Register:
         self.fields: list["RegisterField"] = []
         self.bit_index = 0
 
+    @property
+    def utilized_width(self) -> int:
+        """
+        The number of bits that are utilized by the fields in this register.
+        Note that this is not always the same as the width of the register.
+        Some generator implementations can be optimized by only taking into account the
+        bits that are actually utilized.
+
+        Note that if the register has no fields, we do not really know what the user is doing with
+        it, and we have to assume that the full width is used.
+        """
+        if not self.fields:
+            return 32
+
+        return self.fields[-1].base_index + self.fields[-1].width
+
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """
         Append a bit field to this register.
