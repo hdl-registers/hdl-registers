@@ -54,7 +54,7 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
     :ref:`reg_file.axi_lite_reg_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     SHORT_DESCRIPTION = "VHDL register package"
 
@@ -166,12 +166,23 @@ end package body;
     def _register_range(self) -> str:
         """
         A VHDL type that defines the legal range of register indexes.
+        Note that this method is only called if there are any registers, so
+        the indexing is safe.
         """
         last_index = self.register_list.register_objects[-1].index
+        index_width = 1 if last_index == 0 else last_index.bit_length()
+        address_width = index_width + 2
+
         vhdl = f"""\
   -- ---------------------------------------------------------------------------
   -- The valid range of register indexes.
   subtype {self._register_range_type_name} is natural range 0 to {last_index};
+
+  -- ---------------------------------------------------------------------------
+  -- The number of bits needed to address all {last_index + 1} registers on a register bus.
+  -- Note that this figure includes the lowest two address bits that are assumed zero, since
+  -- registers are 32-bit and unaligned accesses are not supported.
+  constant {self.name}_address_width : positive := {address_width};
 
 """
         return vhdl
@@ -460,8 +471,8 @@ range {field.width + field.base_index - 1} downto {field.base_index};
             else:
                 for array_index in range(register_object.length):
                     for register in register_object.registers:
-                        regiser_name = self.qualified_register_name(register, register_object)
-                        idx = f"{regiser_name}({array_index})"
+                        register_name = self.qualified_register_name(register, register_object)
+                        idx = f"{register_name}({array_index})"
                         opening = f"{vhdl_array_index} => "
 
                         register_definitions.append(
