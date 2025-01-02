@@ -21,7 +21,7 @@ class VhdlTrailWrapperGenerator(VhdlGeneratorCommon):
     Generate a VHDL wrapper around a generic TRAIL register file with correct generics and ports.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.1"
 
     SHORT_DESCRIPTION = "VHDL AXI-Lite register file"
 
@@ -128,8 +128,9 @@ are present.
 -- AXI-Lite register file for the '{self.name}' module registers.
 --
 -- Is a wrapper around the generic AXI-Lite register file from hdl-modules:
--- * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
--- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/axi_lite_reg_file.vhd
+-- * https://hdl-modules.com/modules/register_file/register_file.html#axi-lite-reg-file-vhd
+-- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/\
+src/axi_lite_register_file.vhd
 --
 -- Sets correct generics, and performs conversion to the easy-to-use register record types.
 -- -----------------------------------------------------------------------------
@@ -140,8 +141,8 @@ use ieee.std_logic_1164.all;
 library trail;
 use trail.trail_pkg.all;
 
-library reg_file;
-use reg_file.reg_file_pkg.all;
+library register_file;
+use register_file.register_file_pkg.all;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -160,10 +161,10 @@ begin
 
   ------------------------------------------------------------------------------
   -- Instantiate the generic AXI-Lite register file from
-  -- * https://hdl-modules.com/modules/reg_file/reg_file.html#axi-lite-reg-file-vhd
-  -- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/reg_file/src/\
-axi_lite_reg_file.vhd
-  trail_reg_file_inst : entity reg_file.trail_reg_file
+  -- * https://hdl-modules.com/modules/register_file/register_file.html#axi-lite-reg-file-vhd
+  -- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/src/\
+axi_lite_register_file.vhd
+  trail_register_file_inst : entity register_file.trail_register_file
     generic map (
       regs => {self.name}_reg_map,
       default_values => {self.name}_regs_init
