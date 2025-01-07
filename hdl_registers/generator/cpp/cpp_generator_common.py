@@ -46,7 +46,7 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     def _constructor_signature(self) -> str:
         return (
-            f"{self._class_name}(volatile uint8_t *base_address, "
+            f"{self._class_name}(void *base_address, "
             "bool (*assertion_handler) (const std::string*))"
         )
 

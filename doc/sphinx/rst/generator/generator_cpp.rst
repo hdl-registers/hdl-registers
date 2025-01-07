@@ -114,7 +114,7 @@ More advanced handler functions are left to the user.
 
 .. code-block:: C++
 
-  volatile uint8_t *base_address = reinterpret_cast<volatile uint8_t*>(0x43C00000);
+  void *base_address = reinterpret_cast<void*>(0x43C00000);
 
   bool register_assert_fail_handler(const std::string *diagnostic_message)
   {

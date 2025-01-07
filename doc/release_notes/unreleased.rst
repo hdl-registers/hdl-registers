@@ -13,11 +13,13 @@ Breaking changes
   argument to the generated C++ class.
   See :ref:`cpp_assertion_macros`.
 
+* Change type of C++ constructor ``base_address`` argument to be ``void*``.
+
 Changes
+
+* Significant resource optimizations of generated VHDL code.
 
 * The :meth:`.RegisterCodeGenerator.create` method now includes the header lines in the generated
   code on its own.
   No need to call :meth:`.RegisterCodeGenerator.header` in :meth:`.RegisterCodeGenerator.get_code`
   in custom generators anymore.
-
-* Significant resource optimizations of generated VHDL code.
