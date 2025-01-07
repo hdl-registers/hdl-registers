@@ -62,6 +62,8 @@ class CppHeaderGenerator(CppGeneratorCommon):
     /**
      * Class constructor.
      * @param base_address Pointer to where these registers are memory mapped.
+     *                     As returned by e.g. 'mmap()' in Linux, or
+     *                     e.g. 'reinterpret_cast<void*>(0x43C00000)' in bare metal.
      *                     When using an operating system, care must be taken to pass the
      *                     physical address, not the virtual address.
      *                     When using bare metal, these are the same.
