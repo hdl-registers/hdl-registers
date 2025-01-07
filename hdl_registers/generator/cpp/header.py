@@ -65,7 +65,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
      *                     As returned by e.g. 'mmap()' in Linux, or
      *                     e.g. 'reinterpret_cast<void*>(0x43C00000)' in bare metal.
      *                     When using an operating system, care must be taken to pass the
-     *                     physical address, not the virtual address.
+     *                     virtual address, not the physical address.
      *                     When using bare metal, these are the same.
      * @param assertion_handler Function to call when an assertion fails.
      *                          Function takes a string pointer as an argument and must return a
