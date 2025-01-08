@@ -45,7 +45,7 @@ bool register_assert_handler(const std::string *diagnostic_message)
 int main()
 {{
   uint32_t memory[fpga_regs::Caesar::num_registers];
-  void *base_address = reinterpret_cast<void*>(memory);
+  uintptr_t base_address = reinterpret_cast<uintptr_t>(memory);
   fpga_regs::Caesar caesar = fpga_regs::Caesar(base_address, register_assert_handler);
 
 {test_code}
