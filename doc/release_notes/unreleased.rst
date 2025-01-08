@@ -13,7 +13,7 @@ Breaking changes
   argument to the generated C++ class.
   See :ref:`cpp_assertion_macros`.
 
-* Change type of C++ constructor ``base_address`` argument to be ``void*``.
+* Change type of C++ constructor ``base_address`` argument to be ``uintptr_t``.
 
 Changes
 
