@@ -39,7 +39,7 @@ jobs:
     name: Run Python tests
     strategy:
       matrix:
-        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        os: ['ubuntu-24.04', 'windows-latest', 'macos-latest']
         py: ['3.9', '3.10', '3.11', '3.12', '3.13']
     runs-on: ${{ matrix.os }}
     steps:
@@ -66,18 +66,18 @@ jobs:
     # Run only the UNIT tests on most Python versions in the matrix.
     # This is very fast (2-3 s).
     - name: Run unit tests
-      if: matrix.os != 'ubuntu-latest' || matrix.py != '3.13'
+      if: matrix.os != 'ubuntu-24.04' || matrix.py != '3.13'
       run: |
         python3 -m pytest --verbose hdl_registers
 
     # On one Python version however, we run ALL the Python-based tests, which requires a few more
     # dependencies, and then we collect coverage from this run.
     - name: Setup GHDL
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
-      uses: ghdl/setup-ghdl-ci@nightly
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
+      uses: paebbels/setup-ghdl@main
 
     - name: Install further Python packages
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
       run: |
         python3 -m pip install \
           flake8 \
@@ -93,7 +93,7 @@ jobs:
     # Run ALL tests, including unit, lint and functional ones.
     # The execution time goes from 1:13 -> 0:50 when two threads are used.
     - name: Run all tests
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
       run: |
         python3 -m pytest \
           --verbose \
@@ -105,7 +105,7 @@ jobs:
           tests
 
     - name: Upload coverage artifacts
-      if: matrix.os == 'ubuntu-latest' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
       uses: actions/upload-artifact@v4
       with:
         name: coverage
