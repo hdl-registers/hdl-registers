@@ -74,7 +74,7 @@ jobs:
     # dependencies, and then we collect coverage from this run.
     - name: Setup GHDL
       if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
-      uses: paebbels/setup-ghdl@main
+      uses: ghdl/setup-ghdl@v1
 
     - name: Install further Python packages
       if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
