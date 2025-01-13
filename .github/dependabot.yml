@@ -4,8 +4,16 @@ updates:
     directory: "/hdl_registers"
     schedule:
       interval: "daily"
+    labels:
+      - Dependencies
+    reviewers:
+      - LukasVik
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - Dependencies
+    reviewers:
+      - LukasVik
