@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/tsfpga"
+    directory: "/hdl_registers"
     schedule:
       interval: "daily"
 
