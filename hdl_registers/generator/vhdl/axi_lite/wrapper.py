@@ -66,6 +66,13 @@ axi_lite_register_file.vhd
         Overloaded here because this file shall only be created if the register list
         actually has any registers.
         """
+        # The artifact from this generator was renamed in version 7.0.0.
+        # An old artifact laying around might cause confusion and compilation errors.
+        old_output_file = self.output_folder / f"{self.name}_reg_file.vhd"
+        if old_output_file.exists():
+            print(f"Deleting old artifact {old_output_file}")
+            old_output_file.unlink()
+
         return self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
 
     def get_code(self, **kwargs: Any) -> str:
