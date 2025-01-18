@@ -114,7 +114,7 @@ More advanced handler functions are left to the user.
 
 .. code-block:: C++
 
-  void *base_address = reinterpret_cast<void*>(0x43C00000);
+  uintptr_t base_address = 0x43C00000;
 
   bool register_assert_fail_handler(const std::string *diagnostic_message)
   {
