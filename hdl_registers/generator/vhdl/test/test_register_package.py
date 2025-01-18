@@ -47,9 +47,9 @@ class RegisterConfigurationTest:
         vhdl = get_package(register_list=self.register_list, output_folder=output_path)
 
         if test_registers:
-            assert "constant test_reg_map : " in vhdl, vhdl
+            assert "constant test_register_map : " in vhdl, vhdl
         else:
-            assert "constant test_reg_map : " not in vhdl, vhdl
+            assert "constant test_register_map : " not in vhdl, vhdl
 
         if test_constants:
             assert "constant test_constant_boolean_constant : boolean := true;" in vhdl, vhdl
@@ -96,7 +96,7 @@ def test_vhdl_package_with_constants_and_no_registers(tmp_path, register_configu
 
 def test_vhdl_package_with_only_one_register(tmp_path):
     """
-    Test that reg_map constant has valid VHDL syntax even when there is only one register.
+    Test that register_map constant has valid VHDL syntax even when there is only one register.
     """
     register_list = RegisterList(name="apa", source_definition_file=None)
     register_list.append_register(
@@ -105,7 +105,7 @@ def test_vhdl_package_with_only_one_register(tmp_path):
     vhdl = read_file(VhdlRegisterPackageGenerator(register_list, tmp_path).create())
 
     expected = """
-  constant apa_reg_map : register_definition_vec_t(apa_reg_range) := (
+  constant apa_register_map : register_definition_vec_t(apa_register_range) := (
     0 => (index => apa_hest, mode => r, utilized_width => 32)
   );
 

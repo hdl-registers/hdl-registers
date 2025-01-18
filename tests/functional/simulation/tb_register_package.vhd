@@ -56,18 +56,18 @@ begin
       check_equal(caesar_dummies2_dummy(0), 13);
 
     elsif run("test_register_modes") then
-      assert caesar_reg_map(caesar_config).mode = r_w;
-      assert caesar_reg_map(caesar_status).mode = r;
-      assert caesar_reg_map(caesar_command).mode = wpulse;
-      assert caesar_reg_map(caesar_irq_status).mode = r_wpulse;
-      assert caesar_reg_map(caesar_address).mode = w;
+      assert caesar_register_map(caesar_config).mode = r_w;
+      assert caesar_register_map(caesar_status).mode = r;
+      assert caesar_register_map(caesar_command).mode = wpulse;
+      assert caesar_register_map(caesar_irq_status).mode = r_wpulse;
+      assert caesar_register_map(caesar_address).mode = w;
 
-      assert caesar_reg_map(caesar_dummies_first(0)).mode = r_w;
-      assert caesar_reg_map(caesar_dummies_second(0)).mode = r;
-      assert caesar_reg_map(caesar_dummies_first(1)).mode = r_w;
-      assert caesar_reg_map(caesar_dummies_second(1)).mode = r;
-      assert caesar_reg_map(caesar_dummies_first(2)).mode = r_w;
-      assert caesar_reg_map(caesar_dummies_second(2)).mode = r;
+      assert caesar_register_map(caesar_dummies_first(0)).mode = r_w;
+      assert caesar_register_map(caesar_dummies_second(0)).mode = r;
+      assert caesar_register_map(caesar_dummies_first(1)).mode = r_w;
+      assert caesar_register_map(caesar_dummies_second(1)).mode = r;
+      assert caesar_register_map(caesar_dummies_first(2)).mode = r_w;
+      assert caesar_register_map(caesar_dummies_second(2)).mode = r;
 
     elsif run("test_register_field_indexes") then
       -- Generated field indexes should match the order and widths in the TOML

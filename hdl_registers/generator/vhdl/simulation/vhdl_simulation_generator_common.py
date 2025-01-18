@@ -63,7 +63,7 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
             f"{register_name}(array_index=>array_index)" if register_array else register_name
         )
 
-        return f"    constant reg_index : {self.name}_reg_range := {reg_index};\n"
+        return f"    constant reg_index : {self.name}_register_range := {reg_index};\n"
 
     @staticmethod
     def reg_address_constant() -> str:

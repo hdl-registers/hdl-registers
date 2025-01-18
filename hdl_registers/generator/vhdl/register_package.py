@@ -161,7 +161,7 @@ end package body;
         """
         Name of the type which is the legal index range of registers.
         """
-        return f"{self.name}_reg_range"
+        return f"{self.name}_register_range"
 
     def _register_range(self) -> str:
         """
@@ -244,14 +244,15 @@ end package body;
         """
         Get constants mapping the register indexes to register modes.
         """
-        map_name = f"{self.name}_reg_map"
+        map_name = f"{self.name}_register_map"
 
         vhdl = f"""\
-  -- Declare 'reg_map' and 'regs_init' constants here but define them in body (deferred constants).
+  -- Declare 'register_map' and 'regs_init' constants here but define them in
+  -- the package body (deferred constants).
   -- So that functions have been elaborated when they are called.
   -- Needed for ModelSim compilation to pass.
 
-  -- To be used as the 'regs' generic of 'axi_lite_register_file.vhd'.
+  -- To be used as the 'registers' generic of 'axi_lite_register_file.vhd'.
   constant {map_name} : register_definition_vec_t({self._register_range_type_name});
 
   -- To be used for the 'regs_up' and 'regs_down' ports of 'axi_lite_register_file.vhd'.
@@ -450,8 +451,8 @@ range {field.width + field.base_index - 1} downto {field.base_index};
         """
         Get the body of the register map definition constants.
         """
-        map_name = f"{self.name}_reg_map"
-        range_name = f"{self.name}_reg_range"
+        map_name = f"{self.name}_register_map"
+        range_name = f"{self.name}_register_range"
 
         register_definitions = []
         default_values = []

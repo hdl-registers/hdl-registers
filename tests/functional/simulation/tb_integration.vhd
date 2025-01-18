@@ -59,7 +59,7 @@ architecture tb of tb_integration is
   signal reg_was_read : caesar_reg_was_read_t := caesar_reg_was_read_init;
   signal reg_was_written : caesar_reg_was_written_t := caesar_reg_was_written_init;
 
-  signal reg_was_read_count, reg_was_written_count : natural_vec_t(caesar_reg_range) := (
+  signal reg_was_read_count, reg_was_written_count : natural_vec_t(caesar_register_range) := (
     others => 0
   );
 
@@ -103,9 +103,9 @@ begin
       check_equal(value.j, caesar_dummies2_dummy_j_init);
     end procedure;
 
-    variable reg_was_read_expected, reg_was_written_expected : natural_vec_t(caesar_reg_range) := (
-      others => 0
-    );
+    variable reg_was_read_expected, reg_was_written_expected : natural_vec_t(
+      caesar_register_range
+    ) := (others => 0);
 
     procedure test_plain_r_register is
       procedure check(

@@ -193,7 +193,7 @@ begin
 axi_lite_register_file.vhd
   axi_lite_register_file_inst : entity register_file.axi_lite_register_file
     generic map (
-      regs => {self.name}_reg_map,
+      registers => {self.name}_register_map,
       default_values => {self.name}_regs_init
     )
     port map(
