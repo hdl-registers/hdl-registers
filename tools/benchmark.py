@@ -96,11 +96,11 @@ def main():  # pylint: disable=too-many-locals
 
     tests = [
         ("hdl-registers", benchmark_hdl_registers_comparable),
-        # ("cheby", benchmark_cheby),
-        # ("corsair", benchmark_corsair),
-        # ("PeakRDL", benchmark_peakrdl),
-        # ("rggen", benchmark_rggen),
-        # ("vhdmmio", benchmark_vhdmmio),
+        ("cheby", benchmark_cheby),
+        ("corsair", benchmark_corsair),
+        ("PeakRDL", benchmark_peakrdl),
+        ("rggen", benchmark_rggen),
+        ("vhdmmio", benchmark_vhdmmio),
     ]
 
     if not args.skip_hdl_registers_typical:
