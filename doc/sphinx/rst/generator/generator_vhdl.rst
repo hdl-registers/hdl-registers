@@ -214,7 +214,7 @@ without any manual casting.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_reg_file.vhd
+  .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_vhdl/counter_register_file_axi_lite.vhd
     :caption: Example AXI-Lite register file wrapper.
     :language: VHDL
     :linenos:

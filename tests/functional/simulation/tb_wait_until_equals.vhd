@@ -242,7 +242,7 @@ begin
 
 
   ------------------------------------------------------------------------------
-  caesar_reg_file_inst : entity work.caesar_reg_file
+  caesar_register_file_axi_lite_inst : entity work.caesar_register_file_axi_lite
     port map(
       clk => clk,
       --

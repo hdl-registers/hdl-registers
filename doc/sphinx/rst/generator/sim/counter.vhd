@@ -44,7 +44,7 @@ architecture a of counter is
 begin
 
   ------------------------------------------------------------------------------
-  counter_reg_file_inst : entity work.counter_reg_file
+  counter_register_file_axi_lite_inst : entity work.counter_register_file_axi_lite
     port map (
       clk => clk,
       --

@@ -68,7 +68,7 @@ def test_can_generate_vhdl_without_error(tmp_path, register_list):
     assert (tmp_path / f"{register_list.name}_register_wait_until_pkg.vhd").exists()
 
     VhdlAxiLiteWrapperGenerator(register_list, tmp_path).create()
-    assert (tmp_path / f"{register_list.name}_reg_file.vhd").exists()
+    assert (tmp_path / f"{register_list.name}_register_file_axi_lite.vhd").exists()
 
 
 @pytest.mark.parametrize("register_list", REGISTER_LISTS)
