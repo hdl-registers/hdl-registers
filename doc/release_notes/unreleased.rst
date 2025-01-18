@@ -3,6 +3,7 @@ Added
 * Add custom assertion macro call for C++ runtime checks.
   Adds the possibility of user-defined handling of errors.
   See :ref:`cpp_assertion_macros`.
+* Add :attr:`.Register.utilized_width` property.
 
 Breaking changes
 
