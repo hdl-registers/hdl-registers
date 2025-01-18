@@ -20,7 +20,7 @@ use axi_lite.axi_lite_pkg.all;
 use work.test_register_record_pkg.all;
 
 
-entity test_reg_file_wrapper is
+entity test_register_file_axi_lite_wrapper is
   port (
     clk : in std_ulogic;
     --# {}
@@ -33,12 +33,12 @@ entity test_reg_file_wrapper is
   );
 end entity;
 
-architecture a of test_reg_file_wrapper is
+architecture a of test_register_file_axi_lite_wrapper is
 
 begin
 
   ------------------------------------------------------------------------------
-  test_reg_file_inst : entity work.test_reg_file
+  test_register_file_axi_lite_inst : entity work.test_register_file_axi_lite
     port map(
       clk => clk,
       --

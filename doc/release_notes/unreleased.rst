@@ -16,6 +16,9 @@ Breaking changes
 
 * Change type of C++ constructor ``base_address`` argument to be ``uintptr_t``.
 
+* Rename :class:`.VhdlAxiLiteWrapperGenerator` output file and entity name from
+  ``<name>_reg_file`` to ``<name>_register_file_axi_lite``.
+
 Changes
 
 * Significant resource optimizations of generated VHDL code.

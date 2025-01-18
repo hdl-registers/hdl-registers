@@ -312,12 +312,12 @@ def benchmark_hdl_registers(  # pylint: disable=too-many-locals
             # 'reg_was_written' signals.
             # Since (most of) the other tools do not have this feature, excluding these
             # signals makes the comparison more fair.
-            top = "test_reg_file_wrapper"
+            top = "test_register_file_axi_lite_wrapper"
             copy2(
                 BENCHMARK_FOLDER / "hdl_registers" / f"{top}.vhd", registers_folder / f"{top}.vhd"
             )
         else:
-            top = "test_reg_file"
+            top = "test_register_file_axi_lite"
 
         lut, ff = build(registers_folder=registers_folder, build_folder=build_folder, top=top)
 

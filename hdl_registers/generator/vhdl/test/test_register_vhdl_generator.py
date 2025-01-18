@@ -152,7 +152,7 @@ def test_registers_only_in_up_direction_should_give_no_down_type_or_port(tmp_pat
         string = _get_register_arrays_record_string("down")
         assert string not in vhd
 
-        vhd = read_file(tmp_path / f"{file_name}_reg_file.vhd")
+        vhd = read_file(tmp_path / f"{file_name}_register_file_axi_lite.vhd")
 
         assert "regs_up : in" in vhd
         assert "regs_down : out" not in vhd
@@ -182,7 +182,7 @@ def test_registers_only_in_down_direction_should_give_no_down_type_or_port(tmp_p
         string = _get_register_arrays_record_string("up")
         assert string not in vhd
 
-        vhd = read_file(tmp_path / f"{file_name}_reg_file.vhd")
+        vhd = read_file(tmp_path / f"{file_name}_register_file_axi_lite.vhd")
 
         assert "regs_up : in" not in vhd
         assert "regs_down : out" in vhd

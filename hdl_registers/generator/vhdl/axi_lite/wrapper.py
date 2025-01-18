@@ -57,7 +57,7 @@ axi_lite_register_file.vhd
         """
         Result will be placed in this file.
         """
-        return self.output_folder / f"{self.name}_reg_file.vhd"
+        return self.output_folder / f"{self.name}_register_file_axi_lite.vhd"
 
     def create(self, **kwargs: Any) -> Path:
         """
