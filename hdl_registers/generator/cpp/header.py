@@ -56,8 +56,6 @@ class CppHeaderGenerator(CppGeneratorCommon):
     volatile uint32_t *m_registers;
     bool (*m_assertion_handler) (const std::string*);
 
-    void _assert_failed(const std::string *message) const;
-
   public:
     /**
      * Class constructor.
