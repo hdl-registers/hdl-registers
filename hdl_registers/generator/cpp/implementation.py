@@ -70,11 +70,6 @@ class CppImplementationGenerator(CppGeneratorCommon):
     // Empty
   }}
 
-  void {self._class_name}::_assert_failed(const std::string *message) const
-  {{
-    m_assertion_handler(message);
-  }}
-
 """
 
         for register, register_array in self.iterate_registers():
@@ -131,7 +126,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
       diagnostics << "{message} out of range in " << __FILE__ << ":" {message_space}\\
                   << __LINE__ << ", message: " << message << ".";                \\
       std::string diagnostic_message = diagnostics.str();                        \\
-      _assert_failed(&diagnostic_message);                                       \\
+      m_assertion_handler(&diagnostic_message);                                  \\
     }}                                                                            \\
   }}
 
