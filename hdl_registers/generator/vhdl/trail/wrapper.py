@@ -21,16 +21,16 @@ class VhdlTrailWrapperGenerator(VhdlGeneratorCommon):
     Generate a VHDL wrapper around a generic TRAIL register file with correct generics and ports.
     """
 
-    __version__ = "1.0.1"
+    __version__ = "1.0.5"
 
-    SHORT_DESCRIPTION = "VHDL AXI-Lite register file"
+    SHORT_DESCRIPTION = "VHDL TRAIL register file"
 
     @property
     def output_file(self) -> Path:
         """
         Result will be placed in this file.
         """
-        return self.output_folder / f"{self.name}_register_file.vhd"
+        return self.output_folder / f"{self.name}_register_file_trail.vhd"
 
     def create(self, **kwargs: Any) -> Path:
         """
@@ -166,7 +166,7 @@ begin
 axi_lite_register_file.vhd
   trail_register_file_inst : entity register_file.trail_register_file
     generic map (
-      regs => {self.name}_reg_map,
+      registers => {self.name}_register_map,
       default_values => {self.name}_regs_init
     )
     port map(
