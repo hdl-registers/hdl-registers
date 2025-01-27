@@ -41,6 +41,8 @@ class RegisterConfigurationTest:
         self.register_list.add_constant(name="boolean_constant", value=True, description="")
         self.register_list.add_constant(name="integer_constant", value=3, description="")
         self.register_list.add_constant(name="real_constant", value=3.14, description="")
+        self.register_list.add_constant(name="real_big_constant", value=1e20, description="")
+        self.register_list.add_constant(name="real_small_constant", value=4e-8, description="")
         self.register_list.add_constant(name="string_constant", value="apa", description="")
 
     def test_vhdl_package(self, output_path, test_registers, test_constants):
@@ -55,6 +57,8 @@ class RegisterConfigurationTest:
             assert "constant test_constant_boolean_constant : boolean := true;" in vhdl, vhdl
             assert "constant test_constant_integer_constant : integer := 3;" in vhdl, vhdl
             assert "constant test_constant_real_constant : real := 3.14;" in vhdl, vhdl
+            assert "constant test_constant_real_big_constant : real := 1.0e+20;" in vhdl, vhdl
+            assert "constant test_constant_real_small_constant : real := 4.0e-08;" in vhdl, vhdl
             assert 'constant test_constant_string_constant : string := "apa";' in vhdl, vhdl
             assert (
                 "constant test_constant_base_address_hex : "

@@ -9,6 +9,7 @@
 
 # Standard libraries
 from pathlib import Path
+from re import compile as re_compile
 from typing import TYPE_CHECKING, Any
 
 # First party libraries
@@ -118,6 +119,7 @@ end package body;
   -- ---------------------------------------------------------------------------
   -- Values of register constants.
 """
+        re_float_start_with_integer = re_compile(r"^(\d+)e")
 
         for constant in self.iterate_constants():
             if isinstance(constant, BooleanConstant):
@@ -132,6 +134,10 @@ end package body;
                 # Note that casting a Python float to string guarantees full precision in the
                 # resulting string: https://stackoverflow.com/a/60026172
                 value = str(constant.value)
+                match = re_float_start_with_integer.match(value)
+                if match:
+                    # "1e-3" is not valid VHDL, but "1.0e-3" is.
+                    value = f"{match.group(1)}.0{value[match.end(1):]}"
             elif isinstance(constant, StringConstant):
                 type_declaration = "string"
                 value = f'"{constant.value}"'

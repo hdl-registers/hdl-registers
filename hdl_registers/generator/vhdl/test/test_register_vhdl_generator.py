@@ -119,6 +119,8 @@ def generate_strange_register_maps(output_path):
     register_list = RegisterList(name="only_constants")
     register_list.add_constant(name="first", value=123, description="")
     register_list.add_constant(name="second", value=True, description="")
+    register_list.add_constant(name="third", value=5e30, description="")
+    register_list.add_constant(name="fourth", value=1e-12, description="")
     generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
     register_list = RegisterList(name="empty")
