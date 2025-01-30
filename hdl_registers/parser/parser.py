@@ -163,7 +163,7 @@ class RegisterParser:
                 print(
                     f"""
 ERROR: Parsing register data that appears to be in the old pre-6.0.0 format.
-ERROR: For more information, see: {WEBSITE_URL}/rst/basic_feature/basic_feature_register_modes.html
+ERROR: For more information, see: {WEBSITE_URL}/rst/about/new_data_file_format.html
 ERROR: Your data will be automatically converted to the new format and saved to: {output_file}
 ERROR: Please inspect that file and update your data file to the new format.
 """
