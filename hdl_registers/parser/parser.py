@@ -531,7 +531,7 @@ ERROR: Please inspect that file and update your data file to the new format.
 
 
 def _convert_to_new_format(  # pylint: disable=too-many-locals
-    old_data: dict[str, Any]
+    old_data: dict[str, Any],
 ) -> dict[str, Any]:
     """
     Convert pre-6.0.0 format to the new format.
