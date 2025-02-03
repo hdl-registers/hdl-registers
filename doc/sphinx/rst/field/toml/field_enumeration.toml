@@ -4,35 +4,30 @@ mode = "r_w"
 description = "Configuration register."
 
 # This will allocate an enumeration field named "severity_level" in the "config" register.
-[config.severity_level]
-
 # The "type" property MUST be present and set to "enumeration".
-type = "enumeration"
+severity_level.type = "enumeration"
 
 # The "description" property is OPTIONAL for an enumeration field.
 # Will default to "" if not specified.
 # The value specified MUST be a string.
-description = "Run-time configuration of severity."
+severity_level.description = "Run-time configuration of severity."
 
 # The "default_value" property is OPTIONAL for an enumeration field.
 # Will default to the first enumeration element declared below, if not specified.
 # The value specified MUST be a string that matches one of the enumeration element names
 # specified below.
-default_value = "warning"
+severity_level.default_value = "warning"
 
 # For an enumeration field there MUST be at least one enumeration element declared.
 # The name of each element is mapped below to the description of that element.
-element.info = "Informational message. Is not considered an error."
-element.warning = "Warning message. Is not considered an error."
-element.error = "Error message. Is considered an error."
-element.failure = "Failure message. Is considered an error."
+severity_level.element.info = "Informational message. Is not considered an error."
+severity_level.element.warning = "Warning message. Is not considered an error."
+severity_level.element.error = "Error message. Is considered an error."
+severity_level.element.failure = "Failure message. Is considered an error."
 
 
-[config.packet_source]
-
-type = "enumeration"
-description = "Set input mux."
-
-element.streaming = "Process incoming streaming data."
-element.dma = "Read packets from DMA."
-element.none = "Don't send anything."
+packet_source.type = "enumeration"
+packet_source.description = "Set input mux."
+packet_source.element.streaming = "Process incoming streaming data."
+packet_source.element.dma = "Read packets from DMA."
+packet_source.element.none = "Don't send anything."

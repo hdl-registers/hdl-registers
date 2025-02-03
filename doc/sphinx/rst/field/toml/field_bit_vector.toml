@@ -4,30 +4,26 @@ mode = "r_w"
 description = "Configuration register."
 
 # This will allocate a bit vector field named "tuser" in the "config" register.
-[config.tuser]
-
 # The "type" property MUST be present and set to "bit_vector".
-type = "bit_vector"
+tuser.type = "bit_vector"
 
 # The "width" property MUST be present for a bit vector field.
 # The value specified MUST be a positive integer.
-width = 4
+tuser.width = 4
 
 # The "description" property is OPTIONAL for a bit vector field.
 # Will default to "" if not specified.
 # The value specified MUST be a string.
-description = "Value to set for **TUSER** in the data stream."
+tuser.description = "Value to set for **TUSER** in the data stream."
 
 # The "default_value" property is OPTIONAL for a bit vector field.
 # Will default to all zeros if not specified.
 # The value specified MUST be a string whose length is the same as the
 # specified 'width' property value.
 # The value specified MUST contain only ones and zeros.
-default_value = "0101"
+tuser.default_value = "0101"
 
 
-[config.tid]
-
-type = "bit_vector"
-width = 8
-description = "Value to set for **TID** in the data stream."
+tid.type = "bit_vector"
+tid.width = 8
+tid.description = "Value to set for **TID** in the data stream."
