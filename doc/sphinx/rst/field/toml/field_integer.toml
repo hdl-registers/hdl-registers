@@ -4,43 +4,37 @@ mode = "r_w"
 description = "Configuration register."
 
 # This will allocate an integer field named "burst_length_bytes" in the "config" register.
-[config.burst_length_bytes]
-
 # The "type" property MUST be present and set to "integer".
-type = "integer"
+burst_length_bytes.type = "integer"
 
 # The "min_value" property is OPTIONAL for an integer field.
 # Will default to 0 if not specified.
 # The value specified MUST be an integer.
-min_value = 1
+burst_length_bytes.min_value = 1
 
 # The "max_value" property MUST be present for an integer field.
 # The value specified MUST be an integer, and greater than or equal to the
 # "min_value" parameter value.
-max_value = 256
+burst_length_bytes.max_value = 256
 
 # The "description" property is OPTIONAL for an integer field.
 # Will default to "" if not specified.
 # The value specified MUST be a string.
-description = "The number of bytes to request."
+burst_length_bytes.description = "The number of bytes to request."
 
 # The "default_value" property is OPTIONAL for a integer field.
 # Will default to the "min_value" parameter value if not specified.
 # The value specified MUST be an integer within the specified min/max range.
-default_value = 64
+burst_length_bytes.default_value = 64
 
 
-[config.increment]
-
-type = "integer"
-min_value = -4
-max_value = 3
-description = "Offset that will be added to data."
-default_value = 0
+increment.type = "integer"
+increment.min_value = -4
+increment.max_value = 3
+increment.description = "Offset that will be added to data."
+increment.default_value = 0
 
 
-[config.retry_count]
-
-type = "integer"
-max_value = 5
-description = "Number of retry attempts before giving up."
+retry_count.type = "integer"
+retry_count.max_value = 5
+retry_count.description = "Number of retry attempts before giving up."

@@ -26,25 +26,20 @@ This is the description of my register.
 Rudimentary RST formatting can be used, such as **boldface** and *italics*.
 """
 
-[config.enable]
+enable.type = "bit"
+enable.description = "Enable operation."
+enable.default_value = "1"
 
-type = "bit"
-description = "Enable operation."
-default_value = "1"
-
-[config.direction]
-
-type = "enumeration"
-description = "Set the data direction."
-default_value = "high_z"
-
-element.data_in = "Receive data from outside the FPGA."
-element.high_z = """
+direction.type = "enumeration"
+direction.description = "Set the data direction."
+direction.default_value = "high_z"
+direction.element.data_in = "Receive data from outside the FPGA."
+direction.element.high_z = """
 Set pins to high impedance.
 
 Will not process any incoming data, nor send anything out.
 """
-element.data_out = "Send data from FPGA."
+direction.element.data_out = "Send data from FPGA."
 
 
 ################################################################################
