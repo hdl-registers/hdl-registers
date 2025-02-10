@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.generator.register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from hdl_registers.register import Register
 from hdl_registers.register_modes import REGISTER_MODES
@@ -32,7 +30,7 @@ def test_field_setter_should_read_modify_write():
 def test_field_setter_should_read_modify_write_should_raise_exception_if_there_are_no_fields():
     register = Register(name="", index=0, mode=REGISTER_MODES["r_w"], description="")
 
-    with pytest.raises(AssertionError) as exception_info:
+    with pytest.raises(ValueError) as exception_info:
         RegisterCodeGeneratorHelpers.field_setter_should_read_modify_write(register)
     assert str(exception_info.value) == "Should not end up here if the register has no fields."
 

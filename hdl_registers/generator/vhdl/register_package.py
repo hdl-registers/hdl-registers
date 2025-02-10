@@ -7,12 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from re import compile as re_compile
 from typing import TYPE_CHECKING, Any
 
-# First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
@@ -30,12 +28,11 @@ from hdl_registers.field.numerical_interpretation import (
 )
 from hdl_registers.register import Register
 
+from .vhdl_generator_common import VhdlGeneratorCommon
+
 if TYPE_CHECKING:
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register_array import RegisterArray
-
-# Local folder libraries
-from .vhdl_generator_common import VhdlGeneratorCommon
 
 
 class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
@@ -66,7 +63,10 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_regs_pkg.vhd"
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete VHDL package with register and constant information.
         """
@@ -119,6 +119,7 @@ end package body;
   -- ---------------------------------------------------------------------------
   -- Values of register constants.
 """
+        # Match e.g. 5e60, but not 5.0e60.
         re_float_start_with_integer = re_compile(r"^(\d+)e")
 
         for constant in self.iterate_constants():
@@ -134,10 +135,13 @@ end package body;
                 # Note that casting a Python float to string guarantees full precision in the
                 # resulting string: https://stackoverflow.com/a/60026172
                 value = str(constant.value)
+
                 match = re_float_start_with_integer.match(value)
                 if match:
                     # "1e-3" is not valid VHDL, but "1.0e-3" is.
-                    value = f"{match.group(1)}.0{value[match.end(1):]}"
+                    base = match.group(1)
+                    exponent = value[match.end(1) :]
+                    value = f"{base}.0{exponent}"
             elif isinstance(constant, StringConstant):
                 type_declaration = "string"
                 value = f'"{constant.value}"'
@@ -151,7 +155,7 @@ end package body;
                     # But not when defining a binary SLV.
                     value = f'"{constant.value_without_separator}"'
             else:
-                raise ValueError(f"Got unexpected constant type. {constant}")
+                raise TypeError(f"Got unexpected constant type. {constant}")
 
             vhdl += (
                 "  constant "
@@ -179,7 +183,7 @@ end package body;
         index_width = 1 if last_index == 0 else last_index.bit_length()
         address_width = index_width + 2
 
-        vhdl = f"""\
+        return f"""\
   -- ---------------------------------------------------------------------------
   -- The valid range of register indexes.
   subtype {self._register_range_type_name} is natural range 0 to {last_index};
@@ -191,7 +195,6 @@ end package body;
   constant {self.name}_address_width : positive := {address_width};
 
 """
-        return vhdl
 
     def _array_constants(self) -> str:
         """
@@ -219,11 +222,10 @@ end package body;
         register array.
         """
         array_name = self.qualified_register_array_name(register_array=register_array)
-        vhdl = f"""\
+        return f"""\
   function {self.qualified_register_name(register, register_array)}(
     array_index : {array_name}_range
   ) return {self._register_range_type_name}"""
-        return vhdl
 
     def _register_indexes(self) -> str:
         """
@@ -252,7 +254,7 @@ end package body;
         """
         map_name = f"{self.name}_register_map"
 
-        vhdl = f"""\
+        return f"""\
   -- Declare 'register_map' and 'regs_init' constants here but define them in
   -- the package body (deferred constants).
   -- So that functions have been elaborated when they are called.
@@ -271,8 +273,6 @@ end package body;
 std_ulogic_vector({self._register_range_type_name});
 
 """
-
-        return vhdl
 
     def _field_declarations(self) -> str:
         """
@@ -375,8 +375,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
 
         if isinstance(field, Integer):
             return (
-                f"  subtype {field_name}_t is integer "
-                f"range {field.min_value} to {field.max_value};"
+                f"  subtype {field_name}_t is integer range {field.min_value} to {field.max_value};"
             )
 
         raise TypeError(f'Got unexpected type for field: "{field}".')
@@ -491,7 +490,7 @@ range {field.width + field.base_index - 1} downto {field.base_index};
                         index += 1
 
         array_element_separator = ",\n    "
-        vhdl = f"""\
+        return f"""\
   constant {map_name} : register_definition_vec_t({range_name}) := (
     {array_element_separator.join(register_definitions)}
   );
@@ -501,8 +500,6 @@ range {field.width + field.base_index - 1} downto {field.base_index};
   );
 
 """
-
-        return vhdl
 
     def _field_conversion_implementations(self) -> str:
         """

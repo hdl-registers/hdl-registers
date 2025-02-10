@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.field.bit import Bit
 
 
@@ -70,7 +68,7 @@ def test_default_value_uint():
 
 
 def test_invalid_default_value_should_raise_exception():
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         Bit(name="hest", index=0, description="", default_value=1)
     assert str(exception_info.value) == (
         'Bit "hest" should have string value for "default_value". Got "1".'

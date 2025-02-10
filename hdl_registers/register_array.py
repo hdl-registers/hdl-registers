@@ -8,14 +8,11 @@
 # --------------------------------------------------------------------------------------------------
 
 
-# Standard libraries
 from typing import TYPE_CHECKING
 
-# Local folder libraries
 from .register import Register
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.register_mode import RegisterMode
 
 
@@ -30,7 +27,7 @@ class RegisterArray:
     Empty register arrays will result in errors.
     """
 
-    def __init__(self, name: str, base_index: int, length: int, description: str):
+    def __init__(self, name: str, base_index: int, length: int, description: str) -> None:
         """
         Arguments:
             name: The name of this register array.
@@ -77,6 +74,7 @@ class RegisterArray:
 
         Arguments:
             name: The name of the register.
+
         Return:
             The register.
         """
@@ -121,5 +119,5 @@ name={self.name},\
 base_index={self.base_index},\
 length={self.length},\
 description={self.description},\
-registers={','.join([repr(register) for register in self.registers])},\
+registers={",".join([repr(register) for register in self.registers])},\
 )"""

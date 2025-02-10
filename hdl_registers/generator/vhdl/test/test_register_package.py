@@ -12,11 +12,9 @@ Some limited unit tests that check the generated code.
 Note that the generated VHDL code is also simulated in a functional test.
 """
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import read_file
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.field.numerical_interpretation import (
     Signed,
@@ -78,10 +76,6 @@ class RegisterConfigurationTest:
 @pytest.fixture
 def register_configuration():
     return RegisterConfigurationTest("test", HDL_REGISTERS_TESTS / "regs_test.toml")
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 def test_vhdl_package_with_registers_and_constants(tmp_path, register_configuration):

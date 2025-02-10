@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -23,14 +22,14 @@ class Constant(ABC):
 
     @property
     @abstractmethod
-    def value(self) -> Any:
+    def value(self) -> Any:  # noqa: ANN401
         """
         The value of the constant. Return type depends on the subclass.
         """
 
     @value.setter
     @abstractmethod
-    def value(self, value: Any) -> None:
+    def value(self, value: Any) -> None:  # noqa: ANN401
         """
         Setter to update the constant value.
         Argument type depends on the subclass.

@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from typing import Optional, Union
+from __future__ import annotations
 
-# Local folder libraries
 from .numerical_interpretation import NumericalInterpretation, Unsigned
 from .register_field import RegisterField
 
@@ -27,8 +25,8 @@ class BitVector(RegisterField):
         description: str,
         width: int,
         default_value: str,
-        numerical_interpretation: Optional[NumericalInterpretation] = None,
-    ):  # pylint: disable=too-many-arguments
+        numerical_interpretation: NumericalInterpretation | None = None,
+    ) -> None:
         """
         Arguments:
             name: The name of the bit vector.
@@ -79,7 +77,7 @@ class BitVector(RegisterField):
             message = (
                 f'Bit vector "{self.name}" should have integer value for "width". Got: "{width}".'
             )
-            raise ValueError(message)
+            raise TypeError(message)
 
         if width < 1 or width > 32:
             raise ValueError(f'Invalid width for bit vector "{self.name}". Got: "{width}".')
@@ -108,7 +106,7 @@ class BitVector(RegisterField):
                 f'Bit vector "{self.name}" should have string value for "default_value". '
                 f'Got: "{value}"'
             )
-            raise ValueError(message)
+            raise TypeError(message)
 
         if len(value) != self.width:
             message = (
@@ -127,7 +125,7 @@ class BitVector(RegisterField):
 
         self._default_value = value
 
-    def get_value(self, register_value: int) -> Union[int, float]:  # type: ignore[override]
+    def get_value(self, register_value: int) -> int | float:
         """
         See super method for details.
         This subclass method uses the native numeric representation of the field value
@@ -141,7 +139,7 @@ class BitVector(RegisterField):
             unsigned_binary=value_unsigned
         )
 
-    def set_value(self, field_value: Union[int, float]) -> int:
+    def set_value(self, field_value: float) -> int:
         """
         See super method for details.
         This subclass method uses the native numeric representation of the field value

@@ -12,10 +12,8 @@ Some limited unit tests.
 Note that the generated VHDL code is also simulated in a functional test.
 """
 
-# Third party libraries
 from tsfpga.system_utils import read_file
 
-# First party libraries
 from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,

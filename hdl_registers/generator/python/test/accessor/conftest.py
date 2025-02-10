@@ -7,15 +7,13 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import Union
+from __future__ import annotations
 
-# Third party libraries
+from typing import TYPE_CHECKING, Any
+
 import pytest
 from tsfpga.system_utils import load_python_module
 
-# First party libraries
 from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
@@ -24,13 +22,14 @@ from hdl_registers.field.numerical_interpretation import (
 )
 from hdl_registers.generator.python.accessor import PythonAccessorGenerator
 from hdl_registers.generator.python.pickle import PythonPickleGenerator
-from hdl_registers.register_array import RegisterArray
 from hdl_registers.register_list import RegisterList
-from hdl_registers.register_mode import RegisterMode
 from hdl_registers.register_modes import REGISTER_MODES
 
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from hdl_registers.register_array import RegisterArray
+    from hdl_registers.register_mode import RegisterMode
 
 
 @pytest.fixture(scope="session")
@@ -45,7 +44,7 @@ def tmp_session_path(tmp_path_factory: pytest.TempdirFactory) -> Path:
 
 
 @pytest.fixture(scope="session")
-def generate_default_accessor(tmp_session_path):
+def generate_default_accessor(tmp_session_path: Path) -> tuple[Path, Any]:
     """
     Since all the tests use the same register list, we can save a lot of time by generating the
     Python code artifact only once.
@@ -73,13 +72,13 @@ def generate_default_accessor(tmp_session_path):
     return tmp_session_path, python_module
 
 
-def add_test_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
+def add_test_registers(register_list_or_array: RegisterList | RegisterArray) -> None:
     for mode in REGISTER_MODES.values():
         setup_test_register(register_list_or_array=register_list_or_array, mode=mode)
 
 
 def setup_test_register(
-    register_list_or_array: Union[RegisterList, RegisterArray], mode: RegisterMode
+    register_list_or_array: RegisterList | RegisterArray, mode: RegisterMode
 ) -> None:
     register = register_list_or_array.append_register(
         f"reg_{mode.shorthand}", mode=mode, description=""
@@ -120,7 +119,7 @@ def setup_test_register(
     register.append_enumeration(
         name="enumeration_aa",
         description="",
-        elements=dict(element_aa0="", element_aa1="", element_aa2=""),
+        elements={"element_aa0": "", "element_aa1": "", "element_aa2": ""},
         default_value="element_aa1",
     )
 
@@ -132,14 +131,14 @@ def setup_test_register(
     )
 
 
-def add_empty_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
+def add_empty_registers(register_list_or_array: RegisterList | RegisterArray) -> None:
     for mode in REGISTER_MODES.values():
         register_list_or_array.append_register(
             name=f"empty_{mode.shorthand}", mode=mode, description=""
         )
 
 
-def add_single_field_registers(register_list_or_array: Union[RegisterList, RegisterArray]) -> None:
+def add_single_field_registers(register_list_or_array: RegisterList | RegisterArray) -> None:
     register = register_list_or_array.append_register(
         "single_w_bit", mode=REGISTER_MODES["w"], description=""
     )
@@ -173,7 +172,7 @@ def add_single_field_registers(register_list_or_array: Union[RegisterList, Regis
     register.append_enumeration(
         name="enumeration_bb",
         description="",
-        elements=dict(element_bb0="", element_bb1="", element_bb2=""),
+        elements={"element_bb0": "", "element_bb1": "", "element_bb2": ""},
         default_value="element_bb2",
     )
 

@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
@@ -49,7 +47,7 @@ class TxtRegisterListGenerator(RegisterCodeGenerator):
         return txt
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     """
     Set up some registers and generate text file with our custom generator.
     """

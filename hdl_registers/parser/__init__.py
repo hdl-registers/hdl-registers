@@ -6,3 +6,5 @@
 # https://hdl-registers.com
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
+
+# ruff: noqa: A005

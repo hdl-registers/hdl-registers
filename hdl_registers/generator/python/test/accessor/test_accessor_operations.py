@@ -7,24 +7,19 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+from __future__ import annotations
+
 import contextlib
 import io
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
 from unittest.mock import Mock
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.generator.python.register_accessor_interface import (
     PythonRegisterAccessorInterface,
 )
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture
@@ -50,9 +45,9 @@ def default_accessor(generate_default_accessor):
 
         def assert_call(
             self,
-            read_index: Optional[int] = None,
-            write_index: Optional[int] = None,
-            write_value: Optional[int] = None,
+            read_index: int | None = None,
+            write_index: int | None = None,
+            write_value: int | None = None,
         ):
             if read_index is None:
                 self.register_accessor.read_register.assert_not_called()
@@ -82,7 +77,7 @@ SAMPLE_U32_1 = 0b01010101010101010101010101010101
 # ==================================================================================================
 
 
-def get_a_value_int(  # pylint: disable=too-many-arguments
+def get_a_value_int(
     bit_aa0=0b0,
     bit_aa1=0b1,
     unsigned_aa=0b0101,
@@ -109,7 +104,7 @@ def get_a_value_int(  # pylint: disable=too-many-arguments
     )
 
 
-def a_value0_int(  # pylint: disable=too-many-arguments
+def a_value0_int(
     bit_aa0=0b0,
     bit_aa1=0b1,
     unsigned_aa=0b0110,
@@ -147,7 +142,7 @@ def a_value0_class(value_class, uint_aa=10):
     )
 
 
-def a_value1_int(  # pylint: disable=too-many-arguments
+def a_value1_int(
     bit_aa0=0b1,
     bit_aa1=0b0,
     unsigned_aa=0b1111,
@@ -185,7 +180,7 @@ def a_value1_class(value_class):
     )
 
 
-def a_value2_int(  # pylint: disable=too-many-arguments
+def a_value2_int(
     bit_aa0=0b0,
     bit_aa1=0b1,
     unsigned_aa=0b0010,
@@ -810,7 +805,7 @@ def test_write_integer_out_of_range_should_raise_exception(default_accessor):
 
 def test_write_enumeration_out_of_range_should_raise_exception(default_accessor):
     @dataclass
-    class ValueClass:  # pylint: disable=too-many-instance-attributes
+    class ValueClass:
         class EnumerationAa(Enum):
             ELEMENT_AA0 = 1
             ELEMENT_AA1 = 2

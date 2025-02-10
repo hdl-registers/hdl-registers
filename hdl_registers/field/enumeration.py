@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Local folder libraries
 from .register_field import RegisterField
 
 
@@ -25,7 +24,7 @@ class EnumerationElement:
     It is deemed more flexible to use a simple class for now.
     """
 
-    def __init__(self, name: str, value: int, description: str):
+    def __init__(self, name: str, value: int, description: str) -> None:
         self._name = name
         self._value = value
         self.description = description
@@ -71,7 +70,7 @@ class Enumeration(RegisterField):
         description: str,
         elements: dict[str, str],
         default_value: str,
-    ):
+    ) -> None:
         """
         Arguments:
             name: The name of the register field.
@@ -108,9 +107,7 @@ class Enumeration(RegisterField):
 
     def _calculate_width(self) -> int:
         num_elements = len(self._elements)
-        num_bits = (num_elements - 1).bit_length() if num_elements > 1 else 1
-
-        return num_bits
+        return (num_elements - 1).bit_length() if num_elements > 1 else 1
 
     @property
     def elements(self) -> list[EnumerationElement]:
@@ -157,7 +154,7 @@ class Enumeration(RegisterField):
         )
         raise ValueError(message)
 
-    @property  # type: ignore[override]
+    @property
     def default_value(self) -> EnumerationElement:
         """
         Getter for ``default_value``.
@@ -169,7 +166,7 @@ class Enumeration(RegisterField):
         Set the default value for this enumeration field.
 
         Arguments:
-            value: The name of the enumeration element that shall be set as default.
+            name: The name of the enumeration element that shall be set as default.
         """
         self._default_value = self.get_element_by_name(name=name)
 
@@ -177,7 +174,7 @@ class Enumeration(RegisterField):
     def default_value_uint(self) -> int:
         return self.default_value.value
 
-    def get_value(self, register_value: int) -> EnumerationElement:  # type: ignore[override]
+    def get_value(self, register_value: int) -> EnumerationElement:
         """
         See super method for details.
         This subclass method uses a different type to represent the field value, and also
@@ -186,7 +183,7 @@ class Enumeration(RegisterField):
         value_integer = super().get_value(register_value=register_value)
         return self.get_element_by_value(value=value_integer)
 
-    def set_value(self, field_value: EnumerationElement) -> int:  # type: ignore[override]
+    def set_value(self, field_value: EnumerationElement) -> int:
         """
         See super method for details.
         This subclass method uses a different type to represent the field value.

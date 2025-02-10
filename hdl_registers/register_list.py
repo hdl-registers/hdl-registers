@@ -7,13 +7,12 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+from __future__ import annotations
+
 import copy
 import hashlib
-from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
-# Local folder libraries
 from .constant.bit_vector_constant import UnsignedVector, UnsignedVectorConstant
 from .constant.boolean_constant import BooleanConstant
 from .constant.float_constant import FloatConstant
@@ -21,11 +20,12 @@ from .constant.integer_constant import IntegerConstant
 from .constant.string_constant import StringConstant
 from .register import Register
 from .register_array import RegisterArray
-from .register_mode import RegisterMode
 
 if TYPE_CHECKING:
-    # Local folder libraries
+    from pathlib import Path
+
     from .constant.constant import Constant
+    from .register_mode import RegisterMode
 
 
 class RegisterList:
@@ -33,7 +33,7 @@ class RegisterList:
     Used to handle the registers of a module. Also known as a register map.
     """
 
-    def __init__(self, name: str, source_definition_file: Optional[Path] = None):
+    def __init__(self, name: str, source_definition_file: Path | None = None) -> None:
         """
         Arguments:
             name: The name of this register list.
@@ -47,13 +47,13 @@ class RegisterList:
         self.name = name
         self.source_definition_file = source_definition_file
 
-        self.register_objects: list[Union[Register, RegisterArray]] = []
-        self.constants: list["Constant"] = []
+        self.register_objects: list[Register | RegisterArray] = []
+        self.constants: list[Constant] = []
 
     @classmethod
     def from_default_registers(
         cls, name: str, source_definition_file: Path, default_registers: list[Register]
-    ) -> "RegisterList":
+    ) -> RegisterList:
         """
         Factory method. Create a ``RegisterList`` object from a plain list of registers.
 
@@ -79,11 +79,11 @@ class RegisterList:
                 raise ValueError(message)
 
         register_list = cls(name=name, source_definition_file=source_definition_file)
-        register_list.register_objects = copy.deepcopy(default_registers)  # type: ignore[arg-type]
+        register_list.register_objects = copy.deepcopy(default_registers)
 
         return register_list
 
-    def append_register(self, name: str, mode: "RegisterMode", description: str) -> Register:
+    def append_register(self, name: str, mode: RegisterMode, description: str) -> Register:
         """
         Append a register to this register list.
 
@@ -93,17 +93,14 @@ class RegisterList:
                 See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
                 for more information about the different modes.
             description: Textual register description.
+
         Return:
             The register object that was created.
         """
-        if self.register_objects:
-            index = self.register_objects[-1].index + 1
-        else:
-            index = 0
+        index = self.register_objects[-1].index + 1 if self.register_objects else 0
+        register = Register(name=name, index=index, mode=mode, description=description)
 
-        register = Register(name, index, mode, description)
         self.register_objects.append(register)
-
         return register
 
     def append_register_array(self, name: str, length: int, description: str) -> RegisterArray:
@@ -114,13 +111,11 @@ class RegisterList:
             name: The name of the register array.
             length: The number of times the register sequence shall be repeated.
             description: Textual description of the register array.
+
         Return:
             The register array object that was created.
         """
-        if self.register_objects:
-            base_index = self.register_objects[-1].index + 1
-        else:
-            base_index = 0
+        base_index = self.register_objects[-1].index + 1 if self.register_objects else 0
         register_array = RegisterArray(
             name=name, base_index=base_index, length=length, description=description
         )
@@ -128,9 +123,7 @@ class RegisterList:
         self.register_objects.append(register_array)
         return register_array
 
-    def get_register(
-        self, register_name: str, register_array_name: Optional[str] = None
-    ) -> Register:
+    def get_register(self, register_name: str, register_array_name: str | None = None) -> Register:
         """
         Get a register from this list.
         Will raise exception if no register matches.
@@ -144,6 +137,7 @@ class RegisterList:
             register_name: The name of the register.
             register_array_name: If the register is within a register array, this is the name of
                 the array.
+
         Return:
             The register.
         """
@@ -165,6 +159,7 @@ class RegisterList:
 
         Arguments:
             name: The name of the register array.
+
         Return:
             The register array.
         """
@@ -179,8 +174,8 @@ class RegisterList:
     def get_register_index(
         self,
         register_name: str,
-        register_array_name: Optional[str] = None,
-        register_array_index: Optional[int] = None,
+        register_array_name: str | None = None,
+        register_array_index: int | None = None,
     ) -> int:
         """
         Get the zero-based index within the register list for the specified register.
@@ -215,9 +210,9 @@ class RegisterList:
     def add_constant(
         self,
         name: str,
-        value: Union[bool, float, int, str, UnsignedVector],
+        value: bool | float | str | UnsignedVector,
         description: str,
-    ) -> "Constant":
+    ) -> Constant:
         """
         Add a constant. Will be available in the generated packages and headers.
         Will automatically determine the type of the constant based on the type of the
@@ -227,12 +222,13 @@ class RegisterList:
             name: The name of the constant.
             value: The constant value.
             description: Textual description for the constant.
+
         Return:
             The constant object that was created.
         """
         # Note that this is a sub-type of 'int', hence it must be before the check below.
         if isinstance(value, bool):
-            constant: "Constant" = BooleanConstant(name=name, value=value, description=description)
+            constant: Constant = BooleanConstant(name=name, value=value, description=description)
 
         elif isinstance(value, int):
             constant = IntegerConstant(name=name, value=value, description=description)
@@ -254,12 +250,13 @@ class RegisterList:
         self.constants.append(constant)
         return constant
 
-    def get_constant(self, name: str) -> "Constant":
+    def get_constant(self, name: str) -> Constant:
         """
         Get a constant from this list. Will raise exception if no constant matches.
 
         Arguments:
             name: The name of the constant.
+
         Return:
             The constant.
         """
@@ -273,16 +270,20 @@ class RegisterList:
     def object_hash(self) -> str:
         """
         Get a hash of this object representation.
+
         SHA1 is the fastest method according to e.g.
         http://atodorov.org/blog/2013/02/05/performance-test-md5-sha1-sha256-sha512/
         Result is a lowercase hexadecimal string.
         """
-        return hashlib.sha1(repr(self).encode()).hexdigest()
+        # Is considered insecure, but we don't need a cryptographically secure hash here.
+        # Just something that is fast and unique.
+        # https://docs.astral.sh/ruff/rules/hashlib-insecure-hash-function/
+        return hashlib.sha1(repr(self).encode()).hexdigest()  # noqa: S324
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
 name={self.name},\
-source_definition_file={repr(self.source_definition_file)},\
-register_objects={','.join([repr(register_object) for register_object in self.register_objects])},\
-constants={','.join([repr(constant) for constant in self.constants])},\
+source_definition_file={self.source_definition_file!r},\
+register_objects={",".join([repr(register_object) for register_object in self.register_objects])},\
+constants={",".join([repr(constant) for constant in self.constants])},\
 )"""

@@ -7,16 +7,17 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from typing import TYPE_CHECKING, Iterator, Optional, Union
+from __future__ import annotations
 
-# First party libraries
+from typing import TYPE_CHECKING
+
 from hdl_registers.register import Register
 from hdl_registers.register_array import RegisterArray
 from hdl_registers.register_modes import REGISTER_MODES
 
 if TYPE_CHECKING:
-    # First party libraries
+    from collections.abc import Iterator
+
     from hdl_registers.constant.constant import Constant
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register_list import RegisterList
@@ -29,26 +30,26 @@ class RegisterCodeGeneratorHelpers:
 
     # Defined in 'RegisterCodeGenerator' class, which shall also be inherited wherever this class
     # is used.
-    register_list: "RegisterList"
+    register_list: RegisterList
     name: str
     DEFAULT_INDENTATION_LEVEL: int
     COMMENT_START: str
     COMMENT_END: str
 
-    def iterate_constants(self) -> Iterator["Constant"]:
+    def iterate_constants(self) -> Iterator[Constant]:
         """
         Iterate of all constants in the register list.
         """
         yield from self.register_list.constants
 
-    def iterate_register_objects(self) -> Iterator[Union[Register, RegisterArray]]:
+    def iterate_register_objects(self) -> Iterator[Register | RegisterArray]:
         """
         Iterate over all register objects in the register list.
         I.e. all plain registers and all register arrays.
         """
         yield from self.register_list.register_objects
 
-    def iterate_registers(self) -> Iterator[tuple[Register, Optional[RegisterArray]]]:
+    def iterate_registers(self) -> Iterator[tuple[Register, RegisterArray | None]]:
         """
         Iterate over all registers, plain or in array, in the register list.
 
@@ -80,7 +81,7 @@ class RegisterCodeGeneratorHelpers:
                 yield register_object
 
     def qualified_register_name(
-        self, register: "Register", register_array: Optional["RegisterArray"] = None
+        self, register: Register, register_array: RegisterArray | None = None
     ) -> str:
         """
         Get the qualified register name, e.g. "<module name>_<register name>".
@@ -92,7 +93,7 @@ class RegisterCodeGeneratorHelpers:
         register_array_name = self.qualified_register_array_name(register_array=register_array)
         return f"{register_array_name}_{register.name}"
 
-    def qualified_register_array_name(self, register_array: "RegisterArray") -> str:
+    def qualified_register_array_name(self, register_array: RegisterArray) -> str:
         """
         Get the qualified register array name, e.g. "<module name>_<register array name>".
         To be used where the scope requires it, i.e. outside of records.
@@ -101,9 +102,9 @@ class RegisterCodeGeneratorHelpers:
 
     def qualified_field_name(
         self,
-        register: "Register",
-        field: "RegisterField",
-        register_array: Optional["RegisterArray"] = None,
+        register: Register,
+        field: RegisterField,
+        register_array: RegisterArray | None = None,
     ) -> str:
         """
         Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
@@ -114,7 +115,7 @@ class RegisterCodeGeneratorHelpers:
         )
         return f"{register_name}_{field.name}"
 
-    def get_indentation(self, indent: Optional[int] = None) -> str:
+    def get_indentation(self, indent: int | None = None) -> str:
         """
         Get the requested indentation in spaces.
         Will use the default indentation for this generator if not specified.
@@ -122,7 +123,7 @@ class RegisterCodeGeneratorHelpers:
         indent = self.DEFAULT_INDENTATION_LEVEL if indent is None else indent
         return " " * indent
 
-    def get_separator_line(self, indent: Optional[int] = None) -> str:
+    def get_separator_line(self, indent: int | None = None) -> str:
         """
         Get a separator line, e.g. ``# ---------------------------------``.
         """
@@ -135,14 +136,14 @@ class RegisterCodeGeneratorHelpers:
 
         return result
 
-    def comment(self, comment: str, indent: Optional[int] = None) -> str:
+    def comment(self, comment: str, indent: int | None = None) -> str:
         """
         Create a one-line comment.
         """
         indentation = self.get_indentation(indent=indent)
         return f"{indentation}{self.COMMENT_START} {comment}{self.COMMENT_END}\n"
 
-    def comment_block(self, text: list[str], indent: Optional[int] = None) -> str:
+    def comment_block(self, text: list[str], indent: int | None = None) -> str:
         """
         Create a comment block from a list of text lines.
         """
@@ -150,7 +151,7 @@ class RegisterCodeGeneratorHelpers:
 
     @staticmethod
     def register_description(
-        register: Register, register_array: Optional[RegisterArray] = None
+        register: Register, register_array: RegisterArray | None = None
     ) -> str:
         """
         Get a comment describing the register.
@@ -165,8 +166,8 @@ class RegisterCodeGeneratorHelpers:
     def field_description(
         self,
         register: Register,
-        field: "RegisterField",
-        register_array: Optional[RegisterArray] = None,
+        field: RegisterField,
+        register_array: RegisterArray | None = None,
     ) -> str:
         """
         Get a comment describing the field.
@@ -186,7 +187,8 @@ class RegisterCodeGeneratorHelpers:
         Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
         it is a waste of CPU cycles.
         """
-        assert register.fields, "Should not end up here if the register has no fields."
+        if not register.fields:
+            raise ValueError("Should not end up here if the register has no fields.")
 
         if register.mode == REGISTER_MODES["r_w"]:
             return len(register.fields) > 1

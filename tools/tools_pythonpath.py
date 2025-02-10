@@ -11,7 +11,6 @@
 Import this file to have the default paths of some third party packages added to PYTHONPATH.
 """
 
-# Standard libraries
 import sys
 from pathlib import Path
 

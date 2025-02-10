@@ -7,14 +7,11 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import create_file, run_command
 
-# First party libraries
 from hdl_registers.generator.c.header import CHeaderGenerator
 from tests.functional.gcc.compile_and_run_test import CompileAndRunTest
 
@@ -67,10 +64,6 @@ int main()
         run_command(compile_command)
 
         run_command([executable])
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture

@@ -7,10 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from typing import Optional
-
-# Local folder libraries
 from .constant import Constant
 
 
@@ -19,7 +15,7 @@ class BitVectorConstant(Constant):
     allowed_binary_characters = "01" + separator_character
     allowed_hexadecimal_characters = "0123456789abcdefABCDEF" + separator_character
 
-    def __init__(self, name: str, value: str, description: Optional[str] = None):
+    def __init__(self, name: str, value: str, description: str = "") -> None:
         """
         Arguments:
             name: The name of the constant.
@@ -28,7 +24,7 @@ class BitVectorConstant(Constant):
             description: Textual description for the constant.
         """
         self.name = name
-        self.description = "" if description is None else description
+        self.description = description
 
         # Assigned in 'value' setter.
         self._is_hexadecimal_not_binary = False
@@ -66,8 +62,7 @@ class BitVectorConstant(Constant):
 
         if len(value) < 3 or self._prefix not in ["0b", "0x"]:
             raise ValueError(
-                f'Constant "{self.name}" value must start with a correct prefix. '
-                f'Value: "{value}".'
+                f'Constant "{self.name}" value must start with a correct prefix. Value: "{value}".'
             )
 
         self._is_hexadecimal_not_binary = self._prefix == "0x"
@@ -125,6 +120,9 @@ class UnsignedVector(str):
     (as opposed to a **register constant** of the same type, which would use the
     :class:`.UnsignedVectorConstant` class).
     """
+
+    # https://docs.astral.sh/ruff/rules/no-slots-in-str-subclass/
+    __slots__ = ()
 
 
 class UnsignedVectorConstant(BitVectorConstant):

@@ -29,7 +29,6 @@
 #            vhdmmio (0.0.3) |  285 |  416 |                              1.7x
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import argparse
 import contextlib
 import sys
@@ -37,23 +36,20 @@ import timeit
 from pathlib import Path
 from shutil import copy2
 
-# Third party libraries
 import git
 
 # Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install.
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
 
-# Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
+# Import before others since it modifies PYTHONPATH.
 import tools.tools_pythonpath  # noqa: F401
 
-# Third party libraries
 from hdl_modules import get_hdl_modules
 from tsfpga.examples.vivado.project import TsfpgaExampleVivadoNetlistProject
 from tsfpga.module import BaseModule
 from tsfpga.system_utils import create_directory, delete, run_command
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_GENERATED
 from hdl_registers.register import Register
 
@@ -69,10 +65,8 @@ NUM_RUNS = 20
 # The FPGA part name to use for Vivado synthesis.
 PART = "xc7z020clg400-1"
 
-# pylint: disable=import-outside-toplevel
 
-
-def main():  # pylint: disable=too-many-locals
+def main() -> None:
     args = arguments()
 
     # Clean up any previous runs.
@@ -143,7 +137,7 @@ def main():  # pylint: disable=too-many-locals
         )
 
 
-def arguments():
+def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         "Compare different register generators",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -173,8 +167,7 @@ def arguments():
     return parser.parse_args()
 
 
-def print_intro():
-    # First party libraries
+def print_intro() -> None:
     from hdl_registers.parser.toml import from_toml
 
     register_list = from_toml(
@@ -185,12 +178,12 @@ def print_intro():
     num_fields = 0
     num_bits = 0
     for register_object in register_list.register_objects:
-        if isinstance(register_object, Register):
-            for field in register_object.fields:
-                num_fields += 1
-                num_bits += field.width
-        else:
-            assert False, "should be no register arrays in this test file"
+        assert isinstance(register_object, Register), (
+            "should be no register arrays in this test file"
+        )
+        for field in register_object.fields:
+            num_fields += 1
+            num_bits += field.width
 
     print(
         "Benchmarking a typical medium-sized FPGA project scenario: "
@@ -223,14 +216,13 @@ def build(registers_folder: Path, build_folder: Path, top: str) -> tuple[int, in
     return build_result.synthesis_size["Total LUTs"], build_result.synthesis_size["FFs"]
 
 
-def benchmark_hdl_registers(  # pylint: disable=too-many-locals
+def benchmark_hdl_registers(
     toml_file: Path,
     output_folder: Path,
     test_comparable: bool,
     skip_time: bool,
     skip_resource_usage: bool,
 ) -> tuple[str, float, int, int]:
-    # First party libraries
     from hdl_registers import __version__
     from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
     from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
@@ -246,7 +238,7 @@ def benchmark_hdl_registers(  # pylint: disable=too-many-locals
     registers_folder = output_folder / "hdl-registers"
     build_folder = output_folder / "vivado_project"
 
-    def run_test_all():
+    def run_test_all() -> None:
         # Produce all outputs that we would produce before a simulation/synthesis run.
         register_list = from_toml(name="test", toml_file=toml_file)
 
@@ -270,7 +262,7 @@ def benchmark_hdl_registers(  # pylint: disable=too-many-locals
             register_list=register_list, output_folder=registers_folder
         ).create_if_needed()
 
-    def run_test_comparable():
+    def run_test_comparable() -> None:
         # Produce only roughly the same output as the other tools.
         register_list = from_toml(name="test", toml_file=toml_file)
 
@@ -350,7 +342,6 @@ def benchmark_hdl_registers_typical(
     Hence this one is way more relevant for us to keep track of during development.
     But it is not possible to use this data to compare with the others.
     """
-    # First party libraries
     from hdl_registers import HDL_REGISTERS_TESTS
 
     return benchmark_hdl_registers(
@@ -362,7 +353,7 @@ def benchmark_hdl_registers_typical(
     )
 
 
-def benchmark_corsair(  # pylint: disable=too-many-locals
+def benchmark_corsair(
     output_folder: Path, skip_time: bool, skip_resource_usage: bool
 ) -> tuple[str, float, int, int]:
     """
@@ -377,7 +368,6 @@ def benchmark_corsair(  # pylint: disable=too-many-locals
     how to use the function calls programmatically from a Python script.
     This makes the comparison as fair as possible.
     """
-    # Third party libraries
     import corsair
 
     benchmark_folder = BENCHMARK_FOLDER / "corsair"
@@ -398,7 +388,7 @@ def benchmark_corsair(  # pylint: disable=too-many-locals
     gen_args = targets[target_name]
     gen_args["path"] = str(registers_folder / "corsair_regs.vhd")
 
-    def run_test():
+    def run_test() -> None:
         # Parse the register map data file.
         register_map = corsair.RegisterMap()
         # The JSON file was use was created by running the template
@@ -459,7 +449,7 @@ def benchmark_cheby(
     registers_folder = create_directory(output_folder / "cheby")
     build_folder = output_folder / "vivado_project"
 
-    def run_test():
+    def run_test() -> None:
         # The configuration YAML file is based on the example:
         # https://gitlab.cern.ch/be-cem-edl/common/cheby/-/blob/master/doc/srcs/counter.cheby
         # Registers and fields added so it has 21 registers and 56 fields.
@@ -513,13 +503,12 @@ def benchmark_vhdmmio(
     registers_folder = output_folder / "vhdmmio"
     build_folder = output_folder / "vivado_project"
 
-    # Third party libraries
     from vhdmmio.config import RegisterFileConfig
     from vhdmmio.core import RegisterFile
     from vhdmmio.version import __version__
     from vhdmmio.vhdl import VhdlEntitiesGenerator
 
-    def run_test():
+    def run_test() -> None:
         # YAML file for test based on
         # https://github.com/abs-tudelft/vhdmmio/blob/master/examples/basic/basic.mmio.yaml
         # and https://github.com/abs-tudelft/vhdmmio/blob/master/examples/lpc1313_ssp/
@@ -594,7 +583,7 @@ def benchmark_rggen(
         "git@github.com:rggen/rggen-vhdl-rtl.git", str(registers_folder.resolve()), branch="master"
     )
 
-    def run_test():
+    def run_test() -> None:
         # Configuration files adapted from
         # https://github.com/rggen/rggen-sample/blob/master/config.yml
         # https://github.com/rggen/rggen-sample/blob/master/uart_csr.yml
@@ -665,7 +654,7 @@ def benchmark_peakrdl(
     registers_folder = output_folder / "peakrdl"
     build_folder = output_folder / "vivado_project"
 
-    def run_test():
+    def run_test() -> None:
         # Configuration file adapted from
         # https://github.com/SystemRDL/PeakRDL/blob/main/examples/atxmega_spi.rdl
         # Registers and fields added so it has 21 registers and 56 fields.

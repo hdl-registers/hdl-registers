@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from typing import TYPE_CHECKING, Optional
 
-# Local folder libraries
 from .field.bit import Bit
 from .field.bit_vector import BitVector
 from .field.enumeration import Enumeration
@@ -18,7 +16,6 @@ from .field.integer import Integer
 from .register_mode import RegisterMode
 
 if TYPE_CHECKING:
-    # Local folder libraries
     from .field.numerical_interpretation import NumericalInterpretation
     from .field.register_field import RegisterField
 
@@ -28,7 +25,7 @@ class Register:
     Used to represent a register and its fields.
     """
 
-    def __init__(self, name: str, index: int, mode: "RegisterMode", description: str):
+    def __init__(self, name: str, index: int, mode: "RegisterMode", description: str) -> None:
         """
         Arguments:
             name: The name of the register.
@@ -45,7 +42,7 @@ class Register:
         if not isinstance(mode, RegisterMode):
             # This check should be removed eventually.
             # It is only here to help users during the transition period.
-            raise ValueError(
+            raise TypeError(
                 f'Invalid mode: "{mode}". '
                 "Since version 6.0.0, the mode should be a 'RegisterMode' object, not a string."
             )
@@ -54,7 +51,7 @@ class Register:
         self.index = index
         self.mode = mode
         self.description = description
-        self.fields: list["RegisterField"] = []
+        self.fields: list[RegisterField] = []
         self.bit_index = 0
 
     @property
@@ -211,5 +208,5 @@ name={self.name},\
 index={self.index},\
 mode={self.mode},\
 description={self.description},\
-fields={','.join([repr(field) for field in self.fields])},\
+fields={",".join([repr(field) for field in self.fields])},\
 )"""

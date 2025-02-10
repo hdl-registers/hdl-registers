@@ -80,14 +80,11 @@ jobs:
       if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
       run: |
         python3 -m pip install \
-          flake8 \
           GitPython \
-          mypy \
           pybadges \
-          pylint \
           pytest-cov \
           pytest-xdist \
-          types-PyYAML \
+          ruff \
           vunit-hdl@git+https://github.com/VUnit/vunit.git
 
     # Run ALL tests, including unit, lint and functional ones.

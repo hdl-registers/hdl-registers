@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 from tsfpga.git_utils import find_git_files
 from tsfpga.test.lint.file_format_lint import (
     check_file_ends_with_newline,
@@ -18,7 +17,6 @@ from tsfpga.test.lint.file_format_lint import (
     open_file_with_encoding,
 )
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TESTS, HDL_REGISTERS_TOOLS, REPO_ROOT
 
 
@@ -32,7 +30,7 @@ def test_all_checked_in_files_are_properly_encoded():
 
 
 def test_all_checked_in_files_end_with_newline():
-    """
+    r"""
     All checked in files should end with a UNIX style line break (\n).
     Otherwise UNIX doesn't consider them actual text files.
     """
@@ -62,7 +60,7 @@ def test_no_checked_in_files_contain_tabs():
 
 
 def test_no_checked_in_files_contain_carriage_return():
-    """
+    r"""
     All checked in files should use UNIX style line breaks (\n not \r\n). Some Linux editors and
     tools will display or interpret the \r as something other than a line break.
     """

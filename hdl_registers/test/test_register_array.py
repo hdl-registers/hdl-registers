@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.register_array import RegisterArray
 from hdl_registers.register_modes import REGISTER_MODES
 

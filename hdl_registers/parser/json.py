@@ -7,26 +7,27 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-import json
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+# ruff: noqa: A005
 
-# Third party libraries
+from __future__ import annotations
+
+import json
+from typing import TYPE_CHECKING, Any
+
 from tsfpga.system_utils import read_file
 
-# Local folder libraries
 from .parser import RegisterParser
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.register import Register
     from hdl_registers.register_list import RegisterList
 
 
 def from_json(
-    name: str, json_file: Path, default_registers: Optional[list["Register"]] = None
-) -> "RegisterList":
+    name: str, json_file: Path, default_registers: list[Register] | None = None
+) -> RegisterList:
     """
     Parse a JSON file with register data.
 
@@ -55,8 +56,7 @@ def _load_json_file(file_path: Path) -> dict[str, Any]:
 
     raw_json = read_file(file_path)
     try:
-        json_dict: dict[str, Any] = json.loads(raw_json)
-        return json_dict
+        return json.loads(raw_json)
     except Exception as exception_info:
         message = f"Error while parsing JSON file {file_path}:\n{exception_info}"
         raise ValueError(message) from exception_info

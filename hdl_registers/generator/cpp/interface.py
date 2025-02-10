@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
-# First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
@@ -22,11 +20,9 @@ from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 
-# Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -68,7 +64,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         """
         return self.output_folder / f"i_{self.name}.h"
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete C++ interface header with constants, types, attributes and methods for
         accessing registers and fields.
@@ -170,7 +169,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 type_declaration = " auto"
                 value = f"{constant.prefix}{constant.value_without_separator}"
             else:
-                raise ValueError(f"Got unexpected constant type. {constant}")
+                raise TypeError(f"Got unexpected constant type: {constant}")
 
             cpp_code += self.comment("Register constant.")
             cpp_code += f"    static const{type_declaration} {constant.name} = {value};\n"

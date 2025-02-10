@@ -7,21 +7,21 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
 
-# First party libraries
+from typing import TYPE_CHECKING
+
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.register_list import RegisterList
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
+    from hdl_registers.register_list import RegisterList
 
 
 class CppGeneratorCommon(RegisterCodeGenerator):
@@ -31,7 +31,7 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     COMMENT_START = "//"
 
-    def __init__(self, register_list: RegisterList, output_folder: Path):
+    def __init__(self, register_list: RegisterList, output_folder: Path) -> None:
         super().__init__(register_list=register_list, output_folder=output_folder)
 
         self._class_name = self.to_pascal_case(snake_string=self.name)
@@ -51,7 +51,7 @@ class CppGeneratorCommon(RegisterCodeGenerator):
         )
 
     def _get_methods_description(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         register_description = self.register_description(
             register=register, register_array=register_array
@@ -60,9 +60,9 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     def _field_value_type_name(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
     ) -> str:
         """
         The name of the type used to represent the field.
@@ -85,7 +85,7 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     @staticmethod
     def _register_getter_function_name(
-        register: "Register", register_array: Optional["RegisterArray"]
+        register: Register, register_array: RegisterArray | None
     ) -> str:
         result = "get"
 
@@ -98,9 +98,9 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     def _register_getter_function_signature(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        indent: Optional[int] = None,
+        register: Register,
+        register_array: RegisterArray | None,
+        indent: int | None = None,
     ) -> str:
         function_name = self._register_getter_function_name(
             register=register, register_array=register_array
@@ -117,9 +117,9 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     @staticmethod
     def _field_getter_function_name(
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         from_value: bool,
     ) -> str:
         result = "get"
@@ -136,11 +136,11 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     def _field_getter_function_signature(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         from_value: bool,
-        indent: Optional[int] = None,
+        indent: int | None = None,
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
@@ -163,7 +163,7 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     @staticmethod
     def _register_setter_function_name(
-        register: "Register", register_array: Optional["RegisterArray"]
+        register: Register, register_array: RegisterArray | None
     ) -> str:
         result = "set"
 
@@ -176,9 +176,9 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     def _register_setter_function_signature(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        indent: Optional[int] = None,
+        register: Register,
+        register_array: RegisterArray | None,
+        indent: int | None = None,
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
@@ -196,9 +196,9 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     @staticmethod
     def _field_setter_function_name(
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         from_value: bool,
     ) -> str:
         result = "set"
@@ -215,11 +215,11 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     def _field_setter_function_signature(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         from_value: bool,
-        indent: Optional[int] = None,
+        indent: int | None = None,
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 

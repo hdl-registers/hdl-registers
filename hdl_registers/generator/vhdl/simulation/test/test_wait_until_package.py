@@ -12,7 +12,6 @@ Some limited unit tests.
 Note that the generated VHDL code is also simulated in a functional test.
 """
 
-# First party libraries
 from hdl_registers.generator.vhdl.simulation.wait_until_package import (
     VhdlSimulationWaitUntilPackageGenerator,
 )

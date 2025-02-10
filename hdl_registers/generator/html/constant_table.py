@@ -7,23 +7,19 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-# First party libraries
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 
-# Local folder libraries
 from .html_generator_common import HtmlGeneratorCommon
 from .html_translator import HtmlTranslator
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.constant.constant import Constant
     from hdl_registers.register_list import RegisterList
 
@@ -45,12 +41,15 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_constant_table.html"
 
-    def __init__(self, register_list: "RegisterList", output_folder: Path):
+    def __init__(self, register_list: "RegisterList", output_folder: Path) -> None:
         super().__init__(register_list=register_list, output_folder=output_folder)
 
         self._html_translator = HtmlTranslator()
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a HTML table with information about register constants.
         """

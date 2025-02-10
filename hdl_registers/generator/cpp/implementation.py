@@ -7,21 +7,20 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
 
-# First party libraries
+from typing import TYPE_CHECKING, Any
+
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 
-# Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -57,7 +56,10 @@ class CppImplementationGenerator(CppGeneratorCommon):
         """
         return self.output_folder / f"{self.name}.cpp"
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete C++ class implementation with all methods.
         """
@@ -151,7 +153,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
     def _register_setter_function(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         signature = self._register_setter_function_signature(
             register=register, register_array=register_array, indent=2
@@ -179,10 +181,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     def _field_setter_function(
-        self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         signature = self._field_setter_function_signature(
             register=register,
@@ -236,10 +235,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     def _field_setter_function_from_value(
-        self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         signature = self._field_setter_function_signature(
             register=register, register_array=register_array, field=field, from_value=True, indent=2
@@ -264,7 +260,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
     @staticmethod
-    def _get_field_shift_and_mask(field: "RegisterField") -> str:
+    def _get_field_shift_and_mask(field: RegisterField) -> str:
         return f"""\
     const uint32_t shift = {field.base_index}uL;
     const uint32_t mask_at_base = 0b{"1" * field.width}uL;
@@ -273,7 +269,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
     @staticmethod
-    def _get_field_value_checker(field: "RegisterField", setter_or_getter: str) -> str:
+    def _get_field_value_checker(field: RegisterField, setter_or_getter: str) -> str:
         comment = "// Check that field value is within the legal range."
         assertion = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
 
@@ -304,14 +300,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return ""
 
-    def _get_field_getter_value_checker(self, field: "RegisterField") -> str:
+    def _get_field_getter_value_checker(self, field: RegisterField) -> str:
         if isinstance(field, Integer):
             return self._get_field_value_checker(field=field, setter_or_getter="getter")
 
         return ""
 
     def _register_getter_function(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         signature = self._register_getter_function_signature(
             register=register, register_array=register_array, indent=2
@@ -340,10 +336,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     def _field_getter_function(
-        self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         signature = self._field_getter_function_signature(
             register=register,
@@ -383,10 +376,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code
 
     def _field_getter_function_from_value(
-        self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         signature = self._field_getter_function_signature(
             register=register, register_array=register_array, field=field, from_value=True, indent=2
@@ -413,15 +403,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
     field_value = result_shifted;
 """
 
-        else:
-            if isinstance(field, Enumeration):
-                cpp_code += f"""\
+        elif isinstance(field, Enumeration):
+            cpp_code += f"""\
     // "Cast" to the enum type.
     field_value = {type_name}(result_shifted);
 """
 
-            elif isinstance(field, Integer) and field.is_signed:
-                cpp_code += f"""\
+        elif isinstance(field, Integer) and field.is_signed:
+            cpp_code += f"""\
     const {type_name} sign_bit_mask = 1 << {field.width - 1};
 
     if (result_shifted & sign_bit_mask)
@@ -436,8 +425,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
       field_value = result_shifted;
     }}
 """
-            else:
-                raise ValueError(f"Got unexpected field type: {type_name}")
+        else:
+            raise ValueError(f"Got unexpected field type: {type_name}")
 
         cpp_code += f"""
 {self._get_field_getter_value_checker(field=field)}\

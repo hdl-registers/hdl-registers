@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 
-# Local folder libraries
 from .about import get_short_slogan
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()
@@ -22,4 +20,6 @@ HDL_REGISTERS_TESTS = REPO_ROOT / "tests"
 HDL_REGISTERS_TOOLS = REPO_ROOT / "tools"
 
 __version__ = "7.0.3-dev"
-__doc__ = get_short_slogan()  # pylint: disable=redefined-builtin
+
+# We have the slogan in one place only, instead of repeating it here in a proper docstring.
+__doc__ = get_short_slogan()  # noqa: A001

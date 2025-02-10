@@ -7,19 +7,18 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+# ruff: noqa: E402, S101
+
 import sys
 from os.path import relpath
 from pathlib import Path
 
-# Third party libraries
 from setuptools import find_packages, setup
 
 # Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install.
 REPO_ROOT = Path(__file__).parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
 
-# First party libraries
 import hdl_registers
 from hdl_registers.about import REPOSITORY_URL, WEBSITE_URL, get_readme_rst, get_short_slogan
 
@@ -31,7 +30,7 @@ REQUIREMENTS_DEVELOP_TXT = hdl_registers.HDL_REGISTERS_PATH / "requirements_deve
 PY_TYPED = hdl_registers.HDL_REGISTERS_PATH / "py.typed"
 
 
-def main():
+def main() -> None:
     """
     Be extremely careful when making changes to this setup script.
     It is hard to see what is actually included and what is missing.
@@ -62,20 +61,20 @@ def main():
 
     setup(
         name="hdl_registers",
-        #
+        # ----------------------------------
         version=hdl_registers.__version__,
-        #
+        # ----------------------------------
         description=get_short_slogan(),
-        #
+        # ----------------------------------
         long_description=get_readme_rst(include_extra_for_pypi=True),
         long_description_content_type="text/x-rst",
-        #
+        # ----------------------------------
         author="Lukas Vik",
         author_email="10241915+LukasVik@users.noreply.github.com",
-        #
+        # ----------------------------------
         packages=packages,
         package_data={"hdl_registers": get_package_data()},
-        #
+        # ----------------------------------
         classifiers=[
             "Development Status :: 5 - Production/Stable",
             "Intended Audience :: Developers",
@@ -92,9 +91,9 @@ def main():
             "Topic :: Software Development :: Testing",
             "Topic :: Software Development",
         ],
-        #
+        # ----------------------------------
         license="BSD 3-Clause License",
-        #
+        # ----------------------------------
         # Same as on GitHub
         keywords=[
             "python",
@@ -113,12 +112,12 @@ def main():
             "axi-lite",
             "register-interface",
         ],
-        #
+        # ----------------------------------
         install_requires=read_requirements_file(REQUIREMENTS_TXT),
-        extras_require=dict(develop=read_requirements_file(REQUIREMENTS_DEVELOP_TXT)),
-        #
+        extras_require={"develop": read_requirements_file(REQUIREMENTS_DEVELOP_TXT)},
+        # ----------------------------------
         python_requires=">=3.9",
-        #
+        # ----------------------------------
         project_urls={
             "Homepage": WEBSITE_URL,
             "Documentation": WEBSITE_URL,
@@ -129,18 +128,12 @@ def main():
     )
 
 
-def read_requirements_file(path):
-    requirements = []
-    with open(path, encoding=DEFAULT_FILE_ENCODING) as file_handle:
-        # Requirements file contains one package name per line
-        for line_data in file_handle.readlines():
-            if line_data:
-                requirements.append(line_data.strip())
-
-    return requirements
+def read_requirements_file(path: Path) -> list[str]:
+    with path.open(encoding=DEFAULT_FILE_ENCODING) as file_handle:
+        return [line_data.strip() for line_data in file_handle.readlines() if line_data]
 
 
-def get_package_data():
+def get_package_data() -> list[str]:
     """
     Get all files that shall be include with the release, apart from the package python files
     that are already there.
@@ -148,15 +141,13 @@ def get_package_data():
     files = [REQUIREMENTS_TXT, REQUIREMENTS_DEVELOP_TXT, PY_TYPED]
 
     # Specify path relative to the python package folder
-    package_data = [
+    return [
         str(path_relative_to(file_path, hdl_registers.HDL_REGISTERS_PATH)) for file_path in files
     ]
 
-    return package_data
-
 
 # Duplicated system_utils.py since setup.py can not depend on tsfpga
-def path_relative_to(path, other):
+def path_relative_to(path: Path, other: Path) -> bool:
     """
     Note Path.relative_to() does not support the use case where e.g. readme.md should get
     relative path "../readme.md". Hence we have to use os.path.

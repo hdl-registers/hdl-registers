@@ -8,12 +8,8 @@
 # --------------------------------------------------------------------------------------------------
 
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import read_file
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 @pytest.fixture(scope="module")

@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# First party libraries
 from hdl_registers.generator.c.header import CHeaderGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
@@ -75,7 +73,7 @@ def create_from_api() -> RegisterList:
     return register_list
 
 
-def generate(register_list: RegisterList, output_folder: Path):
+def generate(register_list: RegisterList, output_folder: Path) -> None:
     """
     Generate the artifacts that we are interested in.
     """
@@ -85,7 +83,7 @@ def generate(register_list: RegisterList, output_folder: Path):
     VhdlRegisterPackageGenerator(register_list=register_list, output_folder=output_folder).create()
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     generate(register_list=parse_toml(), output_folder=output_folder / "toml")
     generate(register_list=create_from_api(), output_folder=output_folder / "api")
 

@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.numerical_interpretation import (
     Signed,
@@ -203,7 +201,7 @@ def test_repr():
 
 
 def test_invalid_width():
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         BitVector(name="foo", base_index=0, width="4", description="", default_value="0000")
     assert (
         str(exception_info.value)
@@ -220,7 +218,7 @@ def test_invalid_width():
 
 
 def test_invalid_default_value_should_raise_exception():
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         BitVector(name="hest", base_index=0, description="", width=4, default_value=1111)
     assert str(exception_info.value) == (
         'Bit vector "hest" should have string value for "default_value". Got: "1111"'
@@ -252,7 +250,7 @@ def test_updating_to_invalid_default_value_should_raise_exception():
     bit_vector = BitVector(name="hest", base_index=0, description="", width=4, default_value="1111")
 
     # Update to an invalid value
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         bit_vector.default_value = 1111
     assert str(exception_info.value) == (
         'Bit vector "hest" should have string value for "default_value". Got: "1111"'

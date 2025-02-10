@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# First party libraries
 from hdl_registers.register_mode import (
     HardwareAccessDirection,
     RegisterMode,
