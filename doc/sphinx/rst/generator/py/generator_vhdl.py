@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# First party libraries
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
@@ -29,7 +27,7 @@ from hdl_registers.parser.toml import from_toml
 THIS_DIR = Path(__file__).parent
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     """
     Create register VHDL artifacts from the "counter" example module.
     """

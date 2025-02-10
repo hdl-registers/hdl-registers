@@ -7,19 +7,15 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
-# First party libraries
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.numerical_interpretation import Signed, Unsigned
 
-# Local folder libraries
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -69,7 +65,10 @@ class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_read_write_pkg.vhd"
 
-    def create(self, **kwargs: Any) -> Path:
+    def create(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         See super class for API details.
 
@@ -78,13 +77,16 @@ class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
         """
         return self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a package with methods for reading/writing registers.
         """
         package_name = self.output_file.stem
 
-        vhdl = f"""\
+        return f"""\
 library ieee;
 use ieee.numeric_std.all;
 use ieee.std_logic_1164.all;
@@ -118,8 +120,6 @@ package body {package_name} is
 {self._implementations()}\
 end package body;
 """
-
-        return vhdl
 
     def _declarations(self) -> str:
         """
@@ -280,7 +280,9 @@ end package body;
         type_comment = (
             " as a plain 'register_t'"
             if value_type == "register_t"
-            else " as an 'integer'" if value_type == "integer" else ""
+            else " as an 'integer'"
+            if value_type == "integer"
+            else ""
         )
 
         return f"""\

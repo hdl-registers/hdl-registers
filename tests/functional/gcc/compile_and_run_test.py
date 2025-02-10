@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.parser.toml import from_toml
 

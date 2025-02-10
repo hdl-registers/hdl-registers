@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import Any
 
-# First party libraries
 from hdl_registers.generator.vhdl.vhdl_generator_common import VhdlGeneratorCommon
 from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
@@ -59,7 +57,10 @@ axi_lite_register_file.vhd
         """
         return self.output_folder / f"{self.name}_register_file_axi_lite.vhd"
 
-    def create(self, **kwargs: Any) -> Path:
+    def create(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         See super class for API details.
 
@@ -75,7 +76,10 @@ axi_lite_register_file.vhd
 
         return self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get VHDL code for a wrapper around the generic AXi_lite register file from hdl-modules:
         """
@@ -84,9 +88,7 @@ axi_lite_register_file.vhd
         up_port = f"    regs_up : in {self.name}_regs_up_t := {self.name}_regs_up_init;\n"
         has_any_up = self.has_any_hardware_accessible_register(HardwareAccessDirection.UP)
 
-        down_port = (
-            f"    regs_down : out {self.name}_regs_down_t " f":= {self.name}_regs_down_init;\n"
-        )
+        down_port = f"    regs_down : out {self.name}_regs_down_t := {self.name}_regs_down_init;\n"
         has_any_down = self.has_any_hardware_accessible_register(HardwareAccessDirection.DOWN)
 
         was_read_port, was_written_port = self._get_was_accessed_ports()
@@ -157,7 +159,7 @@ are present.
   end process;
 """
 
-        vhdl = f"""\
+        return f"""\
 -- -----------------------------------------------------------------------------
 -- AXI-Lite register file for the '{self.name}' module registers.
 --
@@ -223,8 +225,6 @@ axi_lite_register_file.vhd
 end architecture;
 """
 
-        return vhdl
-
     def _get_was_accessed_ports(self) -> tuple[str, str]:
         has_any_read = self.has_any_software_accessible_register(
             direction=SoftwareAccessDirection.READ
@@ -244,10 +244,7 @@ end architecture;
         )
 
         was_read = (
-            (
-                f"    reg_was_read : out {self.name}_reg_was_read_t := "
-                f"{self.name}_reg_was_read_init"
-            )
+            f"    reg_was_read : out {self.name}_reg_was_read_t := {self.name}_reg_was_read_init"
             if has_any_read
             else ""
         )

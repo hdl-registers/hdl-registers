@@ -7,13 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from copy import copy
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.constant.bit_vector_constant import BitVectorConstant, UnsignedVectorConstant
 
 

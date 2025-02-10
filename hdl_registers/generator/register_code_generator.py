@@ -7,27 +7,24 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+from __future__ import annotations
+
 import datetime
 import re
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
-# Third party libraries
 from tsfpga.git_utils import get_git_commit, git_commands_are_available
 from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_available
 from tsfpga.system_utils import create_file, path_relative_to, read_file
 
-# First party libraries
 from hdl_registers import __version__ as hdl_registers_version
 
-# Local folder libraries
 from .register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from .reserved_keywords import RESERVED_KEYWORDS
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.register_list import RegisterList
 
 
@@ -42,7 +39,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
     @property
     @abstractmethod
-    def SHORT_DESCRIPTION(self) -> str:  # pylint: disable=invalid-name
+    def SHORT_DESCRIPTION(self) -> str:  # noqa: N802
         """
         A short description of what this generator produces.
         Will be used when printing status messages.
@@ -51,14 +48,16 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         .. code-block:: python
 
-          SHORT_DESCRIPTION = "C++ header"
+          class MyCoolGenerator(RegisterCodeGenerator):
+
+              SHORT_DESCRIPTION = "C++ header"
 
         as a static class member at the top of the class.
         """
 
     @property
-    @abstractmethod  # type: ignore[override]
-    def COMMENT_START(self) -> str:  # pylint: disable=invalid-name
+    @abstractmethod
+    def COMMENT_START(self) -> str:  # noqa: N802
         """
         The character(s) that start a comment line in the programming language that we are
         generating code for.
@@ -67,7 +66,9 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         .. code-block:: python
 
-          COMMENT_START = "#"
+          class MyCoolGenerator(RegisterCodeGenerator):
+
+              COMMENT_START = "#"
 
         as a static class member at the top of the class.
         Note that for some languages you might have to set :attr:`.COMMENT_END` as well.
@@ -91,7 +92,10 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         """
 
     @abstractmethod
-    def get_code(self, **kwargs: Any) -> str:  # pylint: disable=unused-argument
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> str:
         """
         Get the generated code as a string.
 
@@ -120,7 +124,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
     # is called.
     __version__ = "0.0.1"
 
-    def __init__(self, register_list: "RegisterList", output_folder: Path):
+    def __init__(self, register_list: RegisterList, output_folder: Path) -> None:
         """
         Arguments:
             register_list: Registers and constants from this register list will be included
@@ -132,7 +136,10 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         self.name = register_list.name
 
-    def create(self, **kwargs: Any) -> Path:
+    def create(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         Generate the result artifact.
         I.e. create the :meth:`.output_file` containing the result from :meth:`.get_code` method.
@@ -148,7 +155,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         output_file = self.output_file
 
         try:
-            path_to_print = path_relative_to(path=output_file, other=Path("."))
+            path_to_print = path_relative_to(path=output_file, other=Path())
         except ValueError:
             # Fails on Windows if CWD and the file are on different drives.
             path_to_print = output_file
@@ -164,7 +171,10 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         return output_file
 
-    def create_if_needed(self, **kwargs: Any) -> tuple[bool, Path]:
+    def create_if_needed(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> tuple[bool, Path]:
         """
         Generate the result file if needed.
         I.e. call :meth:`.create` if :meth:`.should_create` is ``True``.
@@ -217,18 +227,15 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         if not output_file.exists():
             return True
 
-        if (
+        return self._find_versions_and_hash_of_existing_file(file_path=output_file) != (
             hdl_registers_version,
             self.__version__,
             self.register_list.object_hash,
-        ) != self._find_versions_and_hash_of_existing_file(file_path=output_file):
-            return True
-
-        return False
+        )
 
     def _find_versions_and_hash_of_existing_file(
         self, file_path: Path
-    ) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    ) -> tuple[str | None, str | None, str | None]:
         """
         Returns the matching strings in a tuple. Either field can be ``None`` if nothing found.
         """
@@ -240,10 +247,8 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         # This is either the very first line of the file, or starting on a new line.
         package_version_re = re.compile(
-            (
-                rf"(^|\n){self.COMMENT_START} This file is automatically generated by "
-                rf"hdl-registers version (\S+)\.{self.COMMENT_END}\n"
-            )
+            rf"(^|\n){self.COMMENT_START} This file is automatically generated by "
+            rf"hdl-registers version (\S+)\.{self.COMMENT_END}\n"
         )
         package_version_match = package_version_re.search(existing_file_content)
         if package_version_match:
@@ -283,9 +288,14 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         Containing info about the source of the generated register information.
         """
         # Default: Get git SHA from the user's current working directory.
-        directory = Path(".")
+        directory = Path()
 
-        time_info = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        # This call will more or less guess the user's timezone.
+        # In a general use case this is not reliable, hence the rule, but in our case
+        # the date information is not critical in any way.
+        # It is just there for extra info.
+        # https://docs.astral.sh/ruff/rules/call-datetime-now-without-tzinfo/
+        time_info = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # noqa: DTZ005
 
         file_info = ""
         if self.register_list.source_definition_file is not None:

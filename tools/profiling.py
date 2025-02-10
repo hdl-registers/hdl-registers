@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import cProfile
 import json
 import pstats
@@ -18,13 +17,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
 
-# Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
+# Import before others since it modifies PYTHONPATH.
 import tools.tools_pythonpath  # noqa: F401
 
-# Third party libraries
 from tsfpga.system_utils import create_directory, run_command
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
@@ -52,13 +49,15 @@ def create_json_data_file() -> None:
     """
     toml_dict = _load_toml_file(TOML_FILE)
 
-    with open(JSON_FILE, "w", encoding="utf-8") as file_handle:
+    with JSON_FILE.open("w", encoding="utf-8") as file_handle:
         json.dump(obj=toml_dict, fp=file_handle)
 
     print(f"Created JSON file: {JSON_FILE}")
 
 
-def profile_parse_toml(output_folder: Path) -> cProfile.Profile:  # pylint: disable=unused-argument
+def profile_parse_toml(
+    output_folder: Path,  # noqa: ARG001
+) -> cProfile.Profile:
     profiler = cProfile.Profile()
 
     profiler.enable()
@@ -69,7 +68,9 @@ def profile_parse_toml(output_folder: Path) -> cProfile.Profile:  # pylint: disa
     return profiler
 
 
-def profile_parse_json(output_folder: Path) -> cProfile.Profile:  # pylint: disable=unused-argument
+def profile_parse_json(
+    output_folder: Path,  # noqa: ARG001
+) -> cProfile.Profile:
     profiler = cProfile.Profile()
 
     profiler.enable()

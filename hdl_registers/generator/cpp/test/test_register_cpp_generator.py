@@ -14,11 +14,9 @@
 # run-time assertions in a C program.
 # That test is considered more meaningful and exhaustive than a unit test would be.
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import read_file
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
 from hdl_registers.parser.toml import from_toml
@@ -31,10 +29,6 @@ def cpp_test_toml_code(tmp_path):
     return read_file(
         CppInterfaceGenerator(register_list=registers, output_folder=tmp_path).create()
     )
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 def test_read_only_register_has_no_setters(cpp_test_toml_code):

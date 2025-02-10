@@ -12,7 +12,6 @@ Some limited unit tests.
 Note that the generated VHDL code is also simulated in a functional test.
 """
 
-# First party libraries
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES

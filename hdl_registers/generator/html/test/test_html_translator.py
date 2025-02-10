@@ -7,20 +7,14 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.generator.html.html_translator import HtmlTranslator
 
 
 @pytest.fixture
 def html_translator():
     return HtmlTranslator()
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 def test_markdown_parser_can_handle_annotating_sentences(html_translator):

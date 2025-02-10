@@ -7,9 +7,13 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .enumeration import EnumerationElement
 
 
 class RegisterField(ABC):
@@ -23,7 +27,7 @@ class RegisterField(ABC):
     _base_index: int
     _width: int
     description: str
-    default_value: Union[str, int]
+    default_value: str | int | EnumerationElement
 
     @property
     def base_index(self) -> int:
@@ -74,9 +78,7 @@ class RegisterField(ABC):
         mask_at_base = (1 << self.width) - 1
         mask_shifted = mask_at_base << shift_count
 
-        value = (register_value & mask_shifted) >> shift_count
-
-        return value
+        return (register_value & mask_shifted) >> shift_count
 
     def set_value(self, field_value: int) -> int:
         """

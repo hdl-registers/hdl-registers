@@ -7,17 +7,15 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# First party libraries
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     """
     Set up some dummy registers and fields using the Python API.
     """

@@ -7,25 +7,24 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
 
-# Third party libraries
+from typing import TYPE_CHECKING, Any
+
 import rtoml
 
-# Local folder libraries
 from .parser import RegisterParser
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.register import Register
     from hdl_registers.register_list import RegisterList
 
 
 def from_toml(
-    name: str, toml_file: Path, default_registers: Optional[list["Register"]] = None
-) -> "RegisterList":
+    name: str, toml_file: Path, default_registers: list[Register] | None = None
+) -> RegisterList:
     """
     Parse a TOML file with register data.
 

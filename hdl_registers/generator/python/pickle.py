@@ -7,15 +7,14 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+# ruff: noqa: A005
+
 import pickle
 from pathlib import Path
 from typing import Any
 
-# Third party libraries
 from tsfpga.system_utils import create_directory
 
-# First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.register_list import RegisterList
 
@@ -41,12 +40,15 @@ class PythonPickleGenerator(RegisterCodeGenerator):
         """
         return self.output_folder / f"{self.name}.py"
 
-    def __init__(self, register_list: RegisterList, output_folder: Path):
+    def __init__(self, register_list: RegisterList, output_folder: Path) -> None:
         super().__init__(register_list=register_list, output_folder=output_folder)
 
         self.pickle_file = self.output_folder / f"{self.name}.pickle"
 
-    def create(self, **kwargs: Any) -> Path:
+    def create(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         Create the binary pickle also, apart from the class file.
 
@@ -61,7 +63,10 @@ class PythonPickleGenerator(RegisterCodeGenerator):
 
         return super().create(**kwargs)
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Save register list object to binary file (pickle) and create a python class
         that recreates it.
@@ -69,14 +74,12 @@ class PythonPickleGenerator(RegisterCodeGenerator):
         class_name = self.to_pascal_case(self.name)
 
         return f'''\
-# Standard libraries
 import pickle
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    # Third party libraries
-    from hdl_registers.register_list import RegisterList
+        from hdl_registers.register_list import RegisterList
 
 THIS_DIR = Path(__file__).parent
 PICKLE_FILE = THIS_DIR / "{self.pickle_file.name}"

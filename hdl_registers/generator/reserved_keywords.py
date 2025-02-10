@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# First party libraries
 from hdl_registers.generator.c.reserved_keywords import RESERVED_C_KEYWORDS
 from hdl_registers.generator.cpp.reserved_keywords import RESERVED_CPP_KEYWORDS
 from hdl_registers.generator.html.reserved_keywords import RESERVED_HTML_KEYWORDS

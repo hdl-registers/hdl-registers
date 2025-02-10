@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import os
 import sys
 from pathlib import Path
@@ -16,13 +15,11 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
 
-# Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
+# Import before others since it modifies PYTHONPATH.
 import tools.tools_pythonpath  # noqa: F401
 
-# Third party libraries
 from tsfpga.system_utils import load_python_module
 
-# First party libraries
 import hdl_registers
 from hdl_registers.generator.python.accessor import PythonAccessorGenerator
 from hdl_registers.generator.python.pickle import PythonPickleGenerator
@@ -40,7 +37,11 @@ class RegisterAccessor(PythonRegisterAccessorInterface):
     Dummy register accessor that always returns the same read value.
     """
 
-    def read_register(self, register_list_name: str, register_address: int) -> int:
+    def read_register(
+        self,
+        register_list_name: str,  # noqa: ARG002
+        register_address: int,  # noqa: ARG002
+    ) -> int:
         return a_value0_int()
 
     def write_register(

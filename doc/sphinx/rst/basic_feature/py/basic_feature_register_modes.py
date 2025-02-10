@@ -7,18 +7,15 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# Third party libraries
 from tsfpga.system_utils import create_file
 
-# First party libraries
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     rst = """
 .. list-table:: All available register modes.
    :header-rows: 1

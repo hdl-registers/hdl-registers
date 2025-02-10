@@ -6,12 +6,3 @@
 # https://hdl-registers.com
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
-
-from hdl_registers.generator.reserved_keywords import RESERVED_KEYWORDS
-
-
-def test_is_all_lowercase():
-    # The check for reserved keywords is done with a lowercase argument, hence everything in the set
-    # of reserved keywords must also be lowercase for this mechanism to work.
-    for keyword in RESERVED_KEYWORDS:
-        assert keyword.islower(), keyword

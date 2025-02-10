@@ -7,14 +7,11 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import copy
 from pathlib import Path
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.register import Register
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
@@ -81,7 +78,7 @@ def test_header_constants():
 
 
 def test_registers_are_appended_properly_and_can_be_edited_in_place():
-    register_array = RegisterList(name="apa", source_definition_file=Path("."))
+    register_array = RegisterList(name="apa", source_definition_file=Path())
 
     register_hest = register_array.append_register(
         name="hest", mode=REGISTER_MODES["r"], description=""
@@ -98,7 +95,7 @@ def test_registers_are_appended_properly_and_can_be_edited_in_place():
 
 
 def test_register_arrays_are_appended_properly_and_can_be_edited_in_place():
-    register_array = RegisterList(name="apa", source_definition_file=Path("."))
+    register_array = RegisterList(name="apa", source_definition_file=Path())
 
     register_array_hest = register_array.append_register_array(
         name="hest", length=4, description=""
@@ -215,22 +212,22 @@ def test_get_register_index():
 
 def test_repr_basic():
     # Check that repr is an actual representation, not just "X object at 0xABCDEF"
-    assert "apa" in repr(RegisterList(name="apa", source_definition_file=Path(".")))
+    assert "apa" in repr(RegisterList(name="apa", source_definition_file=Path()))
 
     # Different name
-    assert repr(RegisterList(name="apa", source_definition_file=Path("."))) != repr(
-        RegisterList(name="hest", source_definition_file=Path("."))
+    assert repr(RegisterList(name="apa", source_definition_file=Path())) != repr(
+        RegisterList(name="hest", source_definition_file=Path())
     )
 
     # Different source_definition_file
-    assert repr(RegisterList(name="apa", source_definition_file=Path("."))) != repr(
+    assert repr(RegisterList(name="apa", source_definition_file=Path())) != repr(
         RegisterList(name="apa", source_definition_file=Path("./zebra"))
     )
 
 
 def test_repr_with_constant_added():
-    register_list_a = RegisterList(name="apa", source_definition_file=Path("."))
-    register_list_b = RegisterList(name="apa", source_definition_file=Path("."))
+    register_list_a = RegisterList(name="apa", source_definition_file=Path())
+    register_list_b = RegisterList(name="apa", source_definition_file=Path())
     assert repr(register_list_a) == repr(register_list_b)
 
     register_list_a.add_constant(name="zebra", value=3, description="")
@@ -239,8 +236,8 @@ def test_repr_with_constant_added():
 
 
 def test_repr_with_register_appended():
-    register_list_a = RegisterList(name="apa", source_definition_file=Path("."))
-    register_list_b = RegisterList(name="apa", source_definition_file=Path("."))
+    register_list_a = RegisterList(name="apa", source_definition_file=Path())
+    register_list_b = RegisterList(name="apa", source_definition_file=Path())
     assert repr(register_list_a) == repr(register_list_b)
 
     register_list_a.append_register(name="zebra", mode=REGISTER_MODES["w"], description="")
@@ -249,8 +246,8 @@ def test_repr_with_register_appended():
 
 
 def test_repr_with_register_array_appended():
-    register_list_a = RegisterList(name="apa", source_definition_file=Path("."))
-    register_list_b = RegisterList(name="apa", source_definition_file=Path("."))
+    register_list_a = RegisterList(name="apa", source_definition_file=Path())
+    register_list_b = RegisterList(name="apa", source_definition_file=Path())
     assert repr(register_list_a) == repr(register_list_b)
 
     register_list_a.append_register_array(name="zebra", length=4, description="")
@@ -275,14 +272,16 @@ def test_deep_copy_of_register_list_actually_copies_everything():
     assert copied_list.constants[0] is not original_list.constants[0]
 
     copied_list.add_constant(name="new_constant", value=5, description="")
-    assert len(copied_list.constants) == 2 and len(original_list.constants) == 1
+    assert len(copied_list.constants) == 2
+    assert len(original_list.constants) == 1
 
     assert copied_list.register_objects is not original_list.register_objects
     assert copied_list.register_objects[0] is not original_list.register_objects[0]
 
     # Original register in position 0, original register array in position 1, new register in 2
     copied_list.append_register(name="new_register", mode=REGISTER_MODES["r"], description="")
-    assert len(copied_list.register_objects) == 3 and len(original_list.register_objects) == 2
+    assert len(copied_list.register_objects) == 3
+    assert len(original_list.register_objects) == 2
 
     assert copied_list.register_objects[1] is not original_list.register_objects[1]
     assert (

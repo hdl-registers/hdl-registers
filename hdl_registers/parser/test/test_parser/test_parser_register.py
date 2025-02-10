@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import create_file
 
-# First party libraries
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_modes import REGISTER_MODES
 

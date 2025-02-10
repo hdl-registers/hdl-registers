@@ -12,13 +12,10 @@ Some limited unit tests that check the generated code.
 Note that the generated VHDL code is also simulated in a functional test.
 """
 
-# Standard libraries
 from pathlib import Path
 
-# Third party libraries
 from tsfpga.system_utils import read_file
 
-# First party libraries
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
@@ -79,7 +76,7 @@ def generate_strange_register_maps(output_path):
                 name="integer", description="", min_value=-10, max_value=10, default_value=3
             )
             register.append_enumeration(
-                name="enumeration", description="", elements=dict(a="", b=""), default_value="b"
+                name="enumeration", description="", elements={"a": "", "b": ""}, default_value="b"
             )
 
         def append_registers(data):

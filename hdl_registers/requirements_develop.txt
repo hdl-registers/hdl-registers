@@ -1,15 +1,13 @@
-flake8
 GitPython
-mypy
 packaging
 pybadges
 pycairo
 PyGObject
-pylint
 pytest
 pytest-cov
 pytest-xdist
 PyYAML
+ruff
 setuptools
 sphinx
 sphinx_sitemap
@@ -18,5 +16,4 @@ sphinx-toolbox
 sphinxcontrib-wavedrom
 sphinxext-opengraph
 twine
-types-PyYAML
 vunit_hdl

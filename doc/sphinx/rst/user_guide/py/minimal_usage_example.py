@@ -7,15 +7,13 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# Third party libraries
 from tsfpga.system_utils import create_file, load_python_module
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     # Handle this as a string rather than its own file to avoid running isort and pylint on in.
     minimal_usage_example = """\
 from pathlib import Path

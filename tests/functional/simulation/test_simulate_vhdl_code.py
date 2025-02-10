@@ -7,11 +7,12 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from os import environ
 from pathlib import Path
-from xml.etree import ElementTree
+from xml.etree import ElementTree  # noqa: ICN001
+
+import pytest
 
 THIS_DIR = Path(__file__).parent.resolve()
 REPO_ROOT = THIS_DIR.parent.parent.parent.resolve()
@@ -20,12 +21,12 @@ sys.path.append(str(REPO_ROOT))
 # Add path for default location of tsfpga to PYTHONPATH.
 sys.path.append(str((REPO_ROOT.parent.parent / "tsfpga" / "tsfpga").resolve()))
 
-# Third party libraries
+# ruff: noqa: E402
+
 from tsfpga.examples.example_env import get_hdl_modules
 from tsfpga.system_utils import create_directory
 from vunit import VUnit
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_GENERATED, HDL_REGISTERS_TESTS
 from hdl_registers.field.numerical_interpretation import (
     Signed,
@@ -69,7 +70,8 @@ def test_running_simulation(tmp_path):
             str(vunit_out_path),
             "--xunit-xml",
             str(xml_report_path),
-        ] + args
+            *args,
+        ]
         vunit_proj = VUnit.from_argv(argv=argv)
         vunit_proj.add_verification_components()
         vunit_proj.add_vhdl_builtins()
@@ -90,10 +92,9 @@ def test_running_simulation(tmp_path):
             for hdl_file in module.get_simulation_files(include_tests=False):
                 vunit_library.add_source_file(hdl_file.path)
 
-        try:
+        with pytest.raises(SystemExit) as exception_info:
             vunit_proj.main()
-        except SystemExit as exception:
-            assert exception.code == exit_code
+        assert exception_info.value.code == exit_code
 
     # All these tests should pass.
     run(
@@ -169,18 +170,18 @@ def test_running_simulation(tmp_path):
                 "register. Custom message here. - Got 111111.11 (63.750000). "
                 "Expected 101010.10 (42.500000)."
             ),
-            #
+            # ------------------------------------------------------------
             f"{tb_integration}test_reading_write_only_register_should_fail": (
                 "FAILURE - rresp - Got AXI response SLVERR(10) expected OKAY(00)"
             ),
             f"{tb_integration}test_writing_read_only_register_should_fail": (
                 "FAILURE - bresp - Got AXI response SLVERR(10) expected OKAY(00)"
             ),
-            #
+            # ------------------------------------------------------------
             f"{tb_register_package}test_enumeration_out_of_range": out_of_range,
             f"{tb_register_package}test_integer_from_slv_out_of_range": out_of_range,
             f"{tb_register_package}test_integer_to_slv_out_of_range": out_of_range,
-            #
+            # ------------------------------------------------------------
             f"{tb_wait_until}test_wait_until_array_field_equals_timeout_with_base_address": (
                 "FAILURE - Timeout while waiting for the 'array_integer' field in the 'first' "
                 "register within the 'dummies[1]' register array (at base address x\"00050000\") "
@@ -271,7 +272,7 @@ def check_failed_tests(xml_report_file: Path, test_outputs: dict[str, str]) -> N
     * all tests failed, and
     * the test output is the expected.
     """
-    tree = ElementTree.parse(xml_report_file)
+    tree = ElementTree.parse(xml_report_file)  # noqa: S314
     root = tree.getroot()
 
     num_tests = int(root.attrib["tests"])

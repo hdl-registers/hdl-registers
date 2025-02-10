@@ -7,17 +7,18 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import Any, Optional
+from __future__ import annotations
 
-# First party libraries
+from typing import TYPE_CHECKING, Any
+
 from hdl_registers.register_modes import REGISTER_MODES
 
-# Local folder libraries
 from .constant_table import HtmlConstantTableGenerator
 from .html_generator_common import HtmlGeneratorCommon
 from .register_table import HtmlRegisterTableGenerator
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class HtmlPageGenerator(HtmlGeneratorCommon):
@@ -37,7 +38,10 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_regs.html"
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete HTML page with register and constant information.
         """
@@ -59,7 +63,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
   <h1>{title}</h1>
   <p>This document is a specification for the register interface of the FPGA module \
 <b>{self.name}</b>.</p>
-  <p>{' '.join(self.generated_source_info)}</p>
+  <p>{" ".join(self.generated_source_info)}</p>
   <h2>Register modes</h2>
   <p>The following register modes are available.</p>
 {self._get_mode_descriptions()}
@@ -96,7 +100,7 @@ class HtmlPageGenerator(HtmlGeneratorCommon):
 
     @staticmethod
     def get_page_style(
-        table_style: Optional[str] = None, font_style: Optional[str] = None, extra_style: str = ""
+        table_style: str | None = None, font_style: str | None = None, extra_style: str = ""
     ) -> str:
         """
         Get a CSS style for the register pages. Shall be saved to a file called ``regs_style.css``.
@@ -140,11 +144,10 @@ th {
   color: white;
 }"""
 
-        style = f"""
+        return f"""
 {font_style}
 {table_style}
 {extra_style}"""
-        return style
 
     @staticmethod
     def _get_mode_descriptions() -> str:

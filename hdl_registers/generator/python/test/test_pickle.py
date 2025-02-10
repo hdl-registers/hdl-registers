@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 from tsfpga.system_utils import load_python_module
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.python.pickle import PythonPickleGenerator
 from hdl_registers.parser.toml import from_toml

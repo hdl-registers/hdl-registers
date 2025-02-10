@@ -7,23 +7,22 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
 
-# First party libraries
+from typing import TYPE_CHECKING, Any
+
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.register import Register
 
-# Local folder libraries
 from .html_generator_common import HtmlGeneratorCommon
 from .html_translator import HtmlTranslator
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register_array import RegisterArray
     from hdl_registers.register_list import RegisterList
@@ -46,12 +45,15 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_table.html"
 
-    def __init__(self, register_list: "RegisterList", output_folder: Path):
+    def __init__(self, register_list: RegisterList, output_folder: Path) -> None:
         super().__init__(register_list=register_list, output_folder=output_folder)
 
         self._html_translator = HtmlTranslator()
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         if not self.register_list.register_objects:
             return ""
 
@@ -92,7 +94,7 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
         formatting_string = f"0x{{:0{num_nibbles}X}}"
         return formatting_string.format(value)
 
-    def _annotate_register_array(self, register_object: "RegisterArray") -> str:
+    def _annotate_register_array(self, register_object: RegisterArray) -> str:
         description = self._html_translator.translate(register_object.description)
         html = f"""
   <tr>
@@ -119,16 +121,13 @@ repeated {register_object.length} times.
     def _annotate_register(
         self,
         register: Register,
-        register_array_index: Optional[int] = None,
-        array_index_increment: Optional[int] = None,
+        register_array_index: int | None = None,
+        array_index_increment: int | None = None,
     ) -> str:
         if register_array_index is None:
             address_readable = self._to_hex_string(register.address)
             index = str(register.address // 4)
         else:
-            # Should also be set.
-            assert array_index_increment is not None
-
             register_address = self._to_hex_string(4 * register_array_index)
             address_increment = self._to_hex_string(4 * array_index_increment)
             address_readable = f"{register_address} + i &times; {address_increment}"
@@ -151,7 +150,7 @@ repeated {register_object.length} times.
 
         return html
 
-    def _annotate_field(self, field: "RegisterField") -> str:
+    def _annotate_field(self, field: RegisterField) -> str:
         description = self._html_translator.translate(field.description)
 
         if isinstance(field, Enumeration):
@@ -182,7 +181,7 @@ repeated {register_object.length} times.
       Valid numeric range: [{field.min_value} &ndash; {field.max_value}].
 """
 
-        html = f"""
+        return f"""
   <tr>
     <td>&nbsp;&nbsp;<em>{field.name}</em></td>
     <td>&nbsp;&nbsp;{self._field_range(field=field)}</td>
@@ -194,10 +193,8 @@ repeated {register_object.length} times.
     </td>
   </tr>"""
 
-        return html
-
     @staticmethod
-    def _field_range(field: "RegisterField") -> str:
+    def _field_range(field: RegisterField) -> str:
         """
         Return the bits that this field occupies in a readable format.
         The way it shall appear in documentation.
@@ -208,7 +205,7 @@ repeated {register_object.length} times.
         return f"{field.base_index + field.width - 1}:{field.base_index}"
 
     @staticmethod
-    def _field_default_value(field: "RegisterField") -> str:
+    def _field_default_value(field: RegisterField) -> str:
         """
         A human-readable string representation of the default value.
         """

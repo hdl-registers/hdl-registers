@@ -7,15 +7,12 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import subprocess
 from pathlib import Path
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import create_file, run_command
 
-# First party libraries
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
@@ -54,7 +51,7 @@ int main()
 }}
 """
 
-    def compile(  # pylint: disable=too-many-arguments
+    def compile(
         self,
         test_code,
         include_directories=None,
@@ -108,10 +105,6 @@ int main()
 @pytest.fixture
 def base_cpp_test(tmp_path):
     return BaseCppTest(tmp_path=tmp_path)
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 class CppTest(BaseCppTest):

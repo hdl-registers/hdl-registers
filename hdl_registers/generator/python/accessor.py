@@ -7,14 +7,12 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
 
-# Third party libraries
+from typing import TYPE_CHECKING, Any
+
 from black import Mode, format_str
 
-# First party libraries
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
@@ -30,7 +28,8 @@ from hdl_registers.generator.register_code_generator import RegisterCodeGenerato
 from hdl_registers.register import Register
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register_array import RegisterArray
 
@@ -61,7 +60,10 @@ class PythonAccessorGenerator(RegisterCodeGenerator):
         """
         return self.output_folder / f"{self.name}_accessor.py"
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get Python code for accessing register and field values.
         """
@@ -76,7 +78,6 @@ class PythonAccessorGenerator(RegisterCodeGenerator):
         register_value_types = self._get_register_value_types()
 
         result = f'''\
-# Standard libraries
 import pickle
 from dataclasses import dataclass
 from enum import Enum
@@ -84,12 +85,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from termcolor import colored
 
-# Third party libraries
 from hdl_registers.field.numerical_interpretation import to_unsigned_binary
 from tsfpga.math_utils import to_binary_nibble_string, to_hex_byte_string
 
 if TYPE_CHECKING:
-    # Third party libraries
     from hdl_registers.generator.python.register_accessor_interface import (
         PythonRegisterAccessorInterface,
     )
@@ -199,7 +198,7 @@ def _format_unsigned_number(value: int, width: int, include_decimal: bool=True) 
         return self._format_with_black(result)
 
     def _get_register_value_type_name(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         The name of the python type that represents the native Python value of a register.
@@ -231,7 +230,7 @@ def _format_unsigned_number(value: int, width: int, include_decimal: bool=True) 
         return result
 
     def _get_register_value_type(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         Get class for register value for one specific register.
@@ -298,13 +297,14 @@ class {class_name}:
         return result
 
     def _get_field_python_type_name(
-        self, field: "RegisterField", global_type_name: Optional[str] = None
+        self, field: RegisterField, global_type_name: str | None = None
     ) -> str:
         """
         Get the Python type name for the native type that represents a field value.
         Is either a built-in type (e.g. int) or a type that we define in another place in the file.
 
         Arguments:
+            field: The field for which we want to get the type name.
             global_type_name: When the field type is a custom one, the type class is declared within
                 the dataclass of the register.
                 When the field type is referenced within the register class, its local name can be
@@ -334,16 +334,13 @@ class {class_name}:
         raise ValueError(f"Unknown field {field}")
 
     @staticmethod
-    def _get_field_type_and_range_comment(field: "RegisterField") -> str:
+    def _get_field_type_and_range_comment(field: RegisterField) -> str:
         """
         A string the describes the field.
         Suitable for descriptions in accessor methods.
         """
         if isinstance(field, BitVector):
-            if field.numerical_interpretation.is_signed:
-                sign_comment = "Signed"
-            else:
-                sign_comment = "Unsigned"
+            sign_comment = "Signed" if field.numerical_interpretation.is_signed else "Unsigned"
 
             range_comment = (
                 f"Range: {field.numerical_interpretation.min_value} - "
@@ -373,15 +370,12 @@ class {class_name}:
             return f"Enumeration. Possible values: {element_names}."
 
         if isinstance(field, Integer):
-            if field.is_signed:
-                sign_comment = "Signed"
-            else:
-                sign_comment = "Unsigned"
+            sign_comment = "Signed" if field.is_signed else "Unsigned"
             return f"{sign_comment} integer. Range: {field.min_value} - {field.max_value}."
 
         raise ValueError(f"Unknown field {field}")
 
-    def _get_field_type_to_string_value(self, field: "RegisterField") -> str:
+    def _get_field_type_to_string_value(self, field: RegisterField) -> str:
         """
         Get Python code that casts a field value to a string suitable for printing.
         """
@@ -484,7 +478,7 @@ class {class_name}:
         return result
 
     def _get_register_read_as_class(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         For a register that has fields, the unsigned value read from the bus is converted to a
@@ -520,7 +514,7 @@ class {class_name}:
         return result
 
     def _get_register_read_as_integer(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         For registers without fields, the unsigned value read from the bus is simply passed on.
@@ -540,8 +534,8 @@ class {class_name}:
 
     def _get_register_read_common(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        register: Register,
+        register_array: RegisterArray | None,
         register_value_type_name: str,
         extra_docstring: str = "",
     ) -> str:
@@ -577,7 +571,7 @@ class {class_name}:
 '''
 
     def _get_register_write_as_class(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         For a register that has fields, the value to be written is provided as a custom class.
@@ -619,7 +613,7 @@ class {class_name}:
         return result
 
     def _get_register_write_as_integer(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         For a register without fields, the value to be written is provided as an unsigned
@@ -643,8 +637,8 @@ class {class_name}:
 
     def _get_register_write_common(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        register: Register,
+        register_array: RegisterArray | None,
         register_value_type_name: str,
         register_value_docstring: str,
     ) -> str:
@@ -682,7 +676,7 @@ register_value: "{register_value_type_name}"{array_index_argument}) -> None:
 '''
 
     @staticmethod
-    def _get_index_variable(register: "Register", register_array: Optional["RegisterArray"]) -> str:
+    def _get_index_variable(register: Register, register_array: RegisterArray | None) -> str:
         """
         Get Python code that extracts the register index from the register list.
         """
@@ -696,9 +690,7 @@ register_value: "{register_value_type_name}"{array_index_argument}) -> None:
         )
 """
 
-    def _get_fields_write(
-        self, register: "Register", register_array: Optional["RegisterArray"]
-    ) -> str:
+    def _get_fields_write(self, register: Register, register_array: RegisterArray | None) -> str:
         """
         Get Python class methods for writing the values of each field in the register.
         Will either write the whole register or read-modify-write the register.
@@ -721,10 +713,7 @@ register_value: "{register_value_type_name}"{array_index_argument}) -> None:
         return result
 
     def _get_field_read_modify_write(
-        self,
-        field: "RegisterField",
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        self, field: RegisterField, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         Python class method to read-modify-write a register, updating the value of one field.
@@ -755,9 +744,9 @@ Will read-modify-write the ``{register.name}`` register, setting the ``{field.na
     def _get_field_write(
         self,
         field_idx: int,
-        field: "RegisterField",
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        field: RegisterField,
+        register: Register,
+        register_array: RegisterArray | None,
     ) -> str:
         """
         Python class method to write a register, setting the value of one field only.
@@ -806,9 +795,9 @@ Will write the ``{register.name}`` register, setting the ``{field.name}`` field 
 
     def _get_field_write_common(
         self,
-        field: "RegisterField",
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        field: RegisterField,
+        register: Register,
+        register_array: RegisterArray | None,
         docstring: str,
     ) -> str:
         """
@@ -853,7 +842,7 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
 
     @staticmethod
     def _get_semi_qualified_register_name(
-        register: "Register", register_array: Optional["RegisterArray"]
+        register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         Base name of register access methods.
@@ -865,10 +854,7 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
         return f"{register_array.name}_{register.name}"
 
     def _get_semi_qualified_field_name(
-        self,
-        field: "RegisterField",
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        self, field: RegisterField, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         Base name of field access methods.
@@ -915,9 +901,9 @@ field_value: "{field_value_type_name}"{array_index_argument}) -> None:
     @staticmethod
     def _get_print_register(
         is_readable: bool,
-        register: "Register",
-        register_array: Optional["RegisterArray"] = None,
-        register_array_index: Optional[int] = None,
+        register: Register,
+        register_array: RegisterArray | None = None,
+        register_array_index: int | None = None,
     ) -> str:
         """
         Python code to print a single register and its field values.

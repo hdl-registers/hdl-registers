@@ -7,17 +7,14 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import contextlib
 import io
 from pathlib import Path
 from unittest.mock import PropertyMock, patch
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import create_directory, create_file
 
-# First party libraries
 from hdl_registers import __version__ as hdl_registers_version
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.parser.toml import from_toml
@@ -34,7 +31,10 @@ class CustomGenerator(RegisterCodeGenerator):
     def output_file(self):
         return self.output_folder / f"{self.name}.x"
 
-    def get_code(self, **kwargs) -> str:
+    def get_code(
+        self,
+        **kwargs,  # noqa: ARG002
+    ) -> str:
         return "Nothing, its a stupid generator."
 
 
@@ -58,10 +58,6 @@ description = "My register"
         return CustomGenerator(register_list=register_list, output_folder=tmp_path)
 
     return get
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 def test_create_return_value(generator_from_toml):
@@ -153,9 +149,12 @@ def test_create_should_run_again_if_package_version_is_changed(generator_from_to
     generator = generator_from_toml()
     generator.create_if_needed()
 
-    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create, patch(
-        "hdl_registers.generator.register_code_generator.hdl_registers_version", autospec=True
-    ) as _:
+    with (
+        patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create,
+        patch(
+            "hdl_registers.generator.register_code_generator.hdl_registers_version", autospec=True
+        ) as _,
+    ):
         generator.create_if_needed()
         mocked_create.assert_called_once()
 
@@ -164,9 +163,12 @@ def test_create_should_run_again_if_generator_version_is_changed(generator_from_
     generator = generator_from_toml()
     generator.create_if_needed()
 
-    with patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create, patch(
-        f"{__name__}.CustomGenerator.__version__", new_callable=PropertyMock
-    ) as mocked_generator_version:
+    with (
+        patch(f"{__name__}.CustomGenerator.create", autospec=True) as mocked_create,
+        patch(
+            f"{__name__}.CustomGenerator.__version__", new_callable=PropertyMock
+        ) as mocked_generator_version,
+    ):
         mocked_generator_version.return_value = "4.0.0"
 
         generator.create_if_needed()

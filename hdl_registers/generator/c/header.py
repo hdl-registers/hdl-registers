@@ -7,11 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
 
-# First party libraries
+from typing import TYPE_CHECKING, Any
+
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
 from hdl_registers.constant.float_constant import FloatConstant
@@ -20,11 +19,12 @@ from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 from hdl_registers.register import Register
-from hdl_registers.register_list import RegisterList
 
 if TYPE_CHECKING:
-    # First party libraries
+    from pathlib import Path
+
     from hdl_registers.register_array import RegisterArray
+    from hdl_registers.register_list import RegisterList
 
 # There is no unit test of this class that checks the generated code. It is instead functionally
 # tested in the file 'test_compiled_c_code.py'. That test generates C code from an example
@@ -68,9 +68,9 @@ class CHeaderGenerator(RegisterCodeGenerator):
         """
         return self.output_folder / self._file_name
 
-    def __init__(
-        self, register_list: RegisterList, output_folder: Path, file_name: Optional[str] = None
-    ):
+    def __init__(  # noqa: D417
+        self, register_list: RegisterList, output_folder: Path, file_name: str | None = None
+    ) -> None:
         """
         For argument description, please see the super class.
 
@@ -82,13 +82,16 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
         self._file_name = f"{self.name}_regs.h" if file_name is None else file_name
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete C header with all constants and all registers.
         """
         define_name = f"{self.name.upper()}_REGS_H"
 
-        c_code = f"""\
+        return f"""\
 #ifndef {define_name}
 #define {define_name}
 
@@ -97,8 +100,6 @@ class CHeaderGenerator(RegisterCodeGenerator):
 {self._register_struct()}
 {self._register_defines()}\
 #endif {self.comment(define_name)}"""
-
-        return c_code
 
     def _register_struct(self) -> str:
         array_structs = ""
@@ -155,7 +156,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
         return c_code
 
-    def _addr_define(self, register: Register, register_array: Optional["RegisterArray"]) -> str:
+    def _addr_define(self, register: Register, register_array: RegisterArray | None) -> str:
         name = self.qualified_register_name(
             register=register, register_array=register_array
         ).upper()
@@ -185,9 +186,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
         return c_code
 
-    def _field_definitions(
-        self, register: Register, register_array: Optional["RegisterArray"]
-    ) -> str:
+    def _field_definitions(self, register: Register, register_array: RegisterArray | None) -> str:
         c_code = ""
         for field in register.fields:
             field_description = self.field_description(
@@ -199,7 +198,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
                 register=register, field=field, register_array=register_array
             ).upper()
             c_code += f"#define {name}_SHIFT ({field.base_index}u)\n"
-            c_code += f'#define {name}_MASK (0b{"1" * field.width}u << {field.base_index}u)\n'
+            c_code += f"#define {name}_MASK (0b{'1' * field.width}u << {field.base_index}u)\n"
             c_code += f"#define {name}_MASK_INVERSE (~{name}_MASK)\n"
 
             if isinstance(field, Enumeration):
@@ -256,6 +255,6 @@ enum {self.to_pascal_case(name)}
                     constant_name, f"{constant.prefix}{constant.value_without_separator}UL"
                 )
             else:
-                raise ValueError(f"Got unexpected constant type. {constant}")
+                raise TypeError(f"Got unexpected constant type. {constant}")
 
         return c_code

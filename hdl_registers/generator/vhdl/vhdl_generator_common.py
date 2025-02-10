@@ -7,11 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
+from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
-# First party libraries
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
@@ -21,7 +20,6 @@ from hdl_registers.generator.register_code_generator import RegisterCodeGenerato
 from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -227,7 +225,10 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
             if accessible_registers:
                 yield register_array
 
-    def _create_if_there_are_registers_otherwise_delete_file(self, **kwargs: Any) -> Path:
+    def _create_if_there_are_registers_otherwise_delete_file(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         Create the code artifact only if the register list actually has any registers.
         Convenient to call in generators where no registers would result in the generated file being

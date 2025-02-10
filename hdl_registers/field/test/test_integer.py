@@ -7,13 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from copy import copy
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.field.integer import Integer
 
 TEST_FIELD = Integer(
@@ -149,7 +146,7 @@ def test_non_ascending_range_should_raise_exception():
 
 
 def test_non_integer_range_should_raise_exception():
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         Integer(
             name="apa",
             base_index=0,
@@ -163,7 +160,7 @@ def test_non_integer_range_should_raise_exception():
         == 'Integer field "apa" should have integer value for "min_value". Got: "5".'
     )
 
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         Integer(
             name="apa",
             base_index=0,
@@ -268,7 +265,7 @@ def test_default_value_uint():
 
 
 def test_default_value_of_bad_type_should_raise_exception():
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         Integer(
             name="apa",
             base_index=0,
@@ -291,7 +288,7 @@ def test_default_value_of_bad_type_should_raise_exception():
         default_value=5,
     )
 
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         field.default_value = "8"
     assert (
         str(exception_info.value)

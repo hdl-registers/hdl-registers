@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from abc import ABC, abstractmethod
 
 
@@ -47,6 +46,7 @@ class PythonRegisterAccessorInterface(ABC):
         Arguments:
             register_list_name: Name of the register list that the requested register belongs to.
             register_address: Byte address of the register, within the register list.
+
         Return:
             The register value that was read, as an unsigned 32-bit number.
         """

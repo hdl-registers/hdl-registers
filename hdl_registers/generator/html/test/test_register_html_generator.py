@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import read_file
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
@@ -27,11 +25,9 @@ class HtmlTest:
         )
 
     def create_html_page(self):
-        html = read_file(HtmlPageGenerator(self.register_list, self.tmp_path).create())
-        return html
+        return read_file(HtmlPageGenerator(self.register_list, self.tmp_path).create())
 
     @staticmethod
-    # pylint: disable=too-many-arguments
     def check_register(name, index, address, mode, default_value, description, html):
         expected = f"""
   <tr>
@@ -90,10 +86,6 @@ class HtmlTest:
 @pytest.fixture
 def html_test(tmp_path):
     return HtmlTest(tmp_path=tmp_path)
-
-
-# False positive for pytest fixtures
-# pylint: disable=redefined-outer-name
 
 
 def test_registers(html_test):

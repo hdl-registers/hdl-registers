@@ -11,12 +11,10 @@
 Some happy path tests to show that all register code generation can run without error.
 """
 
-# Third party libraries
 import pytest
 import tsfpga
 from tsfpga.examples.example_env import get_default_registers
 
-# First party libraries
 from hdl_registers import HDL_REGISTERS_DOC, HDL_REGISTERS_TESTS
 from hdl_registers.generator.c.header import CHeaderGenerator
 from hdl_registers.generator.cpp.header import CppHeaderGenerator

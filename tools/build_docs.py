@@ -7,26 +7,23 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import argparse
 import shutil
 import sys
 from pathlib import Path
-from xml.etree import ElementTree
+from xml.etree import ElementTree  # noqa: ICN001
 
 # Do PYTHONPATH insert() instead of append() to prefer any local repo checkout over any pip install.
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(REPO_ROOT))
 
-# Import before others since it modifies PYTHONPATH. pylint: disable=unused-import
+# Import before others since it modifies PYTHONPATH.
 import tools.tools_pythonpath  # noqa: F401
 
-# Third party libraries
 from pybadges import badge
 from tsfpga.system_utils import create_directory, create_file, delete, read_file, run_command
 from tsfpga.tools.sphinx_doc import build_sphinx, generate_release_notes
 
-# First party libraries
 import hdl_registers
 from hdl_registers.about import WEBSITE_URL, get_readme_rst, get_short_slogan
 
@@ -105,7 +102,7 @@ def generate_api_documentation() -> None:
 
 def generate_register_code() -> None:
     # Set the path environment variable in the python calls below so they find e.g. tsfpga.
-    env = dict(PYTHONPATH=":".join(sys.path))
+    env = {"PYTHONPATH": ":".join(sys.path)}
 
     for folder in (SPHINX_DOC / "rst").glob("*"):
         for py_file in (folder / "py").glob("*.py"):
@@ -223,7 +220,7 @@ def build_python_coverage_badge(output_path: Path) -> None:
     coverage_xml = hdl_registers.HDL_REGISTERS_GENERATED / "python_coverage.xml"
     assert coverage_xml.exists(), "Run pytest with coverage before building documentation"
 
-    xml_root = ElementTree.parse(coverage_xml).getroot()
+    xml_root = ElementTree.parse(coverage_xml).getroot()  # noqa: S314
     line_coverage = int(round(float(xml_root.attrib["line-rate"]) * 100))
     assert line_coverage > 50, f"Coverage is way low: {line_coverage}. Something is wrong."
     color = BADGE_COLOR_RIGHT if line_coverage > 80 else "red"
@@ -244,9 +241,9 @@ def copy_python_coverage_to_html_output() -> None:
     delete(html_output_path)
 
     coverage_html = hdl_registers.HDL_REGISTERS_GENERATED / "python_coverage_html"
-    assert (
-        coverage_html / "index.html"
-    ).exists(), "Run pytest with coverage before building documentation"
+    assert (coverage_html / "index.html").exists(), (
+        "Run pytest with coverage before building documentation"
+    )
 
     shutil.copytree(coverage_html, html_output_path)
 

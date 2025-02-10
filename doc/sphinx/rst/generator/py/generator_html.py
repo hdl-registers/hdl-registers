@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import sys
 from pathlib import Path
 
-# First party libraries
 from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerator
 from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
@@ -20,7 +18,7 @@ from hdl_registers.parser.toml import from_toml
 THIS_DIR = Path(__file__).parent
 
 
-def main(output_folder: Path):
+def main(output_folder: Path) -> None:
     """
     Create register HTML artifacts from the TOML example file.
     """

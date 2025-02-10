@@ -7,22 +7,18 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
-# First party libraries
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
-# Local folder libraries
 from .vhdl_generator_common import VhdlGeneratorCommon
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
 
@@ -58,7 +54,10 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_record_pkg.vhd"
 
-    def create(self, **kwargs: Any) -> Path:
+    def create(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         See super class for API details.
 
@@ -67,7 +66,10 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
         """
         return self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete VHDL package with register record types.
         """

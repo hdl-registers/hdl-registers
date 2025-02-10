@@ -7,14 +7,11 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from typing import TYPE_CHECKING, Optional
 
-# First party libraries
 from hdl_registers.generator.vhdl.vhdl_generator_common import VhdlGeneratorCommon
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
 

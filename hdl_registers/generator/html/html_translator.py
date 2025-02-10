@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 import re
 
 
@@ -48,9 +47,7 @@ class HtmlTranslator:
         """
         result = self._translate_angle_brackets(text)
         result = self._annotate(result)
-        result = self._insert_line_breaks(result)
-
-        return result
+        return self._insert_line_breaks(result)
 
     def _annotate(self, text: str) -> str:
         """
@@ -58,9 +55,9 @@ class HtmlTranslator:
         """
         result = re.sub(self._re_strong_pattern, r"<strong>\g<1></strong>", text)
         result = re.sub(self._re_emphasis_pattern, r"<em>\g<1></em>", result)
+
         # Remove the escape sign
-        result = re.sub(self._re_escaped_literal_pattern, r"\g<1>", result)
-        return result
+        return re.sub(self._re_escaped_literal_pattern, r"\g<1>", result)
 
     def _insert_line_breaks(self, text: str) -> str:
         """
@@ -68,11 +65,12 @@ class HtmlTranslator:
         """
         # Two line breaks to get new paragraph.
         result = re.sub(self._re_paragraph_separator, "<br /><br />", text)
+
         # A single newline in Markdown should be a space
         result = result.replace("\n", " ")
+
         # Split to get nicer HTML file formatting
-        result = result.replace("<br />", "<br />\n")
-        return result
+        return result.replace("<br />", "<br />\n")
 
     @staticmethod
     def _translate_angle_brackets(text: str) -> str:
@@ -81,5 +79,4 @@ class HtmlTranslator:
         HTML tags by the web browse.
         """
         result = text.replace("<", "&lt;")
-        result = result.replace(">", "&gt;")
-        return result
+        return result.replace(">", "&gt;")

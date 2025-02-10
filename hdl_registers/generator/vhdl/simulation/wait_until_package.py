@@ -7,18 +7,14 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
-# First party libraries
 from hdl_registers.register_mode import SoftwareAccessDirection
 
-# Local folder libraries
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
-    # First party libraries
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -52,7 +48,10 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
         """
         return self.output_folder / f"{self.name}_register_wait_until_pkg.vhd"
 
-    def create(self, **kwargs: Any) -> Path:
+    def create(
+        self,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
         """
         See super class for API details.
 
@@ -61,13 +60,16 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
         """
         return self._create_if_there_are_registers_otherwise_delete_file(**kwargs)
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a package with ``wait_until_X_equals`` methods for registers/fields.
         """
         package_name = self.output_file.stem
 
-        vhdl = f"""\
+        return f"""\
 library ieee;
 use ieee.fixed_pkg.all;
 use ieee.std_logic_1164.all;
@@ -102,8 +104,6 @@ package body {package_name} is
 {self._implementations()}\
 end package body;
 """
-
-        return vhdl
 
     def _declarations(self) -> str:
         """
@@ -215,20 +215,18 @@ end package body;
         for register, register_array in self.iterate_software_accessible_registers(
             direction=SoftwareAccessDirection.READ
         ):
-            implementations = []
-
-            implementations.append(
+            implementations = [
                 self._register_wait_until_equals_implementation(
                     register=register, register_array=register_array
                 )
-            )
+            ]
 
-            for field in register.fields:
-                implementations.append(
-                    self._field_wait_until_equals_implementation(
-                        register=register, register_array=register_array, field=field
-                    )
+            implementations.extend(
+                self._field_wait_until_equals_implementation(
+                    register=register, register_array=register_array, field=field
                 )
+                for field in register.fields
+            )
 
             vhdl += separator
             vhdl += "\n".join(implementations)
@@ -312,10 +310,7 @@ end package body;
         """
         Get constants code that is common for all 'wait_until_*_equals' procedures.
         """
-        if field:
-            field_description = f" the '{field.name}' field in"
-        else:
-            field_description = ""
+        field_description = f" the '{field.name}' field in" if field else ""
 
         return f"""\
 {self.reg_index_constant(register=register, register_array=register_array)}\

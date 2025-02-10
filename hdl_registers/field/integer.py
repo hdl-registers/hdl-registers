@@ -7,12 +7,11 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Local folder libraries
 from .numerical_interpretation import Signed, Unsigned
 from .register_field import RegisterField
 
 
-class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
+class Integer(RegisterField):
     """
     Used to represent an integer field in a register.
     """
@@ -25,14 +24,14 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         min_value: int,
         max_value: int,
         default_value: int,
-    ):  # pylint: disable=too-many-arguments
+    ) -> None:
         """
         Arguments:
             name: The name of the field.
             base_index: The zero-based index within the register for the lowest bit of this field.
             description: Textual field description.
-            min_value: The minimum value that this field shall be able to represent.
-            min_value: The maximum value that this field shall be able to represent.
+            min_value: The *minimum* value that this field shall be able to represent.
+            max_value: The *maximum* value that this field shall be able to represent.
             default_value: Default value. Must be within the specified range.
         """
         self.name = name
@@ -66,14 +65,14 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
                 f'Integer field "{self.name}" should have integer value for "min_value". '
                 f'Got: "{min_value}".'
             )
-            raise ValueError(message)
+            raise TypeError(message)
 
         if not isinstance(max_value, int):
             message = (
                 f'Integer field "{self.name}" should have integer value for "max_value". '
                 f'Got: "{max_value}".'
             )
-            raise ValueError(message)
+            raise TypeError(message)
 
         if min_value > max_value:
             message = (
@@ -154,7 +153,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
                 f'Integer field "{self.name}" should have integer value for "default_value". '
                 f'Got: "{value}".'
             )
-            raise ValueError(message)
+            raise TypeError(message)
 
         if value < self.min_value or value > self.max_value:
             message = (
@@ -170,7 +169,8 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
         if self.default_value >= 0:
             return self.default_value
 
-        assert self.is_signed, "Should not end up here unless signed."
+        if not self.is_signed:
+            raise ValueError("Should not end up here unless signed.")
 
         # Offset the sign bit.
         result: int = self.default_value + 2**self.width
@@ -196,7 +196,7 @@ class Integer(RegisterField):  # pylint: disable=too-many-instance-attributes
             f"legal range: ({self.min_value}, {self.max_value})."
         )
 
-    def set_value(self, field_value: int) -> int:  # type: ignore
+    def set_value(self, field_value: int) -> int:
         """
         See super method for details.
         Adds signed/unsigned logic, and sanity checks of the value.

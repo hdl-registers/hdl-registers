@@ -7,15 +7,11 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
-from typing import Optional
-
-# Local folder libraries
 from .constant import Constant
 
 
 class IntegerConstant(Constant):
-    def __init__(self, name: str, value: int, description: Optional[str] = None):
+    def __init__(self, name: str, value: int, description: str = "") -> None:
         """
         Arguments:
             name: The name of the constant.
@@ -42,7 +38,7 @@ class IntegerConstant(Constant):
         Setter for value that performs sanity checks.
         """
         if not isinstance(value, int):
-            raise ValueError(
+            raise TypeError(
                 f'Constant "{self.name}" has invalid data type "{type(value)}". Value: "{value}".'
             )
 

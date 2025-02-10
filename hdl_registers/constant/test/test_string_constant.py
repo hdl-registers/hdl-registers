@@ -7,13 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from copy import copy
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.constant.string_constant import StringConstant
 
 
@@ -27,7 +24,7 @@ def test_constant():
 
 
 def test_invalid_data_type():
-    with pytest.raises(ValueError) as exception_info:
+    with pytest.raises(TypeError) as exception_info:
         StringConstant(name="apa", value=3.5)
     assert (
         str(exception_info.value)

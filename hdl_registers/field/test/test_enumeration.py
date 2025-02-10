@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.field.enumeration import Enumeration, EnumerationElement
 
 
@@ -60,7 +58,7 @@ def test_no_elements_should_raise_exception():
             name="apa",
             base_index=3,
             description="",
-            elements=dict(),
+            elements={},
             default_value="element0",
         )
     assert str(exception_info.value) == 'Enumeration "apa", must have at least one element.'

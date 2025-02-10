@@ -6,12 +6,9 @@
 # https://hdl-registers.com
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
-# pylint: disable=protected-access
 
-# Third party libraries
 import pytest
 
-# First party libraries
 from hdl_registers.field.numerical_interpretation import (
     Signed,
     SignedFixedPoint,
@@ -19,9 +16,12 @@ from hdl_registers.field.numerical_interpretation import (
     UnsignedFixedPoint,
 )
 
+# We test a little sloppily here.
+# ruff: noqa: SLF001
+
 
 @pytest.mark.parametrize(
-    "numerical_interpretation, min_value, max_value",
+    ("numerical_interpretation", "min_value", "max_value"),
     [
         (Unsigned(bit_width=2), 0.0, 3),
         (Unsigned(bit_width=8), 0.0, 255),
@@ -110,7 +110,7 @@ def test_out_of_range(numerical_interpretation):
 
 
 @pytest.mark.parametrize(
-    "bit_width, value, expected",
+    ("bit_width", "value", "expected"),
     [
         (8, 1, 0b00000001),
         (8, -1, 0b11111111),
@@ -132,7 +132,7 @@ def test_signed(bit_width, value, expected):
 
 
 @pytest.mark.parametrize(
-    "max_bit_index, min_bit_index, value, exp_uint, exp_return",
+    ("max_bit_index", "min_bit_index", "value", "exp_uint", "exp_return"),
     [
         (-1, -1, 0.00, 0b0, 0.00),
         (-1, -1, 0.25, 0b0, 0.00),
@@ -168,7 +168,7 @@ def test_ufixed(max_bit_index, min_bit_index, value, exp_uint, exp_return):
 
 
 @pytest.mark.parametrize(
-    "max_bit_index, min_bit_index, value, expected, expected_restored",
+    ("max_bit_index", "min_bit_index", "value", "expected", "expected_restored"),
     [
         (-1, -2, -0.25, 0b11, -0.25),
         (-1, -2, 0.25, 0b01, 0.25),
@@ -197,7 +197,7 @@ def test_sfixed(max_bit_index, min_bit_index, value, expected, expected_restored
 
 
 @pytest.mark.parametrize(
-    "numerical_interpretation_class, integer_bit_width, fraction_bit_width",
+    ("numerical_interpretation_class", "integer_bit_width", "fraction_bit_width"),
     [
         (UnsignedFixedPoint, 9, 2),
         (UnsignedFixedPoint, 11, -8),

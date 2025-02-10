@@ -7,7 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# First party libraries
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 
 

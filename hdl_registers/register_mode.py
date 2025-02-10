@@ -7,10 +7,8 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any
 
 
 @dataclass
@@ -74,7 +72,7 @@ class RegisterMode:
         software_can_read: bool,
         software_can_write: bool,
         hardware_has_up: bool,
-    ):  # pylint: disable=too-many-arguments
+    ) -> None:
         """
         Arguments:
             shorthand: A short string that can be used to refer to this mode.
@@ -100,10 +98,11 @@ class RegisterMode:
                 * mode is not software-readable, or
                 * mode loopbacks a software-written value to the software read value.
         """
-        assert software_can_read or not hardware_has_up, (
-            f'Register mode "{shorthand}"" has hardware "up", but is not software readable. '
-            "This does not make sense."
-        )
+        if hardware_has_up and not software_can_read:
+            raise ValueError(
+                f'Register mode "{shorthand}"" has hardware "up", but is not software readable. '
+                "This does not make sense."
+            )
 
         self.shorthand = shorthand
         self.name = name
@@ -155,7 +154,7 @@ class RegisterMode:
     def __str__(self) -> str:
         return repr(self)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, self.__class__):
             return False
 

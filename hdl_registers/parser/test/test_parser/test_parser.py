@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import create_file
 
-# First party libraries
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_modes import REGISTER_MODES
 
@@ -47,7 +45,7 @@ hest.type = "register_constant"
     )
 
 
-def test_order_of_registers_and_fields(tmp_path):  # pylint: disable=too-many-statements
+def test_order_of_registers_and_fields(tmp_path):  # noqa: PLR0915
     toml_data = """
 ################################################################################
 [data]

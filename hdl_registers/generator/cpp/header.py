@@ -7,11 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 from pathlib import Path
 from typing import Any
 
-# Local folder libraries
 from .cpp_generator_common import CppGeneratorCommon
 
 
@@ -45,7 +43,10 @@ class CppHeaderGenerator(CppGeneratorCommon):
         """
         return self.output_folder / f"{self.name}.h"
 
-    def get_code(self, **kwargs: Any) -> str:
+    def get_code(
+        self,
+        **kwargs: Any,  # noqa: ANN401, ARG002
+    ) -> str:
         """
         Get a complete C++ class header with methods for accessing registers and fields.
         """

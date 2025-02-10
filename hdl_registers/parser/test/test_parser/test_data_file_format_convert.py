@@ -7,13 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# Standard libraries
 
-# Third party libraries
 import pytest
 from tsfpga.system_utils import create_file
 
-# First party libraries
 from hdl_registers.parser.json import _load_json_file, from_json
 from hdl_registers.parser.toml import _load_toml_file, from_toml
 from hdl_registers.parser.yaml import _load_yaml_file, from_yaml
