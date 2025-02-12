@@ -68,8 +68,6 @@ per-file-ignores."tools/**/*.py" = [
     # We import "tools_pythonpath" before external imports to set up the PYTHONPATH.
     "E402",
     # Tools are run during development and CI, and never with optimization.
-    "PT015",
-    # Are not run with optimization.
     "S101",
 ]
 
