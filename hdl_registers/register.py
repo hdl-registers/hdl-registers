@@ -7,7 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from .field.bit import Bit
 from .field.bit_vector import BitVector
@@ -25,7 +27,7 @@ class Register:
     Used to represent a register and its fields.
     """
 
-    def __init__(self, name: str, index: int, mode: "RegisterMode", description: str) -> None:
+    def __init__(self, name: str, index: int, mode: RegisterMode, description: str) -> None:
         """
         Arguments:
             name: The name of the register.
@@ -92,7 +94,7 @@ class Register:
         description: str,
         width: int,
         default_value: str,
-        numerical_interpretation: Optional["NumericalInterpretation"] = None,
+        numerical_interpretation: NumericalInterpretation | None = None,
     ) -> BitVector:
         """
         Append a bit vector field to this register.
@@ -159,7 +161,7 @@ class Register:
 
         return integer
 
-    def _append_field(self, field: "RegisterField") -> None:
+    def _append_field(self, field: RegisterField) -> None:
         self.fields.append(field)
 
         self.bit_index += field.width
@@ -178,7 +180,7 @@ class Register:
 
         return default_value
 
-    def get_field(self, name: str) -> "RegisterField":
+    def get_field(self, name: str) -> RegisterField:
         """
         Get the field within this register that has the given name. Will raise exception if no
         field matches.

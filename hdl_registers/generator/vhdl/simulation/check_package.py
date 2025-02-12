@@ -7,8 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
@@ -18,6 +19,8 @@ from hdl_registers.register_mode import SoftwareAccessDirection
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -176,7 +179,7 @@ end package body;
         return vhdl
 
     def _register_check_signature(
-        self, register: "Register", register_array: Optional["RegisterArray"], value_type: str
+        self, register: Register, register_array: RegisterArray | None, value_type: str
     ) -> str:
         """
         Get signature for a 'check_X_equal' procedure for register values.
@@ -212,9 +215,9 @@ end package body;
 
     def _field_check_signature(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
     ) -> str:
         """
         Get signature for a 'check_X_equal' procedure for field values.
@@ -298,7 +301,7 @@ end package body;
         return vhdl
 
     def _register_check_implementation(
-        self, register: "Register", register_array: Optional["RegisterArray"], value_type: str
+        self, register: Register, register_array: RegisterArray | None, value_type: str
     ) -> str:
         """
         Get implementation for a 'check_X_equal' procedure for field values.
@@ -359,9 +362,9 @@ end package body;
 
     def _field_check_implementation(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
     ) -> str:
         """
         Get implementation for a 'check_X_equal' procedure for field values.

@@ -7,8 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
 from hdl_registers.constant.boolean_constant import BooleanConstant
@@ -23,6 +24,8 @@ from hdl_registers.field.integer import Integer
 from .cpp_generator_common import CppGeneratorCommon
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -189,9 +192,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
 
-    def _field_interface(
-        self, register: "Register", register_array: Optional["RegisterArray"]
-    ) -> str:
+    def _field_interface(self, register: Register, register_array: RegisterArray | None) -> str:
         def function(return_type_name: str, signature: str) -> str:
             return f"    virtual {return_type_name} {signature} const = 0;\n"
 
@@ -269,7 +270,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         return cpp_code
 
     @staticmethod
-    def _get_default_value(field: "RegisterField") -> str:
+    def _get_default_value(field: RegisterField) -> str:
         """
         Get the field's default value formatted in a way suitable for C++ code.
         """
@@ -286,9 +287,9 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
     def _field_attributes(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
     ) -> str:
         field_description = self.field_description(
             register=register, register_array=register_array, field=field
@@ -319,7 +320,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         return cpp_code
 
-    def _register_array_attributes(self, register_array: "RegisterArray") -> str:
+    def _register_array_attributes(self, register_array: RegisterArray) -> str:
         return f"""\
   // Attributes for the "{register_array.name}" register array.
   namespace {self.name}::{register_array.name}

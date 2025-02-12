@@ -7,9 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from collections.abc import Iterator
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
@@ -17,12 +17,15 @@ from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.field.numerical_interpretation import Fixed, Signed, Unsigned
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
-from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
+    from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 
 class VhdlGeneratorCommon(RegisterCodeGenerator):
@@ -33,7 +36,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
     COMMENT_START = "--"
 
     @staticmethod
-    def field_to_slv_function_name(field: "RegisterField", field_name: str) -> str:
+    def field_to_slv_function_name(field: RegisterField, field_name: str) -> str:
         """
         Name of the function that converts the field's native VHDL representation to SLV.
 
@@ -53,7 +56,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
         raise TypeError(f"Field {field} does not have a conversion function.")
 
-    def field_to_slv(self, field: "RegisterField", field_name: str, value: str) -> str:
+    def field_to_slv(self, field: RegisterField, field_name: str, value: str) -> str:
         """
         Get a VHDL snippet that converts a value of the given field to SLV.
         Via e.g. a function call or a cast.
@@ -87,9 +90,9 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def field_type_name(
         self,
-        register: "Register",
-        field: "RegisterField",
-        register_array: Optional["RegisterArray"] = None,
+        register: Register,
+        field: RegisterField,
+        register_array: RegisterArray | None = None,
     ) -> str:
         """
         Get the native VHDL type name that will represent the value of the supplied field.
@@ -118,7 +121,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def iterate_software_accessible_registers(
         self, direction: SoftwareAccessDirection
-    ) -> Iterator[tuple["Register", Optional["RegisterArray"]]]:
+    ) -> Iterator[tuple[Register, RegisterArray | None]]:
         """
         Iterate all registers in the register list, plain or in array, that are software-accessible
         in the given direction.
@@ -129,7 +132,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def iterate_software_accessible_plain_registers(
         self, direction: SoftwareAccessDirection
-    ) -> Iterator["Register"]:
+    ) -> Iterator[Register]:
         """
         Iterate all plain registers in the register list that are software-accessible in the
         given direction.
@@ -139,8 +142,8 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
                 yield register
 
     def iterate_software_accessible_array_registers(
-        self, register_array: "RegisterArray", direction: SoftwareAccessDirection
-    ) -> Iterator["Register"]:
+        self, register_array: RegisterArray, direction: SoftwareAccessDirection
+    ) -> Iterator[Register]:
         """
         Iterate all registers in the register array that are software-accessible in the
         given direction.
@@ -151,7 +154,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def iterate_software_accessible_register_arrays(
         self, direction: SoftwareAccessDirection
-    ) -> Iterator["RegisterArray"]:
+    ) -> Iterator[RegisterArray]:
         """
         Iterate all register arrays in the register list that contain at least one register that
         is software-accessible in the given direction.
@@ -178,7 +181,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def iterate_hardware_accessible_registers(
         self, direction: HardwareAccessDirection
-    ) -> Iterator[tuple["Register", Optional["RegisterArray"]]]:
+    ) -> Iterator[tuple[Register, RegisterArray | None]]:
         """
         Iterate all registers in the register list, plain or in array, that are hardware-accessible
         in the given direction.
@@ -189,7 +192,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def iterate_hardware_accessible_plain_registers(
         self, direction: HardwareAccessDirection
-    ) -> Iterator["Register"]:
+    ) -> Iterator[Register]:
         """
         Iterate all plain registers in the register list that are hardware-accessible in the
         given direction.
@@ -199,8 +202,8 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
                 yield register
 
     def iterate_hardware_accessible_array_registers(
-        self, register_array: "RegisterArray", direction: HardwareAccessDirection
-    ) -> Iterator["Register"]:
+        self, register_array: RegisterArray, direction: HardwareAccessDirection
+    ) -> Iterator[Register]:
         """
         Iterate all registers in the register array that are hardware-accessible in the
         given direction.
@@ -211,7 +214,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
     def iterate_hardware_accessible_register_arrays(
         self, direction: HardwareAccessDirection
-    ) -> Iterator["RegisterArray"]:
+    ) -> Iterator[RegisterArray]:
         """
         Iterate all register arrays in the register list that contain at least one register that
         is hardware-accessible in the given direction.

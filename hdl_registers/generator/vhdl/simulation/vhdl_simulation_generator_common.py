@@ -7,7 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from typing import TYPE_CHECKING, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from hdl_registers.generator.vhdl.vhdl_generator_common import VhdlGeneratorCommon
 
@@ -21,7 +23,7 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
     Common methods for generation of VHDL simulation code.
     """
 
-    def get_array_index_port(self, register_array: Optional["RegisterArray"]) -> str:
+    def get_array_index_port(self, register_array: RegisterArray | None) -> str:
         """
         Get the array index port declaration.
         Suitable for VHDL procedure/function signatures that can read registers in arrays.
@@ -33,7 +35,7 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
         return ""
 
     @staticmethod
-    def get_array_index_association(register_array: Optional["RegisterArray"]) -> str:
+    def get_array_index_association(register_array: RegisterArray | None) -> str:
         """
         Get the array index association.
         Suitable when associating the array index port to a read/write procedure call.
@@ -44,7 +46,7 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
         return ""
 
     def reg_index_constant(
-        self, register: "Register", register_array: Optional["RegisterArray"] = None
+        self, register: Register, register_array: RegisterArray | None = None
     ) -> str:
         """
         Get a 'reg_index' constant declaration, for the index of the supplied register.
@@ -76,9 +78,7 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
         )
 
     @staticmethod
-    def get_register_array_message(
-        register_array: Optional["RegisterArray"],
-    ) -> str:
+    def get_register_array_message(register_array: RegisterArray | None) -> str:
         """
         Status message for register array information.
         Suitable for error printouts.

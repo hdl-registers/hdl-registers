@@ -7,8 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.numerical_interpretation import Signed, Unsigned
@@ -16,6 +17,8 @@ from hdl_registers.field.numerical_interpretation import Signed, Unsigned
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -259,8 +262,8 @@ end package body;
     def _register_read_write_signature(
         self,
         is_read_not_write: bool,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        register: Register,
+        register_array: RegisterArray | None,
         value_type: str,
     ) -> str:
         """
@@ -299,9 +302,9 @@ end package body;
     def _field_read_write_signature(
         self,
         is_read_not_write: bool,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         value_type: str,
     ) -> str:
         """
@@ -347,7 +350,7 @@ end package body;
 """
 
     @staticmethod
-    def _should_be_able_to_access_field_as_integer(field: "RegisterField") -> bool:
+    def _should_be_able_to_access_field_as_integer(field: RegisterField) -> bool:
         """
         Return True if the field is of a type where there should be procedures to read/write it
         casted as an integer.
@@ -496,8 +499,8 @@ end package body;
 
     def _register_read_implementation(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        register: Register,
+        register_array: RegisterArray | None,
         value_type: str,
         value_conversion: str,
     ) -> str:
@@ -529,8 +532,8 @@ end package body;
 
     def _register_write_implementation(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
+        register: Register,
+        register_array: RegisterArray | None,
         value_type: str,
         value_conversion: str,
     ) -> str:
@@ -561,9 +564,9 @@ end package body;
 
     def _field_read_implementation(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         value_type: str,
         value_conversion: str,
     ) -> str:
@@ -599,9 +602,9 @@ end package body;
 
     def _field_write_implementation(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
         value_type: str,
     ) -> str:
         """
