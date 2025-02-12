@@ -7,8 +7,9 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
@@ -19,6 +20,8 @@ from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessD
 from .vhdl_generator_common import VhdlGeneratorCommon
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
 
@@ -213,7 +216,7 @@ return {self.name}_regs_{direction.name.lower()}_t;
 
         return vhdl
 
-    def _array_field_records(self, direction: "HardwareAccessDirection") -> str:
+    def _array_field_records(self, direction: HardwareAccessDirection) -> str:
         """
         For every register array that has at least one register in the specified direction:
 
@@ -273,7 +276,7 @@ the '{direction.name.lower()}' direction.
 
         return f"{heading}{vhdl}"
 
-    def _get_register_record(self, direction: "HardwareAccessDirection") -> str:
+    def _get_register_record(self, direction: HardwareAccessDirection) -> str:
         """
         Get the record that contains all registers and arrays in the specified direction.
         Also default value constant for this record.
@@ -316,7 +319,7 @@ the '{direction.name.lower()}' direction.
 """
 
     def _record_member_declaration_for_register(
-        self, register: "Register", register_array: Optional["RegisterArray"] = None
+        self, register: Register, register_array: RegisterArray | None = None
     ) -> str:
         """
         Get the record member declaration line for a register that shall be part of the record.
@@ -343,7 +346,7 @@ the '{direction.name.lower()}' direction.
 
         return vhdl
 
-    def _register_was_accessed_record(self, direction: "SoftwareAccessDirection") -> str:
+    def _register_was_accessed_record(self, direction: SoftwareAccessDirection) -> str:
         """
         Get the record for 'reg_was_read' or 'reg_was_written'.
         """
@@ -426,7 +429,7 @@ to the record above.
         """
         vhdl = ""
 
-        def _get_functions(register: "Register", register_array: Optional["RegisterArray"]) -> str:
+        def _get_functions(register: Register, register_array: RegisterArray | None) -> str:
             register_name = self.qualified_register_name(
                 register=register, register_array=register_array
             )
@@ -599,7 +602,7 @@ to the record above.
         return vhdl
 
     def _register_was_accessed_conversion_implementation(
-        self, direction: "SoftwareAccessDirection"
+        self, direction: SoftwareAccessDirection
     ) -> str:
         """
         Get a conversion function  from SLV 'reg_was_read'/'reg_was_written' to record type.

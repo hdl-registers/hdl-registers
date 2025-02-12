@@ -7,14 +7,17 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
 
 from hdl_registers.register_mode import SoftwareAccessDirection
 
 from .vhdl_simulation_generator_common import VhdlSimulationGeneratorCommon
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
     from hdl_registers.register_array import RegisterArray
@@ -136,7 +139,7 @@ end package body;
         return vhdl
 
     def _register_wait_until_equals_signature(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         Get signature for a 'wait_until_reg_equals' procedure.
@@ -174,9 +177,9 @@ end package body;
 
     def _field_wait_until_equals_signature(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
     ) -> str:
         """
         Get signature for a 'wait_until_field_equals' procedure.
@@ -236,7 +239,7 @@ end package body;
         return vhdl
 
     def _register_wait_until_equals_implementation(
-        self, register: "Register", register_array: Optional["RegisterArray"]
+        self, register: Register, register_array: RegisterArray | None
     ) -> str:
         """
         Get implementation for a 'wait_until_reg_equals' procedure.
@@ -266,9 +269,9 @@ end package body;
 
     def _field_wait_until_equals_implementation(
         self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: "RegisterField",
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
     ) -> str:
         """
         Get implementation for a 'wait_until_field_equals' procedure.
@@ -302,10 +305,7 @@ end package body;
 """
 
     def _get_common_constants(
-        self,
-        register: "Register",
-        register_array: Optional["RegisterArray"],
-        field: Optional["RegisterField"],
+        self, register: Register, register_array: RegisterArray | None, field: RegisterField | None
     ) -> str:
         """
         Get constants code that is common for all 'wait_until_*_equals' procedures.
