@@ -46,24 +46,26 @@ Consider the following scenario: You are about to run a simulation in your FPGA 
 to make sure that all your register definitions are up to date.
 This scenario is very common, on a productive day it happens a hundred times.
 The table below compares how long that would take in a medium-sized FPGA project.
-It measures the time to parse and generate VHDL artifacts for 20 register lists with 20 registers
-and 50 fields each.
+It measures the time to parse and generate VHDL artifacts for 20 register lists with 16 registers
+and 32 fields.
 
 
 .. code-block:: none
 
   $ python3 tools/benchmark.py
-  --------------------------------------------------------------------------
-                         Tool | Execution time | Relative (lower is better)
-  ----------------------------+----------------+----------------------------
-    hdl-registers (5.1.1-dev) |        17.5 ms | 1x (baseline)
-             cheby (1.6.dev0) |        1.83  s | 104x
-              corsair (1.0.4) |         2.6  s | 148x
-              PeakRDL (1.1.0) |         7.2  s | 410x
-                 rggen (0.31) |        9.74  s | 555x
-              vhdmmio (0.0.3) |        17.3  s | 987x
+  -------------------------------------------------------------------------------------------------------------
+                        Tool | Generate time | Time relative (lower is better) |   LUT |   FF | LUT+FF relative
+  ---------------------------+---------------+---------------------------------+-------+------+----------------
+   hdl-registers (7.0.4-dev) |       10.4 ms |                   1x (baseline) |  1920 | 6100 |   1x (baseline)
+            cheby (1.6.dev0) |       1.88  s |                            181x |  2120 | 7940 |            1.3x
+             corsair (1.0.4) |       2.33  s |                            224x |  3500 | 7700 |            1.4x
+             PeakRDL (1.2.3) |       6.98  s |                            672x |  7520 | 7300 |            1.8x
+                rggen (0.34) |       9.68  s |                            932x | 11880 | 6880 |            2.3x
+             vhdmmio (0.0.3) |       9.39  s |                            904x |  5700 | 8320 |            1.7x
+
 
 Clearly, only one of these tools is fast enough to run in real time without impacting productivity.
+It is also evident that a lot of resources can be lost or gained depending on what tools is used.
 
 Disclaimer:
 We have tried to be as fair as possible in this comparison, see
