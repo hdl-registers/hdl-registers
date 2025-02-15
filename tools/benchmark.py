@@ -77,11 +77,11 @@ def main() -> None:
     print(
         """\
 -------------------------------------------------------------------------------\
-------------------------------------------------
+------------------------------
                       Tool | Generate time | Time relative (lower is better) | \
-  LUT |   FF | LUT+FF relative (lower is better)
+  LUT |   FF | LUT+FF relative
 ---------------------------+---------------+---------------------------------+-\
-------+------+----------------------------------\
+------+------+----------------\
 """
     )
 
@@ -133,7 +133,7 @@ def main() -> None:
 
         print(
             f"{tool:>26} | {execution_time:>13} | {relative_time:>31} | "
-            f"{NUM_RUNS * lut:>5} | {NUM_RUNS * ff:>4} | {relative_usage:>33}"
+            f"{NUM_RUNS * lut:>5} | {NUM_RUNS * ff:>4} | {relative_usage:>15}"
         )
 
 
@@ -186,7 +186,7 @@ def print_intro() -> None:
             num_bits += field.width
 
     print(
-        "Benchmarking a typical medium-sized FPGA project scenario: "
+        "Benchmarking a medium-sized FPGA project: "
         f"{NUM_RUNS} register lists, each containing {num_registers} registers "
         f"with {num_fields // num_registers} {num_bits // num_fields}-bit fields."
     )
