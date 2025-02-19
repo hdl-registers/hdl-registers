@@ -25,7 +25,6 @@ class BaseCppTest(CompileAndRunTest):
     @staticmethod
     def get_main(includes="", test_code=""):
         return f"""\
-#include <assert.h>
 #include <iostream>
 
 #include "include/caesar.h"
@@ -159,8 +158,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Provided array index out of range in "
-        f"{base_cpp_test.working_dir}/caesar.cpp:1269, message: "
+        "Provided array index out of range in caesar.cpp:1272, message: "
         "'dummies' array index out of range, got '3'.\n"
     )
 
@@ -190,7 +188,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:347, "
+        "Tried to set value out of range in caesar.cpp:350, "
         "message: 'plain_integer' value too small, got '-1024'.\n"
     )
 
@@ -204,7 +202,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:351, "
+        "Tried to set value out of range in caesar.cpp:354, "
         "message: 'plain_integer' value too large, got '110'.\n"
     )
 
@@ -242,7 +240,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Got read value out of range in {base_cpp_test.working_dir}/caesar.cpp:186, "
+        "Got read value out of range in caesar.cpp:189, "
         "message: 'plain_integer' value too large, got '101'.\n"
     )
 
@@ -257,7 +255,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Got read value out of range in {base_cpp_test.working_dir}/caesar.cpp:182, "
+        "Got read value out of range in caesar.cpp:185, "
         "message: 'plain_integer' value too small, got '-51'.\n"
     )
 
@@ -292,7 +290,7 @@ def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:276, "
+        "Tried to set value out of range in caesar.cpp:279, "
         "message: 'plain_bit_a' value too many bits used, got '2'.\n"
     )
 
@@ -313,6 +311,6 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        f"Tried to set value out of range in {base_cpp_test.working_dir}/caesar.cpp:312, "
+        "Tried to set value out of range in caesar.cpp:315, "
         "message: 'plain_bit_vector' value too many bits used, got '16'.\n"
     )
