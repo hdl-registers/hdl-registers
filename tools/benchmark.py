@@ -93,8 +93,8 @@ def main() -> None:
         ("cheby", benchmark_cheby),
         ("corsair", benchmark_corsair),
         ("PeakRDL", benchmark_peakrdl),
-        ("rggen", benchmark_rggen),
         ("vhdmmio", benchmark_vhdmmio),
+        ("rggen", benchmark_rggen),
     ]
 
     if not args.skip_hdl_registers_typical:
