@@ -43,7 +43,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         depending on the mode of the register.
     """
 
-    __version__ = "2.0.0"
+    __version__ = "2.0.1"
 
     SHORT_DESCRIPTION = "C++ implementation"
 
@@ -108,11 +108,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code_top + self._with_namespace(cpp_code)
 
     def _macros(self) -> str:
+        file_name = self.output_file.name
+
         def get_macro(name: str, message: str) -> str:
             macro_name = f"_{name}_ASSERT_TRUE"
             guard_name = f"NO_REGISTER_{name}_ASSERT"
             name_space = " " * (38 - len(name))
-            message_space = " " * (21 - len(message))
+            message_space = " " * (40 - len(message))
+            file_name_space = " " * (44 - len(file_name))
             base = """\
 #ifdef {guard_name}
 
@@ -125,8 +128,9 @@ class CppImplementationGenerator(CppGeneratorCommon):
   {{                                                                              \\
     if (!static_cast<bool>(expression)) {{                                        \\
       std::ostringstream diagnostics;                                            \\
-      diagnostics << "{message} out of range in " << __FILE__ << ":" {message_space}\\
-                  << __LINE__ << ", message: " << message << ".";                \\
+      diagnostics << "{message} out of range in " {message_space}\\
+                  << "{file_name}:" << __LINE__ {file_name_space}\\
+                  << ", message: " << message << ".";                            \\
       std::string diagnostic_message = diagnostics.str();                        \\
       m_assertion_handler(&diagnostic_message);                                  \\
     }}                                                                            \\
@@ -141,6 +145,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
                 name_space=name_space,
                 message=message,
                 message_space=message_space,
+                file_name=file_name,
+                file_name_space=file_name_space,
             )
 
         setter_assert = get_macro(name="SETTER", message="Tried to set value")
