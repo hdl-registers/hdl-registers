@@ -43,7 +43,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         depending on the mode of the register.
     """
 
-    __version__ = "2.0.1"
+    __version__ = "2.0.2"
 
     SHORT_DESCRIPTION = "C++ implementation"
 
@@ -110,11 +110,10 @@ class CppImplementationGenerator(CppGeneratorCommon):
     def _macros(self) -> str:
         file_name = self.output_file.name
 
-        def get_macro(name: str, message: str) -> str:
+        def get_macro(name: str) -> str:
             macro_name = f"_{name}_ASSERT_TRUE"
             guard_name = f"NO_REGISTER_{name}_ASSERT"
             name_space = " " * (38 - len(name))
-            message_space = " " * (40 - len(message))
             file_name_space = " " * (44 - len(file_name))
             base = """\
 #ifdef {guard_name}
@@ -128,9 +127,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
   {{                                                                              \\
     if (!static_cast<bool>(expression)) {{                                        \\
       std::ostringstream diagnostics;                                            \\
-      diagnostics << "{message} out of range in " {message_space}\\
-                  << "{file_name}:" << __LINE__ {file_name_space}\\
-                  << ", message: " << message << ".";                            \\
+      diagnostics << "{file_name}:" << __LINE__ {file_name_space}\\
+                  << ": " << message << ".";                                     \\
       std::string diagnostic_message = diagnostics.str();                        \\
       m_assertion_handler(&diagnostic_message);                                  \\
     }}                                                                            \\
@@ -143,15 +141,13 @@ class CppImplementationGenerator(CppGeneratorCommon):
                 macro_name=macro_name,
                 name=name,
                 name_space=name_space,
-                message=message,
-                message_space=message_space,
                 file_name=file_name,
                 file_name_space=file_name_space,
             )
 
-        setter_assert = get_macro(name="SETTER", message="Tried to set value")
-        getter_assert = get_macro(name="GETTER", message="Got read value")
-        array_index_assert = get_macro(name="ARRAY_INDEX", message="Provided array index")
+        setter_assert = get_macro(name="SETTER")
+        getter_assert = get_macro(name="GETTER")
+        array_index_assert = get_macro(name="ARRAY_INDEX")
         return f"""\
 {setter_assert}
 {getter_assert}
@@ -171,7 +167,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             cpp_code += f"""\
     _ARRAY_INDEX_ASSERT_TRUE(
       array_index < {self.name}::{register_array.name}::array_length,
-      "'{register_array.name}' array index out of range, got '" << array_index << "'"
+      "Got '{register_array.name}' array index out of range: " << array_index
     );
 
 """
@@ -284,11 +280,11 @@ class CppImplementationGenerator(CppGeneratorCommon):
     {comment}
     {assertion}(
       field_value >= {field.min_value},
-      "'{field.name}' value too small, got '" << field_value << "'"
+      "Got '{field.name}' value too small: " << field_value
     );
     {assertion}(
       field_value <= {field.max_value},
-      "'{field.name}' value too large, got '" << field_value << "'"
+      "Got '{field.name}' value too large: " << field_value
     );
 
 """
@@ -299,7 +295,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
     const uint32_t mask_at_base_inverse = ~mask_at_base;
     {assertion}(
       (field_value & mask_at_base_inverse) == 0,
-      "'{field.name}' value too many bits used, got '" << field_value << "'"
+      "Got '{field.name}' value too many bits used: " << field_value
     );
 
 """
@@ -325,7 +321,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             cpp_code += f"""\
     _ARRAY_INDEX_ASSERT_TRUE(
       array_index < {self.name}::{register_array.name}::array_length,
-      "'{register_array.name}' array index out of range, got '" << array_index << "'"
+      "Got '{register_array.name}' array index out of range: " << array_index
     );
 
 """

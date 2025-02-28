@@ -21,8 +21,10 @@ void test_constants(uint32_t *memory, fpga_regs::Caesar *caesar)
   assert(fpga_regs::Caesar::rate == 3.5);
   assert(fpga_regs::Caesar::rate != 3.6);
 
-  assert(fpga_regs::Caesar::paragraph == "hello there :)");
-  assert(fpga_regs::Caesar::paragraph != "");
+  const std::string hello = "hello there :)";
+  const std::string hi = "hi";
+  assert(hello.compare(fpga_regs::Caesar::paragraph) == 0);
+  assert(hi.compare(fpga_regs::Caesar::paragraph) != 0);
 
   assert(fpga_regs::Caesar::base_address_bin == fpga_regs::Caesar::base_address_hex);
   // This assertions shows that values greater than unsigned 32-bit integer work.
