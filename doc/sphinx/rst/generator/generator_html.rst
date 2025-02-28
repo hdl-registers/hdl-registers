@@ -17,10 +17,8 @@ A HTML page generated from the :ref:`TOML format example <toml_format>` can be v
 :download:`example_regs.html <../../../../generated/sphinx_rst/register_code/generator/generator_html/example_regs.html>`
 
 .. note::
-   Markdown/reStructuredText syntax can be used in register and bit descriptions, which will be
-   converted to appropriate HTML tags.
-   Text can be set bold with double asterisks, and italicised with a single asterisk.
-   A paragraph break can be inserted with consecutive newlines.
+   Any reStructuredText (RST) code in description fields will be converted to HTML.
+   See the HTML file above for an example of this.
 
 
 Tables only

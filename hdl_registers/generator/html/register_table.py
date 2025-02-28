@@ -99,11 +99,15 @@ class HtmlRegisterTableGenerator(HtmlGeneratorCommon):
         html = f"""
   <tr>
     <td class="array_header" colspan=5>
-      Register array <strong>{register_object.name}</strong>, \
+      <p>
+        Register array <strong>{register_object.name}</strong>, \
 repeated {register_object.length} times.
-      Iterator <i>i &isin; [0, {register_object.length - 1}].</i>
+        Iterator <span class="formula">i &isin; [0, {register_object.length - 1}]</span>.
+      </p>
     </td>
-    <td class="array_header">{description}</td>
+    <td class="array_header">
+{description}
+    </td>
   </tr>"""
         array_index_increment = len(register_object.registers)
         for register in register_object.registers:
@@ -113,7 +117,7 @@ repeated {register_object.length} times.
         html += f"""
   <tr>
     <td colspan="6" class="array_footer">
-      End register array <strong>{register_object.name}.</strong>
+      <p>End register array <strong>{register_object.name}.</strong></p>
     </td>
   </tr>"""
         return html
@@ -137,12 +141,14 @@ repeated {register_object.length} times.
         description = self._html_translator.translate(register.description)
         html = f"""
   <tr>
-    <td><strong>{register.name}</strong></td>
-    <td>{index}</td>
-    <td>{address_readable}</td>
-    <td>{register.mode.name}</td>
-    <td>{self._to_hex_string(register.default_value, num_nibbles=1)}</td>
-    <td>{description}</td>
+    <td><p><strong>{register.name}</strong></p></td>
+    <td><p>{index}</p></td>
+    <td><p>{address_readable}</p></td>
+    <td><p>{register.mode.name}</p></td>
+    <td><p>{self._to_hex_string(register.default_value, num_nibbles=1)}</p></td>
+    <td>
+{description}
+    </td>
   </tr>"""
 
         for field in register.fields:
@@ -151,45 +157,37 @@ repeated {register_object.length} times.
         return html
 
     def _annotate_field(self, field: RegisterField) -> str:
-        description = self._html_translator.translate(field.description)
+        description = field.description
 
         if isinstance(field, Enumeration):
-            description += """\
-      <br />
-      <br />
-      Can be set to the following values:
+            description += """
 
-      <dl>
+Can be set to the following values:
+
 """
-
             for element in field.elements:
+                # Indent so multi-line description is part of the bullet point.
+                element_description = element.description.strip().replace("\n", "\n  ")
                 description += f"""\
-        <dt style="display: list-item; margin-left:1em">
-          <em>{element.name} ({element.value})</em>:
-        </dt>
+* ``{element.name}`` ({element.value}): {element_description}
 """
 
-                element_html = self._html_translator.translate(element.description)
-                description += f"        <dd>{element_html}</dd>\n"
-
-            description += "      </dl>\n"
+        description = self._html_translator.translate(description)
 
         if isinstance(field, Integer):
             description += f"""\
-      <br />
-      <br />
-      Valid numeric range: [{field.min_value} &ndash; {field.max_value}].
+<p>Valid numeric range: [{field.min_value} &ndash; {field.max_value}].</p>
 """
 
         return f"""
   <tr>
-    <td>&nbsp;&nbsp;<em>{field.name}</em></td>
-    <td>&nbsp;&nbsp;{self._field_range(field=field)}</td>
-    <td></td>
-    <td></td>
-    <td>{self._field_default_value(field=field)}</td>
+    <td><p>&nbsp;&nbsp;<em>{field.name}</em></p></td>
+    <td><p>&nbsp;&nbsp;{self._field_range(field=field)}</p></td>
+    <td><p></p></td>
+    <td><p></p></td>
+    <td>{self._get_field_default_value(field=field)}</td>
     <td>
-      {description}
+{description}
     </td>
   </tr>"""
 
@@ -204,6 +202,12 @@ repeated {register_object.length} times.
 
         return f"{field.base_index + field.width - 1}:{field.base_index}"
 
+    def _get_field_default_value(self, field: RegisterField) -> str:
+        """
+        A human-readable string representation of the default value.
+        """
+        return self._html_translator.translate(self._field_default_value(field=field))
+
     @staticmethod
     def _field_default_value(field: RegisterField) -> str:
         """
@@ -213,7 +217,7 @@ repeated {register_object.length} times.
             return f"0b{field.default_value}"
 
         if isinstance(field, Enumeration):
-            return field.default_value.name
+            return f"``{field.default_value.name}``"
 
         if isinstance(field, Integer):
             return str(field.default_value)

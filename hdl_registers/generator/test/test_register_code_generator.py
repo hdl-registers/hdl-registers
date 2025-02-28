@@ -205,7 +205,7 @@ def test_generated_source_info(
 
     assert got[0] == expected_first_line
     assert got[1] == expected_second_line
-    assert " from file regs.toml at commit GIT_SHA." in got[2]
+    assert " from file regs.toml at Git commit GIT_SHA." in got[2]
     assert got[3] == "Register hash REGISTER_SHA."
 
     # Test with SVN information
@@ -216,7 +216,7 @@ def test_generated_source_info(
     got = CustomGenerator(register_list=register_list, output_folder=None).generated_source_info
     assert got[0] == expected_first_line
     assert got[1] == expected_second_line
-    assert " from file regs.toml at revision REVISION." in got[2]
+    assert " from file regs.toml at SVN revision REVISION." in got[2]
     assert got[3] == "Register hash REGISTER_SHA."
 
     # Test with no source definition file
@@ -226,7 +226,7 @@ def test_generated_source_info(
     assert got[0] == expected_first_line
     assert got[1] == expected_second_line
     assert "from file" not in got[2]
-    assert " at revision REVISION." in got[2]
+    assert " at SVN revision REVISION." in got[2]
     assert got[3] == "Register hash REGISTER_SHA."
 
 

@@ -31,56 +31,77 @@ class HtmlTest:
     def check_register(name, index, address, mode, default_value, description, html):
         expected = f"""
   <tr>
-    <td><strong>{name}</strong></td>
-    <td>{index}</td>
-    <td>{address}</td>
-    <td>{mode}</td>
-    <td>{default_value}</td>
-    <td>{description}</td>
+    <td><p><strong>{name}</strong></p></td>
+    <td><p>{index}</p></td>
+    <td><p>{address}</p></td>
+    <td><p>{mode}</p></td>
+    <td><p>{default_value}</p></td>
+    <td>
+<p>{description}</p>
+    </td>
   </tr>
 """
-        assert expected in html, f"{expected}\n\n{html}"
+        if expected not in html:
+            print(html)
+            print()
+            print(expected)
+            raise ValueError
 
     @staticmethod
     def check_field(name, index, default_value, html, description=None):
         expected = f"""
   <tr>
-    <td>&nbsp;&nbsp;<em>{name}</em></td>
-    <td>&nbsp;&nbsp;{index}</td>
-    <td></td>
-    <td></td>
-    <td>{default_value}</td>
+    <td><p>&nbsp;&nbsp;<em>{name}</em></p></td>
+    <td><p>&nbsp;&nbsp;{index}</p></td>
+    <td><p></p></td>
+    <td><p></p></td>
+    <td><p>{default_value}</p></td>
 """
         if description:
             expected += f"""\
     <td>
-      {description}
+<p>{description}</p>
     </td>
 """
-
-        assert expected in html, f"{expected}\n\n{html}"
+        if expected not in html:
+            print(html)
+            print()
+            print(expected)
+            raise ValueError
 
     @staticmethod
     def check_register_array(name, length, iterator_range, description, html):
         expected = f"""
   <tr>
     <td class="array_header" colspan=5>
-      Register array <strong>{name}</strong>, repeated {length} times.
-      Iterator <i>{iterator_range}.</i>
+      <p>
+        Register array <strong>{name}</strong>, repeated {length} times.
+        Iterator <span class="formula">{iterator_range}</span>.
+      </p>
     </td>
-    <td class="array_header">{description}</td>
+    <td class="array_header">
+<p>{description}</p>
+    </td>
   </tr>
 """
-        assert expected in html, f"{expected}\n\n{html}"
+        if expected not in html:
+            print(html)
+            print()
+            print(expected)
+            raise ValueError
 
     @staticmethod
     def check_constant(name, value, html):
         expected = f"""
   <tr>
-    <td><strong>{name}</strong></td>
-    <td>{value}</td>
+    <td><p><strong>{name}</strong></p></td>
+    <td><p>{value}</p></td>
 """
-        assert expected in html, f"{expected}\n\n{html}"
+        if expected not in html:
+            print(html)
+            print()
+            print(expected)
+            raise ValueError
 
 
 @pytest.fixture
@@ -163,7 +184,7 @@ def test_register_fields(html_test):
     html_test.check_field(
         name="plain_enumeration",
         index="15:13",
-        default_value="third",
+        default_value='<span class="docutils literal">third</span>',
         html=html,
     )
     html_test.check_field(
