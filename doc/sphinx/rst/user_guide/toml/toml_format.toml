@@ -22,8 +22,6 @@ mode = "r_w"
 # The value specified MUST be a string.
 description = """
 This is the description of my register.
-
-Rudimentary RST formatting can be used, such as **boldface** and *italics*.
 """
 
 enable.type = "bit"
@@ -74,7 +72,25 @@ enable.description = "Enable this channel."
 
 tuser.type = "bit_vector"
 tuser.width = 8
-tuser.description = "**TUSER** value for this channel."
+tuser.description = """
+**TUSER** value for this channel.
+
+Below are examples of reStructuredText (RST) formatting which can be used in any description field.
+It will be rendered in generated HTML documentation.
+
+* **Bold text**
+* *Italic text*
+
+1. ``Code text``
+2. `Hyperlink <https://hdl-registers.com>`_
+3. Inline math :math:`a^2 + b^2 = c^2`
+
+Block math:
+
+.. math::
+
+  \\tilde f(\\omega)=\\frac{1}{2\\pi} \\int_{-\\infty}^\\infty f(x)e^{-i\\omega x} \\, dx
+"""
 
 
 ################################################################################

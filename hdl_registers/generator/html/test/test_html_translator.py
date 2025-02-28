@@ -40,29 +40,25 @@ def test_markdown_parser_can_handle_escaped_asterisks(html_translator):
     text = r"Part of this sentence *\*should be in italics and surrounded\** by asterisks"
     assert expected in html_translator.translate(text)
 
-    expected = "Part of this sentence *<em>should be in italics and surrounded</em>* by asterisks"
-    text = r"Part of this sentence \**should be in italics and surrounded*\* by asterisks"
-    assert expected in html_translator.translate(text)
-
     expected = "Part of this sentence should have an <em>*</em> in italics"
     text = r"Part of this sentence should have an *\** in italics"
     assert expected in html_translator.translate(text)
 
 
 def test_line_breaks(html_translator):
-    expected = "Two empty lines<br />\n<br />\nbetween paragraphs."
+    expected = "Two empty lines</p>\n<p>between paragraphs."
     text = "Two empty lines\n\nbetween paragraphs."
     assert expected in html_translator.translate(text)
 
-    expected = "Three empty lines<br />\n<br />\nbetween paragraphs."
+    expected = "Three empty lines</p>\n<p>between paragraphs."
     text = "Three empty lines\n\n\nbetween paragraphs."
     assert expected in html_translator.translate(text)
 
-    expected = r"Escaped \n\n\n should not result in paragraph break."
+    expected = r"Escaped nnn should not result in paragraph break."
     text = r"Escaped \n\n\n should not result in paragraph break."
     assert expected in html_translator.translate(text)
 
-    expected = "One empty line means same paragraph."
+    expected = "<p>One empty line\nmeans same paragraph.</p>"
     text = "One empty line\nmeans same paragraph."
     assert expected in html_translator.translate(text)
 

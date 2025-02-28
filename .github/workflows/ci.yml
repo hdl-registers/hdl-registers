@@ -56,7 +56,7 @@ jobs:
 
     - name: Install Python packages
       run: |
-        python3 -m pip install black pytest PyYAML rtoml termcolor tomli_w
+        python3 -m pip install black docutils pytest PyYAML rtoml termcolor tomli_w
 
     - name: Clone dependency repos
       run: |
@@ -132,6 +132,7 @@ jobs:
       run: |
         pip install \
           black \
+          docutils \
           GitPython \
           pybadges \
           PyYAML \

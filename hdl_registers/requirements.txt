@@ -1,4 +1,5 @@
 black
+docutils
 GitPython
 PyYAML
 rtoml

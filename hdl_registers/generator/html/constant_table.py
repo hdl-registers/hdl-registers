@@ -71,9 +71,11 @@ class HtmlConstantTableGenerator(HtmlGeneratorCommon):
             description = self._html_translator.translate(constant.description)
             html += f"""
   <tr>
-    <td><strong>{constant.name}</strong></td>
-    <td>{self._format_constant_value(constant=constant)}</td>
-    <td>{description}</td>
+    <td><p><strong>{constant.name}</strong></p></td>
+    <td><p>{self._format_constant_value(constant=constant)}</p></td>
+    <td>
+{description}
+    </td>
   </tr>"""
 
         html += """
