@@ -247,7 +247,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
   uint32_t {self._class_name}::{signature} const\
   {{
 {self._get_field_shift_and_mask(field=field)}\
-{self._get_field_value_checker(field=field, setter_or_getter="setter")}\
+{self._get_field_value_checker(register=register, field=field, setter_or_getter="setter")}\
     const uint32_t field_value_masked = field_value & mask_at_base;
     const uint32_t field_value_masked_and_shifted = field_value_masked << shift;
 
@@ -270,18 +270,32 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
 """
 
-    @staticmethod
-    def _get_field_value_checker(field: RegisterField, setter_or_getter: str) -> str:
+    def _get_field_value_checker(
+        self, register: Register, field: RegisterField, setter_or_getter: str
+    ) -> str:
         comment = "// Check that field value is within the legal range."
         assertion = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
 
         if isinstance(field, Integer):
-            return f"""\
-    {comment}
+            if (
+                field.min_value == 0
+                and not field.is_signed
+                and self._field_value_type_name(
+                    register=register, register_array=None, field=field
+                ).startswith("uint")
+            ):
+                min_value_check = ""
+            else:
+                min_value_check = f"""\
     {assertion}(
       field_value >= {field.min_value},
       "Got '{field.name}' value too small: " << field_value
     );
+"""
+
+            return f"""\
+    {comment}
+{min_value_check}\
     {assertion}(
       field_value <= {field.max_value},
       "Got '{field.name}' value too large: " << field_value
@@ -302,9 +316,11 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return ""
 
-    def _get_field_getter_value_checker(self, field: RegisterField) -> str:
+    def _get_field_getter_value_checker(self, register: Register, field: RegisterField) -> str:
         if isinstance(field, Integer):
-            return self._get_field_value_checker(field=field, setter_or_getter="getter")
+            return self._get_field_value_checker(
+                register=register, field=field, setter_or_getter="getter"
+            )
 
         return ""
 
@@ -431,7 +447,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             raise ValueError(f"Got unexpected field type: {type_name}")
 
         cpp_code += f"""
-{self._get_field_getter_value_checker(field=field)}\
+{self._get_field_getter_value_checker(register=register, field=field)}\
     return field_value;
   }}
 
