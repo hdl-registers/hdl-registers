@@ -162,7 +162,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1269: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1265: Got 'dummies' array index out of range: 3.\n"
     )
 
 
