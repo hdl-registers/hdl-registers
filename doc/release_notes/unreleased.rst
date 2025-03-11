@@ -1,1 +1,3 @@
-Nothing here yet.
+Fixed
+
+* Bump pegged tsfpga version.
