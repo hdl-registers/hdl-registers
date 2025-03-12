@@ -508,7 +508,17 @@ def test_relative_path_printout(tmp_path, monkeypatch):
         generator.create()
         stdout = string_io.getvalue()
 
+    # Prints one sub-folder.
     assert f"file: {Path('out') / 'test.x'}" in stdout
+
+    string_io = io.StringIO()
+    with contextlib.redirect_stdout(string_io):
+        monkeypatch.chdir(tmp_path.parent)
+        generator.create()
+        stdout = string_io.getvalue()
+
+    # Prints multiple sub-folders.
+    assert f"file: {Path(tmp_path.name) / 'out' / 'test.x'}" in stdout
 
     string_io = io.StringIO()
     with contextlib.redirect_stdout(string_io):
@@ -517,12 +527,5 @@ def test_relative_path_printout(tmp_path, monkeypatch):
         generator.create()
         stdout = string_io.getvalue()
 
-    assert f"file: {Path('..') / 'out' / 'test.x'}" in stdout
-
-    string_io = io.StringIO()
-    with contextlib.redirect_stdout(string_io):
-        monkeypatch.chdir(tmp_path.parent)
-        generator.create()
-        stdout = string_io.getvalue()
-
-    assert f"file: {Path(tmp_path.name) / 'out' / 'test.x'}" in stdout
+    # Prints full path since the output is not inside the CWD.
+    assert f"file: {tmp_path / 'out' / 'test.x'}" in stdout

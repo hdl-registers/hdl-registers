@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any
 
 from tsfpga.git_utils import get_git_commit, git_commands_are_available
 from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_available
-from tsfpga.system_utils import create_file, path_relative_to, read_file
+from tsfpga.system_utils import create_file, read_file
 
 from hdl_registers import __version__ as hdl_registers_version
 
@@ -154,10 +154,12 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         """
         output_file = self.output_file
 
-        try:
-            path_to_print = path_relative_to(path=output_file, other=Path())
-        except ValueError:
-            # Fails on Windows if CWD and the file are on different drives.
+        current_working_directory = Path.cwd()
+        if current_working_directory in output_file.parents:
+            # Print a shorter path if the output is inside the CWD.
+            path_to_print = output_file.relative_to(current_working_directory)
+        else:
+            # But don't print a long string of ../../ if it is outside, but instead the full path.
             path_to_print = output_file
         print(f"Creating {self.SHORT_DESCRIPTION} file: {path_to_print}")
 
@@ -294,7 +296,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         Lines with info about the automatically generated file.
         """
         # Default: Get git SHA from the user's current working directory.
-        directory = Path()
+        directory = Path.cwd()
 
         # This call will more or less guess the user's timezone.
         # In a general use case this is not reliable, hence the rule, but in our case
