@@ -22,7 +22,7 @@ def main(output_folder: Path) -> None:
     register_list = RegisterList(name="caesar")
 
     register = register_list.append_register(
-        name="config", mode=REGISTER_MODES["r_w"], description="Configuration register."
+        name="conf", mode=REGISTER_MODES["r_w"], description="Configuration register."
     )
 
     register.append_bit_vector(

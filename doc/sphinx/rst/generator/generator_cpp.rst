@@ -1,7 +1,7 @@
 .. _generator_cpp:
 
-C++ code generator
-==================
+C++ generator
+=============
 
 A complete C++ class can be generated with methods to read/write the registers or fields.
 

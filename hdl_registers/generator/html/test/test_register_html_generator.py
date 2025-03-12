@@ -116,7 +116,7 @@ def test_registers(html_test):
     html = html_test.create_html_page()
 
     html_test.check_register(
-        name="config",
+        name="conf",
         index=0,
         address="0x0000",
         mode="Read, Write",

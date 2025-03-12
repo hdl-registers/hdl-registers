@@ -72,7 +72,7 @@ begin
       regs_up.status.enabled <= '0';
     end if;
 
-    if reg_was_written.config then
+    if reg_was_written.conf then
       -- Clear value when configuration is changed.
       regs_up.status.pulse_count <= 0;
     else
@@ -100,18 +100,18 @@ begin
 
       pulse <= '0';
 
-      case regs_down.config.condition is
+      case regs_down.conf.condition is
         when condition_clock_cycles =>
-          count <= count + regs_down.config.increment;
+          count <= count + regs_down.conf.increment;
 
         when condition_clock_cycles_with_enable =>
           if clock_enable then
-            count <= count + regs_down.config.increment;
+            count <= count + regs_down.conf.increment;
           end if;
 
         when condition_enable_edges =>
           if clock_enable /= clock_enable_p1 then
-            count <= count + regs_down.config.increment;
+            count <= count + regs_down.conf.increment;
           end if;
       end case;
 

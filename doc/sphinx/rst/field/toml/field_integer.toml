@@ -1,9 +1,9 @@
-[config]
+[conf]
 
 mode = "r_w"
 description = "Configuration register."
 
-# This will allocate an integer field named "burst_length_bytes" in the "config" register.
+# This will allocate an integer field named "burst_length_bytes" in the "conf" register.
 # The "type" property MUST be present and set to "integer".
 burst_length_bytes.type = "integer"
 

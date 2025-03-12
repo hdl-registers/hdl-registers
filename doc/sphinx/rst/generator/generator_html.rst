@@ -1,7 +1,7 @@
 .. _generator_html:
 
-HTML code generator
-===================
+HTML generator
+==============
 
 A complete HTML page can be generated, with register details as well as textual description of the
 different register modes.

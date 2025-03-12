@@ -1,0 +1,36 @@
+################################################################################
+[conf]
+
+mode = "r_w"
+
+enable.type = "bit"
+enable.description = "Write as '1' to enable the module."
+
+tuser.type = "bit_vector"
+tuser.width = 8
+tuser.description = "Tag all output data with this."
+
+
+################################################################################
+[address]
+
+mode = "r_w"
+
+value.type = "bit_vector"
+value.width = 28
+value.description = "Data will be read from this base address."
+
+
+################################################################################
+[status]
+
+mode = "r"
+
+state.type = "enumeration"
+state.description = "Current state of the module."
+state.element.idle = "Is ready to receive new data."
+state.element.processing = "Is processing a chunk."
+state.element.sending_out = "Is waiting to send out data."
+
+overflow.type = "bit"
+overflow.description = "Is asserted if an overflow has occurred at any point."

@@ -1,7 +1,7 @@
 .. _generator_python:
 
-Python code generator
-=====================
+Python generator
+================
 
 The Python code generator creates an accessor class for reading, writing and printing register and
 field values on a target device.

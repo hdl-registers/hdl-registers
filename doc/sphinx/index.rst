@@ -55,6 +55,7 @@
     rst/generator/generator_cpp
     rst/generator/generator_html
     rst/generator/generator_python
+    rst/generator/generator_systemverilog
     rst/generator/generator_vhdl
 
 .. toctree::
@@ -75,6 +76,8 @@
     rst/api_reference/hdl_registers.generator.cpp
     rst/api_reference/hdl_registers.generator.html
     rst/api_reference/hdl_registers.generator.python
+    rst/api_reference/hdl_registers.generator.systemverilog
+    rst/api_reference/hdl_registers.generator.systemverilog.axi_lite
     rst/api_reference/hdl_registers.generator.vhdl
     rst/api_reference/hdl_registers.generator.vhdl.axi_lite
     rst/api_reference/hdl_registers.generator.vhdl.simulation

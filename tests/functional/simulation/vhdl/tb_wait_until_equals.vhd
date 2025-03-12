@@ -67,9 +67,9 @@ begin
       wait until rising_edge(clk);
       start_write_plain_register <= true;
 
-      wait_until_caesar_config_equals(
+      wait_until_caesar_conf_equals(
         net=>net,
-        value=>caesar_config_non_init,
+        value=>caesar_conf_non_init,
         timeout=>write_register_timeout + 10 * clk_period
       );
 
@@ -81,8 +81,8 @@ begin
       -- vunit: .expected_failure
       -- We never set the register, so it will never assume this value.
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      wait_until_caesar_config_equals(
-        net=>net, value=>caesar_config_non_init, timeout=>100 * clk_period
+      wait_until_caesar_conf_equals(
+        net=>net, value=>caesar_conf_non_init, timeout=>100 * clk_period
       );
 
     elsif run("test_wait_until_array_register_equals") then
@@ -116,11 +116,11 @@ begin
     elsif run("test_wait_until_reg_equals_works_even_when_there_is_junk_in_unused_bits") then
       -- The fields of the register currently occupy bits 14:0.
       -- Write junk to some other bits of the register.
-      reg := to_slv(caesar_config_non_init);
+      reg := to_slv(caesar_conf_non_init);
       reg(31 downto 20) := "101010101010";
-      write_reg(net=>net, reg_index=>caesar_config, value=>reg);
+      write_reg(net=>net, reg_index=>caesar_conf, value=>reg);
 
-      wait_until_caesar_config_equals(net=>net, value=>caesar_config_non_init);
+      wait_until_caesar_conf_equals(net=>net, value=>caesar_conf_non_init);
 
     elsif run("test_using_wildcard_in_slv_register_value_is_possible") then
       -- Use "don't care" as a wildcard. The wait should end after the very first write.
@@ -131,9 +131,9 @@ begin
       wait until rising_edge(clk);
       start_write_plain_register <= true;
 
-      wait_until_caesar_config_plain_enumeration_equals(
+      wait_until_caesar_conf_plain_enumeration_equals(
         net=>net,
-        value=>caesar_config_non_init.plain_enumeration,
+        value=>caesar_conf_non_init.plain_enumeration,
         timeout=>write_register_timeout + 10 * clk_period
       );
 
@@ -145,16 +145,16 @@ begin
       -- vunit: .expected_failure
       -- We never set the register, so it will never assume this value.
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      wait_until_caesar_config_plain_integer_equals(
-        net=>net, value=>caesar_config_non_init.plain_integer, timeout=>100 * clk_period
+      wait_until_caesar_conf_plain_integer_equals(
+        net=>net, value=>caesar_conf_non_init.plain_integer, timeout=>100 * clk_period
       );
 
     elsif run("test_wait_until_plain_field_equals_timeout_with_message") then
       -- vunit: .expected_failure
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      wait_until_caesar_config_plain_integer_equals(
+      wait_until_caesar_conf_plain_integer_equals(
         net=>net,
-        value=>caesar_config_non_init.plain_integer,
+        value=>caesar_conf_non_init.plain_integer,
         timeout=>100 * clk_period,
         message=>"Extra printout that can be set!"
       );
@@ -212,7 +212,7 @@ begin
 
     wait for write_register_timeout;
 
-    write_caesar_config(net=>net, value=>caesar_config_non_init);
+    write_caesar_conf(net=>net, value=>caesar_conf_non_init);
   end process;
 
 

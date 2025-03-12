@@ -1,5 +1,5 @@
 ################################################################################
-[config]
+[conf]
 
 mode = "r_w"
 
@@ -43,5 +43,5 @@ pulse_count.max_value = 255
 pulse_count.description = """
 Number of pulses that have been sent.
 Will wrap around.
-Value will be cleared to zero when **config** register is written.
+Value will be cleared to zero when ``conf`` register is written.
 """

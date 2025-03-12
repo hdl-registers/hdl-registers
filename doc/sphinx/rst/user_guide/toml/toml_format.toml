@@ -1,5 +1,5 @@
 ################################################################################
-[config]
+[conf]
 
 # The "type" property is OPTIONAL for a register (but required for register arrays and constants).
 # It is commonly left out for registers to keep line count down.
@@ -62,7 +62,7 @@ description = "Read address for DMA data."
 
 
 # ------------------------------------------------------------------------------
-[channels.config]
+[channels.conf]
 
 mode = "w"
 description = "Configuration of channel settings."

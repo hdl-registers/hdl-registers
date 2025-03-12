@@ -17,7 +17,7 @@ use work.caesar_regs_pkg.all;
 package caesar_simulation_test_pkg is
 
   -- Different values than init values.
-  constant caesar_config_non_init : caesar_config_t := (
+  constant caesar_conf_non_init : caesar_conf_t := (
     plain_bit_a => '1',
     plain_bit_vector => "1100",
     plain_integer => -33,

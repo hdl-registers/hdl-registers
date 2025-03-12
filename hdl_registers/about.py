@@ -145,6 +145,10 @@ The following code can be generated:
   * AXI-Lite register file wrapper using records and native VHDL types for values.
   * Simulation support packages for compact read/write/wait/checking of register and field values.
 
+* `SystemVerilog <{WEBSITE_URL}/rst/generator/generator_systemverilog.html>`_
+
+  * AXI-Lite register file using structures and native types to represent field values.
+
 * `C++ <{WEBSITE_URL}/rst/generator/generator_cpp.html>`_
 
   * Complete class with setters and getters for registers and fields.

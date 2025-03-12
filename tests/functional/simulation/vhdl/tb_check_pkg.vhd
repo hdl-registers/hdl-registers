@@ -60,23 +60,23 @@ begin
     test_runner_setup(runner, runner_cfg);
 
     if run("test_check_equal_of_plain_register_fields") then
-      check_caesar_config_plain_bit_a_equal(net=>net, expected=>caesar_config_init.plain_bit_a);
-      check_caesar_config_plain_bit_b_equal(net=>net, expected=>caesar_config_init.plain_bit_b);
-      check_caesar_config_plain_bit_vector_equal(
-        net=>net, expected=>caesar_config_init.plain_bit_vector
+      check_caesar_conf_plain_bit_a_equal(net=>net, expected=>caesar_conf_init.plain_bit_a);
+      check_caesar_conf_plain_bit_b_equal(net=>net, expected=>caesar_conf_init.plain_bit_b);
+      check_caesar_conf_plain_bit_vector_equal(
+        net=>net, expected=>caesar_conf_init.plain_bit_vector
       );
-      check_caesar_config_plain_enumeration_equal(
-        net=>net, expected=>caesar_config_init.plain_enumeration
+      check_caesar_conf_plain_enumeration_equal(
+        net=>net, expected=>caesar_conf_init.plain_enumeration
       );
-      check_caesar_config_plain_integer_equal(
-        net=>net, expected=>caesar_config_init.plain_integer
+      check_caesar_conf_plain_integer_equal(
+        net=>net, expected=>caesar_conf_init.plain_integer
       );
 
       check_caesar_field_test_ufixed0_equal(net=>net, expected=>"11111111");
       check_caesar_field_test_sfixed0_equal(net=>net, expected=>"111111");
 
     elsif run("test_check_equal_of_plain_register_as_record") then
-      check_caesar_config_equal(net=>net, expected=>caesar_config_init);
+      check_caesar_conf_equal(net=>net, expected=>caesar_conf_init);
 
     elsif run("test_check_equal_of_plain_register_as_slv") then
       reg_value := std_ulogic_vector(to_unsigned(14, 32));
@@ -151,29 +151,29 @@ begin
     elsif run("test_check_equal_fail_for_bit_field") then
       -- vunit: .expected_failure
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      check_caesar_config_plain_bit_a_equal(
-        net=>net, expected=>caesar_config_non_init.plain_bit_a
+      check_caesar_conf_plain_bit_a_equal(
+        net=>net, expected=>caesar_conf_non_init.plain_bit_a
       );
 
     elsif run("test_check_equal_fail_for_bit_vector_field_at_a_base_address") then
       -- vunit: .expected_failure
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      check_caesar_config_plain_bit_vector_equal(
-        net=>net, expected=>caesar_config_non_init.plain_bit_vector, base_address=>x"00050000"
+      check_caesar_conf_plain_bit_vector_equal(
+        net=>net, expected=>caesar_conf_non_init.plain_bit_vector, base_address=>x"00050000"
       );
 
     elsif run("test_check_equal_fail_for_enumeration_field") then
       -- vunit: .expected_failure
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      check_caesar_config_plain_enumeration_equal(
-        net=>net, expected=>caesar_config_non_init.plain_enumeration
+      check_caesar_conf_plain_enumeration_equal(
+        net=>net, expected=>caesar_conf_non_init.plain_enumeration
       );
 
     elsif run("test_check_equal_fail_for_integer_field") then
       -- vunit: .expected_failure
       -- Should fail. Inspect the console output to see that error message is constructed correctly.
-      check_caesar_config_plain_integer_equal(
-        net=>net, expected=>caesar_config_non_init.plain_integer
+      check_caesar_conf_plain_integer_equal(
+        net=>net, expected=>caesar_conf_non_init.plain_integer
       );
 
     elsif run("test_check_equal_fail_for_ufixed_field") then

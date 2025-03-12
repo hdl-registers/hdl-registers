@@ -244,7 +244,7 @@ begin
       reg_was_written_expected(caesar_dummies4_flabby(array_index=>regs_down.dummies4'high)) := 1;
     end procedure;
 
-    procedure check_config(got : caesar_config_t; expected : caesar_config_t) is
+    procedure check_config(got : caesar_conf_t; expected : caesar_conf_t) is
     begin
       check_equal(got.plain_bit_a, expected.plain_bit_a);
       check_equal(got.plain_bit_vector, expected.plain_bit_vector);
@@ -254,27 +254,27 @@ begin
     end procedure;
 
     procedure test_plain_r_w_register is
-      variable config : caesar_config_t := caesar_config_init;
+      variable config : caesar_conf_t := caesar_conf_init;
     begin
       -- Check init values in the aggregated record and in the register file.
-      check_config(got=>caesar_regs_down_init.config, expected=>caesar_config_init);
-      check_config(got=>regs_down.config, expected=>caesar_config_init);
+      check_config(got=>caesar_regs_down_init.conf, expected=>caesar_conf_init);
+      check_config(got=>regs_down.conf, expected=>caesar_conf_init);
 
-      read_caesar_config(net=>net, value=>config);
-      check_config(got=>config, expected=>caesar_config_init);
+      read_caesar_conf(net=>net, value=>config);
+      check_config(got=>config, expected=>caesar_conf_init);
 
       -- Check writing updated value.
-      write_caesar_config(net=>net, value=>caesar_config_non_init);
+      write_caesar_conf(net=>net, value=>caesar_conf_non_init);
       wait_for_write;
 
       -- Should be set in register as well as in the read-back value.
-      check_config(got=>regs_down.config, expected=>caesar_config_non_init);
-      read_caesar_config(net=>net, value=>config);
-      check_config(got=>config, expected=>caesar_config_non_init);
+      check_config(got=>regs_down.conf, expected=>caesar_conf_non_init);
+      read_caesar_conf(net=>net, value=>config);
+      check_config(got=>config, expected=>caesar_conf_non_init);
 
       -- Check that the correct register index was accessed.
-      reg_was_read_expected(caesar_config) := 2;
-      reg_was_written_expected(caesar_config) := 1;
+      reg_was_read_expected(caesar_conf) := 2;
+      reg_was_written_expected(caesar_conf) := 1;
     end procedure;
 
     procedure test_array_r_w_register is
@@ -528,7 +528,7 @@ begin
       reg_was_written_expected(caesar_dummies2_dummy(array_index=>1)) := 1;
     end procedure;
 
-    variable config, config2 : caesar_config_t;
+    variable config, config2 : caesar_conf_t;
     variable command : caesar_command_t := caesar_command_init;
     variable irq_status : caesar_irq_status_t;
     variable dummies_first, dummies_first2 : caesar_dummies_first_t;
@@ -554,23 +554,23 @@ begin
 
       -- A plain register of type 'r_w' that has all the different field types.
       -- Show that the default value constants have been set correctly.
-      check_equal(caesar_config_plain_bit_a_init, '0');
-      check_equal(caesar_config_plain_bit_vector_init, std_logic_vector'("0011"));
-      check_equal(caesar_config_plain_integer_init, 66);
-      assert caesar_config_plain_enumeration_init = plain_enumeration_third;
-      check_equal(caesar_config_plain_bit_b_init, '1');
+      check_equal(caesar_conf_plain_bit_a_init, '0');
+      check_equal(caesar_conf_plain_bit_vector_init, std_logic_vector'("0011"));
+      check_equal(caesar_conf_plain_integer_init, 66);
+      assert caesar_conf_plain_enumeration_init = plain_enumeration_third;
+      check_equal(caesar_conf_plain_bit_b_init, '1');
 
       -- The aggregated record type should have identical init values.
-      check_config(got=>caesar_regs_down_init.config, expected=>caesar_config_init);
-      check_config(got=>regs_down.config, expected=>caesar_config_init);
+      check_config(got=>caesar_regs_down_init.conf, expected=>caesar_conf_init);
+      check_config(got=>regs_down.conf, expected=>caesar_conf_init);
 
       -- An 'r_w' register gets its default value from the 'default_values' generic,
       -- which is an SLV value calculated in Python.
       -- Show that converting to record from SLV works correctly.
-      read_caesar_config(net=>net, value=>config);
-      check_config(got=>config, expected=>caesar_config_init);
+      read_caesar_conf(net=>net, value=>config);
+      check_config(got=>config, expected=>caesar_conf_init);
 
-      reg_was_read_expected(caesar_config) := 1;
+      reg_was_read_expected(caesar_conf) := 1;
 
       -- A plain register of type 'r_wpulse' that has all the different field types.
       check_equal(caesar_irq_status_a_init, '1');
@@ -626,15 +626,15 @@ begin
 
       -- Convert to SLV, write over register bus.
       -- Register file converts it back to a record for the checks below.
-      write_caesar_config(net=>net, value=>config);
-      reg_was_written_expected(caesar_config) := 1;
+      write_caesar_conf(net=>net, value=>config);
+      reg_was_written_expected(caesar_conf) := 1;
       wait_for_write;
 
-      check_equal(regs_down.config.plain_bit_a, '1');
-      check_equal(regs_down.config.plain_bit_vector, std_logic_vector'("1010"));
-      check_equal(regs_down.config.plain_integer, -13);
-      assert regs_down.config.plain_enumeration = plain_enumeration_fifth;
-      check_equal(regs_down.config.plain_bit_b, '0');
+      check_equal(regs_down.conf.plain_bit_a, '1');
+      check_equal(regs_down.conf.plain_bit_vector, std_logic_vector'("1010"));
+      check_equal(regs_down.conf.plain_integer, -13);
+      assert regs_down.conf.plain_enumeration = plain_enumeration_fifth;
+      check_equal(regs_down.conf.plain_bit_b, '0');
 
     elsif run("test_write_value_to_array_register") then
       -- Test writing different data to the same register but different repetitions of the array.
@@ -718,8 +718,8 @@ begin
 
     elsif run("test_read_plain_field") then
       -- Check default value.
-      read_caesar_config_plain_bit_a(net=>net, value=>bit_1);
-      read_caesar_config_plain_bit_b(net=>net, value=>bit_2);
+      read_caesar_conf_plain_bit_a(net=>net, value=>bit_1);
+      read_caesar_conf_plain_bit_b(net=>net, value=>bit_2);
 
       check_equal(bit_1, '0');
       check_equal(bit_2, '1');
@@ -728,17 +728,17 @@ begin
       config.plain_bit_a := '1';
       config.plain_bit_b := '0';
 
-      write_caesar_config(net=>net, value=>config);
+      write_caesar_conf(net=>net, value=>config);
 
       -- Check updated value.
-      read_caesar_config_plain_bit_a(net=>net, value=>bit_1);
-      read_caesar_config_plain_bit_b(net=>net, value=>bit_2);
+      read_caesar_conf_plain_bit_a(net=>net, value=>bit_1);
+      read_caesar_conf_plain_bit_b(net=>net, value=>bit_2);
 
       check_equal(bit_1, '1');
       check_equal(bit_2, '0');
 
-      reg_was_read_expected(caesar_config) := 4;
-      reg_was_written_expected(caesar_config) := 1;
+      reg_was_read_expected(caesar_conf) := 4;
+      reg_was_written_expected(caesar_conf) := 1;
 
     elsif run("test_read_array_field") then
       -- Check default value.
@@ -766,30 +766,30 @@ begin
 
     elsif run("test_plain_field_read_modify_write") then
       -- This register is of mode "r_w", so the procedure will read-modify-write.
-      read_caesar_config(net=>net, value=>config);
-      assert config = caesar_config_init;
+      read_caesar_conf(net=>net, value=>config);
+      assert config = caesar_conf_init;
 
       -- Write a new value.
       config.plain_bit_a := not config.plain_bit_a;
-      write_caesar_config_plain_bit_a(net=>net, value=>config.plain_bit_a);
+      write_caesar_conf_plain_bit_a(net=>net, value=>config.plain_bit_a);
 
       -- Check updated value.
-      read_caesar_config(net=>net, value=>config2);
+      read_caesar_conf(net=>net, value=>config2);
       assert config2 = config;
 
-      reg_was_read_expected(caesar_config) := 3;
-      reg_was_written_expected(caesar_config) := 1;
+      reg_was_read_expected(caesar_conf) := 3;
+      reg_was_written_expected(caesar_conf) := 1;
 
       -- Write a new value on a different bit.
       config.plain_bit_b := not config.plain_bit_b;
-      write_caesar_config_plain_bit_b(net=>net, value=>config.plain_bit_b);
+      write_caesar_conf_plain_bit_b(net=>net, value=>config.plain_bit_b);
 
       -- Check updated value.
-      read_caesar_config(net=>net, value=>config2);
+      read_caesar_conf(net=>net, value=>config2);
       assert config2 = config;
 
-      reg_was_read_expected(caesar_config) := 5;
-      reg_was_written_expected(caesar_config) := 2;
+      reg_was_read_expected(caesar_conf) := 5;
+      reg_was_written_expected(caesar_conf) := 2;
 
     elsif run("test_plain_field_write") then
       -- This register is of mode "wpulse", so the procedure will only write.
@@ -881,8 +881,8 @@ begin
 
     assert reg_was_read_count'length = 22;
 
-    reg_was_read_count(caesar_config) <=
-      reg_was_read_count(caesar_config) + to_int(reg_was_read.config);
+    reg_was_read_count(caesar_conf) <=
+      reg_was_read_count(caesar_conf) + to_int(reg_was_read.conf);
     reg_was_read_count(caesar_irq_status) <=
       reg_was_read_count(caesar_irq_status) + to_int(reg_was_read.irq_status);
     reg_was_read_count(caesar_status) <=
@@ -890,8 +890,8 @@ begin
     reg_was_read_count(caesar_current_timestamp) <=
       reg_was_read_count(caesar_current_timestamp) + to_int(reg_was_read.current_timestamp);
 
-    reg_was_written_count(caesar_config) <=
-      reg_was_written_count(caesar_config) + to_int(reg_was_written.config);
+    reg_was_written_count(caesar_conf) <=
+      reg_was_written_count(caesar_conf) + to_int(reg_was_written.conf);
     reg_was_written_count(caesar_command) <=
       reg_was_written_count(caesar_command) + to_int(reg_was_written.command);
     reg_was_written_count(caesar_irq_status) <=

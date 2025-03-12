@@ -1,9 +1,9 @@
-[config]
+[conf]
 
 mode = "r_w"
 description = "Configuration register."
 
-# This will allocate a bit field named "enable" in the "config" register.
+# This will allocate a bit field named "enable" in the "conf" register.
 # The "type" property MUST be present and set to "bit".
 enable.type = "bit"
 
