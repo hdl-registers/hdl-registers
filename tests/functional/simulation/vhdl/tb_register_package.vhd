@@ -40,7 +40,7 @@ begin
     test_runner_setup(runner, runner_cfg);
 
     if run("test_register_addresses") then
-      check_equal(caesar_config, 0);
+      check_equal(caesar_conf, 0);
       check_equal(caesar_command, 1);
       check_equal(caesar_irq_status, 2);
       check_equal(caesar_status, 3);
@@ -56,7 +56,7 @@ begin
       check_equal(caesar_dummies2_dummy(0), 13);
 
     elsif run("test_register_modes") then
-      assert caesar_register_map(caesar_config).mode = r_w;
+      assert caesar_register_map(caesar_conf).mode = r_w;
       assert caesar_register_map(caesar_status).mode = r;
       assert caesar_register_map(caesar_command).mode = wpulse;
       assert caesar_register_map(caesar_irq_status).mode = r_wpulse;
@@ -73,15 +73,15 @@ begin
       -- Generated field indexes should match the order and widths in the TOML
 
       -- Status register
-      check_equal(caesar_config_plain_bit_a, 0);
+      check_equal(caesar_conf_plain_bit_a, 0);
 
-      check_equal(caesar_config_plain_bit_vector'low, 1);
-      check_equal(caesar_config_plain_bit_vector'high, 4);
-      check_equal(caesar_config_plain_bit_vector_width, 4);
-      check_equal(caesar_config_plain_bit_vector_t'high, 3);
-      check_equal(caesar_config_plain_bit_vector_t'low, 0);
+      check_equal(caesar_conf_plain_bit_vector'low, 1);
+      check_equal(caesar_conf_plain_bit_vector'high, 4);
+      check_equal(caesar_conf_plain_bit_vector_width, 4);
+      check_equal(caesar_conf_plain_bit_vector_t'high, 3);
+      check_equal(caesar_conf_plain_bit_vector_t'low, 0);
 
-      check_equal(caesar_config_plain_bit_b, 16);
+      check_equal(caesar_conf_plain_bit_b, 16);
 
       -- Fields in array registers
       check_equal(caesar_dummies_first_array_bit_a, 7);
@@ -139,69 +139,69 @@ begin
     elsif run("test_enumeration_from_slv") then
       reg := (others => '1');
 
-      reg(caesar_config_plain_enumeration) := "000";
-      assert to_caesar_config_plain_enumeration(reg) = plain_enumeration_first;
+      reg(caesar_conf_plain_enumeration) := "000";
+      assert to_caesar_conf_plain_enumeration(reg) = plain_enumeration_first;
 
-      reg(caesar_config_plain_enumeration) := "001";
-      assert to_caesar_config_plain_enumeration(reg) = plain_enumeration_second;
+      reg(caesar_conf_plain_enumeration) := "001";
+      assert to_caesar_conf_plain_enumeration(reg) = plain_enumeration_second;
 
-      reg(caesar_config_plain_enumeration) := "010";
-      assert to_caesar_config_plain_enumeration(reg) = plain_enumeration_third;
+      reg(caesar_conf_plain_enumeration) := "010";
+      assert to_caesar_conf_plain_enumeration(reg) = plain_enumeration_third;
 
-      reg(caesar_config_plain_enumeration) := "011";
-      assert to_caesar_config_plain_enumeration(reg) = plain_enumeration_fourth;
+      reg(caesar_conf_plain_enumeration) := "011";
+      assert to_caesar_conf_plain_enumeration(reg) = plain_enumeration_fourth;
 
-      reg(caesar_config_plain_enumeration) := "100";
-      assert to_caesar_config_plain_enumeration(reg) = plain_enumeration_fifth;
+      reg(caesar_conf_plain_enumeration) := "100";
+      assert to_caesar_conf_plain_enumeration(reg) = plain_enumeration_fifth;
 
     elsif run("test_enumeration_out_of_range") then
       -- vunit: .expected_failure
       -- Element does not exist in enum.
-      reg(caesar_config_plain_enumeration) := "110";
-      assert to_caesar_config_plain_enumeration(reg) = plain_enumeration_fifth;
+      reg(caesar_conf_plain_enumeration) := "110";
+      assert to_caesar_conf_plain_enumeration(reg) = plain_enumeration_fifth;
 
     elsif run("test_integer_to_slv") then
-      check_equal(to_caesar_config_plain_integer_slv(-17), std_logic_vector'("11101111"));
-      check_equal(to_caesar_config_plain_integer_slv(-16), std_logic_vector'("11110000"));
-      check_equal(to_caesar_config_plain_integer_slv(-15), std_logic_vector'("11110001"));
+      check_equal(to_caesar_conf_plain_integer_slv(-17), std_logic_vector'("11101111"));
+      check_equal(to_caesar_conf_plain_integer_slv(-16), std_logic_vector'("11110000"));
+      check_equal(to_caesar_conf_plain_integer_slv(-15), std_logic_vector'("11110001"));
 
-      check_equal(to_caesar_config_plain_integer_slv(63), std_logic_vector'("00111111"));
-      check_equal(to_caesar_config_plain_integer_slv(64), std_logic_vector'("01000000"));
-      check_equal(to_caesar_config_plain_integer_slv(65), std_logic_vector'("01000001"));
+      check_equal(to_caesar_conf_plain_integer_slv(63), std_logic_vector'("00111111"));
+      check_equal(to_caesar_conf_plain_integer_slv(64), std_logic_vector'("01000000"));
+      check_equal(to_caesar_conf_plain_integer_slv(65), std_logic_vector'("01000001"));
 
     elsif run("test_integer_to_slv_out_of_range") then
       -- vunit: .expected_failure
       -- Is outside of the numeric range of the field.
       -- Aldec Riviera-PRO catches this error during compilation, so if you are running
       -- these functional tests with that simulator, this needs to be commented out.
-      check_equal(to_caesar_config_plain_integer_slv(127), std_logic_vector'("01111111"));
+      check_equal(to_caesar_conf_plain_integer_slv(127), std_logic_vector'("01111111"));
 
     elsif run("test_integer_from_slv") then
       reg := (others => '1');
 
-      reg(caesar_config_plain_integer) := "11101111";
-      assert to_caesar_config_plain_integer(reg) = -17;
+      reg(caesar_conf_plain_integer) := "11101111";
+      assert to_caesar_conf_plain_integer(reg) = -17;
 
-      reg(caesar_config_plain_integer) := "11110000";
-      assert to_caesar_config_plain_integer(reg) = -16;
+      reg(caesar_conf_plain_integer) := "11110000";
+      assert to_caesar_conf_plain_integer(reg) = -16;
 
-      reg(caesar_config_plain_integer) := "11110001";
-      assert to_caesar_config_plain_integer(reg) = -15;
+      reg(caesar_conf_plain_integer) := "11110001";
+      assert to_caesar_conf_plain_integer(reg) = -15;
 
-      reg(caesar_config_plain_integer) := "00111111";
-      assert to_caesar_config_plain_integer(reg) = 63;
+      reg(caesar_conf_plain_integer) := "00111111";
+      assert to_caesar_conf_plain_integer(reg) = 63;
 
-      reg(caesar_config_plain_integer) := "01000000";
-      assert to_caesar_config_plain_integer(reg) = 64;
+      reg(caesar_conf_plain_integer) := "01000000";
+      assert to_caesar_conf_plain_integer(reg) = 64;
 
-      reg(caesar_config_plain_integer) := "01000001";
-      assert to_caesar_config_plain_integer(reg) = 65;
+      reg(caesar_conf_plain_integer) := "01000001";
+      assert to_caesar_conf_plain_integer(reg) = 65;
 
     elsif run("test_integer_from_slv_out_of_range") then
       -- vunit: .expected_failure
       -- Is outside of the numeric range of the field.
-      reg(caesar_config_plain_integer) := "01111111";
-      assert to_caesar_config_plain_integer(reg) = 1;
+      reg(caesar_conf_plain_integer) := "01111111";
+      assert to_caesar_conf_plain_integer(reg) = 1;
     end if;
 
     test_runner_cleanup(runner);

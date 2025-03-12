@@ -25,7 +25,7 @@ def test_load_nonexistent_json_file_should_raise_exception(tmp_path):
 def test_load_dirty_json_file_should_raise_exception(tmp_path):
     json = """
 {
-    "config": {
+    "conf": {
         "mode": "r_w"
     }
 }
@@ -70,13 +70,13 @@ def test_default_registers(tmp_path):
         name="",
         json_file=json_path,
         default_registers=[
-            Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description=""),
+            Register(name="conf", index=0, mode=REGISTER_MODES["r_w"], description=""),
             Register(name="status", index=1, mode=REGISTER_MODES["r"], description=""),
         ],
     )
 
     # Default registers.
-    assert register_list.get_register("config").index == 0
+    assert register_list.get_register("conf").index == 0
     assert register_list.get_register("status").index == 1
 
     # json registers.

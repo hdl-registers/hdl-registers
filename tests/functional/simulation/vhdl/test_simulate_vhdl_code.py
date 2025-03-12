@@ -6,6 +6,8 @@
 # https://hdl-registers.com
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
+# Works with any VHDL simulator supported by VUnit. Tested with GHDL and ModelSim.
+# --------------------------------------------------------------------------------------------------
 
 import sys
 from os import environ
@@ -15,7 +17,7 @@ from xml.etree import ElementTree  # noqa: ICN001
 import pytest
 
 THIS_DIR = Path(__file__).parent.resolve()
-REPO_ROOT = THIS_DIR.parent.parent.parent.resolve()
+REPO_ROOT = THIS_DIR.parent.parent.parent.parent.resolve()
 sys.path.append(str(REPO_ROOT))
 
 # Add path for default location of tsfpga to PYTHONPATH.
@@ -41,7 +43,7 @@ from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_modes import REGISTER_MODES
 
-DOC_SIM_FOLDER = HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "sim"
+COUNTER_EXAMPLE_FOLDER = HDL_REGISTERS_DOC / "sphinx" / "rst" / "generator" / "example_counter"
 
 
 def test_running_simulation(tmp_path):
@@ -81,7 +83,7 @@ def test_running_simulation(tmp_path):
         for vhd_file in THIS_DIR.glob("*.vhd"):
             library.add_source_file(vhd_file)
 
-        for vhd_file in DOC_SIM_FOLDER.glob("*.vhd"):
+        for vhd_file in COUNTER_EXAMPLE_FOLDER.glob("*.vhd"):
             library.add_source_file(vhd_file)
 
         for vhd_file in generated_register_path.glob("*.vhd"):
@@ -146,19 +148,19 @@ def test_running_simulation(tmp_path):
                 "the 'dummies[1]' register array. - Got 1. Expected 0."
             ),
             f"{tb_check}test_check_equal_fail_for_bit_field": (
-                "ERROR - Checking the 'plain_bit_a' field in the 'config' "
+                "ERROR - Checking the 'plain_bit_a' field in the 'conf' "
                 "register. - Got 0. Expected 1."
             ),
             f"{tb_check}test_check_equal_fail_for_bit_vector_field_at_a_base_address": (
-                "ERROR - Checking the 'plain_bit_vector' field in the 'config' "
+                "ERROR - Checking the 'plain_bit_vector' field in the 'conf' "
                 'register (at base address x"00050000"). - Got 0011 (3). Expected 1100 (12).'
             ),
             f"{tb_check}test_check_equal_fail_for_enumeration_field": (
-                "ERROR - Checking the 'plain_enumeration' field in the 'config' "
+                "ERROR - Checking the 'plain_enumeration' field in the 'conf' "
                 "register. - Got plain_enumeration_third. Expected plain_enumeration_fifth."
             ),
             f"{tb_check}test_check_equal_fail_for_integer_field": (
-                "ERROR - Checking the 'plain_integer' field in the 'config' "
+                "ERROR - Checking the 'plain_integer' field in the 'conf' "
                 "register. - Got 66. Expected -33."
             ),
             f"{tb_check}test_check_equal_fail_for_sfixed_field": (
@@ -200,15 +202,15 @@ def test_running_simulation(tmp_path):
             ),
             f"{tb_wait_until}test_wait_until_plain_field_equals_timeout_with_message": (
                 "FAILURE - Timeout while waiting for the 'plain_integer' field in the "
-                "'config' register to equal the given "
+                "'conf' register to equal the given "
                 "value: -------------------11011111-----. Extra printout that can be set!."
             ),
             f"{tb_wait_until}test_wait_until_plain_field_equals_timeout": (
                 "FAILURE - Timeout while waiting for the 'plain_integer' field in the "
-                "'config' register to equal the given value: -------------------11011111-----."
+                "'conf' register to equal the given value: -------------------11011111-----."
             ),
             f"{tb_wait_until}test_wait_until_plain_register_equals_timeout": (
-                "FAILURE - Timeout while waiting for the 'config' register to equal the given "
+                "FAILURE - Timeout while waiting for the 'conf' register to equal the given "
                 "value: ---------------01001101111111001."
             ),
         },
@@ -260,7 +262,9 @@ def generate_toml_registers(output_path):
 
 
 def generate_doc_registers(output_path):
-    register_list = from_toml(name="counter", toml_file=DOC_SIM_FOLDER / "regs_counter.toml")
+    register_list = from_toml(
+        name="counter", toml_file=COUNTER_EXAMPLE_FOLDER / "regs_counter.toml"
+    )
 
     generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 

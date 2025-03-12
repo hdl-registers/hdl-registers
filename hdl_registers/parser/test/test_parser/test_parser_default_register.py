@@ -19,7 +19,7 @@ def test_overriding_default_register(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
-[config]
+[conf]
 
 type = "register"
 description = "apa"
@@ -29,18 +29,18 @@ description = "apa"
         name="",
         toml_file=toml_path,
         default_registers=[
-            Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description="")
+            Register(name="conf", index=0, mode=REGISTER_MODES["r_w"], description="")
         ],
     )
 
-    assert register_list.get_register("config").description == "apa"
+    assert register_list.get_register("conf").description == "apa"
 
 
 def test_changing_mode_of_default_register_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
-[config]
+[conf]
 
 mode = "w"
 """,
@@ -51,10 +51,10 @@ mode = "w"
             name="",
             toml_file=toml_path,
             default_registers=[
-                Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description="")
+                Register(name="conf", index=0, mode=REGISTER_MODES["r_w"], description="")
             ],
         )
     assert str(exception_info.value) == (
-        f'Error while parsing register "config" in {toml_path}: '
+        f'Error while parsing register "conf" in {toml_path}: '
         'A "mode" may not be specified for a default register.'
     )

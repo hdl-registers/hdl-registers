@@ -51,7 +51,7 @@ begin
 
   ------------------------------------------------------------------------------
   main : process
-    variable config : counter_config_t := counter_config_init;
+    variable conf : counter_conf_t := counter_conf_init;
   begin
     test_runner_setup(runner, runner_cfg);
 
@@ -60,18 +60,18 @@ begin
     check_counter_status_pulse_count_equal(net=>net, expected=>0);
 
     if run("test_count_clock_cycles") then
-      config.condition := condition_clock_cycles;
-      config.increment := 13;
+      conf.condition := condition_clock_cycles;
+      conf.increment := 13;
 
     elsif run("test_count_clock_cycles_with_enable") then
-      config.condition := condition_clock_cycles_with_enable;
-      config.increment := 8;
+      conf.condition := condition_clock_cycles_with_enable;
+      conf.increment := 8;
 
       clock_enable <= '1';
     end if;
 
     -- Set configuration, which depends on test case.
-    write_counter_config(net=>net, value=>config);
+    write_counter_conf(net=>net, value=>conf);
 
     -- Enable the operation.
     write_counter_command_start(net=>net, value=>'1');

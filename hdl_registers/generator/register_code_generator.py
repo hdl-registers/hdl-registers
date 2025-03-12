@@ -165,13 +165,26 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         self._sanity_check()
 
+        # Constructing the code and creating the file is in a separate method that can
+        # be overridden.
+        # Everything above should be common though.
+        return self._create_artifact(output_file=output_file, **kwargs)
+
+    def _create_artifact(
+        self,
+        output_file: Path,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Path:
+        """
+        The last stage of creating the file: Constructs the code and creates the file.
+        This method is called by :meth:`.create` and should not be called directly.
+        It is separated out to make it easier to override some specific behaviors in subclasses.
+        """
         code = self.get_code(**kwargs)
         result = f"{self.header}\n{code}"
 
         # Will create the containing folder unless it already exists.
-        create_file(file=output_file, contents=result)
-
-        return output_file
+        return create_file(file=output_file, contents=result)
 
     def create_if_needed(
         self,
@@ -224,12 +237,16 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         The version and hash checks above are dependent on the artifact file having a header
         as given by :meth:`.header`.
         """
-        output_file = self.output_file
+        return self._should_create(file_path=self.output_file)
 
-        if not output_file.exists():
+    def _should_create(self, file_path: Path) -> bool:
+        """
+        Check if a (re-)create of this specific artifact is needed.
+        """
+        if not file_path.exists():
             return True
 
-        return self._find_versions_and_hash_of_existing_file(file_path=output_file) != (
+        return self._find_versions_and_hash_of_existing_file(file_path=file_path) != (
             hdl_registers_version,
             self.__version__,
             self.register_list.object_hash,

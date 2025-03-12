@@ -23,7 +23,7 @@ underflow.description = "Too low data rate."
 # It will be included in this register list at its default configuration.
 
 # Further registers and register arrays can be added freely after the default registers.
-[config]
+[conf]
 
 mode = "r_w"
 description = "Generic configuration register."

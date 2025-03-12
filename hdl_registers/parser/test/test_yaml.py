@@ -62,13 +62,13 @@ hest:
         name="",
         yaml_file=yaml_path,
         default_registers=[
-            Register(name="config", index=0, mode=REGISTER_MODES["r_w"], description=""),
+            Register(name="conf", index=0, mode=REGISTER_MODES["r_w"], description=""),
             Register(name="status", index=1, mode=REGISTER_MODES["r"], description=""),
         ],
     )
 
     # Default registers.
-    assert register_list.get_register("config").index == 0
+    assert register_list.get_register("conf").index == 0
     assert register_list.get_register("status").index == 1
 
     # yaml registers.

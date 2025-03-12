@@ -11,12 +11,12 @@
 
 void test_register_attributes()
 {
-    assert(fpga_regs::caesar::config::plain_bit_a::width == 1);
-    assert(fpga_regs::caesar::config::plain_bit_a::default_value == 0);
-    assert(fpga_regs::caesar::config::plain_bit_b::default_value == 1);
+    assert(fpga_regs::caesar::conf::plain_bit_a::width == 1);
+    assert(fpga_regs::caesar::conf::plain_bit_a::default_value == 0);
+    assert(fpga_regs::caesar::conf::plain_bit_b::default_value == 1);
 
-    assert(fpga_regs::caesar::config::plain_bit_vector::width == 4);
-    assert(fpga_regs::caesar::config::plain_bit_vector::default_value == 3);
+    assert(fpga_regs::caesar::conf::plain_bit_vector::width == 4);
+    assert(fpga_regs::caesar::conf::plain_bit_vector::default_value == 3);
 
     assert(fpga_regs::caesar::dummies::array_length == 3);
     assert(fpga_regs::caesar::dummies::first::array_bit_vector::width == 5);
@@ -27,7 +27,7 @@ void test_read_write_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
 {
     // Set data and then check, according to the expected register addresses.
     // Data is a ramp 0-6.
-    caesar->set_config(0);
+    caesar->set_conf(0);
     caesar->set_dummies_first(0, 1);
     // second is read only, so set the value in the memory straight away
     memory[8] = 2;
@@ -37,7 +37,7 @@ void test_read_write_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
     memory[12] = 6;
     caesar->set_dummies2_dummy(0, 7);
 
-    assert(caesar->get_config() == 0);
+    assert(caesar->get_conf() == 0);
     assert(memory[0] == 0);
 
     assert(caesar->get_dummies_first(0) == 1);
@@ -65,23 +65,23 @@ void test_read_write_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
 void test_field_getters(fpga_regs::Caesar *caesar)
 {
     // Assert field getters of plain register
-    caesar->set_config(
+    caesar->set_conf(
         (0b0 << 16) | (0b100 << 13) | (0b01010011 << 5) | (0b1010 << 1) | (0b1 << 0));
-    assert(caesar->get_config_plain_bit_a() == 1);
-    assert(caesar->get_config_plain_bit_vector() == 10);
-    assert(caesar->get_config_plain_integer() == 83);
+    assert(caesar->get_conf_plain_bit_a() == 1);
+    assert(caesar->get_conf_plain_bit_vector() == 10);
+    assert(caesar->get_conf_plain_integer() == 83);
     assert(
-        caesar->get_config_plain_enumeration() == fpga_regs::caesar::config::plain_enumeration::Enumeration::fifth);
-    assert(caesar->get_config_plain_bit_b() == 0);
+        caesar->get_conf_plain_enumeration() == fpga_regs::caesar::conf::plain_enumeration::Enumeration::fifth);
+    assert(caesar->get_conf_plain_bit_b() == 0);
 
-    caesar->set_config(
+    caesar->set_conf(
         (0b1 << 16) | (0b011 << 13) | (0b11011100 << 5) | (0b1011 << 1) | (0b0 << 0));
-    assert(caesar->get_config_plain_bit_a() == 0);
-    assert(caesar->get_config_plain_bit_vector() == 11);
-    assert(caesar->get_config_plain_integer() == -36);
+    assert(caesar->get_conf_plain_bit_a() == 0);
+    assert(caesar->get_conf_plain_bit_vector() == 11);
+    assert(caesar->get_conf_plain_integer() == -36);
     assert(
-        caesar->get_config_plain_enumeration() == fpga_regs::caesar::config::plain_enumeration::Enumeration::fourth);
-    assert(caesar->get_config_plain_bit_b() == 1);
+        caesar->get_conf_plain_enumeration() == fpga_regs::caesar::conf::plain_enumeration::Enumeration::fourth);
+    assert(caesar->get_conf_plain_bit_b() == 1);
 
     // Assert field getters of array register
     caesar->set_dummies_first(
@@ -111,20 +111,20 @@ void test_field_getters_from_value(fpga_regs::Caesar *caesar)
     // Assert field getters of plain register
 
     register_value = (0b0 << 16) | (0b100 << 13) | (0b01010011 << 5) | (0b1010 << 1) | (0b1 << 0);
-    assert(caesar->get_config_plain_bit_a_from_value(register_value) == 1);
-    assert(caesar->get_config_plain_bit_vector_from_value(register_value) == 10);
-    assert(caesar->get_config_plain_integer_from_value(register_value) == 83);
+    assert(caesar->get_conf_plain_bit_a_from_value(register_value) == 1);
+    assert(caesar->get_conf_plain_bit_vector_from_value(register_value) == 10);
+    assert(caesar->get_conf_plain_integer_from_value(register_value) == 83);
     assert(
-        caesar->get_config_plain_enumeration_from_value(register_value) == fpga_regs::caesar::config::plain_enumeration::Enumeration::fifth);
-    assert(caesar->get_config_plain_bit_b_from_value(register_value) == 0);
+        caesar->get_conf_plain_enumeration_from_value(register_value) == fpga_regs::caesar::conf::plain_enumeration::Enumeration::fifth);
+    assert(caesar->get_conf_plain_bit_b_from_value(register_value) == 0);
 
     register_value = (0b1 << 16) | (0b011 << 13) | (0b11011100 << 5) | (0b1011 << 1) | (0b0 << 0);
-    assert(caesar->get_config_plain_bit_a_from_value(register_value) == 0);
-    assert(caesar->get_config_plain_bit_b_from_value(register_value) == 1);
-    assert(caesar->get_config_plain_bit_vector_from_value(register_value) == 11);
+    assert(caesar->get_conf_plain_bit_a_from_value(register_value) == 0);
+    assert(caesar->get_conf_plain_bit_b_from_value(register_value) == 1);
+    assert(caesar->get_conf_plain_bit_vector_from_value(register_value) == 11);
     assert(
-        caesar->get_config_plain_enumeration_from_value(register_value) == fpga_regs::caesar::config::plain_enumeration::Enumeration::fourth);
-    assert(caesar->get_config_plain_integer_from_value(register_value) == -36);
+        caesar->get_conf_plain_enumeration_from_value(register_value) == fpga_regs::caesar::conf::plain_enumeration::Enumeration::fourth);
+    assert(caesar->get_conf_plain_integer_from_value(register_value) == -36);
 
     // Assert field getters of array register
 
@@ -151,31 +151,31 @@ void test_field_setters(fpga_regs::Caesar *caesar)
 {
     // Assert field getters of plain register
 
-    caesar->set_config_plain_bit_a(1);
-    caesar->set_config_plain_bit_b(0);
-    caesar->set_config_plain_bit_vector(0b1010);
-    caesar->set_config_plain_enumeration(
-        fpga_regs::caesar::config::plain_enumeration::Enumeration::first);
-    caesar->set_config_plain_integer(77);
-    assert(caesar->get_config_plain_bit_a() == 1);
-    assert(caesar->get_config_plain_bit_b() == 0);
-    assert(caesar->get_config_plain_bit_vector() == 10);
+    caesar->set_conf_plain_bit_a(1);
+    caesar->set_conf_plain_bit_b(0);
+    caesar->set_conf_plain_bit_vector(0b1010);
+    caesar->set_conf_plain_enumeration(
+        fpga_regs::caesar::conf::plain_enumeration::Enumeration::first);
+    caesar->set_conf_plain_integer(77);
+    assert(caesar->get_conf_plain_bit_a() == 1);
+    assert(caesar->get_conf_plain_bit_b() == 0);
+    assert(caesar->get_conf_plain_bit_vector() == 10);
     assert(
-        caesar->get_config_plain_enumeration() == fpga_regs::caesar::config::plain_enumeration::Enumeration::first);
-    assert(caesar->get_config_plain_integer() == 77);
+        caesar->get_conf_plain_enumeration() == fpga_regs::caesar::conf::plain_enumeration::Enumeration::first);
+    assert(caesar->get_conf_plain_integer() == 77);
 
-    caesar->set_config_plain_bit_a(0);
-    caesar->set_config_plain_bit_b(1);
-    caesar->set_config_plain_bit_vector(0b1011);
-    caesar->set_config_plain_enumeration(
-        fpga_regs::caesar::config::plain_enumeration::Enumeration::fifth);
-    caesar->set_config_plain_integer(-45);
-    assert(caesar->get_config_plain_bit_a() == 0);
-    assert(caesar->get_config_plain_bit_b() == 1);
-    assert(caesar->get_config_plain_bit_vector() == 11);
+    caesar->set_conf_plain_bit_a(0);
+    caesar->set_conf_plain_bit_b(1);
+    caesar->set_conf_plain_bit_vector(0b1011);
+    caesar->set_conf_plain_enumeration(
+        fpga_regs::caesar::conf::plain_enumeration::Enumeration::fifth);
+    caesar->set_conf_plain_integer(-45);
+    assert(caesar->get_conf_plain_bit_a() == 0);
+    assert(caesar->get_conf_plain_bit_b() == 1);
+    assert(caesar->get_conf_plain_bit_vector() == 11);
     assert(
-        caesar->get_config_plain_enumeration() == fpga_regs::caesar::config::plain_enumeration::Enumeration::fifth);
-    assert(caesar->get_config_plain_integer() == -45);
+        caesar->get_conf_plain_enumeration() == fpga_regs::caesar::conf::plain_enumeration::Enumeration::fifth);
+    assert(caesar->get_conf_plain_integer() == -45);
 
     // Assert field setters of array register
 

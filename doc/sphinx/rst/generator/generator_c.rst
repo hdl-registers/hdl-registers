@@ -1,7 +1,7 @@
 .. _generator_c:
 
-C code generator
-================
+C generator
+===========
 
 A C header can be generated, that contains all information about registers, fields and constants.
 The code is generated from the :class:`.CHeaderGenerator` class by calling

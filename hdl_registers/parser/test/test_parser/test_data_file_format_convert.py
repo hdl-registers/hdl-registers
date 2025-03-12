@@ -64,45 +64,45 @@ max_value = 15
 
 
 ################################################################################
-[register_array.config]
+[register_array.conf]
 
 array_length = 3
 description = "A register array"
 
 # ------------------------------------------------------------------------------
-[register_array.config.register.input_settings]
+[register_array.conf.register.input_settings]
 
 description = "Input configuration"
 mode = "r_w"
 
-[register_array.config.register.input_settings.bit.enable]
+[register_array.conf.register.input_settings.bit.enable]
 
 description = "Enable things"
 default_value = "1"
 
-[register_array.config.register.input_settings.integer.number]
+[register_array.conf.register.input_settings.integer.number]
 
 description = "Configure number"
 max_value = 3
 default_value = 1
 
-[register_array.config.register.input_settings.bit.disable]
+[register_array.conf.register.input_settings.bit.disable]
 
 description = ""
 default_value = "0"
 
-[register_array.config.register.input_settings.enumeration.size]
+[register_array.conf.register.input_settings.enumeration.size]
 
 element.small = ""
 element.large = ""
 
 
 # ------------------------------------------------------------------------------
-[register_array.config.register.output_settings]
+[register_array.conf.register.output_settings]
 
 mode = "w"
 
-[register_array.config.register.output_settings.bit_vector.data]
+[register_array.conf.register.output_settings.bit_vector.data]
 
 width=16
 description = "Some data"
@@ -163,7 +163,7 @@ data_type = "unsigned"
                 "max_value": 15,
             },
         },
-        "config": {
+        "conf": {
             "type": "register_array",
             "array_length": 3,
             "description": "A register array",

@@ -95,7 +95,12 @@ int main()
 
         create_file(file=main_file, contents=self.get_main(includes=includes, test_code=test_code))
 
-        result = run_command(compile_command, capture_output=True)
+        try:
+            result = run_command(compile_command, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            print(e.stderr)
+            print(e.stdout)
+            raise
         assert result.stderr == ""
         assert result.stdout == ""
 
@@ -126,7 +131,13 @@ class CppTest(BaseCppTest):
             includes=includes,
         )
 
-        result = run_command(cmd, capture_output=True)
+        try:
+            result = run_command(cmd, capture_output=True)
+        except subprocess.CalledProcessError as e:
+            print(e.stderr)
+            print(e.stdout)
+            raise
+
         assert result.stderr == ""
         assert result.stdout == ""
 
@@ -182,7 +193,7 @@ def test_setting_register_array_out_of_bounds_should_not_crash_if_no_assertion(b
 
 def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
-  caesar.set_config_plain_integer(-1024);
+  caesar.set_conf_plain_integer(-1024);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
@@ -195,7 +206,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
     )
 
     test_code = """\
-  caesar.set_config_plain_integer(110);
+  caesar.set_conf_plain_integer(110);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
@@ -210,7 +221,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
 def test_setting_integer_field_out_of_range_should_not_crash_if_no_assertion(base_cpp_test):
     test_code = """\
-  caesar.set_config_plain_integer(-1024);
+  caesar.set_conf_plain_integer(-1024);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
@@ -225,14 +236,14 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
     # 'config' register is index 0 and 'plain_integer' field starts at bit 9.
     test_code = """\
   memory[0] = 100 << 5;
-  caesar.get_config_plain_integer();
+  caesar.get_conf_plain_integer();
 """
     cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd, capture_output=True)
 
     test_code = """\
   memory[0] = 101 << 5;
-  caesar.get_config_plain_integer();
+  caesar.get_conf_plain_integer();
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
@@ -246,7 +257,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     test_code = """\
   memory[0] = -51 << 5;
-  caesar.get_config_plain_integer();
+  caesar.get_conf_plain_integer();
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
@@ -262,7 +273,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 def test_getting_integer_field_out_of_range_should_not_crash_if_no_assertion(base_cpp_test):
     test_code = """\
   memory[0] = 101 << 5;
-  caesar.get_config_plain_integer();
+  caesar.get_conf_plain_integer();
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
@@ -275,13 +286,13 @@ def test_getting_integer_field_out_of_range_should_not_crash_if_no_assertion(bas
 
 def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
-  caesar.set_config_plain_bit_a(1);
+  caesar.set_conf_plain_bit_a(1);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd, capture_output=True)
 
     test_code = """\
-  caesar.set_config_plain_bit_a(2);
+  caesar.set_conf_plain_bit_a(2);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
     with pytest.raises(subprocess.CalledProcessError) as exception_info:
@@ -295,13 +306,13 @@ def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
 
 def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
-  caesar.set_config_plain_bit_vector(15);
+  caesar.set_conf_plain_bit_vector(15);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd, capture_output=True)
 
     test_code = """\
-  caesar.set_config_plain_bit_vector(16);
+  caesar.set_conf_plain_bit_vector(16);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
     with pytest.raises(subprocess.CalledProcessError) as exception_info:

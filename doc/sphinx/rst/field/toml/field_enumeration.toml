@@ -1,9 +1,9 @@
-[config]
+[conf]
 
 mode = "r_w"
 description = "Configuration register."
 
-# This will allocate an enumeration field named "severity_level" in the "config" register.
+# This will allocate an enumeration field named "severity_level" in the "conf" register.
 # The "type" property MUST be present and set to "enumeration".
 severity_level.type = "enumeration"
 

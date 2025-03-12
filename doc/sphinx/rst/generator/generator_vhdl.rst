@@ -1,7 +1,7 @@
 .. _generator_vhdl:
 
-VHDL code generator
-===================
+VHDL generator
+==============
 
 A large ecosystem of VHDL artifacts can be generated that support both implementation
 and simulation in your project.
@@ -49,7 +49,7 @@ In the registers there are a few different fields, of type :ref:`bit <field_bit>
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: sim/regs_counter.toml
+  .. literalinclude:: example_counter/regs_counter.toml
     :caption: TOML file for example.
     :language: TOML
     :linenos:
@@ -109,7 +109,7 @@ Once again, the application is a bit silly, but it does showcase a lot of intere
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: sim/counter.vhd
+  .. literalinclude:: example_counter/counter.vhd
     :caption: Implementation of counter example.
     :language: VHDL
     :linenos:
@@ -128,7 +128,7 @@ The VHDL below is the testbench for our example counter implementation above.
 1. The testbench uses register read/write procedures from the package produced by
    :class:`.VhdlSimulationReadWritePackageGenerator`, which can be seen
    :ref:`below <example_counter_simulation_read_write_package>`.
-   For example ``write_counter_config``.
+   For example ``write_counter_conf``.
 2. The testbench uses register wait until procedures from the package produced by
    :class:`.VhdlSimulationWaitUntilPackageGenerator`, which can be seen
    :ref:`below <example_counter_simulation_wait_until_package>`.
@@ -153,7 +153,7 @@ The VHDL below is the testbench for our example counter implementation above.
 
 .. collapse:: Click to expand/collapse code.
 
-  .. literalinclude:: sim/tb_counter.vhd
+  .. literalinclude:: example_counter/tb_counter.vhd
     :caption: Testbench for counter example.
     :language: VHDL
     :linenos:

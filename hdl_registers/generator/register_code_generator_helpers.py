@@ -47,7 +47,7 @@ class RegisterCodeGeneratorHelpers:
         Iterate over all register objects in the register list.
         I.e. all plain registers and all register arrays.
         """
-        yield from self.register_list.register_objects
+        yield from iterate_register_objects(register_list=self.register_list)
 
     def iterate_registers(self) -> Iterator[tuple[Register, RegisterArray | None]]:
         """
@@ -57,12 +57,7 @@ class RegisterCodeGeneratorHelpers:
             If the register is plain, the array return value in the tuple will be ``None``.
             If the register is in an array, the array return value will conversely be non-``None``.
         """
-        for register_object in self.iterate_register_objects():
-            if isinstance(register_object, Register):
-                yield (register_object, None)
-            else:
-                for register in register_object.registers:
-                    yield (register, register_object)
+        yield from iterate_registers(register_list=self.register_list)
 
     def iterate_plain_registers(self) -> Iterator[Register]:
         """
@@ -87,18 +82,18 @@ class RegisterCodeGeneratorHelpers:
         Get the qualified register name, e.g. "<module name>_<register name>".
         To be used where the scope requires it, i.e. outside of records.
         """
-        if register_array is None:
-            return f"{self.name}_{register.name}"
-
-        register_array_name = self.qualified_register_array_name(register_array=register_array)
-        return f"{register_array_name}_{register.name}"
+        return qualified_register_name(
+            register_list=self.register_list, register=register, register_array=register_array
+        )
 
     def qualified_register_array_name(self, register_array: RegisterArray) -> str:
         """
         Get the qualified register array name, e.g. "<module name>_<register array name>".
         To be used where the scope requires it, i.e. outside of records.
         """
-        return f"{self.name}_{register_array.name}"
+        return qualified_register_array_name(
+            register_list=self.register_list, register_array=register_array
+        )
 
     def qualified_field_name(
         self,
@@ -110,10 +105,12 @@ class RegisterCodeGeneratorHelpers:
         Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
         To be used where the scope requires it, i.e. outside of records.
         """
-        register_name = self.qualified_register_name(
-            register=register, register_array=register_array
+        return qualified_field_name(
+            register_list=self.register_list,
+            register=register,
+            field=field,
+            register_array=register_array,
         )
-        return f"{register_name}_{field.name}"
 
     def get_indentation(self, indent: int | None = None) -> str:
         """
@@ -211,3 +208,71 @@ class RegisterCodeGeneratorHelpers:
         I.e. how classes are named in Python, C and C++.
         """
         return snake_string.title().replace("_", "")
+
+
+def iterate_register_objects(register_list: RegisterList) -> Iterator[Register | RegisterArray]:
+    """
+    Iterate over all register objects in the register list.
+    I.e. all plain registers and all register arrays.
+    """
+    yield from register_list.register_objects
+
+
+def iterate_registers(
+    register_list: RegisterList,
+) -> Iterator[tuple[Register, RegisterArray | None]]:
+    """
+    Iterate over all registers, plain or in array, in the register list.
+
+    Return:
+        If the register is plain, the array return value in the tuple will be ``None``.
+        If the register is in an array, the array return value will conversely be non-``None``.
+    """
+    for register_object in iterate_register_objects(register_list=register_list):
+        if isinstance(register_object, Register):
+            yield (register_object, None)
+        else:
+            for register in register_object.registers:
+                yield (register, register_object)
+
+
+def qualified_register_name(
+    register_list: RegisterList, register: Register, register_array: RegisterArray | None = None
+) -> str:
+    """
+    Get the qualified register name, e.g. "<module name>_<register name>".
+    To be used where the scope requires it, i.e. outside of records.
+    """
+    if register_array is None:
+        return f"{register_list.name}_{register.name}"
+
+    register_array_name = qualified_register_array_name(
+        register_list=register_list, register_array=register_array
+    )
+    return f"{register_array_name}_{register.name}"
+
+
+def qualified_register_array_name(
+    register_list: RegisterList, register_array: RegisterArray
+) -> str:
+    """
+    Get the qualified register array name, e.g. "<module name>_<register array name>".
+    To be used where the scope requires it, i.e. outside of records.
+    """
+    return f"{register_list.name}_{register_array.name}"
+
+
+def qualified_field_name(
+    register_list: RegisterList,
+    register: Register,
+    field: RegisterField,
+    register_array: RegisterArray | None = None,
+) -> str:
+    """
+    Get the qualified field name, e.g. "<module name>_<register name>_<field_name>".
+    To be used where the scope requires it, i.e. outside of records.
+    """
+    register_name = qualified_register_name(
+        register_list=register_list, register=register, register_array=register_array
+    )
+    return f"{register_name}_{field.name}"

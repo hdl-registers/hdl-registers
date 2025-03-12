@@ -87,7 +87,7 @@ count.max_value = 15
 
 
 ################################################################################
-[config]
+[conf]
 
 type = "register_array"
 array_length = 3
@@ -95,32 +95,32 @@ description = "A register array"
 
 
 # ------------------------------------------------------------------------------
-[config.input_settings]
+[conf.input_settings]
 
 type = "register"
 description = "Input configuration"
 mode = "r_w"
 
-[config.input_settings.enable]
+[conf.input_settings.enable]
 
 type = "bit"
 description = "Enable things"
 default_value = "1"
 
-[config.input_settings.disable]
+[conf.input_settings.disable]
 
 type = "bit"
 description = ""
 default_value = "0"
 
-[config.input_settings.number]
+[conf.input_settings.number]
 
 type = "integer"
 description = "Configure number"
 max_value = 3
 default_value = 1
 
-[config.input_settings.size]
+[conf.input_settings.size]
 
 type = "enumeration"
 default_value = "large"
@@ -130,12 +130,12 @@ element.large = ""
 
 
 # ------------------------------------------------------------------------------
-[config.output_settings]
+[conf.output_settings]
 
 type = "register"
 mode = "w"
 
-[config.output_settings.data]
+[conf.output_settings.data]
 
 type = "bit_vector"
 width = 16
@@ -204,7 +204,7 @@ default_value = "0000000000000011"
         + 0b11011 * 2**8
     )
 
-    assert registers[2].name == "config"
+    assert registers[2].name == "conf"
     assert registers[2].length == 3
     assert registers[2].description == "A register array"
     assert registers[2].index == 2 + 2 * 3 - 1

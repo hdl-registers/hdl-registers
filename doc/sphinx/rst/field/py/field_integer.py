@@ -37,7 +37,7 @@ def create_from_api() -> RegisterList:
     register_list = RegisterList(name="caesar")
 
     register = register_list.append_register(
-        name="config", mode=REGISTER_MODES["r_w"], description="Configuration register."
+        name="conf", mode=REGISTER_MODES["r_w"], description="Configuration register."
     )
 
     register.append_integer(
