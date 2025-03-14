@@ -1,7 +1,7 @@
 black
 docutils
 GitPython
-peakrdl-regblock==0.23.0
+peakrdl-regblock>=0.23.0,<0.24.0
 PyYAML
 rtoml
 termcolor
