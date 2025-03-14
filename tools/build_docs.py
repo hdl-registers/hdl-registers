@@ -221,7 +221,7 @@ def build_python_coverage_badge(output_path: Path) -> None:
     assert coverage_xml.exists(), "Run pytest with coverage before building documentation"
 
     xml_root = ElementTree.parse(coverage_xml).getroot()  # noqa: S314
-    line_coverage = int(round(float(xml_root.attrib["line-rate"]) * 100))
+    line_coverage = round(float(xml_root.attrib["line-rate"]) * 100)
     assert line_coverage > 50, f"Coverage is way low: {line_coverage}. Something is wrong."
     color = BADGE_COLOR_RIGHT if line_coverage > 80 else "red"
 
