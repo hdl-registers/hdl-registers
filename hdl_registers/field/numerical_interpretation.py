@@ -189,6 +189,11 @@ class NumericalInterpretation(ABC):
         Arguments:
             value: Native Python representation of the field value.
         """
+        if isinstance(value, float) and (not value.is_integer()) and (not isinstance(self, Fixed)):
+            raise ValueError(
+                f"Fractional value passed to non-fractional numerical type. Got: {value}."
+            )
+
         min_ = self.min_value
         max_ = self.max_value
         if not min_ <= value <= max_:
@@ -232,8 +237,15 @@ class Unsigned(NumericalInterpretation):
         return unsigned_binary
 
     def convert_to_unsigned_binary(self, value: float) -> int:
+        """
+        Note that the argument is of type ``float`` (which according to Python typing
+        means that either ``int`` or ``float`` values can be passed).
+        This is to keep the same API as the others.
+        However since this numerical interpretation has no fractional bits, the value provided
+        must be an integer.
+        """
         self._check_native_value_in_range(value)
-        return round(value)
+        return int(value)
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
@@ -270,6 +282,13 @@ class Signed(NumericalInterpretation):
         )
 
     def convert_to_unsigned_binary(self, value: float) -> int:
+        """
+        Note that the argument is of type ``float`` (which according to Python typing
+        means that either ``int`` or ``float`` values can be passed).
+        This is to keep the same API as the others.
+        However since this numerical interpretation has no fractional bits, the value provided
+        must be an integer.
+        """
         self._check_native_value_in_range(value)
         return to_unsigned_binary(num_bits=self.bit_width, value=value, is_signed=self.is_signed)
 

@@ -51,7 +51,14 @@ def create_from_api() -> RegisterList:
         name="tid",
         description="Value to set for **TID** in the data stream.",
         width=8,
-        default_value="00000000",
+        default_value=0xF3,
+    )
+
+    register.append_bit_vector(
+        name="tdest",
+        description="Value to set for **TDEST** in the data stream.",
+        width=3,
+        default_value=0,
     )
 
     return register_list
