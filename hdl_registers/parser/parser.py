@@ -473,7 +473,7 @@ ERROR: Please inspect that file and update your data file to the new format.
         width = field_items["width"]
 
         description = field_items.get("description", "")
-        default_value = field_items.get("default_value", "0" * width)
+        default_value = field_items.get("default_value", 0)
 
         register.append_bit_vector(
             name=field_name, description=description, width=width, default_value=default_value

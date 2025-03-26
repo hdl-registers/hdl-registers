@@ -24,7 +24,7 @@ class BitVector(RegisterField):
         base_index: int,
         description: str,
         width: int,
-        default_value: str,
+        default_value: str | float,
         numerical_interpretation: NumericalInterpretation | None = None,
     ) -> None:
         """
@@ -34,8 +34,10 @@ class BitVector(RegisterField):
                 bit vector.
             description: Textual field description.
             width: The width of the bit vector field.
-            default_value: Default value as a string.
-                Must be of length ``width`` and contain only "1" and "0".
+            default_value: Default value.
+                Must be either a string of length ``width`` containing only "1" and "0".
+                Or a numeric value according to the ``numerical_interpretation`` that fits in
+                the ``width``.
             numerical_interpretation: The mode used when interpreting the bits of this field as
                 a numeric value.
                 Default is unsigned with no fractional bits.
@@ -97,33 +99,50 @@ class BitVector(RegisterField):
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: str) -> None:
+    def default_value(self, value: str | float) -> None:
         """
         Setter for ``default_value`` that performs sanity checks.
         """
-        if not isinstance(value, str):
+        if not isinstance(value, (str, int, float)):
             message = (
-                f'Bit vector "{self.name}" should have string value for "default_value". '
-                f'Got: "{value}"'
+                f'Bit vector "{self.name}" should have string or numeric value '
+                f'for "default_value". Got: "{value}".'
             )
             raise TypeError(message)
 
-        if len(value) != self.width:
-            message = (
-                f'Bit vector "{self.name}" should have "default_value" of length {self.width}. '
-                f'Got: "{value}".'
-            )
-            raise ValueError(message)
-
-        for character in value:
-            if character not in ["0", "1"]:
+        if isinstance(value, str):
+            if len(value) != self.width:
                 message = (
-                    f'Bit vector "{self.name}" invalid binary value for "default_value". '
+                    f'Bit vector "{self.name}" should have "default_value" of length {self.width}. '
                     f'Got: "{value}".'
                 )
                 raise ValueError(message)
 
-        self._default_value = value
+            for character in value:
+                if character not in ["0", "1"]:
+                    message = (
+                        f'Bit vector "{self.name}" invalid binary "default_value". Got: "{value}".'
+                    )
+                    raise ValueError(message)
+
+            self._default_value = value
+            return
+
+        try:
+            default_value_uint = self._numerical_interpretation.convert_to_unsigned_binary(
+                value=value
+            )
+        except ValueError as error:
+            message = (
+                f'Bit vector "{self.name}" should have "default_value" that fits in '
+                f'{self.width} bits. Got: "{value}".'
+            )
+            raise ValueError(message) from error
+
+        formatting_string = f"{{:0{self.width}b}}"
+        default_value_bin = formatting_string.format(default_value_uint)
+
+        self._default_value = default_value_bin
 
     def get_value(self, register_value: int) -> int | float:
         """

@@ -93,7 +93,7 @@ class Register:
         name: str,
         description: str,
         width: int,
-        default_value: str,
+        default_value: str | float,
         numerical_interpretation: NumericalInterpretation | None = None,
     ) -> BitVector:
         """

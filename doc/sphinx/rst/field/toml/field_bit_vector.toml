@@ -18,12 +18,18 @@ tuser.description = "Value to set for **TUSER** in the data stream."
 
 # The "default_value" property is OPTIONAL for a bit vector field.
 # Will default to all zeros if not specified.
-# The value specified MUST be a string whose length is the same as the
-# specified 'width' property value.
-# The value specified MUST contain only ones and zeros.
+# The value specified MUST be either
+# 1. A string of 1's and 0's. The string length MUST be the same as the field width.
+# 2. An unsigned integer. The value's binary representation MUST fit within the field width.
 tuser.default_value = "0101"
 
 
 tid.type = "bit_vector"
 tid.width = 8
 tid.description = "Value to set for **TID** in the data stream."
+tid.default_value = 0xf3
+
+
+tdest.type = "bit_vector"
+tdest.width = 3
+tdest.description = "Value to set for **TDEST** in the data stream."

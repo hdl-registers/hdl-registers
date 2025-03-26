@@ -172,6 +172,11 @@ def test_repr():
         BitVector(name="apa", base_index=0, description="", width=1, default_value="1")
     ) != repr(BitVector(name="apa", base_index=0, description="", width=1, default_value="0"))
 
+    # Same default_value but different representation in argument
+    assert repr(
+        BitVector(name="apa", base_index=0, description="", width=4, default_value="1101")
+    ) == repr(BitVector(name="apa", base_index=0, description="", width=4, default_value=13))
+
     # Different numerical_interpretation
     field0 = BitVector(
         name="apa",
@@ -219,21 +224,10 @@ def test_invalid_width():
 
 def test_invalid_default_value_should_raise_exception():
     with pytest.raises(TypeError) as exception_info:
-        BitVector(name="hest", base_index=0, description="", width=4, default_value=1111)
+        BitVector(name="hest", base_index=0, description="", width=4, default_value=TypeError)
     assert str(exception_info.value) == (
-        'Bit vector "hest" should have string value for "default_value". Got: "1111"'
-    )
-
-    with pytest.raises(ValueError) as exception_info:
-        BitVector(name="hest", base_index=0, description="", width=4, default_value="11")
-    assert str(exception_info.value) == (
-        'Bit vector "hest" should have "default_value" of length 4. Got: "11".'
-    )
-
-    with pytest.raises(ValueError) as exception_info:
-        BitVector(name="hest", base_index=0, description="", width=4, default_value="1121")
-    assert str(exception_info.value) == (
-        'Bit vector "hest" invalid binary value for "default_value". Got: "1121".'
+        'Bit vector "hest" should have string or numeric value for "default_value". '
+        "Got: \"<class 'TypeError'>\"."
     )
 
 
@@ -241,8 +235,8 @@ def test_can_update_default_value():
     bit_vector = BitVector(name="hest", base_index=0, description="", width=4, default_value="1111")
     assert bit_vector.default_value == "1111"
 
-    bit_vector.default_value = "0000"
-    assert bit_vector.default_value == "0000"
+    bit_vector.default_value = 3
+    assert bit_vector.default_value == "0011"
 
 
 def test_updating_to_invalid_default_value_should_raise_exception():
@@ -251,9 +245,19 @@ def test_updating_to_invalid_default_value_should_raise_exception():
 
     # Update to an invalid value
     with pytest.raises(TypeError) as exception_info:
-        bit_vector.default_value = 1111
+        bit_vector.default_value = TypeError
     assert str(exception_info.value) == (
-        'Bit vector "hest" should have string value for "default_value". Got: "1111"'
+        'Bit vector "hest" should have string or numeric value for "default_value". '
+        "Got: \"<class 'TypeError'>\"."
+    )
+
+
+def test_setting_non_binary_default_value_should_raise_exception():
+    # Update to an invalid value
+    with pytest.raises(ValueError) as exception_info:
+        BitVector(name="hest", base_index=0, description="", width=4, default_value="1211")
+    assert str(exception_info.value) == (
+        'Bit vector "hest" invalid binary "default_value". Got: "1211".'
     )
 
 
@@ -266,6 +270,71 @@ def test_default_value_uint():
 
     bit_vector.default_value = "1001"
     assert bit_vector.default_value_uint == 9
+
+
+def test_default_value_signed():
+    bit_vector = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=4,
+        default_value=-7,
+        numerical_interpretation=Signed(bit_width=4),
+    )
+    assert bit_vector.default_value == "1001"
+    assert bit_vector.default_value_uint == 9
+
+
+def test_default_value_ufixed():
+    bit_vector = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=6,
+        default_value=7.75,
+        numerical_interpretation=SignedFixedPoint(max_bit_index=3, min_bit_index=-2),
+    )
+    assert bit_vector.default_value == "011111"
+    assert bit_vector.default_value_uint == 31
+
+
+def test_default_value_sfixed():
+    bit_vector = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=5,
+        default_value=-7.5,
+        numerical_interpretation=SignedFixedPoint(max_bit_index=3, min_bit_index=-1),
+    )
+    assert bit_vector.default_value == "10001"
+    assert bit_vector.default_value_uint == 17
+
+
+def test_default_value_fixed_point_that_does_not_fit_perfectly_should_raise_exception():
+    bit_vector = BitVector(
+        name="apa",
+        base_index=0,
+        description="",
+        width=6,
+        default_value=0,
+        numerical_interpretation=SignedFixedPoint(max_bit_index=3, min_bit_index=-2),
+    )
+    bit_vector.default_value = 7.75
+
+    with pytest.raises(ValueError) as exception_info:
+        bit_vector.default_value = 7.76
+    assert str(exception_info.value) == (
+        'Bit vector "apa" should have "default_value" that fits in 6 bits. Got: "7.76".'
+    )
+
+
+def test_default_value_float_value_to_integer_should_raise_exception():
+    with pytest.raises(ValueError) as exception_info:
+        BitVector(name="apa", base_index=0, description="", width=6, default_value=3.5)
+    assert str(exception_info.value) == (
+        'Bit vector "apa" should have "default_value" that fits in 6 bits. Got: "3.5".'
+    )
 
 
 def test_numeric_interpretation():
