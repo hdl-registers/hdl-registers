@@ -61,6 +61,7 @@ description={self.description},\
 class Enumeration(RegisterField):
     """
     Used to represent an enumeration field in a register.
+    See :ref:`field_enumeration` for details.
     """
 
     def __init__(

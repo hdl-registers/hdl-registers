@@ -16,6 +16,7 @@ from .register_field import RegisterField
 class BitVector(RegisterField):
     """
     Used to represent a bit vector field in a register.
+    See :ref:`field_bit_vector` for details.
     """
 
     def __init__(

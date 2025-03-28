@@ -13,11 +13,12 @@ from .constant import Constant
 class FloatConstant(Constant):
     """
     Represent a floating-point constant.
+    See :ref:`constant_float` for details.
 
     .. note::
 
       The ``value`` is stored with its native representation, which is a Python ``float``
-      if a decimal value is provided.
+      if a fractional value is provided.
       The Python ``float`` type is a double-precision value, so the precision in Python matches
       the precision in C/C++/VHDL generators.
     """

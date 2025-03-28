@@ -12,6 +12,11 @@ from .constant import Constant
 
 
 class StringConstant(Constant):
+    """
+    Represent a string constant.
+    See :ref:`constant_string` for details.
+    """
+
     def __init__(self, name: str, value: str, description: str = "") -> None:
         """
         Arguments:

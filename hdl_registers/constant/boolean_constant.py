@@ -12,6 +12,11 @@ from .constant import Constant
 
 
 class BooleanConstant(Constant):
+    """
+    Represent a boolean constant.
+    See :ref:`constant_boolean` for details.
+    """
+
     def __init__(self, name: str, value: bool, description: str = "") -> None:
         """
         Arguments:
