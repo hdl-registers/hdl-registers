@@ -11,6 +11,11 @@ from .constant import Constant
 
 
 class IntegerConstant(Constant):
+    """
+    Represent an integer constant.
+    See :ref:`constant_integer` for details.
+    """
+
     def __init__(self, name: str, value: int, description: str = "") -> None:
         """
         Arguments:

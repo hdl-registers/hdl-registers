@@ -11,6 +11,11 @@ from .constant import Constant
 
 
 class BitVectorConstant(Constant):
+    """
+    Represent a bit vector constant.
+    See :ref:`constant_bit_vector` for details.
+    """
+
     separator_character = "_"
     allowed_binary_characters = "01" + separator_character
     allowed_hexadecimal_characters = "0123456789abcdefABCDEF" + separator_character

@@ -47,7 +47,8 @@ You choose yourself which method you want to use in your code base.
    :linenos:
    :lines: 10-
 
-See :meth:`.Register.append_bit` for more Python API details.
+See :meth:`.Register.append_bit` and the :class:`.Bit` class
+for more Python API details.
 
 
 

@@ -51,7 +51,8 @@ You choose yourself which method you want to use in your code base.
    :linenos:
    :lines: 10-
 
-See :meth:`.Register.append_enumeration` for more Python API details.
+See :meth:`.Register.append_enumeration` and the :class:`.Enumeration` class
+for more Python API details.
 
 
 Generated code

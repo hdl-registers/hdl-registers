@@ -14,6 +14,7 @@ from .register_field import RegisterField
 class Integer(RegisterField):
     """
     Used to represent an integer field in a register.
+    See :ref:`field_integer` for details.
     """
 
     def __init__(

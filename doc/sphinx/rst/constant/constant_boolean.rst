@@ -1,3 +1,5 @@
+.. _constant_boolean:
+
 Boolean constants
 =================
 
@@ -43,7 +45,8 @@ You choose yourself which method you want to use in your code base.
    :linenos:
    :lines: 10-
 
-See :meth:`.RegisterList.add_constant` for more Python API details.
+See :meth:`.RegisterList.add_constant` and the :class:`.BooleanConstant` class
+for more Python API details.
 
 
 Generated code
