@@ -21,7 +21,7 @@ See comments for rules about the different properties.
    :language: TOML
    :linenos:
 
-Note that the second field does not have any default value specified, meaning it will default to
+Note that the third field does not have any default value specified, meaning it will default to
 all zeros.
 
 Below you will see how you can parse this TOML file and generate artifacts from it.
