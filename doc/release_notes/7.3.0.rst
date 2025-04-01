@@ -1,8 +1,8 @@
 Added
 
 * Add support for specifying a numeric value as the default value for :ref:`field_bit_vector`.
-* Add synchronous reset support to generated VHDL AXI-Lite register file.
+* Add synchronous reset support to :ref:`generated VHDL AXI-Lite register file <generator_vhdl>`.
 
 Internal updates
 
-* Simplify dependencies of generated VHDL code.
+* Simplify :ref:`dependencies of generated VHDL code <vhdl_dependencies>`.
