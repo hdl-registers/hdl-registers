@@ -19,7 +19,7 @@ HDL_REGISTERS_GENERATED = REPO_ROOT / "generated"
 HDL_REGISTERS_TESTS = REPO_ROOT / "tests"
 HDL_REGISTERS_TOOLS = REPO_ROOT / "tools"
 
-__version__ = "7.3.0"
+__version__ = "7.3.1-dev"
 
 # We have the slogan in one place only, instead of repeating it here in a proper docstring.
 __doc__ = get_short_slogan()
