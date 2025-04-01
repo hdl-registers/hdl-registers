@@ -95,6 +95,11 @@ class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
 entity {entity_name} is
   port (
     clk : in std_ulogic;
+    -- Active-high synchronous reset.
+    -- The code in this entity uses initial values so an initial reset is NOT necessary.
+    -- This port can safely be left unconnected and tied to zero.
+    -- If asserted, it will reset the AXI-Lite handshaking state as well as all register values.
+    reset : in std_ulogic := '0';
     --# {{}}
     --# Register control bus.
     axi_lite_m2s : in axi_lite_m2s_t;
@@ -202,6 +207,7 @@ axi_lite_register_file.vhd
     )
     port map(
       clk => clk,
+      reset => reset,
       --
       axi_lite_m2s => axi_lite_m2s,
       axi_lite_s2m => axi_lite_s2m,
