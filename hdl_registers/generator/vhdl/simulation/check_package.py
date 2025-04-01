@@ -49,9 +49,10 @@ class VhdlSimulationCheckPackageGenerator(VhdlSimulationGeneratorCommon):
 
     The generated VHDL file needs also the generated packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
+    See also :ref:`vhdl_dependencies` for further dependencies.
     """
 
-    __version__ = "1.2.0"
+    __version__ = "1.2.1"
 
     SHORT_DESCRIPTION = "VHDL simulation check package"
 
@@ -95,9 +96,6 @@ use vunit_lib.check_pkg.all;
 use vunit_lib.checker_pkg.all;
 use vunit_lib.com_types_pkg.network_t;
 use vunit_lib.string_ops.hex_image;
-
-library common;
-use common.addr_pkg.addr_t;
 
 library register_file;
 use register_file.register_file_pkg.register_t;
@@ -207,7 +205,7 @@ end package body;
     signal net : inout network_t;
 {self.get_array_index_port(register_array=register_array)}\
     expected : in {value_type};
-    base_address : in addr_t := (others => '0');
+    base_address : in unsigned(32 - 1 downto 0) := (others => '0');
     bus_handle : in bus_master_t := register_bus_master;
     message : in string := ""
   )\
@@ -240,7 +238,7 @@ end package body;
     signal net : inout network_t;
 {self.get_array_index_port(register_array=register_array)}\
     expected : in {value_type};
-    base_address : in addr_t := (others => '0');
+    base_address : in unsigned(32 - 1 downto 0) := (others => '0');
     bus_handle : in bus_master_t := register_bus_master;
     message : in string := ""
   )\

@@ -44,6 +44,7 @@ class VhdlRecordPackageGenerator(VhdlGeneratorCommon):
 
     The generated VHDL file needs also the generated package
     from :class:`.VhdlRegisterPackageGenerator`.
+    See also :ref:`vhdl_dependencies` for further dependencies.
     """
 
     __version__ = "1.0.0"

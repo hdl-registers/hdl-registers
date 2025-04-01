@@ -23,14 +23,9 @@ class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
     ``regs_down``.
     This makes it very easy-to-use and saves a lot of manual conversion.
 
-    It wraps the following VHDL file:
-
-    * https://hdl-modules.com/modules/register_file/register_file.html#axi-lite-reg-file-vhd
-    * https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/src/\
-axi_lite_register_file.vhd
-
-    It also requires the generated packages from
+    The file is dependent on the packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
+    See also :ref:`vhdl_dependencies` for further dependencies.
 
     Note that the ``regs_up`` port is only available if there are any registers of a type where
     hardware gives a value to the bus.
@@ -46,7 +41,7 @@ axi_lite_register_file.vhd
     They are only present if there are any readable/writeable registers in the register list.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.3"
 
     SHORT_DESCRIPTION = "VHDL AXI-Lite register file"
 
@@ -162,23 +157,23 @@ are present.
         return f"""\
 -- -----------------------------------------------------------------------------
 -- AXI-Lite register file for the '{self.name}' module registers.
---
--- Is a wrapper around the generic AXI-Lite register file from hdl-modules:
--- * https://hdl-modules.com/modules/register_file/register_file.html#axi-lite-reg-file-vhd
--- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/\
-src/axi_lite_register_file.vhd
---
 -- Sets correct generics, and performs conversion to the easy-to-use register record types.
 -- -----------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
 
+-- This VHDL file is a required dependency:
+-- https://github.com/hdl-modules/hdl-modules/blob/main/modules/axi_lite/src/axi_lite_pkg.vhd
+-- See https://hdl-registers.com/rst/generator/generator_vhdl.html for dependency details.
 library axi_lite;
 use axi_lite.axi_lite_pkg.all;
 
+-- This VHDL file is a required dependency:
+-- https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/src/\
+axi_lite_register_file.vhd
+-- See https://hdl-registers.com/rst/generator/generator_vhdl.html for dependency details.
 library register_file;
-use register_file.register_file_pkg.all;
 
 use work.{self.name}_regs_pkg.all;
 use work.{self.name}_register_record_pkg.all;
@@ -196,10 +191,10 @@ architecture a of {entity_name} is
 begin
 
   ------------------------------------------------------------------------------
-  -- Instantiate the generic AXI-Lite register file from
-  -- * https://hdl-modules.com/modules/register_file/register_file.html#axi-lite-reg-file-vhd
-  -- * https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/src/\
+  -- Instantiate the generic register file implementation:
+  -- https://github.com/hdl-modules/hdl-modules/blob/main/modules/register_file/src/\
 axi_lite_register_file.vhd
+  -- See https://hdl-registers.com/rst/generator/generator_vhdl.html for dependency details.
   axi_lite_register_file_inst : entity register_file.axi_lite_register_file
     generic map (
       registers => {self.name}_register_map,
