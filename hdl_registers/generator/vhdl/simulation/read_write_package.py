@@ -55,9 +55,10 @@ class VhdlSimulationReadWritePackageGenerator(VhdlSimulationGeneratorCommon):
 
     The generated VHDL file needs also the generated packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
+    See :ref:`vhdl_dependencies` for further dependencies.
     """
 
-    __version__ = "1.1.0"
+    __version__ = "1.1.1"
 
     SHORT_DESCRIPTION = "VHDL simulation read/write package"
 
@@ -99,10 +100,6 @@ use vunit_lib.bus_master_pkg.bus_master_t;
 use vunit_lib.bus_master_pkg.read_bus;
 use vunit_lib.bus_master_pkg.write_bus;
 use vunit_lib.com_types_pkg.network_t;
-
-library common;
-use common.addr_pkg.addr_t;
-use common.addr_pkg.addr_width;
 
 library register_file;
 use register_file.register_file_pkg.register_t;
@@ -294,7 +291,7 @@ end package body;
     signal net : inout network_t;
 {self.get_array_index_port(register_array=register_array)}\
     value : {value_direction} {value_type};
-    base_address : in addr_t := (others => '0');
+    base_address : in unsigned(32 - 1 downto 0) := (others => '0');
     bus_handle : in bus_master_t := register_bus_master
   )\
 """
@@ -344,7 +341,7 @@ end package body;
     signal net : inout network_t;
 {self.get_array_index_port(register_array=register_array)}\
     value : {value_direction} {value_type};
-    base_address : in addr_t := (others => '0');
+    base_address : in unsigned(32 - 1 downto 0) := (others => '0');
     bus_handle : in bus_master_t := register_bus_master
   )\
 """

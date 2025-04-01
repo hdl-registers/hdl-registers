@@ -73,8 +73,8 @@ class VhdlSimulationGeneratorCommon(VhdlGeneratorCommon):
         Is suitable for implementation of register/field access procedures.
         """
         return (
-            "    constant reg_address : addr_t := base_address + "
-            "to_unsigned(4 * reg_index, addr_width);\n"
+            "    constant reg_address : unsigned(32 - 1 downto 0) := base_address + "
+            "to_unsigned(4 * reg_index, 32);\n"
         )
 
     @staticmethod

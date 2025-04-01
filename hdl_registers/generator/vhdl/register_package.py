@@ -50,6 +50,8 @@ class VhdlRegisterPackageGenerator(VhdlGeneratorCommon):
 
     Also produces a constant that maps indexes to modes, suitable for use with
     :ref:`register_file.axi_lite_register_file` or :class:`.VhdlAxiLiteWrapperGenerator`.
+
+    See :ref:`vhdl_dependencies` for a note on dependencies.
     """
 
     __version__ = "2.0.0"

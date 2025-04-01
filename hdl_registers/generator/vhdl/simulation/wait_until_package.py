@@ -38,9 +38,10 @@ class VhdlSimulationWaitUntilPackageGenerator(VhdlSimulationGeneratorCommon):
 
     The generated VHDL file needs also the generated packages from
     :class:`.VhdlRegisterPackageGenerator` and :class:`.VhdlRecordPackageGenerator`.
+    See :ref:`vhdl_dependencies` for further dependencies.
     """
 
-    __version__ = "1.0.0"
+    __version__ = "1.0.2"
 
     SHORT_DESCRIPTION = "VHDL simulation wait until package"
 
@@ -84,10 +85,6 @@ use vunit_lib.bus_master_pkg.wait_until_read_equals;
 use vunit_lib.com_types_pkg.max_timeout;
 use vunit_lib.com_types_pkg.network_t;
 use vunit_lib.string_ops.hex_image;
-
-library common;
-use common.addr_pkg.addr_t;
-use common.addr_pkg.addr_width;
 
 library register_file;
 use register_file.register_file_pkg.register_t;
@@ -168,7 +165,7 @@ end package body;
     signal net : inout network_t;
 {self.get_array_index_port(register_array=register_array)}\
     value : in {value_type};
-    base_address : in addr_t := (others => '0');
+    base_address : in unsigned(32 - 1 downto 0) := (others => '0');
     bus_handle : in bus_master_t := register_bus_master;
     timeout : delay_length := max_timeout;
     message : string := ""
@@ -201,7 +198,7 @@ end package body;
     signal net : inout network_t;
 {self.get_array_index_port(register_array=register_array)}\
     value : in {value_type};
-    base_address : in addr_t := (others => '0');
+    base_address : in unsigned(32 - 1 downto 0) := (others => '0');
     bus_handle : in bus_master_t := register_bus_master;
     timeout : delay_length := max_timeout;
     message : string := ""
