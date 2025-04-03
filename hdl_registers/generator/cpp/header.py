@@ -67,16 +67,17 @@ class CppHeaderGenerator(CppGeneratorCommon):
      *                     virtual address, not the physical address.
      *                     When using bare metal, these are the same.
      * @param assertion_handler Function to call when an assertion fails.
-     *                          Function takes a string pointer as an argument and must return a
-     *                          boolean 'true'.
+     *                          Function takes a string pointer as an argument, where the string
+     *                          will contain an error diagnostic message.
+     *                          Function must return a boolean 'true'.
      */
     {self._constructor_signature()};
 
     virtual ~{self._class_name}() {{}}
 """
 
-        def function(return_type_name: str, signature: str) -> str:
-            return f"    virtual {return_type_name} {signature} const override;\n"
+        def get_function(return_type: str, signature: str) -> str:
+            return f"    virtual {return_type} {signature} const override;\n"
 
         for register, register_array in self.iterate_registers():
             cpp_code += f"\n{self.get_separator_line()}"
@@ -92,10 +93,10 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 signature = self._register_getter_function_signature(
                     register=register, register_array=register_array
                 )
-                cpp_code += function(return_type_name="uint32_t", signature=signature)
+                cpp_code += get_function(return_type="uint32_t", signature=signature)
 
                 for field in register.fields:
-                    field_type_name = self._field_value_type_name(
+                    field_type = self._get_field_value_type(
                         register=register, register_array=register_array, field=field
                     )
 
@@ -105,7 +106,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                         field=field,
                         from_value=False,
                     )
-                    cpp_code += function(return_type_name=field_type_name, signature=signature)
+                    cpp_code += get_function(return_type=field_type, signature=signature)
 
                     signature = self._field_getter_function_signature(
                         register=register,
@@ -113,14 +114,14 @@ class CppHeaderGenerator(CppGeneratorCommon):
                         field=field,
                         from_value=True,
                     )
-                    cpp_code += function(return_type_name=field_type_name, signature=signature)
+                    cpp_code += get_function(return_type=field_type, signature=signature)
 
             if register.mode.software_can_write:
                 signature = self._register_setter_function_signature(
                     register=register, register_array=register_array
                 )
 
-                cpp_code += function(return_type_name="void", signature=signature)
+                cpp_code += get_function(return_type="void", signature=signature)
 
                 for field in register.fields:
                     signature = self._field_setter_function_signature(
@@ -129,7 +130,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                         field=field,
                         from_value=False,
                     )
-                    cpp_code += function(return_type_name="void", signature=signature)
+                    cpp_code += get_function(return_type="void", signature=signature)
 
                     signature = self._field_setter_function_signature(
                         register=register,
@@ -137,9 +138,9 @@ class CppHeaderGenerator(CppGeneratorCommon):
                         field=field,
                         from_value=True,
                     )
-                    cpp_code += function(return_type_name="uint32_t", signature=signature)
+                    cpp_code += get_function(return_type="uint32_t", signature=signature)
 
-        cpp_code += "  };\n"
+        cpp_code += "  };\n\n"
 
         cpp_code_top = f"""\
 #pragma once

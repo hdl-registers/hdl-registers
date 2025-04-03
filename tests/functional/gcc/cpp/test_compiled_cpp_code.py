@@ -173,7 +173,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1265: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1104: Got 'dummies' array index out of range: 3.\n"
     )
 
 
@@ -202,7 +202,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:347: Got 'plain_integer' value too small: -1024.\n"
+        "caesar.cpp:306: Got 'plain_integer' value too small: -1024.\n"
     )
 
     test_code = """\
@@ -215,7 +215,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:351: Got 'plain_integer' value too large: 110.\n"
+        "caesar.cpp:310: Got 'plain_integer' value too large: 110.\n"
     )
 
 
@@ -252,7 +252,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:186: Got 'plain_integer' value too large: 101.\n"
+        "caesar.cpp:169: Got 'plain_integer' value too large: 101.\n"
     )
 
     test_code = """\
@@ -266,7 +266,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:182: Got 'plain_integer' value too small: -51.\n"
+        "caesar.cpp:165: Got 'plain_integer' value too small: -51.\n"
     )
 
 
@@ -300,7 +300,7 @@ def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:276: Got 'plain_bit_a' value too many bits used: 2.\n"
+        "caesar.cpp:243: Got 'plain_bit_a' value too many bits used: 2.\n"
     )
 
 
@@ -320,5 +320,5 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:312: Got 'plain_bit_vector' value too many bits used: 16.\n"
+        "caesar.cpp:275: Got 'plain_bit_vector' value too many bits used: 16.\n"
     )

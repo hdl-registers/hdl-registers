@@ -20,6 +20,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
+from hdl_registers.register_array import RegisterArray
 
 from .cpp_generator_common import CppGeneratorCommon
 
@@ -28,7 +29,6 @@ if TYPE_CHECKING:
 
     from hdl_registers.field.register_field import RegisterField
     from hdl_registers.register import Register
-    from hdl_registers.register_array import RegisterArray
 
 
 class CppInterfaceGenerator(CppGeneratorCommon):
@@ -75,27 +75,11 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         Get a complete C++ interface header with constants, types, attributes and methods for
         accessing registers and fields.
         """
-        cpp_code = ""
-
-        for register, register_array in self.iterate_registers():
-            field_cpp_code = ""
-
-            for field in register.fields:
-                field_cpp_code += self._field_attributes(
-                    register=register, register_array=register_array, field=field
-                )
-
-            cpp_code += field_cpp_code
-            if field_cpp_code:
-                cpp_code += "\n"
-
-        for register_array in self.iterate_register_arrays():
-            cpp_code += self._register_array_attributes(register_array=register_array)
-
-        cpp_code += f"  class I{self._class_name}\n"
-        cpp_code += "  {\n"
-        cpp_code += "  public:\n"
-
+        cpp_code = f"""{self._get_attributes()}\
+  class I{self._class_name}
+  {{
+  public:
+"""
         cpp_code += self._constants()
 
         cpp_code += self._num_registers()
@@ -193,15 +177,15 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         return cpp_code
 
     def _field_interface(self, register: Register, register_array: RegisterArray | None) -> str:
-        def function(return_type_name: str, signature: str) -> str:
-            return f"    virtual {return_type_name} {signature} const = 0;\n"
+        def get_function(return_type: str, signature: str) -> str:
+            return f"    virtual {return_type} {signature} const = 0;\n"
 
         cpp_code = ""
         for field in register.fields:
-            field_description = self.field_description(
+            field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
-            field_type_name = self._field_value_type_name(
+            field_description = self.field_description(
                 register=register, register_array=register_array, field=field
             )
 
@@ -218,7 +202,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                     field=field,
                     from_value=False,
                 )
-                cpp_code += function(return_type_name=field_type_name, signature=signature)
+                cpp_code += get_function(return_type=field_type, signature=signature)
 
                 comment = [f"Getter for the {field_description},", "given a register value."]
                 cpp_code += self.comment_block(text=comment)
@@ -229,7 +213,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                     field=field,
                     from_value=True,
                 )
-                cpp_code += function(return_type_name=field_type_name, signature=signature)
+                cpp_code += get_function(return_type=field_type, signature=signature)
 
             if register.mode.software_can_write:
                 comment = [f"Setter for the {field_description},"]
@@ -249,7 +233,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                     field=field,
                     from_value=False,
                 )
-                cpp_code += function(return_type_name="void", signature=signature)
+                cpp_code += get_function(return_type="void", signature=signature)
 
                 comment = [
                     f"Setter for the {field_description},",
@@ -263,7 +247,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                     field=field,
                     from_value=True,
                 )
-                cpp_code += function(return_type_name="uint32_t", signature=signature)
+                cpp_code += get_function(return_type="uint32_t", signature=signature)
 
             cpp_code += "\n"
 
@@ -285,48 +269,104 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
 
-    def _field_attributes(
-        self,
-        register: Register,
-        register_array: RegisterArray | None,
-        field: RegisterField,
-    ) -> str:
-        field_description = self.field_description(
-            register=register, register_array=register_array, field=field
-        )
-        cpp_code = self.comment(f"Attributes for the {field_description}.", indent=2)
+    def _get_attributes(self) -> str:
+        if not self.register_list.register_objects:
+            # Don't create a namespace if the register list contains only constants.
+            return ""
 
-        array_namespace = f"::{register_array.name}" if register_array else ""
-        namespace = f"{self.name}{array_namespace}::{register.name}::{field.name}"
+        attributes_cpp: list[str] = []
+        for register_object in self.iterate_register_objects():
+            if isinstance(register_object, RegisterArray):
+                attributes_cpp.append(
+                    self._get_register_array_attributes(register_array=register_object)
+                )
+            elif register_object.fields:
+                attributes_cpp.append(
+                    self._get_register_attributes(register=register_object, indent=4)
+                )
 
-        cpp_code += f"  namespace {namespace}\n"
-        cpp_code += "  {\n"
-        cpp_code += f"    static const auto width = {field.width};\n"
+        attribute_cpp = "\n".join(attributes_cpp)
+        return f"""\
+  namespace {self.name}
+  {{
 
-        if isinstance(field, Enumeration):
-            name_value_pairs = [f"{element.name} = {element.value}," for element in field.elements]
-            separator = "\n      "
-            cpp_code += f"""\
-    enum Enumeration
-    {{
-      {separator.join(name_value_pairs)}
-    }};
+{attribute_cpp}
+  }} // namespace {self.name}
+
 """
 
-        cpp_code += (
-            f"    static const auto default_value = {self._get_default_value(field=field)};\n"
-        )
-        cpp_code += "  }\n"
+    def _get_register_attributes(self, register: Register, indent: int) -> str:
+        if not register.fields:
+            raise ValueError("Should not end up here if the register has no fields.")
 
-        return cpp_code
+        fields_cpp: list[str] = []
 
-    def _register_array_attributes(self, register_array: RegisterArray) -> str:
+        for field in register.fields:
+            indentation = self.get_indentation(indent=indent + 2)
+            field_type = self._get_field_value_type(
+                register=register, register_array=None, field=field, include_namespace=False
+            )
+
+            if isinstance(field, Enumeration):
+                separator = "\n" + " " * (indent + 6)
+                name_value_pairs = "".join(
+                    [f"{separator}{element.name} = {element.value}," for element in field.elements]
+                )
+                typedef = f"""
+{indentation}  // The valid elements for this enumeration field.
+{indentation}  enum Enumeration
+{indentation}  {{\
+{name_value_pairs}
+{indentation}  }};
+"""
+            else:
+                typedef = ""
+
+            # The "u" in the "1uL" is needed if 'width' is 31 or greater.
+            # The "L" is needed if 'width' is 32.
+            fields_cpp.append(f"""\
+{indentation}// Attributes for the '{field.name}' field.
+{indentation}namespace {field.name}
+{indentation}{{
+{indentation}  // The number of bits that the field occupies.
+{indentation}  static const size_t width = {field.width};
+{indentation}  // The bit index of the lowest bit in the field.
+{indentation}  static const size_t shift = {field.base_index};
+{indentation}  // The bit mask of the field, at index zero.
+{indentation}  static const uint32_t mask_at_base = (1uL << width) - 1;
+{indentation}  // The bit mask of the field, at the bit index where the field is located.
+{indentation}  static const uint32_t mask_shifted = mask_at_base << shift;
+{typedef}
+{indentation}  // Initial value of the field at device startup/reset.
+{indentation}  static const {field_type} default_value = {self._get_default_value(field=field)};
+{indentation}}}
+""")
+
+        indentation = self.get_indentation(indent=indent)
+        register_cpp = "\n".join(fields_cpp)
+
         return f"""\
-  // Attributes for the "{register_array.name}" register array.
-  namespace {self.name}::{register_array.name}
-  {{
-    // Number of times the registers of the array are repeated.
-    static const auto array_length = {register_array.length};
-  }};
+{indentation}// Attributes for the '{register.name}' register.
+{indentation}namespace {register.name} {{
+{register_cpp}\
+{indentation}}}
+"""
 
+    def _get_register_array_attributes(self, register_array: RegisterArray) -> str:
+        registers_cpp = [
+            self._get_register_attributes(register=register, indent=6)
+            for register in register_array.registers
+            if register.fields
+        ]
+        register_cpp = "\n".join(registers_cpp)
+
+        return f"""\
+    // Attributes for the '{register_array.name}' register array.
+    namespace {register_array.name}
+    {{
+      // Number of times the registers of the array are repeated.
+      static const auto array_length = {register_array.length};
+
+{register_cpp}\
+    }}
 """

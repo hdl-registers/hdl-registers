@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from hdl_registers.field.bit import Bit
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
@@ -38,11 +40,13 @@ class CppGeneratorCommon(RegisterCodeGenerator):
 
     @staticmethod
     def _with_namespace(cpp_code_body: str) -> str:
-        cpp_code = "namespace fpga_regs\n"
-        cpp_code += "{\n\n"
-        cpp_code += f"{cpp_code_body}"
-        cpp_code += "} /* namespace fpga_regs */\n"
-        return cpp_code
+        return f"""\
+namespace fpga_regs
+{{
+
+{cpp_code_body}\
+}} // namespace fpga_regs
+"""
 
     def _constructor_signature(self) -> str:
         return (
@@ -58,30 +62,48 @@ class CppGeneratorCommon(RegisterCodeGenerator):
         )
         return f"Methods for the {register_description}."
 
-    def _field_value_type_name(
+    def _get_namespace(
+        self,
+        register: Register,
+        register_array: RegisterArray | None = None,
+        field: RegisterField | None = None,
+    ) -> str:
+        """
+        Get namespace to use within the class for the attributes of the field or register that is
+        pointed out by the arguments.
+        """
+        register_array_namespace = f"{register_array.name}::" if register_array else ""
+        field_namespace = f"{field.name}::" if field else ""
+        return f"{self.name}::{register_array_namespace}{register.name}::{field_namespace}"
+
+    def _get_field_value_type(
         self,
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
+        include_namespace: bool = True,
     ) -> str:
         """
-        The name of the type used to represent the field.
+        The name of the type used to represent the field value.
         """
+        if isinstance(field, (Bit, BitVector)):
+            return "uint32_t"
+
         if isinstance(field, Enumeration):
+            if include_namespace:
+                namespace = self._get_namespace(
+                    register=register, register_array=register_array, field=field
+                )
+            else:
+                namespace = ""
+
             # The name of an enum available in this field's attributes.
-            result = f"{self.name}::"
-            if register_array:
-                result += f"{register_array.name}::"
-            result += f"{register.name}::{field.name}::Enumeration"
+            return f"{namespace}Enumeration"
 
-            return result
+        if isinstance(field, Integer):
+            return "int32_t" if field.is_signed else "uint32_t"
 
-        if isinstance(field, Integer) and field.is_signed:
-            # Type that can represent negative values also.
-            return "int32_t"
-
-        # The default for most fields.
-        return "uint32_t"
+        raise ValueError(f"Got unknown field type: {field}")
 
     @staticmethod
     def _register_getter_function_name(
@@ -236,9 +258,9 @@ class CppGeneratorCommon(RegisterCodeGenerator):
             # index if this is an array
             result += f"{indentation}  size_t array_index,\n"
 
-        type_name = self._field_value_type_name(
+        field_type = self._get_field_value_type(
             register=register, register_array=register_array, field=field
         )
-        result += f"{indentation}  {type_name} field_value\n{indentation})"
+        result += f"{indentation}  {field_type} field_value\n{indentation})"
 
         return result

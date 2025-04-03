@@ -243,15 +243,21 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register, register_array=register_array, field=field, from_value=True, indent=2
         )
 
+        namespace = self._get_namespace(
+            register=register, register_array=register_array, field=field
+        )
+        checker = self._get_field_value_checker(
+            register=register, register_array=register_array, field=field, setter_or_getter="setter"
+        )
+
         return f"""\
   uint32_t {self._class_name}::{signature} const\
   {{
-{self._get_field_shift_and_mask(field=field)}\
-{self._get_field_value_checker(register=register, field=field, setter_or_getter="setter")}\
-    const uint32_t field_value_masked = field_value & mask_at_base;
-    const uint32_t field_value_masked_and_shifted = field_value_masked << shift;
+{checker}\
+    const uint32_t field_value_masked = field_value & {namespace}mask_at_base;
+    const uint32_t field_value_masked_and_shifted = field_value_masked << {namespace}shift;
 
-    const uint32_t mask_shifted_inverse = ~mask_shifted;
+    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
     const uint32_t register_value_masked = register_value & mask_shifted_inverse;
 
     const uint32_t result_register_value = register_value_masked | field_value_masked_and_shifted;
@@ -261,37 +267,28 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
 """
 
-    @staticmethod
-    def _get_field_shift_and_mask(field: RegisterField) -> str:
-        return f"""\
-    const uint32_t shift = {field.base_index}uL;
-    const uint32_t mask_at_base = 0b{"1" * field.width}uL;
-    const uint32_t mask_shifted = mask_at_base << shift;
-
-"""
-
     def _get_field_value_checker(
-        self, register: Register, field: RegisterField, setter_or_getter: str
+        self,
+        register: Register,
+        register_array: RegisterArray | None,
+        field: RegisterField,
+        setter_or_getter: str,
     ) -> str:
         comment = "// Check that field value is within the legal range."
         assertion = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
 
         if isinstance(field, Integer):
-            if (
-                field.min_value == 0
-                and not field.is_signed
-                and self._field_value_type_name(
-                    register=register, register_array=None, field=field
-                ).startswith("uint")
-            ):
-                min_value_check = ""
-            else:
+            if field.is_signed or field.min_value != 0:
                 min_value_check = f"""\
     {assertion}(
       field_value >= {field.min_value},
       "Got '{field.name}' value too small: " << field_value
     );
 """
+            else:
+                # Minimum value check would be moot (and result in a compiler warning).
+                # The type of the value will be 'uint32_t' so it can not contain a negative value.
+                min_value_check = ""
 
             return f"""\
     {comment}
@@ -304,22 +301,29 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
         if isinstance(field, (Bit, BitVector)):
+            namespace = self._get_namespace(
+                register=register, register_array=register_array, field=field
+            )
             return f"""\
     {comment}
-    const uint32_t mask_at_base_inverse = ~mask_at_base;
+    const uint32_t mask_at_base_inverse = ~{namespace}mask_at_base;
     {assertion}(
       (field_value & mask_at_base_inverse) == 0,
       "Got '{field.name}' value too many bits used: " << field_value
     );
 
 """
-
         return ""
 
-    def _get_field_getter_value_checker(self, register: Register, field: RegisterField) -> str:
+    def _get_field_getter_value_checker(
+        self, register: Register, register_array: RegisterArray, field: RegisterField
+    ) -> str:
         if isinstance(field, Integer):
             return self._get_field_value_checker(
-                register=register, field=field, setter_or_getter="getter"
+                register=register,
+                register_array=register_array,
+                field=field,
+                setter_or_getter="getter",
             )
 
         return ""
@@ -356,6 +360,9 @@ class CppImplementationGenerator(CppGeneratorCommon):
     def _field_getter_function(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
+        field_type = self._get_field_value_type(
+            register=register, register_array=register_array, field=field
+        )
         signature = self._field_getter_function_signature(
             register=register,
             register_array=register_array,
@@ -364,11 +371,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             indent=2,
         )
 
-        field_type_name = self._field_value_type_name(
-            register=register, register_array=register_array, field=field
-        )
-
-        cpp_code = f"  {field_type_name} {self._class_name}::{signature} const\n"
+        cpp_code = f"  {field_type} {self._class_name}::{signature} const\n"
         cpp_code += "  {\n"
 
         register_getter_function_name = self._register_getter_function_name(
@@ -385,7 +388,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += ");\n"
 
         cpp_code += (
-            f"    const {field_type_name} field_value = "
+            f"    const {field_type} field_value = "
             f"{field_getter_from_value_function_name}(register_value);\n"
         )
         cpp_code += "\n    return field_value;\n"
@@ -396,40 +399,57 @@ class CppImplementationGenerator(CppGeneratorCommon):
     def _field_getter_function_from_value(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
+        namespace = self._get_namespace(
+            register=register, register_array=register_array, field=field
+        )
+        field_type = self._get_field_value_type(
+            register=register, register_array=register_array, field=field
+        )
         signature = self._field_getter_function_signature(
             register=register, register_array=register_array, field=field, from_value=True, indent=2
         )
-
-        type_name = self._field_value_type_name(
+        cast = self._get_field_raw_to_native_cast(field=field, field_type=field_type)
+        checker = self._get_field_getter_value_checker(
             register=register, register_array=register_array, field=field
         )
 
-        cpp_code = f"""\
-  {type_name} {self._class_name}::{signature} const
+        return f"""\
+  {field_type} {self._class_name}::{signature} const
   {{
-{self._get_field_shift_and_mask(field=field)}\
-    const uint32_t result_masked = register_value & mask_shifted;
-    const uint32_t result_shifted = result_masked >> shift;
+    const uint32_t result_masked = register_value & {namespace}mask_shifted;
+    const uint32_t result_shifted = result_masked >> {namespace}shift;
 
-    {type_name} field_value;
+{cast}
+{checker}\
+    return field_value;
+  }}
 
 """
 
-        if type_name == "uint32_t":
-            cpp_code += """\
+    def _get_field_raw_to_native_cast(self, field: RegisterField, field_type: str) -> str:
+        no_cast = """\
     // No casting needed.
-    field_value = result_shifted;
+    const uint32_t field_value = result_shifted;
 """
 
-        elif isinstance(field, Enumeration):
-            cpp_code += f"""\
+        # Note that this logic for decoding field type is duplicated in the attributes
+        # in the '_get_field_value_type' method.
+        if isinstance(field, (Bit, BitVector)):
+            return no_cast
+
+        if isinstance(field, Enumeration):
+            return f"""\
     // "Cast" to the enum type.
-    field_value = {type_name}(result_shifted);
+    const auto field_value = {field_type}(result_shifted);
 """
 
-        elif isinstance(field, Integer) and field.is_signed:
-            cpp_code += f"""\
-    const {type_name} sign_bit_mask = 1 << {field.width - 1};
+        if isinstance(field, Integer):
+            if not field.is_signed:
+                return no_cast
+
+            return f"""\
+    {field_type} field_value;
+    const {field_type} sign_bit_mask = 1 << {field.width - 1};
 
     if (result_shifted & sign_bit_mask)
     {{
@@ -443,14 +463,4 @@ class CppImplementationGenerator(CppGeneratorCommon):
       field_value = result_shifted;
     }}
 """
-        else:
-            raise ValueError(f"Got unexpected field type: {type_name}")
-
-        cpp_code += f"""
-{self._get_field_getter_value_checker(register=register, field=field)}\
-    return field_value;
-  }}
-
-"""
-
-        return cpp_code
+        raise ValueError(f"Got unexpected field type: {field}")
