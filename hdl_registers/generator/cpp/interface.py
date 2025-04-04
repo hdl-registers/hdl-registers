@@ -299,7 +299,9 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         if not register.fields:
             raise ValueError("Should not end up here if the register has no fields.")
 
-        fields_cpp: list[str] = []
+        attributes_cpp: list[str] = []
+        struct_values_cpp: list[str] = []
+        default_values_cpp: list[str] = []
 
         for field in register.fields:
             indentation = self.get_indentation(indent=indent + 2)
@@ -319,15 +321,17 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {name_value_pairs}
 {indentation}  }};
 """
+                field_type_struct = f"{field.name}::Enumeration"
             else:
                 typedef = ""
+                field_type_struct = field_type
 
             # If 'width' is 32, '1 << width' is a 33-bit unsigned number.
             # The C++ standard requires an "int" to be at least 16 bits, "long" at least 32,
             # and "long long" at least 64.
             # Hence in order to avoid overflow, we have to use "uLL".
             # Once '1' is subtracted from the shifted value, it will always fit in 32 unsigned bits.
-            fields_cpp.append(f"""\
+            attributes_cpp.append(f"""\
 {indentation}// Attributes for the '{field.name}' field.
 {indentation}namespace {field.name}
 {indentation}{{
@@ -344,14 +348,27 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {indentation}  static const {field_type} default_value = {self._get_default_value(field=field)};
 {indentation}}}
 """)
+            struct_values_cpp.append(f"{indentation}  {field_type_struct} {field.name};")
+            default_values_cpp.append(f"{indentation}  {field.name}::default_value,")
 
         indentation = self.get_indentation(indent=indent)
-        register_cpp = "\n".join(fields_cpp)
+        attribute_cpp = "\n".join(attributes_cpp)
+        struct_value_cpp = "\n".join(struct_values_cpp)
+        default_value_cpp = "\n".join(default_values_cpp)
 
         return f"""\
 {indentation}// Attributes for the '{register.name}' register.
 {indentation}namespace {register.name} {{
-{register_cpp}\
+{attribute_cpp}
+{indentation}  // Struct that holds the value of each field in the register,
+{indentation}  // in their native C++ representation.
+{indentation}  struct Value {{
+{struct_value_cpp}
+{indentation}  }};
+{indentation}  // Initial value of the register at device startup/reset.
+{indentation}  const Value default_value = {{
+{default_value_cpp}
+{indentation}  }};
 {indentation}}}
 """
 
