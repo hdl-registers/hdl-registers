@@ -72,12 +72,11 @@ class CppHeaderGenerator(CppGeneratorCommon):
 """
 
             if register.mode.software_can_read:
-                public_cpp += self._get_public_getters(
+                public_getters, private_getters = self._get_getters(
                     register=register, register_array=register_array
                 )
-                private_cpp += self._get_private_getters(
-                    register=register, register_array=register_array
-                )
+                public_cpp += public_getters
+                private_cpp += private_getters
 
                 if register.fields and register.mode.software_can_write:
                     # Add empty line between getter and setter interfaces.
@@ -112,7 +111,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
   private:
     volatile uint32_t *m_registers;
     bool (*m_assertion_handler) (const std::string*);
-{private_cpp}
+{private_cpp}\
   }};
 
 """
@@ -124,8 +123,17 @@ class CppHeaderGenerator(CppGeneratorCommon):
 """
         return cpp_code_top + self._with_namespace(cpp_code)
 
-    def _get_public_getters(self, register: Register, register_array: RegisterArray | None) -> str:
-        cpp_code: list[str] = []
+    def _get_getters(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> tuple[str, str]:
+        public_cpp: list[str] = []
+        private_cpp = ""
+
+        def get_from_raw_function(comment: str, return_type: str, signature: str) -> str:
+            return f"""
+    // {comment}
+    static {return_type} {signature};
+"""
 
         register_type = self._get_register_value_type(
             register=register, register_array=register_array
@@ -133,23 +141,38 @@ class CppHeaderGenerator(CppGeneratorCommon):
         signature = self._register_getter_signature(
             register=register, register_array=register_array
         )
-        cpp_code.append(self._get_override_function(return_type=register_type, signature=signature))
+        public_cpp.append(
+            self._get_override_function(return_type=register_type, signature=signature)
+        )
 
         for field in register.fields:
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
+
             signature = self._field_getter_function_signature(
                 register=register,
                 register_array=register_array,
                 field=field,
                 from_raw=False,
             )
-            cpp_code.append(
+            public_cpp.append(
                 self._get_override_function(return_type=field_type, signature=signature)
             )
 
-        return "\n".join(cpp_code)
+            signature = self._field_getter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=True,
+            )
+            private_cpp += get_from_raw_function(
+                comment=f"Slice out the '{field.name}' field value from a raw register value.",
+                return_type=field_type,
+                signature=signature,
+            )
+
+        return "\n".join(public_cpp), private_cpp
 
     @staticmethod
     def _get_override_function(return_type: str, signature: str) -> str:
@@ -157,34 +180,6 @@ class CppHeaderGenerator(CppGeneratorCommon):
     // See interface header for documentation.
     virtual {return_type} {signature} const override;
 """
-
-    def _get_private_getters(self, register: Register, register_array: RegisterArray | None) -> str:
-        cpp_code = ""
-
-        def get_function(comment: str, return_type: str, signature: str) -> str:
-            return f"""
-    // {comment}
-    static {return_type} {signature};
-"""
-
-        for field in register.fields:
-            field_type = self._get_field_value_type(
-                register=register, register_array=register_array, field=field
-            )
-            signature = self._field_getter_function_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=True,
-            )
-
-            cpp_code += get_function(
-                comment=f"Slice out the '{field.name}' field value from a raw register value.",
-                return_type=field_type,
-                signature=signature,
-            )
-
-        return cpp_code
 
     def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
         cpp_code: list[str] = []
