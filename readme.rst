@@ -73,6 +73,7 @@ The following code can be generated:
 * `C++ <https://hdl-registers.com/rst/generator/generator_cpp.html>`_
 
   * Complete class with setters and getters for registers and fields.
+    Uses structs and native C++ representation of values.
   * Includes an abstract interface header for unit test mocking.
 
 * `C header <https://hdl-registers.com/rst/generator/generator_c.html>`_

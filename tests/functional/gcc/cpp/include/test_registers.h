@@ -7,6 +7,7 @@
 // https://github.com/hdl-registers/hdl-registers
 // -------------------------------------------------------------------------------------------------
 
+#include <iostream>
 #include <assert.h>
 
 #include "caesar.h"

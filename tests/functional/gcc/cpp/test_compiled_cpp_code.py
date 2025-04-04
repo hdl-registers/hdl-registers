@@ -16,6 +16,10 @@ from tsfpga.system_utils import create_file, run_command
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
+from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+    get_all_doc_register_lists,
+    get_strange_register_lists,
+)
 from hdl_registers.register_modes import REGISTER_MODES
 from tests.functional.gcc.compile_and_run_test import CompileAndRunTest
 
@@ -54,7 +58,7 @@ int main()
 
     def compile(
         self,
-        test_code,
+        test_code="",
         include_directories=None,
         source_files=None,
         includes="",
@@ -166,7 +170,7 @@ def test_only_constants(cpp_test):
 def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
     test_code = """\
   // Index 3 is out of bounds (should be less than 3)
-  caesar.set_dummies_first(3, 1337);
+  caesar.set_dummies_first_array_integer(3, 1337);
 """
     cmd = base_cpp_test.compile(test_code=test_code)
 
@@ -175,14 +179,14 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1107: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1277: Got 'dummies' array index out of range: 3.\n"
     )
 
 
 def test_setting_register_array_out_of_bounds_should_not_crash_if_no_assertion(base_cpp_test):
     test_code = """\
   // Index 3 is out of bounds (should be less than 3)
-  caesar.set_dummies_first(3, 1337);
+  caesar.set_dummies_first_array_integer(3, 42);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
@@ -209,7 +213,7 @@ def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:244: Got 'plain_bit_a' value too many bits used: 2.\n"
+        "caesar.cpp:282: Got 'plain_bit_a' value too many bits used: 2.\n"
     )
 
 
@@ -229,7 +233,7 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:276: Got 'plain_bit_vector' value too many bits used: 16.\n"
+        "caesar.cpp:316: Got 'plain_bit_vector' value too many bits used: 16.\n"
     )
 
 
@@ -244,7 +248,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:307: Got 'plain_integer' value too small: -1024.\n"
+        "caesar.cpp:349: Got 'plain_integer' value too small: -1024.\n"
     )
 
     test_code = """\
@@ -257,7 +261,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:311: Got 'plain_integer' value too large: 110.\n"
+        "caesar.cpp:353: Got 'plain_integer' value too large: 110.\n"
     )
 
 
@@ -294,7 +298,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:170: Got 'plain_integer' value too large: 101.\n"
+        "caesar.cpp:186: Got 'plain_integer' value too large: 101.\n"
     )
 
     test_code = """\
@@ -308,7 +312,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:166: Got 'plain_integer' value too small: -51.\n"
+        "caesar.cpp:182: Got 'plain_integer' value too small: -51.\n"
     )
 
 
@@ -351,28 +355,48 @@ def test_very_wide_integer_fields(base_cpp_test):
     base_cpp_test.register_list.append_register(
         name="signed_32", mode=REGISTER_MODES["r_w"], description=""
     ).append_integer(
-        name="value", description="", min_value=-2147483648, max_value=3, default_value=0
+        name="value", description="", min_value=-2147483648, max_value=3, default_value=-25
     )
 
     base_cpp_test.register_list.append_register(
         name="unsigned_32", mode=REGISTER_MODES["r_w"], description=""
     ).append_integer(
-        name="value", description="", min_value=7, max_value=2147483649, default_value=30
+        name="value", description="", min_value=7, max_value=2147483649, default_value=2147483648
     )
 
     base_cpp_test.register_list.append_register(
         name="signed_31", mode=REGISTER_MODES["r_w"], description=""
     ).append_integer(
-        name="value", description="", min_value=-1073741824, max_value=3, default_value=0
+        name="value", description="", min_value=-1073741824, max_value=3, default_value=-25
     )
 
     base_cpp_test.register_list.append_register(
         name="unsigned_31", mode=REGISTER_MODES["r_w"], description=""
     ).append_integer(
-        name="value", description="", min_value=7, max_value=1073741825, default_value=30
+        name="value", description="", min_value=7, max_value=1073741825, default_value=1073741824
     )
 
     test_code = """\
+  assert(fpga_regs::caesar::signed_32::value::mask_at_base == 0xFFFFFFFF);
+  assert(fpga_regs::caesar::signed_32::value::mask_shifted == 0xFFFFFFFF);
+  assert(fpga_regs::caesar::signed_32::value::default_value == -25);
+  assert(fpga_regs::caesar::signed_32::value::default_value_raw == 4294967271);
+
+  assert(fpga_regs::caesar::unsigned_32::value::mask_at_base == 0xFFFFFFFF);
+  assert(fpga_regs::caesar::unsigned_32::value::mask_shifted == 0xFFFFFFFF);
+  assert(fpga_regs::caesar::unsigned_32::value::default_value == 2147483648);
+  assert(fpga_regs::caesar::unsigned_32::value::default_value_raw == 2147483648);
+
+  assert(fpga_regs::caesar::signed_31::value::mask_at_base == 0x7FFFFFFF);
+  assert(fpga_regs::caesar::signed_31::value::mask_shifted == 0x7FFFFFFF);
+  assert(fpga_regs::caesar::signed_31::value::default_value == -25);
+  assert(fpga_regs::caesar::signed_31::value::default_value_raw == 2147483623);
+
+  assert(fpga_regs::caesar::unsigned_31::value::mask_at_base == 0x7FFFFFFF);
+  assert(fpga_regs::caesar::unsigned_31::value::mask_shifted == 0x7FFFFFFF);
+  assert(fpga_regs::caesar::unsigned_31::value::default_value == 1073741824);
+  assert(fpga_regs::caesar::unsigned_31::value::default_value_raw == 1073741824);
+
   memory[21] = 0b10000000000000000000000000000001;
   memory[22] = 0b10000000000000000000000000000001;
   memory[23] = 0b11000000000000000000000000000001;
@@ -385,4 +409,91 @@ def test_very_wide_integer_fields(base_cpp_test):
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_very_wide_integer_field_slightly_offset(base_cpp_test):
+    register = base_cpp_test.register_list.append_register(
+        name="signed_31", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit(name="pad", description="", default_value="0")
+    register.append_integer(
+        name="value", description="", min_value=-1073741824, max_value=3, default_value=-1073741809
+    )
+
+    register = base_cpp_test.register_list.append_register(
+        name="unsigned_31", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit(name="pad", description="", default_value="0")
+    register.append_integer(
+        name="value", description="", min_value=0, max_value=2147483647, default_value=1073741839
+    )
+
+    register = base_cpp_test.register_list.append_register(
+        name="signed_30", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit(name="pad", description="", default_value="0")
+    register.append_integer(
+        name="value", description="", min_value=-536870912, max_value=3, default_value=-536870897
+    )
+    register.append_bit(name="pad2", description="", default_value="0")
+
+    register = base_cpp_test.register_list.append_register(
+        name="unsigned_30", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit(name="pad", description="", default_value="0")
+    register.append_integer(
+        name="value", description="", min_value=0, max_value=1073741823, default_value=536870927
+    )
+    register.append_bit(name="pad2", description="", default_value="1")
+
+    test_code = """\
+  assert(fpga_regs::caesar::signed_31::value::mask_at_base == 0x7FFFFFFF);
+  assert(fpga_regs::caesar::signed_31::value::mask_shifted == 0xFFFFFFFE);
+  assert(fpga_regs::caesar::signed_31::value::default_value == -1073741809);
+  assert(fpga_regs::caesar::signed_31::value::default_value_raw == 2147483678);
+
+  assert(fpga_regs::caesar::unsigned_31::value::mask_at_base == 0x7FFFFFFF);
+  assert(fpga_regs::caesar::unsigned_31::value::mask_shifted == 0xFFFFFFFE);
+  assert(fpga_regs::caesar::unsigned_31::value::default_value == 1073741839);
+  assert(fpga_regs::caesar::unsigned_31::value::default_value_raw == 2147483678);
+
+  assert(fpga_regs::caesar::signed_30::value::mask_at_base == 0x3FFFFFFF);
+  assert(fpga_regs::caesar::signed_30::value::mask_shifted == 0x7FFFFFFE);
+  assert(fpga_regs::caesar::signed_30::value::default_value == -536870897);
+  assert(fpga_regs::caesar::signed_30::value::default_value_raw == 1073741854);
+
+  assert(fpga_regs::caesar::unsigned_30::value::mask_at_base == 0x3FFFFFFF);
+  assert(fpga_regs::caesar::unsigned_30::value::mask_shifted == 0x7FFFFFFE);
+  assert(fpga_regs::caesar::unsigned_30::value::default_value == 536870927);
+  assert(fpga_regs::caesar::unsigned_30::value::default_value_raw == 1073741854);
+
+  caesar.set_unsigned_31_value(0b1010101010101010101010101010101);
+  assert(caesar.get_unsigned_31_value() == 0b1010101010101010101010101010101);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_compile_all_register_lists(base_cpp_test):
+    """
+    Test that all available register lists compile.
+    """
+    includes = ""
+
+    for register_list in get_strange_register_lists() + get_all_doc_register_lists():
+        CppImplementationGenerator(
+            register_list=register_list, output_folder=base_cpp_test.working_dir
+        ).create()
+        CppHeaderGenerator(
+            register_list=register_list, output_folder=base_cpp_test.include_dir
+        ).create()
+        CppInterfaceGenerator(
+            register_list=register_list, output_folder=base_cpp_test.include_dir
+        ).create()
+
+        includes += f'#include "include/{register_list.name}.h"\n'
+
+    cmd = base_cpp_test.compile(includes=includes)
     run_command(cmd=cmd)

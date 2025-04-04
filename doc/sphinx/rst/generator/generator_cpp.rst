@@ -25,45 +25,39 @@ example.
 Getters
 -------
 
-It can be noted, most clearly in the :ref:`interface_header` below, that there are three ways to
+It can be noted in the :ref:`interface_header` below that there are two ways to
 read a register field:
 
-1. The method that reads the whole register, e.g. ``get_configuration()``.
+1. The method that reads the whole register, e.g. ``get_conf()``, which returns a ``struct`` with
+   all field values.
 
-2. The method that reads the register and then slices out the field value,
-   e.g. ``get_configuration_enable()``.
-
-3. The method that slices out the field value given a previously read register value,
-   e.g. ``get_configuration_enable_from_value(register_value)``.
+2. The method that reads the register and returns the specific field value,
+   e.g. ``get_conf_enable()``.
 
 Method (2) is the most convenient in most cases.
 However if we want to read out more than one field from a register it would be very inefficient to
 read the register value more than once over the register bus, which would be the result of calling
 (2) multiple times.
-Instead we can call (1) once and then (3) multiple times to get our field values.
+Instead we can call (1) once and then select the field values from the ``struct``.
 
 
 Setters
 -------
 
-Conversely there are three ways to write a register field:
+Conversely there are two ways to write a register field:
 
-1. The method that writes the whole register, e.g. ``set_configuration()``.
+1. The method that writes the whole register, e.g. ``set_conf()``, which takes
+   a ``struct`` of field values as argument.
 
 2. The method that reads the register, updates the value of the field, and then writes the register
-   back, e.g. ``set_configuration_enable()``.
-
-3. The method that updates the value of the field given a previously read register value,
-   and returns an updated register value,
-   e.g. ``set_configuration_enable_from_value(register_value)``.
+   back, e.g. ``set_conf_enable()``.
 
 Method (2) is the most convenient in most cases.
 However if we want to update more than one field of a register it would be very inefficient to
 read and write the register more than once over the register bus, which would be the result of
 calling (2) multiple times.
-Instead we can call a register getter once, e.g. ``get_configuration()``, and then (3) multiple
-times to get our updated register value.
-This value is then written over the register bus using (1).
+Instead we can call a register getter once, e.g. ``get_conf()``, update our field values in the
+variable, and then call (1) once.
 
 Exceptions
 __________
@@ -73,8 +67,8 @@ most common type.
 However there are three register modes where the previously written register value can not be
 read back over the bus and then modified: "write only", "write pulse", and "read, write pulse".
 The field setters for registers of this mode will write all bits outside of the current field
-as zero.
-This can for example be seen in the setter ``set_channels_configuration_enable()`` in the generated
+as their default value.
+This can for example be seen in the setter ``set_channels_conf_enable()`` in the generated
 code :ref:`below <cpp_implementation>`.
 
 
@@ -149,7 +143,14 @@ Interface header
 
 Below is the resulting abstract interface header code, generated from the
 :ref:`toml_formatting` example.
+This contains the public API of the class.
+
 Note that all register constants as well as field attributes are included here.
+It can also be seen that when a register is part of an array, the setters/getters take a second
+argument ``array_index``.
+There is an assert in the :ref:`cpp_implementation` that user-provided array indexes are
+within bounds.
+
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_cpp/include/i_example.h
   :caption: Example interface header
@@ -157,10 +158,13 @@ Note that all register constants as well as field attributes are included here.
   :linenos:
 
 
+.. _cpp_header:
+
 Class header
 ------------
 
-Below is the generated class header:
+Below is the generated class header.
+This overrides from the interface header and adds some internal private methods.
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_cpp/include/example.h
   :caption: Example class header
@@ -174,13 +178,11 @@ Below is the generated class header:
 Implementation
 --------------
 
-Below is the generated class implementation:
+Below is the generated class implementation.
+This implements all the methods of the class, whether public from the :ref:`interface_header`
+or private from the :ref:`cpp_header`.
 
 .. literalinclude:: ../../../../generated/sphinx_rst/register_code/generator/generator_cpp/example.cpp
   :caption: Example class implementation
   :language: C++
   :linenos:
-
-Note that when the register is part of an array, the register setter/getter takes a second
-argument ``array_index``.
-There is an assert that the user-provided array index is within the bounds of the array.
