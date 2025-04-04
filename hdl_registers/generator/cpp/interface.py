@@ -322,8 +322,11 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             else:
                 typedef = ""
 
-            # The "u" in the "1uL" is needed if 'width' is 31 or greater.
-            # The "L" is needed if 'width' is 32.
+            # If 'width' is 32, '1 << width' is a 33-bit unsigned number.
+            # The C++ standard requires an "int" to be at least 16 bits, "long" at least 32,
+            # and "long long" at least 64.
+            # Hence in order to avoid overflow, we have to use "uLL".
+            # Once '1' is subtracted from the shifted value, it will always fit in 32 unsigned bits.
             fields_cpp.append(f"""\
 {indentation}// Attributes for the '{field.name}' field.
 {indentation}namespace {field.name}
@@ -333,7 +336,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {indentation}  // The bit index of the lowest bit in the field.
 {indentation}  static const size_t shift = {field.base_index};
 {indentation}  // The bit mask of the field, at index zero.
-{indentation}  static const uint32_t mask_at_base = (1uL << width) - 1;
+{indentation}  static const uint32_t mask_at_base = (1uLL << width) - 1;
 {indentation}  // The bit mask of the field, at the bit index where the field is located.
 {indentation}  static const uint32_t mask_shifted = mask_at_base << shift;
 {typedef}

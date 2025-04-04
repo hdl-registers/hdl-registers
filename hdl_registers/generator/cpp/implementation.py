@@ -447,14 +447,17 @@ class CppImplementationGenerator(CppGeneratorCommon):
             if not field.is_signed:
                 return no_cast
 
+            # Note that the shift result has maximum value of '1 << 31', which always
+            # fits in a 32-bit unsigned integer.
             return f"""\
     {field_type} field_value;
-    const {field_type} sign_bit_mask = 1 << {field.width - 1};
+    const uint32_t sign_bit_mask = 1 << {field.width - 1};
 
     if (result_shifted & sign_bit_mask)
     {{
       // Value is to be interpreted as negative.
-      // Sign extend it from the width of the field to the width of the return type.
+      // This can be seen as a sign extension from the width of the field to the width of
+      // the return type.
       field_value = result_shifted - 2 * sign_bit_mask;
     }}
     else

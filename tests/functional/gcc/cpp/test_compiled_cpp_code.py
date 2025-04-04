@@ -16,6 +16,7 @@ from tsfpga.system_utils import create_file, run_command
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
+from hdl_registers.register_modes import REGISTER_MODES
 from tests.functional.gcc.compile_and_run_test import CompileAndRunTest
 
 THIS_DIR = Path(__file__).parent.resolve()
@@ -26,6 +27,7 @@ class BaseCppTest(CompileAndRunTest):
     def get_main(includes="", test_code=""):
         return f"""\
 #include <iostream>
+#include <cassert>
 
 #include "include/caesar.h"
 
@@ -173,7 +175,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1104: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1107: Got 'dummies' array index out of range: 3.\n"
     )
 
 
@@ -207,7 +209,7 @@ def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:243: Got 'plain_bit_a' value too many bits used: 2.\n"
+        "caesar.cpp:244: Got 'plain_bit_a' value too many bits used: 2.\n"
     )
 
 
@@ -227,7 +229,7 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:275: Got 'plain_bit_vector' value too many bits used: 16.\n"
+        "caesar.cpp:276: Got 'plain_bit_vector' value too many bits used: 16.\n"
     )
 
 
@@ -242,7 +244,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:306: Got 'plain_integer' value too small: -1024.\n"
+        "caesar.cpp:307: Got 'plain_integer' value too small: -1024.\n"
     )
 
     test_code = """\
@@ -255,7 +257,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:310: Got 'plain_integer' value too large: 110.\n"
+        "caesar.cpp:311: Got 'plain_integer' value too large: 110.\n"
     )
 
 
@@ -292,7 +294,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:169: Got 'plain_integer' value too large: 101.\n"
+        "caesar.cpp:170: Got 'plain_integer' value too large: 101.\n"
     )
 
     test_code = """\
@@ -306,7 +308,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:165: Got 'plain_integer' value too small: -51.\n"
+        "caesar.cpp:166: Got 'plain_integer' value too small: -51.\n"
     )
 
 
@@ -321,4 +323,66 @@ def test_getting_integer_field_out_of_range_should_not_crash_if_no_assertion(bas
         run_command(cmd=cmd)
 
     cmd = base_cpp_test.compile(test_code=test_code, no_getter_assert=True)
+    run_command(cmd=cmd)
+
+
+def test_very_wide_bit_vector_fields(base_cpp_test):
+    base_cpp_test.register_list.append_register(
+        name="vector_32", mode=REGISTER_MODES["r_w"], description=""
+    ).append_bit_vector(name="value", description="", width=32, default_value=0)
+
+    base_cpp_test.register_list.append_register(
+        name="vector_31", mode=REGISTER_MODES["r_w"], description=""
+    ).append_bit_vector(name="value", description="", width=31, default_value=0)
+
+    test_code = """\
+  memory[21] = 0b10000000000000000000000000000001;
+  memory[22] = 0b11000000000000000000000000000001;
+
+  assert(caesar.get_vector_32_value() == 2147483649);
+  assert(caesar.get_vector_31_value() == 1073741825);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_very_wide_integer_fields(base_cpp_test):
+    base_cpp_test.register_list.append_register(
+        name="signed_32", mode=REGISTER_MODES["r_w"], description=""
+    ).append_integer(
+        name="value", description="", min_value=-2147483648, max_value=3, default_value=0
+    )
+
+    base_cpp_test.register_list.append_register(
+        name="unsigned_32", mode=REGISTER_MODES["r_w"], description=""
+    ).append_integer(
+        name="value", description="", min_value=7, max_value=2147483649, default_value=30
+    )
+
+    base_cpp_test.register_list.append_register(
+        name="signed_31", mode=REGISTER_MODES["r_w"], description=""
+    ).append_integer(
+        name="value", description="", min_value=-1073741824, max_value=3, default_value=0
+    )
+
+    base_cpp_test.register_list.append_register(
+        name="unsigned_31", mode=REGISTER_MODES["r_w"], description=""
+    ).append_integer(
+        name="value", description="", min_value=7, max_value=1073741825, default_value=30
+    )
+
+    test_code = """\
+  memory[21] = 0b10000000000000000000000000000001;
+  memory[22] = 0b10000000000000000000000000000001;
+  memory[23] = 0b11000000000000000000000000000001;
+  memory[24] = 0b11000000000000000000000000000001;
+
+  assert(caesar.get_signed_32_value() == -2147483647);
+  assert(caesar.get_unsigned_32_value() == 2147483649);
+  assert(caesar.get_signed_31_value() == -1073741823);
+  assert(caesar.get_unsigned_31_value() == 1073741825);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd)
