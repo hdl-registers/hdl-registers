@@ -54,6 +54,27 @@ namespace fpga_regs
             "bool (*assertion_handler) (const std::string*))"
         )
 
+    def _get_register_heading(
+        self,
+        register: Register,
+        register_array: RegisterArray | None,
+        separator: str,
+        indent: int | None = None,
+        extra: str = "",
+    ) -> str:
+        indentation = self.get_indentation(indent=indent)
+        description = self._get_methods_description(
+            register=register, register_array=register_array
+        )
+        extra_line = f"{indentation}// {extra}\n" if extra else ""
+        return f"""
+{separator}\
+{indentation}// {description}
+{indentation}// Mode '{register.mode.name}'.
+{extra_line}\
+{separator}\
+"""
+
     def _get_methods_description(
         self, register: Register, register_array: RegisterArray | None
     ) -> str:

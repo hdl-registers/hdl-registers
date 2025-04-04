@@ -71,37 +71,56 @@ class CppImplementationGenerator(CppGeneratorCommon):
   {{
     // Empty
   }}
-
 """
 
+        separator = self.get_separator_line(indent=2)
         for register, register_array in self.iterate_registers():
-            cpp_code += f"{self.get_separator_line(indent=2)}"
+            cpp_code += self._get_register_heading(
+                register=register,
+                register_array=register_array,
+                separator=separator,
+                extra="See header or interface header for documentation.",
+                indent=2,
+            )
 
-            description = self._get_methods_description(
-                register=register, register_array=register_array
-            )
-            cpp_code += self.comment_block(
-                text=[description, "See interface header for documentation."], indent=2
-            )
-            cpp_code += "\n"
+            methods_cpp: list[str] = []
 
             if register.mode.software_can_read:
-                cpp_code += self._register_getter_function(register, register_array)
+                methods_cpp.append(
+                    self._register_getter_function(register=register, register_array=register_array)
+                )
 
                 for field in register.fields:
-                    cpp_code += self._field_getter_function(register, register_array, field=field)
-                    cpp_code += self._field_getter_function_from_value(
-                        register, register_array, field=field
+                    methods_cpp.append(
+                        self._field_getter_function(
+                            register=register, register_array=register_array, field=field
+                        )
+                    )
+                    methods_cpp.append(
+                        self._field_getter_function_from_value(
+                            register, register_array, field=field
+                        )
                     )
 
             if register.mode.software_can_write:
-                cpp_code += self._register_setter_function(register, register_array)
+                methods_cpp.append(
+                    self._register_setter_function(register=register, register_array=register_array)
+                )
 
                 for field in register.fields:
-                    cpp_code += self._field_setter_function(register, register_array, field=field)
-                    cpp_code += self._field_setter_function_from_value(
-                        register, register_array, field=field
+                    methods_cpp.append(
+                        self._field_setter_function(
+                            register=register, register_array=register_array, field=field
+                        )
                     )
+                    methods_cpp.append(
+                        self._field_setter_function_from_value(
+                            register, register_array, field=field
+                        )
+                    )
+
+            cpp_code += "\n".join(methods_cpp)
+            cpp_code += separator
 
         cpp_code_top = f'#include "include/{self.name}.h"\n\n'
 
@@ -179,7 +198,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             cpp_code += f"    const size_t index = {register.index};\n"
 
         cpp_code += "    m_registers[index] = register_value;\n"
-        cpp_code += "  }\n\n"
+        cpp_code += "  }\n"
         return cpp_code
 
     def _field_setter_function(
@@ -232,7 +251,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             cpp_code += "array_index, "
         cpp_code += "result_register_value);\n"
 
-        cpp_code += "  }\n\n"
+        cpp_code += "  }\n"
 
         return cpp_code
 
@@ -264,7 +283,6 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
     return result_register_value;
   }}
-
 """
 
     def _get_field_value_checker(
@@ -354,7 +372,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         cpp_code += "    const uint32_t result = m_registers[index];\n\n"
         cpp_code += "    return result;\n"
-        cpp_code += "  }\n\n"
+        cpp_code += "  }\n"
         return cpp_code
 
     def _field_getter_function(
@@ -392,7 +410,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             f"{field_getter_from_value_function_name}(register_value);\n"
         )
         cpp_code += "\n    return field_value;\n"
-        cpp_code += "  }\n\n"
+        cpp_code += "  }\n"
 
         return cpp_code
 
@@ -423,7 +441,6 @@ class CppImplementationGenerator(CppGeneratorCommon):
 {checker}\
     return field_value;
   }}
-
 """
 
     def _get_field_raw_to_native_cast(self, field: RegisterField, field_type: str) -> str:

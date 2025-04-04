@@ -61,15 +61,9 @@ class CppHeaderGenerator(CppGeneratorCommon):
         separator = self.get_separator_line()
 
         for register, register_array in self.iterate_registers():
-            description = self._get_methods_description(
-                register=register, register_array=register_array
+            public_cpp += self._get_register_heading(
+                register=register, register_array=register_array, separator=separator
             )
-            public_cpp += f"""
-{separator}\
-    // {description}
-    // Mode '{register.mode.name}'.
-{separator}\
-"""
 
             if register.mode.software_can_read:
                 public_getters, private_getters = self._get_getters(
