@@ -191,6 +191,46 @@ def test_setting_register_array_out_of_bounds_should_not_crash_if_no_assertion(b
     run_command(cmd=cmd)
 
 
+def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
+    test_code = """\
+  caesar.set_conf_plain_bit_a(1);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  caesar.set_conf_plain_bit_a(2);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:243: Got 'plain_bit_a' value too many bits used: 2.\n"
+    )
+
+
+def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
+    test_code = """\
+  caesar.set_conf_plain_bit_vector(15);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  caesar.set_conf_plain_bit_vector(16);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:275: Got 'plain_bit_vector' value too many bits used: 16.\n"
+    )
+
+
 def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
     test_code = """\
   caesar.set_conf_plain_integer(-1024);
@@ -282,43 +322,3 @@ def test_getting_integer_field_out_of_range_should_not_crash_if_no_assertion(bas
 
     cmd = base_cpp_test.compile(test_code=test_code, no_getter_assert=True)
     run_command(cmd=cmd)
-
-
-def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
-    test_code = """\
-  caesar.set_conf_plain_bit_a(1);
-"""
-    cmd = base_cpp_test.compile(test_code=test_code)
-    run_command(cmd=cmd, capture_output=True)
-
-    test_code = """\
-  caesar.set_conf_plain_bit_a(2);
-"""
-    cmd = base_cpp_test.compile(test_code=test_code)
-    with pytest.raises(subprocess.CalledProcessError) as exception_info:
-        run_command(cmd=cmd, capture_output=True)
-
-    assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:243: Got 'plain_bit_a' value too many bits used: 2.\n"
-    )
-
-
-def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
-    test_code = """\
-  caesar.set_conf_plain_bit_vector(15);
-"""
-    cmd = base_cpp_test.compile(test_code=test_code)
-    run_command(cmd=cmd, capture_output=True)
-
-    test_code = """\
-  caesar.set_conf_plain_bit_vector(16);
-"""
-    cmd = base_cpp_test.compile(test_code=test_code)
-    with pytest.raises(subprocess.CalledProcessError) as exception_info:
-        run_command(cmd=cmd, capture_output=True)
-
-    assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:275: Got 'plain_bit_vector' value too many bits used: 16.\n"
-    )
