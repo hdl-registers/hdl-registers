@@ -84,7 +84,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         cpp_code += self._num_registers()
 
-        cpp_code += f"    virtual ~I{self._class_name}() {{}}\n\n"
+        cpp_code += f"    virtual ~I{self._class_name}() {{}}\n"
 
         separator = self.get_separator_line()
 
@@ -92,7 +92,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
-            cpp_code += f"""\
+            cpp_code += f"""
 {separator}\
     // {description}
     // Mode '{register.mode.name}'.
@@ -112,9 +112,9 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             if register.mode.software_can_write:
                 cpp_code += self._get_setters(register=register, register_array=register_array)
 
-            cpp_code += f"{separator}\n"
+            cpp_code += separator
 
-        cpp_code += "  };\n"
+        cpp_code += "  };\n\n"
 
         cpp_code_top = """\
 #pragma once
@@ -215,13 +215,6 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                     return_type=field_type,
                     signature=signature,
                 )
-            )
-
-            signature = self._field_getter_function_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=True,
             )
 
         return "\n".join(public_cpp)

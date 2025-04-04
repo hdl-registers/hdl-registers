@@ -64,7 +64,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
-            public_cpp += f"""\
+            public_cpp += f"""
 {separator}\
     // {description}
     // Mode '{register.mode.name}'.
@@ -79,12 +79,14 @@ class CppHeaderGenerator(CppGeneratorCommon):
                     register=register, register_array=register_array
                 )
 
-                if register.fields and register.mode.software_can_read:
+                if register.fields and register.mode.software_can_write:
                     # Add empty line between getter and setter interfaces.
                     public_cpp += "\n"
 
             if register.mode.software_can_write:
                 public_cpp += self._get_setters(register=register, register_array=register_array)
+
+            public_cpp += separator
 
         cpp_code = f"""\
   class {self._class_name} : public I{self._class_name}
@@ -107,11 +109,9 @@ class CppHeaderGenerator(CppGeneratorCommon):
 
     virtual ~{self._class_name}() {{}}
 {public_cpp}
-
   private:
     volatile uint32_t *m_registers;
     bool (*m_assertion_handler) (const std::string*);
-
 {private_cpp}
   }};
 
@@ -154,15 +154,15 @@ class CppHeaderGenerator(CppGeneratorCommon):
     @staticmethod
     def _get_override_function(return_type: str, signature: str) -> str:
         return f"""\
-  // See interface header for documentation.
-  virtual {return_type} {signature} const override;
+    // See interface header for documentation.
+    virtual {return_type} {signature} const override;
 """
 
     def _get_private_getters(self, register: Register, register_array: RegisterArray | None) -> str:
         cpp_code = ""
 
         def get_function(comment: str, return_type: str, signature: str) -> str:
-            return f"""\
+            return f"""
     // {comment}
     static {return_type} {signature};
 """
