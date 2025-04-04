@@ -349,31 +349,59 @@ class CppImplementationGenerator(CppGeneratorCommon):
     def _register_getter_function(
         self, register: Register, register_array: RegisterArray | None
     ) -> str:
+        return_type = self._get_register_value_type(
+            register=register, register_array=register_array
+        )
         signature = self._register_getter_signature(
             register=register, register_array=register_array, indent=2
         )
-        cpp_code = f"  uint32_t {self._class_name}::{signature} const\n"
-        cpp_code += "  {\n"
 
         if register_array:
-            cpp_code += f"""\
+            checker = f"""\
     _ARRAY_INDEX_ASSERT_TRUE(
       array_index < {self.name}::{register_array.name}::array_length,
       "Got '{register_array.name}' array index out of range: " << array_index
     );
 
 """
-            cpp_code += (
-                f"    const size_t index = {register_array.base_index} "
-                f"+ array_index * {len(register_array.registers)} + {register.index};\n"
+            index = (
+                f"const size_t index = {register_array.base_index} "
+                f"+ array_index * {len(register_array.registers)} + {register.index};"
             )
         else:
-            cpp_code += f"    const size_t index = {register.index};\n"
+            checker = ""
+            index = f"const size_t index = {register.index};"
 
-        cpp_code += "    const uint32_t result = m_registers[index];\n\n"
-        cpp_code += "    return result;\n"
-        cpp_code += "  }\n"
-        return cpp_code
+        if register.fields:
+            fields = ""
+            values: list[str] = []
+            for field in register.fields:
+                field_type = self._get_field_value_type(
+                    register=register, register_array=register_array, field=field
+                )
+                getter_name = self._field_getter_function_name(
+                    register=register, register_array=register_array, field=field, from_raw=True
+                )
+                fields += f"\n    const {field_type} {field.name}_value = {getter_name}(raw_value);"
+                values.append(f"{field.name}_value")
+
+            fields += "\n"
+            return_value = f"{{{', '.join(values)}}}"
+        else:
+            fields = ""
+            return_value = "raw_value"
+
+        return f"""\
+  {return_type} {self._class_name}::{signature} const\
+  {{
+{checker}\
+    {index}
+    const uint32_t raw_value = m_registers[index];
+{fields}\
+
+    return {return_value};
+  }}\
+"""
 
     def _field_getter_function(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
