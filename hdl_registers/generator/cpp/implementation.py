@@ -189,7 +189,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register,
             register_array=register_array,
             field=field,
-            from_value=False,
+            from_raw=False,
             indent=2,
         )
 
@@ -217,7 +217,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += f"    const uint32_t current_register_value = {current_register_value};\n"
 
         signature = self._field_setter_function_name(
-            register=register, register_array=register_array, field=field, from_value=True
+            register=register, register_array=register_array, field=field, from_raw=True
         )
         cpp_code += (
             "    const uint32_t result_register_value = "
@@ -240,7 +240,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         signature = self._field_setter_function_signature(
-            register=register, register_array=register_array, field=field, from_value=True, indent=2
+            register=register, register_array=register_array, field=field, from_raw=True, indent=2
         )
 
         namespace = self._get_namespace(
@@ -331,7 +331,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
     def _register_getter_function(
         self, register: Register, register_array: RegisterArray | None
     ) -> str:
-        signature = self._register_getter_function_signature(
+        signature = self._register_getter_signature(
             register=register, register_array=register_array, indent=2
         )
         cpp_code = f"  uint32_t {self._class_name}::{signature} const\n"
@@ -367,7 +367,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register,
             register_array=register_array,
             field=field,
-            from_value=False,
+            from_raw=False,
             indent=2,
         )
 
@@ -379,7 +379,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         )
 
         field_getter_from_value_function_name = self._field_getter_function_name(
-            register=register, register_array=register_array, field=field, from_value=True
+            register=register, register_array=register_array, field=field, from_raw=True
         )
 
         cpp_code += f"    const uint32_t register_value = {register_getter_function_name}("
@@ -406,7 +406,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register, register_array=register_array, field=field
         )
         signature = self._field_getter_function_signature(
-            register=register, register_array=register_array, field=field, from_value=True, indent=2
+            register=register, register_array=register_array, field=field, from_raw=True, indent=2
         )
         cast = self._get_field_raw_to_native_cast(field=field, field_type=field_type)
         checker = self._get_field_getter_value_checker(

@@ -6,11 +6,17 @@
 # https://hdl-registers.com
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
+from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .cpp_generator_common import CppGeneratorCommon
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from hdl_registers.register import Register
+    from hdl_registers.register_array import RegisterArray
 
 
 class CppHeaderGenerator(CppGeneratorCommon):
@@ -50,13 +56,39 @@ class CppHeaderGenerator(CppGeneratorCommon):
         """
         Get a complete C++ class header with methods for accessing registers and fields.
         """
+        public_cpp = ""
+        private_cpp = ""
+        separator = self.get_separator_line()
+
+        for register, register_array in self.iterate_registers():
+            description = self._get_methods_description(
+                register=register, register_array=register_array
+            )
+            public_cpp += f"""\
+{separator}\
+    // {description}
+    // Mode '{register.mode.name}'.
+{separator}\
+"""
+
+            if register.mode.software_can_read:
+                public_cpp += self._get_public_getters(
+                    register=register, register_array=register_array
+                )
+                private_cpp += self._get_private_getters(
+                    register=register, register_array=register_array
+                )
+
+                if register.fields and register.mode.software_can_read:
+                    # Add empty line between getter and setter interfaces.
+                    public_cpp += "\n"
+
+            if register.mode.software_can_write:
+                public_cpp += self._get_setters(register=register, register_array=register_array)
+
         cpp_code = f"""\
   class {self._class_name} : public I{self._class_name}
   {{
-  private:
-    volatile uint32_t *m_registers;
-    bool (*m_assertion_handler) (const std::string*);
-
   public:
     /**
      * Class constructor.
@@ -74,74 +106,16 @@ class CppHeaderGenerator(CppGeneratorCommon):
     {self._constructor_signature()};
 
     virtual ~{self._class_name}() {{}}
+{public_cpp}
+
+  private:
+    volatile uint32_t *m_registers;
+    bool (*m_assertion_handler) (const std::string*);
+
+{private_cpp}
+  }};
+
 """
-
-        def get_function(return_type: str, signature: str) -> str:
-            return f"    virtual {return_type} {signature} const override;\n"
-
-        for register, register_array in self.iterate_registers():
-            cpp_code += f"\n{self.get_separator_line()}"
-
-            description = self._get_methods_description(
-                register=register, register_array=register_array
-            )
-            cpp_code += self.comment_block(
-                text=[description, "See interface header for documentation."]
-            )
-
-            if register.mode.software_can_read:
-                signature = self._register_getter_function_signature(
-                    register=register, register_array=register_array
-                )
-                cpp_code += get_function(return_type="uint32_t", signature=signature)
-
-                for field in register.fields:
-                    field_type = self._get_field_value_type(
-                        register=register, register_array=register_array, field=field
-                    )
-
-                    signature = self._field_getter_function_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                        from_value=False,
-                    )
-                    cpp_code += get_function(return_type=field_type, signature=signature)
-
-                    signature = self._field_getter_function_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                        from_value=True,
-                    )
-                    cpp_code += get_function(return_type=field_type, signature=signature)
-
-            if register.mode.software_can_write:
-                signature = self._register_setter_function_signature(
-                    register=register, register_array=register_array
-                )
-
-                cpp_code += get_function(return_type="void", signature=signature)
-
-                for field in register.fields:
-                    signature = self._field_setter_function_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                        from_value=False,
-                    )
-                    cpp_code += get_function(return_type="void", signature=signature)
-
-                    signature = self._field_setter_function_signature(
-                        register=register,
-                        register_array=register_array,
-                        field=field,
-                        from_value=True,
-                    )
-                    cpp_code += get_function(return_type="uint32_t", signature=signature)
-
-        cpp_code += "  };\n\n"
-
         cpp_code_top = f"""\
 #pragma once
 
@@ -149,3 +123,83 @@ class CppHeaderGenerator(CppGeneratorCommon):
 
 """
         return cpp_code_top + self._with_namespace(cpp_code)
+
+    def _get_public_getters(self, register: Register, register_array: RegisterArray | None) -> str:
+        cpp_code: list[str] = []
+
+        register_type = self._get_register_value_type(
+            register=register, register_array=register_array
+        )
+        signature = self._register_getter_signature(
+            register=register, register_array=register_array
+        )
+        cpp_code.append(self._get_override_function(return_type=register_type, signature=signature))
+
+        for field in register.fields:
+            field_type = self._get_field_value_type(
+                register=register, register_array=register_array, field=field
+            )
+            signature = self._field_getter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=False,
+            )
+            cpp_code.append(
+                self._get_override_function(return_type=field_type, signature=signature)
+            )
+
+        return "\n".join(cpp_code)
+
+    @staticmethod
+    def _get_override_function(return_type: str, signature: str) -> str:
+        return f"""\
+  // See interface header for documentation.
+  virtual {return_type} {signature} const override;
+"""
+
+    def _get_private_getters(self, register: Register, register_array: RegisterArray | None) -> str:
+        cpp_code = ""
+
+        def get_function(comment: str, return_type: str, signature: str) -> str:
+            return f"""\
+    // {comment}
+    static {return_type} {signature};
+"""
+
+        for field in register.fields:
+            field_type = self._get_field_value_type(
+                register=register, register_array=register_array, field=field
+            )
+            signature = self._field_getter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=True,
+            )
+            cpp_code += get_function(
+                comment=f"Slice out the '{field.name}' value from a raw register value.",
+                return_type=field_type,
+                signature=signature,
+            )
+
+        return cpp_code
+
+    def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
+        cpp_code: list[str] = []
+
+        signature = self._register_setter_function_signature(
+            register=register, register_array=register_array
+        )
+        cpp_code.append(self._get_override_function(return_type="void", signature=signature))
+
+        for field in register.fields:
+            signature = self._field_setter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=False,
+            )
+            cpp_code.append(self._get_override_function(return_type="void", signature=signature))
+
+        return "\n".join(cpp_code)

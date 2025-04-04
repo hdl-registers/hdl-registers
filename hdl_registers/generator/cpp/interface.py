@@ -80,44 +80,48 @@ class CppInterfaceGenerator(CppGeneratorCommon):
   {{
   public:
 """
-        cpp_code += self._constants()
+        cpp_code += self._get_constants()
 
         cpp_code += self._num_registers()
 
         cpp_code += f"    virtual ~I{self._class_name}() {{}}\n\n"
 
-        for register, register_array in self.iterate_registers():
-            cpp_code += f"{self.get_separator_line()}"
+        separator = self.get_separator_line()
+        private_cpp: str = ""
 
+        for register, register_array in self.iterate_registers():
             description = self._get_methods_description(
                 register=register, register_array=register_array
             )
-            description += f" Mode '{register.mode.name}'."
-
-            cpp_code += self.comment(comment=description)
-            cpp_code += "\n"
+            cpp_code += f"""\
+{separator}\
+    // {description}
+    // Mode '{register.mode.name}'.
+{separator}\
+"""
 
             if register.mode.software_can_read:
-                cpp_code += self.comment(
-                    "Getter that will read the whole register's value over the register bus."
-                )
-                signature = self._register_getter_function_signature(
+                getter_public_cpp, getter_private_cpp = self._get_getters(
                     register=register, register_array=register_array
                 )
-                cpp_code += f"    virtual uint32_t {signature} const = 0;\n\n"
+                cpp_code += getter_public_cpp
+                private_cpp += getter_private_cpp
+
+                if register.fields and register.mode.software_can_write:
+                    # Add empty line between getter and setter interfaces.
+                    cpp_code += "\n"
 
             if register.mode.software_can_write:
-                cpp_code += self.comment(
-                    "Setter that will write the whole register's value over the register bus."
-                )
-                signature = self._register_setter_function_signature(
-                    register=register, register_array=register_array
-                )
-                cpp_code += f"    virtual void {signature} const = 0;\n\n"
+                cpp_code += self._get_setters(register=register, register_array=register_array)
 
-            cpp_code += self._field_interface(register, register_array)
+            cpp_code += f"{separator}\n"
 
-        cpp_code += "  };\n\n"
+        cpp_code += f"""\
+
+  private:
+{private_cpp}
+  }};
+"""
 
         cpp_code_top = """\
 #pragma once
@@ -129,7 +133,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 """
         return cpp_code_top + self._with_namespace(cpp_code)
 
-    def _constants(self) -> str:
+    def _get_constants(self) -> str:
         cpp_code = ""
 
         for constant in self.iterate_constants():
@@ -176,82 +180,102 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
 
-    def _field_interface(self, register: Register, register_array: RegisterArray | None) -> str:
-        def get_function(return_type: str, signature: str) -> str:
-            return f"    virtual {return_type} {signature} const = 0;\n"
+    def _get_getters(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> tuple[str, str]:
+        def get_function(comment: str, return_type: str, signature: str) -> str:
+            return f"""\
+    // {comment}
+    virtual {return_type} {signature} const = 0;
+"""
 
-        cpp_code = ""
+        public_cpp: list[str] = []
+        private_cpp: list[str] = []
+
+        register_type = self._get_register_value_type(
+            register=register, register_array=register_array
+        )
+        signature = self._register_getter_signature(
+            register=register, register_array=register_array
+        )
+        public_cpp.append(
+            get_function(
+                comment="Read the whole register value over the register bus",
+                return_type=register_type,
+                signature=signature,
+            )
+        )
+
         for field in register.fields:
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
-            field_description = self.field_description(
-                register=register, register_array=register_array, field=field
+
+            signature = self._field_getter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=False,
+            )
+            public_cpp.append(
+                get_function(
+                    comment=(
+                        f"Read the register value and slice out the '{field.name}' field value."
+                    ),
+                    return_type=field_type,
+                    signature=signature,
+                )
             )
 
-            if register.mode.software_can_read:
-                comment = [
-                    f"Getter for the {field_description},",
-                    "which will read register value over the register bus.",
-                ]
-                cpp_code += self.comment_block(text=comment)
-
-                signature = self._field_getter_function_signature(
-                    register=register,
-                    register_array=register_array,
-                    field=field,
-                    from_value=False,
+            signature = self._field_getter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=True,
+            )
+            private_cpp.append(
+                get_function(
+                    comment=f"Slice out the '{field.name}' field value from a raw register value.",
+                    return_type=field_type,
+                    signature=signature,
                 )
-                cpp_code += get_function(return_type=field_type, signature=signature)
+            )
 
-                comment = [f"Getter for the {field_description},", "given a register value."]
-                cpp_code += self.comment_block(text=comment)
+        return "\n".join(public_cpp), "\n".join(private_cpp)
 
-                signature = self._field_getter_function_signature(
-                    register=register,
-                    register_array=register_array,
-                    field=field,
-                    from_value=True,
-                )
-                cpp_code += get_function(return_type=field_type, signature=signature)
+    def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
+        def get_function(comment: list[str], signature: str) -> str:
+            comment_block = self.comment_block(text=comment)
+            return f"{comment_block}    virtual void {signature} const = 0;\n"
 
-            if register.mode.software_can_write:
-                comment = [f"Setter for the {field_description},"]
-                if self.field_setter_should_read_modify_write(register=register):
-                    comment.append("which will read-modify-write over the register bus.")
-                else:
-                    comment.append(
-                        "which will set the field to the given value, "
-                        "and everything else to default."
-                    )
+        cpp_code: list[str] = []
 
-                cpp_code += self.comment_block(text=comment)
+        signature = self._register_setter_function_signature(
+            register=register, register_array=register_array
+        )
+        cpp_code.append(
+            get_function(
+                comment=["Write the whole register value over the register bus"],
+                signature=signature,
+            )
+        )
 
-                signature = self._field_setter_function_signature(
-                    register=register,
-                    register_array=register_array,
-                    field=field,
-                    from_value=False,
-                )
-                cpp_code += get_function(return_type="void", signature=signature)
+        for field in register.fields:
+            comment = [f"Set the '{field.name}' field value."]
+            if self.field_setter_should_read_modify_write(register=register):
+                comment.append("Will read-modify-write the register.")
+            else:
+                comment.append("Will write the register with all other fields set as default.")
 
-                comment = [
-                    f"Setter for the {field_description},",
-                    "given a register value, which will return an updated value.",
-                ]
-                cpp_code += self.comment_block(text=comment)
+            signature = self._field_setter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=False,
+            )
+            cpp_code.append(get_function(comment=comment, signature=signature))
 
-                signature = self._field_setter_function_signature(
-                    register=register,
-                    register_array=register_array,
-                    field=field,
-                    from_value=True,
-                )
-                cpp_code += get_function(return_type="uint32_t", signature=signature)
-
-            cpp_code += "\n"
-
-        return cpp_code
+        return "\n".join(cpp_code)
 
     @staticmethod
     def _get_default_value(field: RegisterField) -> str:

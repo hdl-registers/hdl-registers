@@ -76,6 +76,18 @@ namespace fpga_regs
         field_namespace = f"{field.name}::" if field else ""
         return f"{self.name}::{register_array_namespace}{register.name}::{field_namespace}"
 
+    def _get_register_value_type(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> str:
+        """
+        The name of the type used to represent the register value.
+        """
+        if register.fields:
+            namespace = self._get_namespace(register=register, register_array=register_array)
+            return f"{namespace}Value"
+
+        return "uint32_t"
+
     def _get_field_value_type(
         self,
         register: Register,
@@ -118,7 +130,7 @@ namespace fpga_regs
 
         return result
 
-    def _register_getter_function_signature(
+    def _register_getter_signature(
         self,
         register: Register,
         register_array: RegisterArray | None,
@@ -142,7 +154,7 @@ namespace fpga_regs
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
-        from_value: bool,
+        from_raw: bool,
     ) -> str:
         result = "get"
 
@@ -151,8 +163,8 @@ namespace fpga_regs
 
         result += f"_{register.name}_{field.name}"
 
-        if from_value:
-            result += "_from_value"
+        if from_raw:
+            result += "_from_raw"
 
         return result
 
@@ -161,17 +173,17 @@ namespace fpga_regs
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
-        from_value: bool,
+        from_raw: bool,
         indent: int | None = None,
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
         function_name = self._field_getter_function_name(
-            register=register, register_array=register_array, field=field, from_value=from_value
+            register=register, register_array=register_array, field=field, from_raw=from_raw
         )
         result = f"{function_name}("
 
-        if from_value:
+        if from_raw:
             # Value is supplied by user
             result += f"\n{indentation}  uint32_t register_value\n{indentation}"
         elif register_array:
@@ -207,21 +219,23 @@ namespace fpga_regs
         function_name = self._register_setter_function_name(
             register=register, register_array=register_array
         )
-        result = f"{function_name}(\n"
 
-        if register_array:
-            result += f"{indentation}  size_t array_index,\n"
+        array_index = f"{indentation}  size_t array_index,\n" if register_array else ""
+        value_type = self._get_register_value_type(register=register, register_array=register_array)
 
-        result += f"{indentation}  uint32_t register_value\n{indentation})"
-
-        return result
+        return f"""\
+{function_name}(
+{array_index}\
+{indentation}  {value_type} register_value
+{indentation})\
+"""
 
     @staticmethod
     def _field_setter_function_name(
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
-        from_value: bool,
+        from_raw: bool,
     ) -> str:
         result = "set"
 
@@ -230,8 +244,8 @@ namespace fpga_regs
 
         result += f"_{register.name}_{field.name}"
 
-        if from_value:
-            result += "_from_value"
+        if from_raw:
+            result += "_from_raw"
 
         return result
 
@@ -240,17 +254,17 @@ namespace fpga_regs
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
-        from_value: bool,
+        from_raw: bool,
         indent: int | None = None,
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
         function_name = self._field_setter_function_name(
-            register=register, register_array=register_array, field=field, from_value=from_value
+            register=register, register_array=register_array, field=field, from_raw=from_raw
         )
         result = f"{function_name}(\n"
 
-        if from_value:
+        if from_raw:
             # Current register value is supplied by user
             result += f"{indentation}  uint32_t register_value,\n"
         elif register_array:
