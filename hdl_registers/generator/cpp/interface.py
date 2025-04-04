@@ -248,17 +248,22 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         return "\n".join(cpp_code)
 
     @staticmethod
-    def _get_default_value(field: RegisterField) -> str:
+    def _get_default_value(field: RegisterField, raw: bool = False) -> str:
         """
         Get the field's default value formatted in a way suitable for C++ code.
         """
         if isinstance(field, (Bit, BitVector)):
-            return f"0b{field.default_value}"
+            return f"0b{field.default_value}uL"
 
         if isinstance(field, Enumeration):
+            if raw:
+                return f"{field.default_value.value}uL"
+
             return f"Enumeration::{field.default_value.name}"
 
         if isinstance(field, Integer):
+            if raw:
+                return f"{field.default_value_uint}uL"
             return str(field.default_value)
 
         raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
@@ -320,6 +325,9 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 typedef = ""
                 field_type_struct = field_type
 
+            default_value = self._get_default_value(field=field)
+            default_value_raw = self._get_default_value(field=field, raw=True)
+
             # If 'width' is 32, '1 << width' is a 33-bit unsigned number.
             # The C++ standard requires an "int" to be at least 16 bits, "long" at least 32,
             # and "long long" at least 64.
@@ -339,7 +347,8 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {indentation}  static const uint32_t mask_shifted = mask_at_base << shift;
 {typedef}
 {indentation}  // Initial value of the field at device startup/reset.
-{indentation}  static const {field_type} default_value = {self._get_default_value(field=field)};
+{indentation}  static const {field_type} default_value = {default_value};
+{indentation}  static const uint32_t default_value_raw = {default_value_raw};
 {indentation}}}
 """)
             struct_values_cpp.append(f"{indentation}  {field_type_struct} {field.name};")

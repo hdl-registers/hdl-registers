@@ -217,6 +217,13 @@ namespace fpga_regs
         return result
 
     @staticmethod
+    def _field_raw_getter_function_name(
+        register: Register, register_array: RegisterArray | None, field: RegisterField
+    ) -> str:
+        array = f"{register_array.name}_" if register_array else ""
+        return f"get_{array}{register.name}_{field.name}_raw"
+
+    @staticmethod
     def _register_setter_function_name(
         register: Register, register_array: RegisterArray | None
     ) -> str:

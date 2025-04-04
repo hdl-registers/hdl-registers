@@ -175,27 +175,44 @@ class CppImplementationGenerator(CppGeneratorCommon):
         signature = self._register_setter_function_signature(
             register=register, register_array=register_array, indent=2
         )
-        cpp_code = f"  void {self._class_name}::{signature} const\n"
-        cpp_code += "  {\n"
-
         if register_array:
-            cpp_code += f"""\
+            checker = f"""\
     _ARRAY_INDEX_ASSERT_TRUE(
       array_index < {self.name}::{register_array.name}::array_length,
       "Got '{register_array.name}' array index out of range: " << array_index
     );
 
 """
-            cpp_code += (
-                f"    const size_t index = {register_array.base_index} "
-                f"+ array_index * {len(register_array.registers)} + {register.index};\n"
-            )
         else:
-            cpp_code += f"    const size_t index = {register.index};\n"
+            checker = ""
 
-        cpp_code += "    m_registers[index] = register_value;\n"
-        cpp_code += "  }\n"
-        return cpp_code
+        index = self._get_index(register=register, register_array=register_array)
+
+        if register.fields:
+            cast = ""
+            for field in register.fields:
+                getter_name = self._field_raw_getter_function_name(
+                    register=register, register_array=register_array, field=field
+                )
+                cast += (
+                    f"    const uint32_t {field.name}_value = "
+                    f"{getter_name}(register_value.{field.name});\n"
+                )
+            cast += "\n"
+            value = " | ".join([f"{field.name}_value" for field in register.fields])
+        else:
+            cast = ""
+            value = "register_value"
+
+        return f"""\
+  void {self._class_name}::{signature} const
+  {{
+{checker}\
+{index}
+{cast}\
+    m_registers[index] = {value};
+  }}
+"""
 
     def _field_setter_function(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
@@ -212,16 +229,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         cpp_code += "  {\n"
 
         if self.field_setter_should_read_modify_write(register=register):
-            register_getter_function_name = self._register_getter_function_name(
-                register=register, register_array=register_array
-            )
-            cpp_code += self.comment(
-                comment="Get the current value of other fields by reading register on the bus."
-            )
-            current_register_value = f"{register_getter_function_name}("
-            if register_array:
-                current_register_value += "array_index"
-            current_register_value += ")"
+            raw_value = self._get_raw_value(register=register, register_array=register_array)
 
         else:
             cpp_code += self.comment(
@@ -391,18 +399,23 @@ class CppImplementationGenerator(CppGeneratorCommon):
     );
 
 """
-            index = (
-                f"const size_t index = {register_array.base_index} "
-                f"+ array_index * {len(register_array.registers)} + {register.index};"
-            )
         else:
             checker = ""
-            index = f"const size_t index = {register.index};"
+        index = self._get_index(register=register, register_array=register_array)
         return f"""\
 {checker}\
-    {index}
+{index}\
     const uint32_t raw_value = m_registers[index];
 """
+
+    def _get_index(self, register: Register, register_array: RegisterArray | None) -> str:
+        if register_array:
+            return (
+                f"    const size_t index = {register_array.base_index} "
+                f"+ array_index * {len(register_array.registers)} + {register.index};\n"
+            )
+
+        return f"    const size_t index = {register.index};\n"
 
     def _field_getter_function(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
