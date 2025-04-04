@@ -126,7 +126,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
         def get_from_raw_function(comment: str, return_type: str, signature: str) -> str:
             return f"""
     // {comment}
-    static {return_type} {signature};
+    {return_type} {signature} const;
 """
 
         register_type = self._get_register_value_type(
