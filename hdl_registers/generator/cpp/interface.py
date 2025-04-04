@@ -343,12 +343,13 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {indentation}  static const size_t shift = {field.base_index};
 {indentation}  // The bit mask of the field, at index zero.
 {indentation}  static const uint32_t mask_at_base = (1uLL << width) - 1;
-{indentation}  // The bit mask of the field, at the bit index where the field is located.
+{indentation}  // The bit mask of the field, at the the field's bit index.
 {indentation}  static const uint32_t mask_shifted = mask_at_base << shift;
 {typedef}
 {indentation}  // Initial value of the field at device startup/reset.
 {indentation}  static const {field_type} default_value = {default_value};
-{indentation}  static const uint32_t default_value_raw = {default_value_raw};
+{indentation}  // Raw representation of the initial value, at the the field's bit index.
+{indentation}  static const uint32_t default_value_raw = {default_value_raw} << shift;
 {indentation}}}
 """)
             struct_values_cpp.append(f"{indentation}  {field_type_struct} {field.name};")
