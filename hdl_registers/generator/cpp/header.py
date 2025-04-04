@@ -177,8 +177,9 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 field=field,
                 from_raw=True,
             )
+
             cpp_code += get_function(
-                comment=f"Slice out the '{field.name}' value from a raw register value.",
+                comment=f"Slice out the '{field.name}' field value from a raw register value.",
                 return_type=field_type,
                 signature=signature,
             )

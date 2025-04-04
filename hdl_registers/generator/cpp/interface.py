@@ -87,7 +87,6 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += f"    virtual ~I{self._class_name}() {{}}\n\n"
 
         separator = self.get_separator_line()
-        private_cpp: str = ""
 
         for register, register_array in self.iterate_registers():
             description = self._get_methods_description(
@@ -101,11 +100,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 """
 
             if register.mode.software_can_read:
-                getter_public_cpp, getter_private_cpp = self._get_getters(
+                getter_public_cpp = self._get_getters(
                     register=register, register_array=register_array
                 )
                 cpp_code += getter_public_cpp
-                private_cpp += getter_private_cpp
 
                 if register.fields and register.mode.software_can_write:
                     # Add empty line between getter and setter interfaces.
@@ -116,12 +114,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
             cpp_code += f"{separator}\n"
 
-        cpp_code += f"""\
-
-  private:
-{private_cpp}
-  }};
-"""
+        cpp_code += "  };\n"
 
         cpp_code_top = """\
 #pragma once
@@ -180,9 +173,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
         return cpp_code
 
-    def _get_getters(
-        self, register: Register, register_array: RegisterArray | None
-    ) -> tuple[str, str]:
+    def _get_getters(self, register: Register, register_array: RegisterArray | None) -> str:
         def get_function(comment: str, return_type: str, signature: str) -> str:
             return f"""\
     // {comment}
@@ -190,7 +181,6 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 """
 
         public_cpp: list[str] = []
-        private_cpp: list[str] = []
 
         register_type = self._get_register_value_type(
             register=register, register_array=register_array
@@ -233,15 +223,8 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 field=field,
                 from_raw=True,
             )
-            private_cpp.append(
-                get_function(
-                    comment=f"Slice out the '{field.name}' field value from a raw register value.",
-                    return_type=field_type,
-                    signature=signature,
-                )
-            )
 
-        return "\n".join(public_cpp), "\n".join(private_cpp)
+        return "\n".join(public_cpp)
 
     def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
         def get_function(comment: list[str], signature: str) -> str:
