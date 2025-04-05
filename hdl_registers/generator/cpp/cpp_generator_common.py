@@ -214,19 +214,19 @@ namespace fpga_regs
         return result
 
     @staticmethod
-    def _field_get_raw_function_name(
+    def _field_to_raw_function_name(
         register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         array = f"{register_array.name}_" if register_array else ""
         return f"get_{array}{register.name}_{field.name}_raw"
 
-    def _field_get_raw_function_signature(
+    def _field_to_raw_function_signature(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         field_type = self._get_field_value_type(
             register=register, register_array=register_array, field=field
         )
-        function_name = self._field_get_raw_function_name(
+        function_name = self._field_to_raw_function_name(
             register=register, register_array=register_array, field=field
         )
         return f"{function_name}({field_type} field_value) const"
@@ -345,9 +345,17 @@ namespace fpga_regs
         """
         Generate a comment for a ``get_<field>_from_raw`` method documentation.
         """
-        return self.comment(
-            comment=f"Slice out the '{field.name}' field value from a raw register value."
+        return self.comment_block(
+            text=[
+                f"Slice out the '{field.name}' field value from a given raw register value.",
+                "Performs no operation on the register bus.",
+            ]
         )
 
     def _get_field_get_raw_comment(self, field: RegisterField) -> str:
-        return self.comment(comment=f"Get the raw representation of a '{field.name}' field value.")
+        return self.comment_block(
+            text=[
+                f"Get the raw representation of a given '{field.name}' field value.",
+                "Performs no operation on the register bus.",
+            ]
+        )

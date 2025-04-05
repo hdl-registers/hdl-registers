@@ -77,9 +77,14 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 if register.fields and register.mode.software_can_write:
                     # Add empty line between getter and setter interfaces.
                     public_cpp += "\n"
+                    private_cpp += "\n"
 
             if register.mode.software_can_write:
-                public_cpp += self._get_setters(register=register, register_array=register_array)
+                public_setters, private_setters = self._get_setters(
+                    register=register, register_array=register_array
+                )
+                public_cpp += public_setters
+                private_cpp += private_setters
 
             public_cpp += separator
             private_cpp += separator
@@ -123,14 +128,14 @@ class CppHeaderGenerator(CppGeneratorCommon):
     def _get_getters(
         self, register: Register, register_array: RegisterArray | None
     ) -> tuple[str, str]:
-        public_cpp: list[str] = []
-        private_cpp: list[str] = []
-
         def get_from_raw_function(comment: str, return_type: str, signature: str) -> str:
             return f"""\
 {comment}\
     {return_type} {signature};
 """
+
+        public_cpp: list[str] = []
+        private_cpp: list[str] = []
 
         register_type = self._get_register_value_type(
             register=register, register_array=register_array
@@ -188,13 +193,22 @@ class CppHeaderGenerator(CppGeneratorCommon):
     virtual {return_type} {signature} override;
 """
 
-    def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
-        cpp_code: list[str] = []
+    def _get_setters(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> tuple[str, str]:
+        def get_to_raw_function(comment: str, signature: str) -> str:
+            return f"""\
+{comment}\
+    uint32_t {signature};
+"""
+
+        public_cpp: list[str] = []
+        private_cpp: list[str] = []
 
         signature = self._register_setter_function_signature(
             register=register, register_array=register_array
         )
-        cpp_code.append(
+        public_cpp.append(
             self._get_override_function(
                 comment=self._get_setter_comment(register=register),
                 return_type="void",
@@ -209,7 +223,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 field=field,
                 from_raw=False,
             )
-            cpp_code.append(
+            public_cpp.append(
                 self._get_override_function(
                     comment=self._get_setter_comment(register=register, field=field),
                     return_type="void",
@@ -217,4 +231,13 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-        return "\n".join(cpp_code)
+            signature = self._field_to_raw_function_signature(
+                register=register, register_array=register_array, field=field
+            )
+            private_cpp.append(
+                get_to_raw_function(
+                    comment=self._get_field_get_raw_comment(field=field), signature=signature
+                )
+            )
+
+        return "\n".join(public_cpp), "\n".join(private_cpp)
