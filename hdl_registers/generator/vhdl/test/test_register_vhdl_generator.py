@@ -16,6 +16,7 @@ from pathlib import Path
 
 from tsfpga.system_utils import read_file
 
+from hdl_registers import HDL_REGISTERS_DOC
 from hdl_registers.generator.vhdl.axi_lite.wrapper import VhdlAxiLiteWrapperGenerator
 from hdl_registers.generator.vhdl.record_package import VhdlRecordPackageGenerator
 from hdl_registers.generator.vhdl.register_package import VhdlRegisterPackageGenerator
@@ -28,6 +29,7 @@ from hdl_registers.generator.vhdl.simulation.read_write_package import (
 from hdl_registers.generator.vhdl.simulation.wait_until_package import (
     VhdlSimulationWaitUntilPackageGenerator,
 )
+from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
 
@@ -124,6 +126,17 @@ def get_strange_register_lists() -> list[RegisterList]:
     result.append(RegisterList(name="empty"))
 
     return result
+
+
+def get_all_doc_register_lists() -> list[RegisterList]:
+    """
+    Get all register lists that are used for documentation.
+    """
+    return [
+        from_toml(name=toml_file.stem, toml_file=toml_file)
+        for toml_file in HDL_REGISTERS_DOC.glob("**/*.toml")
+        if "default_registers" not in toml_file.stem
+    ]
 
 
 def generate_strange_register_maps(output_path):
