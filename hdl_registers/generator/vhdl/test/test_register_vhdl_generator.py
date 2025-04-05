@@ -58,10 +58,11 @@ def generate_all_vhdl_artifacts(register_list: RegisterList, output_folder: Path
     ).create_if_needed()
 
 
-def generate_strange_register_maps(output_path):
+def get_strange_register_lists() -> list[RegisterList]:
     """
-    Generate register VHDL artifacts for some strange niche cases.
+    Create some strange register lists for testing of niche cases.
     """
+    result = []
 
     def create_packages(direction, mode):
         def append_register(data, name):
@@ -89,7 +90,7 @@ def generate_strange_register_maps(output_path):
         # Some plain registers, in one direction only.
         register_list = RegisterList(name=f"plain_only_{direction}")
         append_registers(data=register_list)
-        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
+        result.append(register_list)
 
         # Some register arrays, in one direction only.
         register_list = RegisterList(name=f"array_only_{direction}")
@@ -97,7 +98,7 @@ def generate_strange_register_maps(output_path):
         append_registers(data=register_array)
         register_array = register_list.append_register_array(name="hest", length=10, description="")
         append_registers(data=register_array)
-        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
+        result.append(register_list)
 
         # Plain registers and some register arrays, in one direction only.
         register_list = RegisterList(name=f"plain_and_array_only_{direction}")
@@ -106,7 +107,7 @@ def generate_strange_register_maps(output_path):
         append_registers(data=register_array)
         register_array = register_list.append_register_array(name="hest", length=10, description="")
         append_registers(data=register_array)
-        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
+        result.append(register_list)
 
     # Mode 'Read only' should give registers only in the 'up' direction'
     create_packages(direction="up", mode=REGISTER_MODES["r"])
@@ -118,10 +119,19 @@ def generate_strange_register_maps(output_path):
     register_list.add_constant(name="second", value=True, description="")
     register_list.add_constant(name="third", value=5e30, description="")
     register_list.add_constant(name="fourth", value=1e-12, description="")
-    generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
+    result.append(register_list)
 
-    register_list = RegisterList(name="empty")
-    generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
+    result.append(RegisterList(name="empty"))
+
+    return result
+
+
+def generate_strange_register_maps(output_path):
+    """
+    Generate register VHDL artifacts for some strange niche cases.
+    """
+    for register_list in get_strange_register_lists():
+        generate_all_vhdl_artifacts(register_list=register_list, output_folder=output_path)
 
 
 def _get_register_arrays_record_string(direction):
