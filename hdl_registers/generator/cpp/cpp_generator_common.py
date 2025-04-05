@@ -318,3 +318,29 @@ namespace fpga_regs
         result += f"{indentation}  {field_type} field_value\n{indentation})"
 
         return result
+
+    def _get_getter_comment(self, field: RegisterField | None = None) -> str:
+        """
+        Generate a comment for getter method documentation.
+        """
+        if field:
+            return self.comment(
+                comment=f"Read the register and slice out the '{field.name}' field value.",
+            )
+
+        return self.comment(comment="Read the whole register value over the register bus")
+
+    def _get_setter_comment(self, register: Register, field: RegisterField | None = None) -> str:
+        """
+        Generate a comment for setter method documentation.
+        """
+        if field:
+            comment = [f"Write the '{field.name}' field value."]
+            if self.field_setter_should_read_modify_write(register=register):
+                comment.append("Will read-modify-write the register.")
+            else:
+                comment.append("Will write the register with all other fields set as default.")
+
+            return self.comment_block(text=comment)
+
+        return self.comment(comment="Write the whole register value over the register bus")

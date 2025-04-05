@@ -82,7 +82,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 """
         cpp_code += self._get_constants()
 
-        cpp_code += self._num_registers()
+        cpp_code += self._get_num_registers()
 
         cpp_code += f"    virtual ~I{self._class_name}() {{}}\n"
 
@@ -119,154 +119,6 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
 """
         return cpp_code_top + self._with_namespace(cpp_code)
-
-    def _get_constants(self) -> str:
-        cpp_code = ""
-
-        for constant in self.iterate_constants():
-            if isinstance(constant, BooleanConstant):
-                type_declaration = " bool"
-                value = str(constant.value).lower()
-            elif isinstance(constant, IntegerConstant):
-                type_declaration = " int"
-                value = str(constant.value)
-            elif isinstance(constant, FloatConstant):
-                # Expand "const" to "constexpr", which is needed for static floats:
-                # https://stackoverflow.com/questions/9141950/
-                # Use "double", to match the VHDL type which is at least 64 bits
-                # (IEEE 1076-2008, 5.2.5.1).
-                type_declaration = "expr double"
-                # Note that casting a Python float to string guarantees full precision in the
-                # resulting string: https://stackoverflow.com/a/60026172
-                value = str(constant.value)
-            elif isinstance(constant, StringConstant):
-                # Expand "const" to "constexpr", which is needed for static string literals.
-                type_declaration = "expr auto"
-                value = f'"{constant.value}"'
-            elif isinstance(constant, UnsignedVectorConstant):
-                type_declaration = " auto"
-                value = f"{constant.prefix}{constant.value_without_separator}"
-            else:
-                raise TypeError(f"Got unexpected constant type: {constant}")
-
-            cpp_code += self.comment("Register constant.")
-            cpp_code += f"    static const{type_declaration} {constant.name} = {value};\n"
-
-        if cpp_code:
-            cpp_code += "\n"
-
-        return cpp_code
-
-    def _num_registers(self) -> str:
-        # It is possible that we have constants but no registers
-        num_registers = 0
-        if self.register_list.register_objects:
-            num_registers = self.register_list.register_objects[-1].index + 1
-
-        cpp_code = self.comment("Number of registers within this register list.")
-        cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
-        return cpp_code
-
-    def _get_getters(self, register: Register, register_array: RegisterArray | None) -> str:
-        def get_function(comment: str, return_type: str, signature: str) -> str:
-            return f"""\
-    // {comment}
-    virtual {return_type} {signature} const = 0;
-"""
-
-        public_cpp: list[str] = []
-
-        register_type = self._get_register_value_type(
-            register=register, register_array=register_array
-        )
-        signature = self._register_getter_signature(
-            register=register, register_array=register_array
-        )
-        public_cpp.append(
-            get_function(
-                comment="Read the whole register value over the register bus",
-                return_type=register_type,
-                signature=signature,
-            )
-        )
-
-        for field in register.fields:
-            field_type = self._get_field_value_type(
-                register=register, register_array=register_array, field=field
-            )
-
-            signature = self._field_getter_function_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=False,
-            )
-            public_cpp.append(
-                get_function(
-                    comment=(
-                        f"Read the register value and slice out the '{field.name}' field value."
-                    ),
-                    return_type=field_type,
-                    signature=signature,
-                )
-            )
-
-        return "\n".join(public_cpp)
-
-    def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
-        def get_function(comment: list[str], signature: str) -> str:
-            comment_block = self.comment_block(text=comment)
-            return f"{comment_block}    virtual void {signature} const = 0;\n"
-
-        cpp_code: list[str] = []
-
-        signature = self._register_setter_function_signature(
-            register=register, register_array=register_array
-        )
-        cpp_code.append(
-            get_function(
-                comment=["Write the whole register value over the register bus"],
-                signature=signature,
-            )
-        )
-
-        for field in register.fields:
-            comment = [f"Set the '{field.name}' field value."]
-            if self.field_setter_should_read_modify_write(register=register):
-                comment.append("Will read-modify-write the register.")
-            else:
-                comment.append("Will write the register with all other fields set as default.")
-
-            signature = self._field_setter_function_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=False,
-            )
-            cpp_code.append(get_function(comment=comment, signature=signature))
-
-        return "\n".join(cpp_code)
-
-    @staticmethod
-    def _get_default_value(field: RegisterField, raw: bool = False) -> str:
-        """
-        Get the field's default value formatted in a way suitable for C++ code.
-        """
-        if isinstance(field, (Bit, BitVector)):
-            return f"0b{field.default_value}uL"
-
-        if isinstance(field, Enumeration):
-            if raw:
-                return f"{field.default_value.value}uL"
-
-            return f"Enumeration::{field.default_value.name}"
-
-        if isinstance(field, Integer):
-            if raw:
-                return f"{field.default_value_uint}uL"
-            return str(field.default_value)
-
-        raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
 
     def _get_attributes(self) -> str:
         if not self.register_list.register_objects:
@@ -376,6 +228,27 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {indentation}}}
 """
 
+    @staticmethod
+    def _get_default_value(field: RegisterField, raw: bool = False) -> str:
+        """
+        Get the field's default value formatted in a way suitable for C++ code.
+        """
+        if isinstance(field, (Bit, BitVector)):
+            return f"0b{field.default_value}uL"
+
+        if isinstance(field, Enumeration):
+            if raw:
+                return f"{field.default_value.value}uL"
+
+            return f"Enumeration::{field.default_value.name}"
+
+        if isinstance(field, Integer):
+            if raw:
+                return f"{field.default_value_uint}uL"
+            return str(field.default_value)
+
+        raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
+
     def _get_register_array_attributes(self, register_array: RegisterArray) -> str:
         registers_cpp = [
             self._get_register_attributes(register=register, indent=6)
@@ -394,3 +267,126 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 {register_cpp}\
     }}
 """
+
+    def _get_constants(self) -> str:
+        cpp_code = ""
+
+        for constant in self.iterate_constants():
+            if isinstance(constant, BooleanConstant):
+                type_declaration = " bool"
+                value = str(constant.value).lower()
+            elif isinstance(constant, IntegerConstant):
+                type_declaration = " int"
+                value = str(constant.value)
+            elif isinstance(constant, FloatConstant):
+                # Expand "const" to "constexpr", which is needed for static floats:
+                # https://stackoverflow.com/questions/9141950/
+                # Use "double", to match the VHDL type which is at least 64 bits
+                # (IEEE 1076-2008, 5.2.5.1).
+                type_declaration = "expr double"
+                # Note that casting a Python float to string guarantees full precision in the
+                # resulting string: https://stackoverflow.com/a/60026172
+                value = str(constant.value)
+            elif isinstance(constant, StringConstant):
+                # Expand "const" to "constexpr", which is needed for static string literals.
+                type_declaration = "expr auto"
+                value = f'"{constant.value}"'
+            elif isinstance(constant, UnsignedVectorConstant):
+                type_declaration = " auto"
+                value = f"{constant.prefix}{constant.value_without_separator}"
+            else:
+                raise TypeError(f"Got unexpected constant type: {constant}")
+
+            cpp_code += self.comment("Register constant.")
+            cpp_code += f"    static const{type_declaration} {constant.name} = {value};\n"
+
+        if cpp_code:
+            cpp_code += "\n"
+
+        return cpp_code
+
+    def _get_num_registers(self) -> str:
+        # It is possible that we have constants but no registers
+        num_registers = 0
+        if self.register_list.register_objects:
+            num_registers = self.register_list.register_objects[-1].index + 1
+
+        cpp_code = self.comment("Number of registers within this register list.")
+        cpp_code += f"    static const size_t num_registers = {num_registers}uL;\n\n"
+        return cpp_code
+
+    def _get_getters(self, register: Register, register_array: RegisterArray | None) -> str:
+        def get_function(comment: str, return_type: str, signature: str) -> str:
+            return f"""\
+{comment}\
+    virtual {return_type} {signature} const = 0;
+"""
+
+        public_cpp: list[str] = []
+
+        register_type = self._get_register_value_type(
+            register=register, register_array=register_array
+        )
+        signature = self._register_getter_signature(
+            register=register, register_array=register_array
+        )
+        public_cpp.append(
+            get_function(
+                comment=self._get_getter_comment(),
+                return_type=register_type,
+                signature=signature,
+            )
+        )
+
+        for field in register.fields:
+            field_type = self._get_field_value_type(
+                register=register, register_array=register_array, field=field
+            )
+
+            signature = self._field_getter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=False,
+            )
+            public_cpp.append(
+                get_function(
+                    comment=self._get_getter_comment(field=field),
+                    return_type=field_type,
+                    signature=signature,
+                )
+            )
+
+        return "\n".join(public_cpp)
+
+    def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
+        def get_function(comment: str, signature: str) -> str:
+            return f"{comment}    virtual void {signature} const = 0;\n"
+
+        cpp_code: list[str] = []
+
+        signature = self._register_setter_function_signature(
+            register=register, register_array=register_array
+        )
+        cpp_code.append(
+            get_function(
+                comment=self._get_setter_comment(register=register),
+                signature=signature,
+            )
+        )
+
+        for field in register.fields:
+            signature = self._field_setter_function_signature(
+                register=register,
+                register_array=register_array,
+                field=field,
+                from_raw=False,
+            )
+            cpp_code.append(
+                get_function(
+                    comment=self._get_setter_comment(register=register, field=field),
+                    signature=signature,
+                )
+            )
+
+        return "\n".join(cpp_code)
