@@ -16,6 +16,10 @@ from tsfpga.system_utils import create_file, run_command
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
+from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+    get_all_doc_register_lists,
+    get_strange_register_lists,
+)
 from hdl_registers.register_modes import REGISTER_MODES
 from tests.functional.gcc.compile_and_run_test import CompileAndRunTest
 
@@ -54,7 +58,7 @@ int main()
 
     def compile(
         self,
-        test_code,
+        test_code="",
         include_directories=None,
         source_files=None,
         includes="",
@@ -386,3 +390,29 @@ def test_very_wide_integer_fields(base_cpp_test):
 
     cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd)
+
+
+def test_compile_all_register_lists(base_cpp_test):
+    """
+    Test that all available register lists compile.
+    """
+    includes = ""
+
+    for register_list in get_strange_register_lists() + get_all_doc_register_lists():
+        CppImplementationGenerator(
+            register_list=register_list, output_folder=base_cpp_test.working_dir
+        ).create()
+        CppHeaderGenerator(
+            register_list=register_list, output_folder=base_cpp_test.include_dir
+        ).create()
+        CppInterfaceGenerator(
+            register_list=register_list, output_folder=base_cpp_test.include_dir
+        ).create()
+
+        includes += f'#include "include/{register_list.name}.h"\n'
+
+    cmd = base_cpp_test.compile(includes=includes)
+    run_command(cmd=cmd)
+
+
+# TODO test wide bit vector and integer fields (signed and unsigned), shifted up +1 and at index 0.
