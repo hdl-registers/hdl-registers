@@ -61,9 +61,11 @@ class CppHeaderGenerator(CppGeneratorCommon):
         separator = self.get_separator_line()
 
         for register, register_array in self.iterate_registers():
-            public_cpp += self._get_register_heading(
+            heading = self._get_register_heading(
                 register=register, register_array=register_array, separator=separator
             )
+            public_cpp += heading
+            private_cpp += heading
 
             if register.mode.software_can_read:
                 public_getters, private_getters = self._get_getters(
@@ -80,6 +82,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 public_cpp += self._get_setters(register=register, register_array=register_array)
 
             public_cpp += separator
+            private_cpp += separator
 
         cpp_code = f"""\
   class {self._class_name} : public I{self._class_name}
@@ -121,10 +124,10 @@ class CppHeaderGenerator(CppGeneratorCommon):
         self, register: Register, register_array: RegisterArray | None
     ) -> tuple[str, str]:
         public_cpp: list[str] = []
-        private_cpp = ""
+        private_cpp: list[str] = []
 
         def get_from_raw_function(comment: str, return_type: str, signature: str) -> str:
-            return f"""
+            return f"""\
 {comment}\
     {return_type} {signature};
 """
@@ -168,13 +171,15 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 field=field,
                 from_raw=True,
             )
-            private_cpp += get_from_raw_function(
-                comment=self._get_from_raw_comment(field=field),
-                return_type=field_type,
-                signature=signature,
+            private_cpp.append(
+                get_from_raw_function(
+                    comment=self._get_from_raw_comment(field=field),
+                    return_type=field_type,
+                    signature=signature,
+                )
             )
 
-        return "\n".join(public_cpp), private_cpp
+        return "\n".join(public_cpp), "\n".join(private_cpp)
 
     @staticmethod
     def _get_override_function(comment: str, return_type: str, signature: str) -> str:

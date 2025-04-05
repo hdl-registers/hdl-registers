@@ -348,3 +348,6 @@ namespace fpga_regs
         return self.comment(
             comment=f"Slice out the '{field.name}' field value from a raw register value."
         )
+
+    def _get_field_get_raw_comment(self, field: RegisterField) -> str:
+        return self.comment(comment=f"Get the raw representation of a '{field.name}' field value.")
