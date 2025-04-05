@@ -413,3 +413,6 @@ def test_compile_all_register_lists(base_cpp_test):
 
     cmd = base_cpp_test.compile(includes=includes)
     run_command(cmd=cmd)
+
+
+# TODO test wide bit vector and integer fields (signed and unsigned), shifted up +1 and at index 0.
