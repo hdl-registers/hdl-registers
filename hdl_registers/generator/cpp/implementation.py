@@ -76,43 +76,39 @@ class CppImplementationGenerator(CppGeneratorCommon):
         separator = self.get_separator_line(indent=2)
         for register, register_array in self.iterate_registers():
             cpp_code += self._get_register_heading(
-                register=register,
-                register_array=register_array,
-                separator=separator,
-                extra="See header or interface header for documentation.",
-                indent=2,
+                register=register, register_array=register_array, separator=separator, indent=2
             )
 
             methods_cpp: list[str] = []
 
             if register.mode.software_can_read:
                 methods_cpp.append(
-                    self._register_getter_function(register=register, register_array=register_array)
+                    self._get_register_getter(register=register, register_array=register_array)
                 )
 
                 for field in register.fields:
                     methods_cpp.append(
-                        self._field_getter_function(
+                        self._get_field_getter(
                             register=register, register_array=register_array, field=field
                         )
                     )
                     methods_cpp.append(
-                        self._field_getter_function_from_raw(register, register_array, field=field)
+                        self._get_field_getter_from_raw(register, register_array, field=field)
                     )
 
             if register.mode.software_can_write:
                 methods_cpp.append(
-                    self._register_setter_function(register=register, register_array=register_array)
+                    self._get_register_setter(register=register, register_array=register_array)
                 )
 
                 for field in register.fields:
                     methods_cpp.append(
-                        self._field_setter_function(
+                        self._get_field_setter(
                             register=register, register_array=register_array, field=field
                         )
                     )
                     methods_cpp.append(
-                        self._field_get_raw_function(register, register_array, field=field)
+                        self._get_field_get_raw(register, register_array, field=field)
                     )
 
             cpp_code += "\n".join(methods_cpp)
@@ -169,124 +165,177 @@ class CppImplementationGenerator(CppGeneratorCommon):
 {array_index_assert}
 """
 
-    def _register_setter_function(
-        self, register: Register, register_array: RegisterArray | None
-    ) -> str:
-        signature = self._register_setter_function_signature(
+    def _get_register_getter(self, register: Register, register_array: RegisterArray | None) -> str:
+        return_type = self._get_register_value_type(
+            register=register, register_array=register_array
+        )
+        signature = self._register_getter_signature(
             register=register, register_array=register_array, indent=2
         )
-        index = self._get_index(register=register, register_array=register_array)
+        raw_value = self._get_read_raw_value(register=register, register_array=register_array)
 
         if register.fields:
-            cast = ""
+            fields = ""
+            values: list[str] = []
             for field in register.fields:
-                getter_name = self._field_get_raw_function_name(
+                field_type = self._get_field_value_type(
                     register=register, register_array=register_array, field=field
                 )
-                cast += (
-                    f"    const uint32_t {field.name}_value = "
-                    f"{getter_name}(register_value.{field.name});\n"
+                getter_name = self._field_getter_function_name(
+                    register=register, register_array=register_array, field=field, from_raw=True
                 )
-            cast += "\n"
-            value = " | ".join([f"{field.name}_value" for field in register.fields])
+                fields += f"\n    const {field_type} {field.name}_value = {getter_name}(raw_value);"
+                values.append(f"{field.name}_value")
+
+            fields += "\n"
+            return_value = f"{{{', '.join(values)}}}"
         else:
-            cast = ""
-            value = "register_value"
+            fields = ""
+            return_value = "raw_value"
 
         return f"""\
-  void {self._class_name}::{signature} const
+  {return_type} {self._class_name}::{signature}
   {{
-{index}
-{cast}\
-    m_registers[index] = {value};
+{raw_value}\
+{fields}\
+
+    return {return_value};
   }}
 """
 
-    def _field_setter_function(
+    def _get_read_raw_value(
+        self,
+        register: Register,
+        register_array: RegisterArray | None,
+        include_index: bool = True,
+    ) -> str:
+        index = (
+            self._get_index(register=register, register_array=register_array)
+            if include_index
+            else ""
+        )
+        return f"""\
+{index}\
+    const uint32_t raw_value = m_registers[index];
+"""
+
+    def _get_index(self, register: Register, register_array: RegisterArray | None) -> str:
+        if register_array:
+            checker = f"""\
+    _ARRAY_INDEX_ASSERT_TRUE(
+      array_index < {self.name}::{register_array.name}::array_length,
+      "Got '{register_array.name}' array index out of range: " << array_index
+    );
+"""
+            index = (
+                f"{register_array.base_index} "
+                f"+ array_index * {len(register_array.registers)} + {register.index}"
+            )
+        else:
+            checker = ""
+            index = str(register.index)
+
+        return f"""\
+{checker}\
+    const size_t index = {index};
+"""
+
+    def _get_field_getter(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
-        signature = self._field_setter_function_signature(
+        field_type = self._get_field_value_type(
+            register=register, register_array=register_array, field=field
+        )
+        signature = self._field_getter_function_signature(
             register=register,
             register_array=register_array,
             field=field,
             from_raw=False,
             indent=2,
         )
-        index = self._get_index(register=register, register_array=register_array)
-
-        if self.field_setter_should_read_modify_write(register=register):
-            namespace = self._get_namespace(
-                register=register, register_array=register_array, field=field
-            )
-            raw_value = self._get_read_raw_value(
-                register=register, register_array=register_array, include_index=False
-            )
-            base_value = f"""\
-{raw_value}\
-    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
-    const uint32_t base_value = raw_value & mask_shifted_inverse;
-"""
-
-        else:
-            default_values = []
-            for loop_field in register.fields:
-                if loop_field.name != field.name:
-                    namespace = self._get_namespace(
-                        register=register, register_array=register_array, field=loop_field
-                    )
-                    default_values.append(f"{namespace}default_value_raw")
-
-            default_value = " | ".join(default_values)
-            base_value = f"""
-  const uint32_t base_value = {default_value};
-"""
-
-        getter_name = self._field_get_raw_function_name(
-            register=register, register_array=register_array, field=field
+        raw_value = self._get_read_raw_value(register=register, register_array=register_array)
+        getter_name = self._field_getter_function_name(
+            register=register, register_array=register_array, field=field, from_raw=True
         )
 
         return f"""\
-  void {self._class_name}::{signature} const
+  {field_type} {self._class_name}::{signature}
   {{
-{index}
-{base_value}\
-
-    const uint32_t field_value_raw = {getter_name}(field_value);
-    const uint32_t register_value = base_value | field_value_raw;
-
-    m_registers[index] = register_value;
+{raw_value}
+    return {getter_name}(raw_value);
   }}
 """
 
-    def _field_get_raw_function(
+    def _get_field_getter_from_raw(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
-        signature = self._field_get_raw_function_signature(
-            register=register, register_array=register_array, field=field
-        )
-
         namespace = self._get_namespace(
             register=register, register_array=register_array, field=field
         )
-        checker = self._get_field_value_checker(
-            register=register, register_array=register_array, field=field, setter_or_getter="setter"
+        field_type = self._get_field_value_type(
+            register=register, register_array=register_array, field=field
+        )
+        signature = self._field_getter_function_signature(
+            register=register, register_array=register_array, field=field, from_raw=True, indent=2
+        )
+        cast = self._get_field_raw_to_native_cast(field=field, field_type=field_type)
+        checker = self._get_field_getter_value_checker(
+            register=register, register_array=register_array, field=field
         )
 
         return f"""\
-  uint32_t {self._class_name}::{signature}\
+  {field_type} {self._class_name}::{signature}
   {{
+    const uint32_t result_masked = register_value & {namespace}mask_shifted;
+    const uint32_t result_shifted = result_masked >> {namespace}shift;
+
+{cast}
 {checker}\
-    const uint32_t field_value_masked = field_value & {namespace}mask_at_base;
-    const uint32_t field_value_masked_and_shifted = field_value_masked << {namespace}shift;
-
-    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
-    const uint32_t register_value_masked = register_value & mask_shifted_inverse;
-
-    const uint32_t result_register_value = register_value_masked | field_value_masked_and_shifted;
-
-    return result_register_value;
+    return field_value;
   }}
 """
+
+    def _get_field_raw_to_native_cast(self, field: RegisterField, field_type: str) -> str:
+        no_cast = """\
+    // No casting needed.
+    const uint32_t field_value = result_shifted;
+"""
+
+        # Note that this logic for decoding field type is duplicated in the attributes
+        # in the '_get_field_value_type' method.
+        if isinstance(field, (Bit, BitVector)):
+            return no_cast
+
+        if isinstance(field, Enumeration):
+            return f"""\
+    // "Cast" to the enum type.
+    const auto field_value = {field_type}(result_shifted);
+"""
+
+        if isinstance(field, Integer):
+            if not field.is_signed:
+                return no_cast
+
+            # Note that the shift result has maximum value of '1 << 31', which always
+            # fits in a 32-bit unsigned integer.
+            return f"""\
+    {field_type} field_value;
+    const uint32_t sign_bit_mask = 1 << {field.width - 1};
+
+    if (result_shifted & sign_bit_mask)
+    {{
+      // Value is to be interpreted as negative.
+      // This can be seen as a sign extension from the width of the field to the width of
+      // the return type.
+      field_value = result_shifted - 2 * sign_bit_mask;
+    }}
+    else
+    {{
+      // Value is positive.
+      field_value = result_shifted;
+    }}
+"""
+        raise ValueError(f"Got unexpected field type: {field}")
 
     def _get_field_value_checker(
         self,
@@ -349,176 +398,119 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         return ""
 
-    def _register_getter_function(
-        self, register: Register, register_array: RegisterArray | None
-    ) -> str:
-        return_type = self._get_register_value_type(
-            register=register, register_array=register_array
-        )
-        signature = self._register_getter_signature(
+    def _get_register_setter(self, register: Register, register_array: RegisterArray | None) -> str:
+        signature = self._register_setter_function_signature(
             register=register, register_array=register_array, indent=2
         )
-        raw_value = self._get_read_raw_value(register=register, register_array=register_array)
+        index = self._get_index(register=register, register_array=register_array)
 
         if register.fields:
-            fields = ""
-            values: list[str] = []
+            cast = ""
             for field in register.fields:
-                field_type = self._get_field_value_type(
+                getter_name = self._field_get_raw_function_name(
                     register=register, register_array=register_array, field=field
                 )
-                getter_name = self._field_getter_function_name(
-                    register=register, register_array=register_array, field=field, from_raw=True
+                cast += (
+                    f"    const uint32_t {field.name}_value = "
+                    f"{getter_name}(register_value.{field.name});\n"
                 )
-                fields += f"\n    const {field_type} {field.name}_value = {getter_name}(raw_value);"
-                values.append(f"{field.name}_value")
-
-            fields += "\n"
-            return_value = f"{{{', '.join(values)}}}"
+            cast += "\n"
+            value = " | ".join([f"{field.name}_value" for field in register.fields])
         else:
-            fields = ""
-            return_value = "raw_value"
+            cast = ""
+            value = "register_value"
 
         return f"""\
-  {return_type} {self._class_name}::{signature} const\
+  void {self._class_name}::{signature}
   {{
-{raw_value}\
-{fields}\
-
-    return {return_value};
+{index}
+{cast}\
+    m_registers[index] = {value};
   }}
 """
 
-    def _get_read_raw_value(
-        self,
-        register: Register,
-        register_array: RegisterArray | None,
-        include_index: bool = True,
-    ) -> str:
-        index = (
-            self._get_index(register=register, register_array=register_array)
-            if include_index
-            else ""
-        )
-        return f"""\
-{index}\
-    const uint32_t raw_value = m_registers[index];
-"""
-
-    def _get_index(self, register: Register, register_array: RegisterArray | None) -> str:
-        if register_array:
-            checker = f"""\
-    _ARRAY_INDEX_ASSERT_TRUE(
-      array_index < {self.name}::{register_array.name}::array_length,
-      "Got '{register_array.name}' array index out of range: " << array_index
-    );
-"""
-            index = (
-                f"{register_array.base_index} "
-                f"+ array_index * {len(register_array.registers)} + {register.index}"
-            )
-        else:
-            checker = ""
-            index = str(register.index)
-
-        return f"""\
-{checker}\
-    const size_t index = {index};
-"""
-
-    def _field_getter_function(
+    def _get_field_setter(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
-        field_type = self._get_field_value_type(
-            register=register, register_array=register_array, field=field
-        )
-        signature = self._field_getter_function_signature(
+        signature = self._field_setter_function_signature(
             register=register,
             register_array=register_array,
             field=field,
             from_raw=False,
             indent=2,
         )
-        raw_value = self._get_read_raw_value(register=register, register_array=register_array)
-        getter_name = self._field_getter_function_name(
-            register=register, register_array=register_array, field=field, from_raw=True
+        index = self._get_index(register=register, register_array=register_array)
+
+        if self.field_setter_should_read_modify_write(register=register):
+            namespace = self._get_namespace(
+                register=register, register_array=register_array, field=field
+            )
+            raw_value = self._get_read_raw_value(
+                register=register, register_array=register_array, include_index=False
+            )
+            base_value = f"""\
+{raw_value}\
+    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
+    const uint32_t base_value = raw_value & mask_shifted_inverse;
+"""
+
+        else:
+            default_values = []
+            for loop_field in register.fields:
+                if loop_field.name != field.name:
+                    namespace = self._get_namespace(
+                        register=register, register_array=register_array, field=loop_field
+                    )
+                    default_values.append(f"{namespace}default_value_raw")
+
+            default_value = " | ".join(default_values)
+            base_value = f"""
+  const uint32_t base_value = {default_value};
+"""
+
+        getter_name = self._field_get_raw_function_name(
+            register=register, register_array=register_array, field=field
         )
 
         return f"""\
-  {field_type} {self._class_name}::{signature} const
+  void {self._class_name}::{signature}
   {{
-{raw_value}
-    return {getter_name}(raw_value);
+{index}
+{base_value}\
+
+    const uint32_t field_value_raw = {getter_name}(field_value);
+    const uint32_t register_value = base_value | field_value_raw;
+
+    m_registers[index] = register_value;
   }}
 """
 
-    def _field_getter_function_from_raw(
+    def _get_field_get_raw(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
+        signature = self._field_get_raw_function_signature(
+            register=register, register_array=register_array, field=field
+        )
+
         namespace = self._get_namespace(
             register=register, register_array=register_array, field=field
         )
-        field_type = self._get_field_value_type(
-            register=register, register_array=register_array, field=field
-        )
-        signature = self._field_getter_function_signature(
-            register=register, register_array=register_array, field=field, from_raw=True, indent=2
-        )
-        cast = self._get_field_raw_to_native_cast(field=field, field_type=field_type)
-        checker = self._get_field_getter_value_checker(
-            register=register, register_array=register_array, field=field
+        checker = self._get_field_value_checker(
+            register=register, register_array=register_array, field=field, setter_or_getter="setter"
         )
 
         return f"""\
-  {field_type} {self._class_name}::{signature} const
+  uint32_t {self._class_name}::{signature}
   {{
-    const uint32_t result_masked = register_value & {namespace}mask_shifted;
-    const uint32_t result_shifted = result_masked >> {namespace}shift;
-
-{cast}
 {checker}\
-    return field_value;
+    const uint32_t field_value_masked = field_value & {namespace}mask_at_base;
+    const uint32_t field_value_masked_and_shifted = field_value_masked << {namespace}shift;
+
+    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
+    const uint32_t register_value_masked = register_value & mask_shifted_inverse;
+
+    const uint32_t result_register_value = register_value_masked | field_value_masked_and_shifted;
+
+    return result_register_value;
   }}
 """
-
-    def _get_field_raw_to_native_cast(self, field: RegisterField, field_type: str) -> str:
-        no_cast = """\
-    // No casting needed.
-    const uint32_t field_value = result_shifted;
-"""
-
-        # Note that this logic for decoding field type is duplicated in the attributes
-        # in the '_get_field_value_type' method.
-        if isinstance(field, (Bit, BitVector)):
-            return no_cast
-
-        if isinstance(field, Enumeration):
-            return f"""\
-    // "Cast" to the enum type.
-    const auto field_value = {field_type}(result_shifted);
-"""
-
-        if isinstance(field, Integer):
-            if not field.is_signed:
-                return no_cast
-
-            # Note that the shift result has maximum value of '1 << 31', which always
-            # fits in a 32-bit unsigned integer.
-            return f"""\
-    {field_type} field_value;
-    const uint32_t sign_bit_mask = 1 << {field.width - 1};
-
-    if (result_shifted & sign_bit_mask)
-    {{
-      // Value is to be interpreted as negative.
-      // This can be seen as a sign extension from the width of the field to the width of
-      // the return type.
-      field_value = result_shifted - 2 * sign_bit_mask;
-    }}
-    else
-    {{
-      // Value is positive.
-      field_value = result_shifted;
-    }}
-"""
-        raise ValueError(f"Got unexpected field type: {field}")

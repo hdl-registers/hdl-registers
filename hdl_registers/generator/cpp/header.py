@@ -125,8 +125,8 @@ class CppHeaderGenerator(CppGeneratorCommon):
 
         def get_from_raw_function(comment: str, return_type: str, signature: str) -> str:
             return f"""
-    // {comment}
-    {return_type} {signature} const;
+{comment}\
+    {return_type} {signature};
 """
 
         register_type = self._get_register_value_type(
@@ -136,7 +136,11 @@ class CppHeaderGenerator(CppGeneratorCommon):
             register=register, register_array=register_array
         )
         public_cpp.append(
-            self._get_override_function(return_type=register_type, signature=signature)
+            self._get_override_function(
+                comment=self._get_getter_comment(),
+                return_type=register_type,
+                signature=signature,
+            )
         )
 
         for field in register.fields:
@@ -151,7 +155,11 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 from_raw=False,
             )
             public_cpp.append(
-                self._get_override_function(return_type=field_type, signature=signature)
+                self._get_override_function(
+                    comment=self._get_getter_comment(field=field),
+                    return_type=field_type,
+                    signature=signature,
+                )
             )
 
             signature = self._field_getter_function_signature(
@@ -161,7 +169,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 from_raw=True,
             )
             private_cpp += get_from_raw_function(
-                comment=f"Slice out the '{field.name}' field value from a raw register value.",
+                comment=self._get_from_raw_comment(field=field),
                 return_type=field_type,
                 signature=signature,
             )
@@ -169,10 +177,10 @@ class CppHeaderGenerator(CppGeneratorCommon):
         return "\n".join(public_cpp), private_cpp
 
     @staticmethod
-    def _get_override_function(return_type: str, signature: str) -> str:
+    def _get_override_function(comment: str, return_type: str, signature: str) -> str:
         return f"""\
-    // See interface header for documentation.
-    virtual {return_type} {signature} const override;
+{comment}\
+    virtual {return_type} {signature} override;
 """
 
     def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
@@ -181,7 +189,13 @@ class CppHeaderGenerator(CppGeneratorCommon):
         signature = self._register_setter_function_signature(
             register=register, register_array=register_array
         )
-        cpp_code.append(self._get_override_function(return_type="void", signature=signature))
+        cpp_code.append(
+            self._get_override_function(
+                comment=self._get_setter_comment(register=register),
+                return_type="void",
+                signature=signature,
+            )
+        )
 
         for field in register.fields:
             signature = self._field_setter_function_signature(
@@ -190,6 +204,12 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 field=field,
                 from_raw=False,
             )
-            cpp_code.append(self._get_override_function(return_type="void", signature=signature))
+            cpp_code.append(
+                self._get_override_function(
+                    comment=self._get_setter_comment(register=register, field=field),
+                    return_type="void",
+                    signature=signature,
+                )
+            )
 
         return "\n".join(cpp_code)

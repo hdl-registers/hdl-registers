@@ -319,7 +319,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         def get_function(comment: str, return_type: str, signature: str) -> str:
             return f"""\
 {comment}\
-    virtual {return_type} {signature} const = 0;
+    virtual {return_type} {signature} = 0;
 """
 
         public_cpp: list[str] = []
@@ -361,7 +361,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
     def _get_setters(self, register: Register, register_array: RegisterArray | None) -> str:
         def get_function(comment: str, signature: str) -> str:
-            return f"{comment}    virtual void {signature} const = 0;\n"
+            return f"{comment}    virtual void {signature} = 0;\n"
 
         cpp_code: list[str] = []
 

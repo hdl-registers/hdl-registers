@@ -60,18 +60,15 @@ namespace fpga_regs
         register_array: RegisterArray | None,
         separator: str,
         indent: int | None = None,
-        extra: str = "",
     ) -> str:
         indentation = self.get_indentation(indent=indent)
         description = self._get_methods_description(
             register=register, register_array=register_array
         )
-        extra_line = f"{indentation}// {extra}\n" if extra else ""
         return f"""
 {separator}\
 {indentation}// {description}
 {indentation}// Mode '{register.mode.name}'.
-{extra_line}\
 {separator}\
 """
 
@@ -166,7 +163,7 @@ namespace fpga_regs
             indentation = self.get_indentation(indent=indent)
             result += f"\n{indentation}  size_t array_index\n{indentation}"
 
-        result += ")"
+        result += ") const"
 
         return result
 
@@ -197,7 +194,6 @@ namespace fpga_regs
         from_raw: bool,
         indent: int | None = None,
     ) -> str:
-        # TODO move trailing 'const' into all of these.
         indentation = self.get_indentation(indent=indent)
 
         function_name = self._field_getter_function_name(
@@ -213,7 +209,7 @@ namespace fpga_regs
             # is an array
             result += f"\n{indentation}  size_t array_index\n{indentation}"
 
-        result += ")"
+        result += ") const"
 
         return result
 
@@ -233,7 +229,7 @@ namespace fpga_regs
         function_name = self._field_get_raw_function_name(
             register=register, register_array=register_array, field=field
         )
-        return f"{function_name}({field_type} field_value)"
+        return f"{function_name}({field_type} field_value) const"
 
     @staticmethod
     def _register_setter_function_name(
@@ -267,7 +263,7 @@ namespace fpga_regs
 {function_name}(
 {array_index}\
 {indentation}  {value_type} register_value
-{indentation})\
+{indentation}) const\
 """
 
     @staticmethod
@@ -315,7 +311,7 @@ namespace fpga_regs
         field_type = self._get_field_value_type(
             register=register, register_array=register_array, field=field
         )
-        result += f"{indentation}  {field_type} field_value\n{indentation})"
+        result += f"{indentation}  {field_type} field_value\n{indentation}) const"
 
         return result
 
@@ -344,3 +340,11 @@ namespace fpga_regs
             return self.comment_block(text=comment)
 
         return self.comment(comment="Write the whole register value over the register bus")
+
+    def _get_from_raw_comment(self, field: RegisterField) -> str:
+        """
+        Generate a comment for a ``get_<field>_from_raw`` method documentation.
+        """
+        return self.comment(
+            comment=f"Slice out the '{field.name}' field value from a raw register value."
+        )
