@@ -38,8 +38,12 @@ void test_read_write_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
 {
     caesar->set_conf(fpga_regs::caesar::conf::default_value);
 
-    assert(caesar->get_conf_plain_bit_a() == fpga_regs::caesar::conf::plain_bit_a::default_value);
+    assert(caesar->get_conf() == fpga_regs::caesar::conf::default_value);
     assert(caesar->get_conf_plain_bit_vector() == fpga_regs::caesar::conf::plain_bit_vector::default_value);
+    assert(caesar->get_conf_plain_bit_a() == fpga_regs::caesar::conf::plain_bit_a::default_value);
+    assert(caesar->get_conf_plain_integer() == fpga_regs::caesar::conf::plain_integer::default_value);
+    assert(caesar->get_conf_plain_enumeration() == fpga_regs::caesar::conf::plain_enumeration::default_value);
+    assert(caesar->get_conf_plain_bit_b() == fpga_regs::caesar::conf::plain_bit_b::default_value);
 
 
     // // Set data and then check, according to the expected register addresses.

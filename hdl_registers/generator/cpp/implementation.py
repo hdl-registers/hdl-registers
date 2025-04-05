@@ -526,8 +526,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             # Shift and then discard all sign extension above the bits of the field.
             cast_and_return = f"""\
     const {value_type} field_value_shifted = field_value << {namespace}shift;
-    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
-    const uint32_t result_value = field_value_shifted & mask_shifted_inverse;
+    const uint32_t result_value = field_value_shifted & {namespace}mask_shifted;
 
     return result_value;
 """
