@@ -115,7 +115,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             cpp_code += separator
 
         cpp_code += "\n"
-        cpp_code_top = f'#include "include/{self.name}.h"\n\n'
+        cpp_code_top = f'#include "include/{self.name}.h"\n#include <iostream>\n'
 
         return cpp_code_top + self._with_namespace(cpp_code)
 
