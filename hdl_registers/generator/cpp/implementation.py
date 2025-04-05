@@ -463,7 +463,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
         else:
-            default_values = []
+            # The '0' is needed in case there are no other fields than the one we are writing.
+            default_values = ["0"]
             for loop_field in register.fields:
                 if loop_field.name != field.name:
                     namespace = self._get_namespace(
@@ -472,8 +473,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     default_values.append(f"{namespace}default_value_raw")
 
             default_value = " | ".join(default_values)
-            base_value = f"""
-  const uint32_t base_value = {default_value};
+            base_value = f"""\
+    const uint32_t base_value = {default_value};
 """
 
         getter_name = self._field_to_raw_function_name(
@@ -501,7 +502,9 @@ class CppImplementationGenerator(CppGeneratorCommon):
         signature = self._field_to_raw_function_signature(
             register=register, register_array=register_array, field=field
         )
-
+        value_type = self._get_field_value_type(
+            register=register, register_array=register_array, field=field
+        )
         namespace = self._get_namespace(
             register=register, register_array=register_array, field=field
         )
@@ -509,19 +512,33 @@ class CppImplementationGenerator(CppGeneratorCommon):
             register=register, register_array=register_array, field=field, setter_or_getter="setter"
         )
 
+        if isinstance(field, (Bit, BitVector, Enumeration)) or (
+            isinstance(field, Integer) and not field.is_signed
+        ):
+            # Value is represented as an unsigned integer.
+            cast_and_return = f"""\
+    const uint32_t field_value_shifted = field_value << {namespace}shift;
+
+    return field_value_shifted;
+"""
+        elif isinstance(field, Integer) and field.is_signed:
+            # Value is represented as a signed integer.
+            # Shift and then discard all sign extension above the bits of the field.
+            cast_and_return = f"""\
+    const {value_type} field_value_shifted = field_value << {namespace}shift;
+    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
+    const uint32_t result_value = field_value_shifted & mask_shifted_inverse;
+
+    return result_value;
+"""
+        else:
+            raise ValueError(f"Got unexpected field type: {field}")
+
         return f"""\
 {comment}\
   uint32_t {self._class_name}::{signature}
   {{
 {checker}\
-    const uint32_t field_value_masked = field_value & {namespace}mask_at_base;
-    const uint32_t field_value_masked_and_shifted = field_value_masked << {namespace}shift;
-
-    const uint32_t mask_shifted_inverse = ~{namespace}mask_shifted;
-    const uint32_t register_value_masked = register_value & mask_shifted_inverse;
-
-    const uint32_t result_register_value = register_value_masked | field_value_masked_and_shifted;
-
-    return result_register_value;
+{cast_and_return}\
   }}
 """
