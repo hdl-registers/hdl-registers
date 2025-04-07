@@ -15,6 +15,12 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
+from hdl_registers.field.numerical_interpretation import (
+    Signed,
+    SignedFixedPoint,
+    Unsigned,
+    UnsignedFixedPoint,
+)
 from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 
 if TYPE_CHECKING:
@@ -120,17 +126,32 @@ namespace fpga_regs
             return "bool"
 
         if isinstance(field, BitVector):
-            return "uint32_t"
+            if isinstance(field.numerical_interpretation, Unsigned):
+                return "uint32_t"
+
+            if isinstance(field.numerical_interpretation, Signed):
+                return "int32_t"
+
+            if isinstance(field.numerical_interpretation, (UnsignedFixedPoint, SignedFixedPoint)):
+                # This assumes that the target platform/compiler uses IEEE-754 single-precision for
+                # 'float' and IEEE-754 double-precision for 'double'.
+                # This is NOT guaranteed by the C++ standard.
+                # The user is encouraged to check their platform's limits
+                # with e.g. 'std::numeric_limits<float>::is_iec559'.
+                # https://stackoverflow.com/questions/24157094
+                return "double" if field.width > 24 else "float"
+
+            raise ValueError(
+                f"Unsupported numerical interpretation: {field.numerical_interpretation}"
+            )
 
         if isinstance(field, Enumeration):
-            if include_namespace:
-                namespace = self._get_namespace(
-                    register=register, register_array=register_array, field=field
-                )
-            else:
-                namespace = ""
-
             # The name of an enum available in this field's attributes.
+            namespace = (
+                self._get_namespace(register=register, register_array=register_array, field=field)
+                if include_namespace
+                else ""
+            )
             return f"{namespace}Enumeration"
 
         if isinstance(field, Integer):

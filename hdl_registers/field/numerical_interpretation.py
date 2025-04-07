@@ -126,6 +126,15 @@ class NumericalInterpretation(ABC):
     bit_width: int
 
     @property
+    def name(self) -> str:
+        """
+        Short name that describes the numerical interpretation.
+        E.g. "Unsigned".
+        We might add bit widths to this in the future.
+        """
+        return self.__class__.__name__
+
+    @property
     @abstractmethod
     def is_signed(self) -> bool:
         """
