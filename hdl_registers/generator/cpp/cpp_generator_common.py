@@ -116,7 +116,10 @@ namespace fpga_regs
         """
         The name of the type used to represent the field value.
         """
-        if isinstance(field, (Bit, BitVector)):
+        if isinstance(field, Bit):
+            return "bool"
+
+        if isinstance(field, BitVector):
             return "uint32_t"
 
         if isinstance(field, Enumeration):

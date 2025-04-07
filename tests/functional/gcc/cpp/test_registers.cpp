@@ -15,7 +15,7 @@ void test_register_attributes()
     assert(fpga_regs::caesar::conf::plain_bit_a::shift == 0);
     assert(fpga_regs::caesar::conf::plain_bit_a::mask_at_base == 1);
     assert(fpga_regs::caesar::conf::plain_bit_a::mask_shifted == 1);
-    assert(fpga_regs::caesar::conf::plain_bit_a::default_value == 0);
+    assert(fpga_regs::caesar::conf::plain_bit_a::default_value == false);
     assert(fpga_regs::caesar::conf::plain_bit_a::default_value_raw == 0);
 
     assert(fpga_regs::caesar::conf::plain_bit_vector::width == 4);
@@ -43,7 +43,7 @@ void test_register_attributes()
     assert(fpga_regs::caesar::conf::plain_bit_b::shift == 16);
     assert(fpga_regs::caesar::conf::plain_bit_b::mask_at_base == 1);
     assert(fpga_regs::caesar::conf::plain_bit_b::mask_shifted == 65536);
-    assert(fpga_regs::caesar::conf::plain_bit_b::default_value == 1);
+    assert(fpga_regs::caesar::conf::plain_bit_b::default_value == true);
     assert(fpga_regs::caesar::conf::plain_bit_b::default_value_raw == 65536);
 
     assert(fpga_regs::caesar::dummies::array_length == 3);
