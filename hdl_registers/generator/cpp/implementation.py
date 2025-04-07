@@ -9,12 +9,18 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
+from hdl_registers.field.numerical_interpretation import (
+    Signed,
+    SignedFixedPoint,
+    Unsigned,
+    UnsignedFixedPoint,
+)
 
 from .cpp_generator_common import CppGeneratorCommon
 
@@ -339,10 +345,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
         signature = self._field_getter_signature(
             register=register, register_array=register_array, field=field, from_raw=True
         )
-        cast = self._get_field_raw_to_native_cast(field=field, field_type=field_type)
-        checker = self._get_field_getter_value_checker(
-            register=register, register_array=register_array, field=field
-        )
+        cast = self._get_from_raw_cast(field=field, field_type=field_type)
+        checker = self._get_field_checker(field=field, setter_or_getter="getter")
 
         return f"""\
 {comment}\
@@ -357,14 +361,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
   }}
 """
 
-    def _get_field_raw_to_native_cast(self, field: RegisterField, field_type: str) -> str:
+    def _get_from_raw_cast(self, field: RegisterField, field_type: str) -> str:  # noqa: PLR0911
         no_cast = """\
     // No casting needed.
     const uint32_t field_value = result_shifted;
 """
 
-        # Note that this logic for decoding field type is duplicated
-        # in the '_get_field_value_type' method.
         if isinstance(field, Bit):
             return """\
     // Convert to the result type.
@@ -372,7 +374,29 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
         if isinstance(field, BitVector):
-            return no_cast
+            if isinstance(field.numerical_interpretation, Unsigned):
+                return no_cast
+
+            if isinstance(field.numerical_interpretation, Signed):
+                return self._get_field_to_negative(field=field)
+
+            if isinstance(field.numerical_interpretation, UnsignedFixedPoint):
+                return self._get_field_to_real(
+                    field=field, field_type=field_type, variable="result_shifted"
+                )
+
+            if isinstance(field.numerical_interpretation, SignedFixedPoint):
+                return (
+                    self._get_field_to_negative(field=field, variable="result_negative")
+                    + "\n"
+                    + self._get_field_to_real(
+                        field=field, field_type=field_type, variable="result_negative"
+                    )
+                )
+
+            raise TypeError(
+                f"Got unexpected numerical interpretation type: {field.numerical_interpretation}"
+            )
 
         if isinstance(field, Enumeration):
             return f"""\
@@ -381,90 +405,127 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
         if isinstance(field, Integer):
-            if not field.is_signed:
-                return no_cast
+            if field.is_signed:
+                return self._get_field_to_negative(field=field)
 
-            # Note that the shift result has maximum value of '1 << 31', which always
-            # fits in a 32-bit unsigned integer.
-            return f"""\
-    {field_type} field_value;
-    const uint32_t sign_bit_mask = 1 << {field.width - 1};
+            return no_cast
 
+        raise TypeError(f"Got unexpected field type: {field}")
+
+    def _get_field_to_negative(self, field: Integer, variable: str = "field_value") -> str:
+        # Note that the shift result has maximum value of '1 << 31', which always
+        # fits in a 32-bit unsigned integer.
+        return f"""\
+    const uint32_t sign_bit_mask = 1uL << {field.width - 1};
+    int32_t {variable};
     if (result_shifted & sign_bit_mask)
     {{
       // Value is to be interpreted as negative.
       // This can be seen as a sign extension from the width of the field to the width of
-      // the return type.
-      field_value = result_shifted - 2 * sign_bit_mask;
+      // the result variable.
+      {variable} = result_shifted - 2 * sign_bit_mask;
     }}
     else
     {{
       // Value is positive.
-      field_value = result_shifted;
+      {variable} = result_shifted;
     }}
 """
-        raise ValueError(f"Got unexpected field type: {field}")
 
-    def _get_field_value_checker(
-        self,
-        register: Register,
-        register_array: RegisterArray | None,
-        field: RegisterField,
-        setter_or_getter: str,
+    def _get_field_to_real(self, field: BitVector, field_type: str, variable: str) -> str:
+        divisor = 2**field.numerical_interpretation.fraction_bit_width
+        return f"""\
+    const {field_type} result_real = static_cast<{field_type}>({variable});
+    const {field_type} field_value = result_real / {divisor};
+"""
+
+    def _get_field_checker(
+        self, field: RegisterField, setter_or_getter: Literal["setter", "getter"]
     ) -> str:
-        comment = "// Check that field value is within the legal range."
-        assertion = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
-
-        if isinstance(field, Integer):
-            if field.is_signed or field.min_value != 0:
-                min_value_check = f"""\
-    {assertion}(
-      field_value >= {field.min_value},
-      "Got '{field.name}' value too small: " << field_value
-    );
-"""
-            else:
-                # Minimum value check would be moot (and result in a compiler warning).
-                # The type of the value will be 'uint32_t' so it can not contain a negative value.
-                min_value_check = ""
-
-            return f"""\
-    {comment}
-{min_value_check}\
-    {assertion}(
-      field_value <= {field.max_value},
-      "Got '{field.name}' value too large: " << field_value
-    );
-
-"""
+        if isinstance(field, Bit):
+            # Values is represented as boolean in C++, and in HDL it is a single bit.
+            # Can not be out of range in either direction.
+            return ""
 
         if isinstance(field, BitVector):
-            namespace = self._get_namespace(
-                register=register, register_array=register_array, field=field
+            if setter_or_getter == "getter":
+                # HDL can by definition not use bits outside the field.
+                return ""
+
+            # If the maximum value is the natural maximum value of the field, this check is moot.
+            # Add guard for this in the future.
+            # https://github.com/hdl-registers/hdl-registers/issues/169
+            max_value = field.numerical_interpretation.max_value
+
+            # Minimum value check would be moot if unsigned, since the C++ type used will
+            # be 'uint32_t'.
+            min_value = (
+                None
+                if isinstance(field.numerical_interpretation, Unsigned)
+                else field.numerical_interpretation.min_value
             )
-            return f"""\
-    {comment}
-    const uint32_t mask_at_base_inverse = ~{namespace}mask_at_base;
-    {assertion}(
-      (field_value & mask_at_base_inverse) == 0,
-      "Got '{field.name}' value too many bits used: " << field_value
+
+            return self._get_checker(
+                field_name=field.name,
+                setter_or_getter=setter_or_getter,
+                min_value=min_value,
+                max_value=max_value,
+            )
+
+        if isinstance(field, Enumeration):
+            # There should be a check that getter value is within range.
+            # Unless, the maximum value is the natural maximum value of the field.
+            # https://github.com/hdl-registers/hdl-registers/issues/169
+            return ""
+
+        if isinstance(field, Integer):
+            # If the maximum value is the natural maximum value of the field, this check is moot.
+            # Add guard for this in the future.
+            # https://github.com/hdl-registers/hdl-registers/issues/169
+            max_value = field.max_value
+
+            # Minimum value check would be moot if unsigned and minimum value zero, since the C++
+            # type used will be 'uint32_t'.
+            # Note that there is the case where the field is unsigned, but has a minimum allowed
+            # value that is greater than zero.
+            # In that case, the minimum value check is still needed.
+            min_value = field.min_value if field.is_signed or field.min_value != 0 else None
+
+            return self._get_checker(
+                field_name=field.name,
+                setter_or_getter=setter_or_getter,
+                min_value=min_value,
+                max_value=max_value,
+            )
+
+        raise TypeError(f"Got unexpected field type: {field}")
+
+    def _get_checker(
+        self,
+        field_name: str,
+        setter_or_getter: Literal["setter", "getter"],
+        min_value: str | None = None,
+        max_value: str | None = None,
+    ) -> str:
+        checks: list[str] = []
+        if min_value is not None:
+            checks.append(f"field_value >= {min_value}")
+        if max_value is not None:
+            checks.append(f"field_value <= {max_value}")
+        check = " && ".join(checks)
+
+        if not check:
+            return ""
+
+        macro = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
+
+        return f"""\
+    {macro}(
+      {check},
+      "Got '{field_name}' value out of range: " << field_value
     );
 
 """
-        return ""
-
-    def _get_field_getter_value_checker(
-        self, register: Register, register_array: RegisterArray, field: RegisterField
-    ) -> str:
-        if isinstance(field, Integer):
-            return self._get_field_value_checker(
-                register=register,
-                register_array=register_array,
-                field=field,
-                setter_or_getter="getter",
-            )
-
-        return ""
 
     def _get_register_setter(self, register: Register, register_array: RegisterArray | None) -> str:
         comment = self._get_setter_comment(register=register)
@@ -622,52 +683,92 @@ class CppImplementationGenerator(CppGeneratorCommon):
         signature = self._field_to_raw_signature(
             register=register, register_array=register_array, field=field
         )
-        value_type = self._get_field_value_type(
-            register=register, register_array=register_array, field=field
-        )
         namespace = self._get_namespace(
             register=register, register_array=register_array, field=field
         )
-        checker = self._get_field_value_checker(
-            register=register, register_array=register_array, field=field, setter_or_getter="setter"
+        checker = self._get_field_checker(field=field, setter_or_getter="setter")
+        cast, variable = self._get_to_raw_cast(
+            register=register, register_array=register_array, field=field
         )
-
-        if isinstance(field, (Bit, BitVector, Enumeration)) or (
-            isinstance(field, Integer) and not field.is_signed
-        ):
-            if isinstance(field, Bit):
-                cast = """\
-    const uint32_t field_value_casted = static_cast<uint32_t>(field_value);
-"""
-                shift_variable = "field_value_casted"
-            else:
-                # Value is already represented as an unsigned integer.
-                cast = ""
-                shift_variable = "field_value"
-
-            cast_and_return = f"""\
-{cast}\
-    const uint32_t field_value_shifted = {shift_variable} << {namespace}shift;
-
-    return field_value_shifted;
-"""
-        elif isinstance(field, Integer) and field.is_signed:
-            # Value is represented as a signed integer.
-            # Shift and then discard all sign extension above the bits of the field.
-            cast_and_return = f"""\
-    const {value_type} field_value_shifted = field_value << {namespace}shift;
-    const uint32_t result_value = field_value_shifted & {namespace}mask_shifted;
-
-    return result_value;
-"""
-        else:
-            raise ValueError(f"Got unexpected field type: {field}")
 
         return f"""\
 {comment}\
   uint32_t {self._class_name}::{signature}
   {{
 {checker}\
-{cast_and_return}\
+{cast}\
+    const uint32_t field_value_shifted = {variable} << {namespace}shift;
+
+    return field_value_shifted;
   }}
 """
+
+    def _get_to_raw_cast(  # noqa: C901, PLR0911
+        self, register: Register, register_array: RegisterArray | None, field: RegisterField
+    ) -> tuple[str, str]:
+        # Useful for values that are in an unsigned integer representation, but not
+        # explicitly 'uint32_t'.
+        cast_to_uint32 = """\
+    const uint32_t field_value_casted = static_cast<uint32_t>(field_value);
+"""
+
+        def _get_reinterpret_as_uint32(variable: str = "field_value") -> str:
+            # Reinterpret as unsigned and then mask out all the sign extended bits above
+            # the field. Useful for signed integer values.
+            # Signed to unsigned static cast produces no change in the bit pattern
+            # https://stackoverflow.com/a/1751368
+            namespace = self._get_namespace(
+                register=register, register_array=register_array, field=field
+            )
+            return f"""\
+    const uint32_t field_value_unsigned = (uint32_t){variable};
+    const uint32_t field_value_masked = field_value_unsigned & {namespace}mask_at_base;
+"""
+
+        if isinstance(field, Bit):
+            return (cast_to_uint32, "field_value_casted")
+
+        if isinstance(field, BitVector):
+            if isinstance(field.numerical_interpretation, Unsigned):
+                return ("", "field_value")
+
+            if isinstance(field.numerical_interpretation, Signed):
+                return (_get_reinterpret_as_uint32(), "field_value_masked")
+
+            value_type = self._get_field_value_type(
+                register=register, register_array=register_array, field=field
+            )
+            multiplier = 2**field.numerical_interpretation.fraction_bit_width
+
+            fixed_type = "int32_t" if field.numerical_interpretation.is_signed else "uint32_t"
+
+            # Static cast implies truncation, which should guarantee that the
+            # fixed-point representation fits in the field.
+            to_fixed = f"""\
+    const {value_type} field_value_multiplied = field_value * {multiplier};
+    const {fixed_type} field_value_fixed = static_cast<{fixed_type}>(field_value_multiplied);
+"""
+
+            if isinstance(field.numerical_interpretation, UnsignedFixedPoint):
+                return (to_fixed, "field_value_fixed")
+
+            if isinstance(field.numerical_interpretation, SignedFixedPoint):
+                return (
+                    to_fixed + _get_reinterpret_as_uint32(variable="field_value_fixed"),
+                    "field_value_masked",
+                )
+
+            raise TypeError(
+                f"Got unexpected numerical interpretation: {field.numerical_interpretation}"
+            )
+
+        if isinstance(field, Enumeration):
+            return (cast_to_uint32, "field_value_casted")
+
+        if isinstance(field, Integer):
+            if field.is_signed:
+                return (_get_reinterpret_as_uint32(), "field_value_masked")
+
+            return ("", "field_value")
+
+        raise TypeError(f"Got unexpected field type: {field}")

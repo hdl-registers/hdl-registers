@@ -237,7 +237,16 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             return "true" if field.default_value == "1" else "false"
 
         if isinstance(field, BitVector):
-            return f"0b{field.default_value}uL"
+            if raw:
+                return f"0b{field.default_value}uL"
+
+            # Note that casting a Python float to string guarantees full precision in the
+            # resulting string: https://stackoverflow.com/a/60026172
+            return str(
+                field.numerical_interpretation.convert_from_unsigned_binary(
+                    unsigned_binary=int(field.default_value, base=2)
+                )
+            )
 
         if isinstance(field, Enumeration):
             if raw:

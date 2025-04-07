@@ -12,3 +12,7 @@ Breaking changes
   * ``get_<field>_from_value`` methods are removed.
 
 * Represent :class:`.Bit` field values as ``bool`` in generated C++ API.
+
+* Represent :class:`.BitVector` field values with numerical interpretation :class:`.Signed`
+  as ``int32_t`` in generated C++ API.
+  Also :class:`.UnsignedFixedPoint` and :class:`.SignedFixedPoint` as ``float``/``double``.

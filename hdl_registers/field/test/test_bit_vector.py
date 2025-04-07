@@ -325,7 +325,8 @@ def test_default_value_fixed_point_that_does_not_fit_perfectly_should_raise_exce
     with pytest.raises(ValueError) as exception_info:
         bit_vector.default_value = 7.76
     assert str(exception_info.value) == (
-        'Bit vector "apa" should have "default_value" that fits in 6 bits. Got: "7.76".'
+        'Bit vector "apa" should have "default_value" that fits in 6 SignedFixedPoint bits. '
+        'Got: "7.76".'
     )
 
 
@@ -333,7 +334,7 @@ def test_default_value_float_value_to_integer_should_raise_exception():
     with pytest.raises(ValueError) as exception_info:
         BitVector(name="apa", base_index=0, description="", width=6, default_value=3.5)
     assert str(exception_info.value) == (
-        'Bit vector "apa" should have "default_value" that fits in 6 bits. Got: "3.5".'
+        'Bit vector "apa" should have "default_value" that fits in 6 Unsigned bits. Got: "3.5".'
     )
 
 

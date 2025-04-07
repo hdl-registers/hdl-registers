@@ -136,7 +136,7 @@ class BitVector(RegisterField):
         except ValueError as error:
             message = (
                 f'Bit vector "{self.name}" should have "default_value" that fits in '
-                f'{self.width} bits. Got: "{value}".'
+                f'{self.width} {self._numerical_interpretation.name} bits. Got: "{value}".'
             )
             raise ValueError(message) from error
 

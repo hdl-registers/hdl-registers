@@ -13,6 +13,11 @@ from pathlib import Path
 import pytest
 from tsfpga.system_utils import create_file, run_command
 
+from hdl_registers.field.numerical_interpretation import (
+    Signed,
+    SignedFixedPoint,
+    UnsignedFixedPoint,
+)
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
@@ -30,8 +35,9 @@ class BaseCppTest(CompileAndRunTest):
     @staticmethod
     def get_main(includes="", test_code=""):
         return f"""\
-#include <iostream>
 #include <cassert>
+#include <iostream>
+#include <iomanip>
 
 #include "include/caesar.h"
 
@@ -179,7 +185,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1286: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1253: Got 'dummies' array index out of range: 3.\n"
     )
 
 
@@ -213,7 +219,128 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:323: Got 'plain_bit_vector' value too many bits used: 16.\n"
+        "caesar.cpp:315: Got 'plain_bit_vector' value out of range: 16.\n"
+    )
+
+
+def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test):
+    base_cpp_test.register_list.append_register(
+        name="apa", mode=REGISTER_MODES["r_w"], description=""
+    ).append_bit_vector(
+        name="value1",
+        description="",
+        width=8,
+        default_value=0,
+        numerical_interpretation=Signed(bit_width=8),
+    )
+    test_code = """\
+  caesar.set_apa_value1(15);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  caesar.set_apa_value1(128);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:2289: Got 'value1' value out of range: 128.\n"
+    )
+
+    test_code = """\
+  caesar.set_apa_value1(-129);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:2289: Got 'value1' value out of range: -129.\n"
+    )
+
+
+def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash(base_cpp_test):
+    base_cpp_test.register_list.append_register(
+        name="apa", mode=REGISTER_MODES["r_w"], description=""
+    ).append_bit_vector(
+        name="value1",
+        description="",
+        width=8,
+        default_value=0,
+        numerical_interpretation=UnsignedFixedPoint(max_bit_index=3, min_bit_index=-4),
+    )
+    test_code = """\
+  caesar.set_apa_value1(15.125);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  caesar.set_apa_value1(16);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:2277: Got 'value1' value out of range: 16.\n"
+    )
+
+    test_code = """\
+  caesar.set_apa_value1(-0.5);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:2277: Got 'value1' value out of range: -0.5.\n"
+    )
+
+
+def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(base_cpp_test):
+    base_cpp_test.register_list.append_register(
+        name="apa", mode=REGISTER_MODES["r_w"], description=""
+    ).append_bit_vector(
+        name="value1",
+        description="",
+        width=8,
+        default_value=0,
+        numerical_interpretation=SignedFixedPoint(max_bit_index=3, min_bit_index=-4),
+    )
+    test_code = """\
+  caesar.set_apa_value1(7.125);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd, capture_output=True)
+
+    test_code = """\
+  caesar.set_apa_value1(8);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == "caesar.cpp:2292: Got 'value1' value out of range: 8.\n"
+
+    test_code = """\
+  caesar.set_apa_value1(-9.125);
+"""
+    cmd = base_cpp_test.compile(test_code=test_code)
+    with pytest.raises(subprocess.CalledProcessError) as exception_info:
+        run_command(cmd=cmd, capture_output=True)
+
+    assert exception_info.value.output == ""
+    assert exception_info.value.stderr == (
+        "caesar.cpp:2292: Got 'value1' value out of range: -9.125.\n"
     )
 
 
@@ -228,7 +355,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:356: Got 'plain_integer' value too small: -1024.\n"
+        "caesar.cpp:347: Got 'plain_integer' value out of range: -1024.\n"
     )
 
     test_code = """\
@@ -241,7 +368,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:360: Got 'plain_integer' value too large: 110.\n"
+        "caesar.cpp:347: Got 'plain_integer' value out of range: 110.\n"
     )
 
 
@@ -278,7 +405,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:192: Got 'plain_integer' value too large: 101.\n"
+        "caesar.cpp:186: Got 'plain_integer' value out of range: 101.\n"
     )
 
     test_code = """\
@@ -292,7 +419,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:188: Got 'plain_integer' value too small: -51.\n"
+        "caesar.cpp:186: Got 'plain_integer' value out of range: -51.\n"
     )
 
 
@@ -362,6 +489,133 @@ def test_very_wide_bit_vector_fields(base_cpp_test):
 
   assert(caesar.get_vector_32_value() == 2147483649);
   assert(caesar.get_vector_31_value() == 1073741825);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_signed_bit_vector_field(base_cpp_test):
+    register = base_cpp_test.register_list.append_register(
+        name="apa", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit_vector(
+        name="value1",
+        description="",
+        width=14,
+        default_value=4111,
+        numerical_interpretation=Signed(bit_width=14),
+    )
+    register.append_bit_vector(
+        name="value2",
+        description="",
+        width=14,
+        default_value=-8177,
+        numerical_interpretation=Signed(bit_width=14),
+    )
+
+    test_code = """\
+  assert(fpga_regs::caesar::apa::value1::default_value == 4111);
+  assert(fpga_regs::caesar::apa::value1::default_value_raw == 4111);
+
+  assert(fpga_regs::caesar::apa::value2::default_value == -8177);
+  assert(fpga_regs::caesar::apa::value2::default_value_raw == 134463488);
+
+  caesar.set_apa({1337, -127});
+  assert(caesar.get_apa_value1() == 1337);
+  assert(caesar.get_apa_value2() == -127);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_unsigned_fixed_point_bit_vector_field(base_cpp_test):
+    register = base_cpp_test.register_list.append_register(
+        name="apa", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit_vector(
+        name="value1",
+        description="",
+        width=14,
+        default_value=16.05859375,
+        numerical_interpretation=UnsignedFixedPoint(max_bit_index=5, min_bit_index=-8),
+    )
+    register.append_bit_vector(
+        name="value2",
+        description="",
+        width=14,
+        default_value=15.94140625,
+        numerical_interpretation=UnsignedFixedPoint(max_bit_index=5, min_bit_index=-8),
+    )
+
+    test_code = """\
+  assert(fpga_regs::caesar::apa::value1::default_value == 16.05859375);
+  assert(fpga_regs::caesar::apa::value1::default_value_raw == 4111);
+
+  assert(fpga_regs::caesar::apa::value2::default_value == 15.94140625);
+  assert(fpga_regs::caesar::apa::value2::default_value_raw == 66863104);
+
+  // Values that fit perfectly with no rounding/truncation.
+  caesar.set_apa({21.33203125, 10.6640625});
+  assert(caesar.get_apa_value1() == 21.33203125);
+  assert(caesar.get_apa_value2() == 10.6640625);
+  assert(memory[21] == 44728320 + 5461);
+
+  // One value is truncated, the other is unchanged.
+  caesar.set_apa_value1(21.332031251);
+  assert(caesar.get_apa_value1() == 21.33203125);
+  assert(caesar.get_apa_value2() == 10.6640625);
+
+  // Will round to the same fixed-point value as above.
+  caesar.set_apa_value1(21.332031);
+  assert(caesar.get_apa_value1() == 21.33203125);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_signed_fixed_point_bit_vector_field(base_cpp_test):
+    register = base_cpp_test.register_list.append_register(
+        name="apa", mode=REGISTER_MODES["r_w"], description=""
+    )
+    register.append_bit_vector(
+        name="value1",
+        description="",
+        width=14,
+        default_value=-63.765625,
+        numerical_interpretation=SignedFixedPoint(max_bit_index=7, min_bit_index=-6),
+    )
+    register.append_bit_vector(
+        name="value2",
+        description="",
+        width=14,
+        default_value=67.796875,
+        numerical_interpretation=SignedFixedPoint(max_bit_index=7, min_bit_index=-6),
+    )
+
+    test_code = """\
+  assert(fpga_regs::caesar::apa::value1::default_value == -63.765625);
+  assert(fpga_regs::caesar::apa::value1::default_value_raw == 12303);
+
+  assert(fpga_regs::caesar::apa::value2::default_value == 67.796875);
+  assert(fpga_regs::caesar::apa::value2::default_value_raw == 71090176);
+
+  // Values that fit perfectly with no rounding/truncation.
+  caesar.set_apa({-53.390625, 74.859375});
+  assert(memory[21] == 78495744 + 12967);
+  assert(caesar.get_apa_value1() == -53.390625);
+  assert(caesar.get_apa_value2() == 74.859375);
+
+  // One value is truncated, the other is unchanged.
+  caesar.set_apa_value1(-53.3906251);
+  assert(caesar.get_apa_value1() == -53.390625);
+  assert(caesar.get_apa_value2() == 74.859375);
+
+  // Will round to the same fixed-point value as above.
+  caesar.set_apa_value1(-53.390624);
+  assert(caesar.get_apa_value1() == -53.390625);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
