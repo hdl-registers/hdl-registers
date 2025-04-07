@@ -229,11 +229,17 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 """
 
     @staticmethod
-    def _get_default_value(field: RegisterField, raw: bool = False) -> str:
+    def _get_default_value(field: RegisterField, raw: bool = False) -> str:  # noqa: PLR0911
         """
         Get the field's default value formatted in a way suitable for C++ code.
         """
-        if isinstance(field, (Bit, BitVector)):
+        if isinstance(field, Bit):
+            if raw:
+                return field.default_value
+
+            return "true" if field.default_value == "1" else "false"
+
+        if isinstance(field, BitVector):
             return f"0b{field.default_value}uL"
 
         if isinstance(field, Enumeration):

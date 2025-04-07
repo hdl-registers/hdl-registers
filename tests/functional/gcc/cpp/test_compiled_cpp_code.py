@@ -179,7 +179,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1277: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1241: Got 'dummies' array index out of range: 3.\n"
     )
 
 
@@ -195,26 +195,6 @@ def test_setting_register_array_out_of_bounds_should_not_crash_if_no_assertion(b
 
     cmd = base_cpp_test.compile(test_code=test_code, no_array_index_assert=True)
     run_command(cmd=cmd)
-
-
-def test_setting_bit_field_out_of_range_should_crash(base_cpp_test):
-    test_code = """\
-  caesar.set_conf_plain_bit_a(1);
-"""
-    cmd = base_cpp_test.compile(test_code=test_code)
-    run_command(cmd=cmd, capture_output=True)
-
-    test_code = """\
-  caesar.set_conf_plain_bit_a(2);
-"""
-    cmd = base_cpp_test.compile(test_code=test_code)
-    with pytest.raises(subprocess.CalledProcessError) as exception_info:
-        run_command(cmd=cmd, capture_output=True)
-
-    assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:282: Got 'plain_bit_a' value too many bits used: 2.\n"
-    )
 
 
 def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
@@ -233,7 +213,7 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:316: Got 'plain_bit_vector' value too many bits used: 16.\n"
+        "caesar.cpp:310: Got 'plain_bit_vector' value too many bits used: 16.\n"
     )
 
 
@@ -248,7 +228,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:349: Got 'plain_integer' value too small: -1024.\n"
+        "caesar.cpp:343: Got 'plain_integer' value too small: -1024.\n"
     )
 
     test_code = """\
@@ -261,7 +241,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:353: Got 'plain_integer' value too large: 110.\n"
+        "caesar.cpp:347: Got 'plain_integer' value too large: 110.\n"
     )
 
 

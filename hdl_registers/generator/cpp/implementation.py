@@ -309,7 +309,13 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         # Note that this logic for decoding field type is duplicated
         # in the '_get_field_value_type' method.
-        if isinstance(field, (Bit, BitVector)):
+        if isinstance(field, Bit):
+            return """\
+    // Convert to the result type.
+    const bool field_value = static_cast<bool>(result_shifted);
+"""
+
+        if isinstance(field, BitVector):
             return no_cast
 
         if isinstance(field, Enumeration):
@@ -376,7 +382,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
 """
 
-        if isinstance(field, (Bit, BitVector)):
+        if isinstance(field, BitVector):
             namespace = self._get_namespace(
                 register=register, register_array=register_array, field=field
             )
@@ -518,9 +524,19 @@ class CppImplementationGenerator(CppGeneratorCommon):
         if isinstance(field, (Bit, BitVector, Enumeration)) or (
             isinstance(field, Integer) and not field.is_signed
         ):
-            # Value is represented as an unsigned integer.
+            if isinstance(field, Bit):
+                cast = """\
+    const uint32_t field_value_casted = static_cast<uint32_t>(field_value);
+"""
+                shift_variable = "field_value_casted"
+            else:
+                # Value is already represented as an unsigned integer.
+                cast = ""
+                shift_variable = "field_value"
+
             cast_and_return = f"""\
-    const uint32_t field_value_shifted = field_value << {namespace}shift;
+{cast}\
+    const uint32_t field_value_shifted = {shift_variable} << {namespace}shift;
 
     return field_value_shifted;
 """
