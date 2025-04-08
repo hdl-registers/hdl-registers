@@ -157,12 +157,26 @@ class CppHeaderGenerator(CppGeneratorCommon):
             )
         )
 
+        if register.fields:
+            # The main getter will perform type conversion.
+            # Provide a getter that returns the raw value also.
+            signature = self._register_getter_signature(
+                register=register, register_array=register_array, raw=True
+            )
+            public_cpp.append(
+                self._get_override_function(
+                    comment=self._get_getter_comment(raw=True),
+                    return_type="uint32_t",
+                    signature=signature,
+                )
+            )
+
         for field in register.fields:
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
 
-            signature = self._field_getter_function_signature(
+            signature = self._field_getter_signature(
                 register=register,
                 register_array=register_array,
                 field=field,
@@ -176,7 +190,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-            signature = self._field_getter_function_signature(
+            signature = self._field_getter_signature(
                 register=register,
                 register_array=register_array,
                 field=field,
@@ -211,7 +225,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
         public_cpp: list[str] = []
         private_cpp: list[str] = []
 
-        signature = self._register_setter_function_signature(
+        signature = self._register_setter_signature(
             register=register, register_array=register_array
         )
         public_cpp.append(
@@ -222,8 +236,22 @@ class CppHeaderGenerator(CppGeneratorCommon):
             )
         )
 
+        if register.fields:
+            # The main setter will perform type conversion.
+            # Provide a setter that takes a raw value also.
+            signature = self._register_setter_signature(
+                register=register, register_array=register_array, raw=True
+            )
+            public_cpp.append(
+                self._get_override_function(
+                    comment=self._get_setter_comment(register=register, raw=True),
+                    return_type="void",
+                    signature=signature,
+                )
+            )
+
         for field in register.fields:
-            signature = self._field_setter_function_signature(
+            signature = self._field_setter_signature(
                 register=register,
                 register_array=register_array,
                 field=field,
@@ -237,7 +265,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-            signature = self._field_to_raw_function_signature(
+            signature = self._field_to_raw_signature(
                 register=register, register_array=register_array, field=field
             )
             private_cpp.append(

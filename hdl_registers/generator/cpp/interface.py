@@ -94,10 +94,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             )
 
             if register.mode.software_can_read:
-                getter_public_cpp = self._get_getters(
-                    register=register, register_array=register_array
-                )
-                cpp_code += getter_public_cpp
+                cpp_code += self._get_getters(register=register, register_array=register_array)
 
                 if register.mode.software_can_write:
                     # Add empty line between getter and setter interfaces.
@@ -344,12 +341,26 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             )
         )
 
+        if register.fields:
+            # The main getter will perform type conversion.
+            # Provide a getter that returns the raw value also.
+            signature = self._register_getter_signature(
+                register=register, register_array=register_array, raw=True
+            )
+            cpp_code.append(
+                get_function(
+                    comment=self._get_getter_comment(raw=True),
+                    return_type="uint32_t",
+                    signature=signature,
+                )
+            )
+
         for field in register.fields:
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
 
-            signature = self._field_getter_function_signature(
+            signature = self._field_getter_signature(
                 register=register,
                 register_array=register_array,
                 field=field,
@@ -371,7 +382,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
         cpp_code: list[str] = []
 
-        signature = self._register_setter_function_signature(
+        signature = self._register_setter_signature(
             register=register, register_array=register_array
         )
         cpp_code.append(
@@ -381,8 +392,21 @@ class CppInterfaceGenerator(CppGeneratorCommon):
             )
         )
 
+        if register.fields:
+            # The main setter will perform type conversion.
+            # Provide a setter that takes a raw value also.
+            signature = self._register_setter_signature(
+                register=register, register_array=register_array, raw=True
+            )
+            cpp_code.append(
+                get_function(
+                    comment=self._get_setter_comment(register=register, raw=True),
+                    signature=signature,
+                )
+            )
+
         for field in register.fields:
-            signature = self._field_setter_function_signature(
+            signature = self._field_setter_signature(
                 register=register,
                 register_array=register_array,
                 field=field,

@@ -40,6 +40,11 @@ read the register value more than once over the register bus, which would be the
 (2) multiple times.
 Instead we can call (1) once and then select the field values from the ``struct``.
 
+Apart from the methods discussed above, these is also a raw register getter available,
+e.g. ``get_conf_raw()``.
+This will read the whole register value and return it without any type conversion.
+Can be convenient in some special cases, for example when working with interrupt registers.
+
 
 Setters
 -------
@@ -59,14 +64,20 @@ calling (2) multiple times.
 Instead we can call a register getter once, e.g. ``get_conf()``, update our field values in the
 variable, and then call (1) once.
 
+Apart from the methods discussed above, these is also a raw register setter available,
+e.g. ``set_conf_raw()``.
+This will write the whole register value without any type conversion.
+Can be convenient in some special cases, for example when working with interrupt registers.
+
+
 Exceptions
 __________
 
-The discussion about setters above is valid for "read write" mode registers, which is arguably the
-most common type.
+The discussion about read-modify-write field setters is valid for "read write" mode registers,
+which is arguably the most common type.
 However there are three register modes where the previously written register value can not be
 read back over the bus and then modified: "write only", "write pulse", and "read, write pulse".
-The field setters for registers of this mode will write all bits outside of the current field
+The field setters for these registers will write all bits outside of the current field
 as their default value.
 This can for example be seen in the setter ``set_channels_conf_enable()`` in the generated
 code :ref:`below <cpp_implementation>`.

@@ -139,57 +139,47 @@ namespace fpga_regs
         raise ValueError(f"Got unknown field type: {field}")
 
     @staticmethod
-    def _register_getter_function_name(
-        register: Register, register_array: RegisterArray | None
+    def _register_getter_name(
+        register: Register, register_array: RegisterArray | None, raw: bool
     ) -> str:
-        result = "get"
-
-        if register_array:
-            result += f"_{register_array.name}"
-
-        result += f"_{register.name}"
-
-        return result
+        register_array_name = f"_{register_array.name}" if register_array else ""
+        raw_name = "_raw" if raw else ""
+        return f"get{register_array_name}_{register.name}{raw_name}"
 
     def _register_getter_signature(
         self,
         register: Register,
         register_array: RegisterArray | None,
+        raw: bool = False,
         indent: int | None = None,
     ) -> str:
-        function_name = self._register_getter_function_name(
-            register=register, register_array=register_array
+        function_name = self._register_getter_name(
+            register=register, register_array=register_array, raw=raw
         )
-        result = f"{function_name}("
 
         if register_array:
             indentation = self.get_indentation(indent=indent)
-            result += f"\n{indentation}  size_t array_index\n{indentation}"
+            array_index = f"""
+{indentation}  size_t array_index
+{indentation}\
+"""
+        else:
+            array_index = ""
 
-        result += ") const"
-
-        return result
+        return f"{function_name}({array_index}) const"
 
     @staticmethod
-    def _field_getter_function_name(
+    def _field_getter_name(
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
         from_raw: bool,
     ) -> str:
-        result = "get"
+        register_array_name = f"_{register_array.name}" if register_array else ""
+        raw_name = "_from_raw" if from_raw else ""
+        return f"get{register_array_name}_{register.name}_{field.name}{raw_name}"
 
-        if register_array:
-            result += f"_{register_array.name}"
-
-        result += f"_{register.name}_{field.name}"
-
-        if from_raw:
-            result += "_from_raw"
-
-        return result
-
-    def _field_getter_function_signature(
+    def _field_getter_signature(
         self,
         register: Register,
         register_array: RegisterArray | None,
@@ -199,7 +189,7 @@ namespace fpga_regs
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
-        function_name = self._field_getter_function_name(
+        function_name = self._field_getter_name(
             register=register, register_array=register_array, field=field, from_raw=from_raw
         )
         result = f"{function_name}("
@@ -217,50 +207,51 @@ namespace fpga_regs
         return result
 
     @staticmethod
-    def _field_to_raw_function_name(
+    def _field_to_raw_name(
         register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         array = f"{register_array.name}_" if register_array else ""
         return f"get_{array}{register.name}_{field.name}_to_raw"
 
-    def _field_to_raw_function_signature(
+    def _field_to_raw_signature(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         field_type = self._get_field_value_type(
             register=register, register_array=register_array, field=field
         )
-        function_name = self._field_to_raw_function_name(
+        function_name = self._field_to_raw_name(
             register=register, register_array=register_array, field=field
         )
         return f"{function_name}({field_type} field_value) const"
 
     @staticmethod
-    def _register_setter_function_name(
-        register: Register, register_array: RegisterArray | None
+    def _register_setter_name(
+        register: Register, register_array: RegisterArray | None, raw: bool
     ) -> str:
-        result = "set"
+        array_name = f"_{register_array.name}" if register_array else ""
+        raw_name = "_raw" if raw else ""
 
-        if register_array:
-            result += f"_{register_array.name}"
+        return f"set{array_name}_{register.name}{raw_name}"
 
-        result += f"_{register.name}"
-
-        return result
-
-    def _register_setter_function_signature(
+    def _register_setter_signature(
         self,
         register: Register,
         register_array: RegisterArray | None,
+        raw: bool = False,
         indent: int | None = None,
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
-        function_name = self._register_setter_function_name(
-            register=register, register_array=register_array
+        function_name = self._register_setter_name(
+            register=register, register_array=register_array, raw=raw
         )
 
         array_index = f"{indentation}  size_t array_index,\n" if register_array else ""
-        value_type = self._get_register_value_type(register=register, register_array=register_array)
+        value_type = (
+            "uint32_t"
+            if raw
+            else self._get_register_value_type(register=register, register_array=register_array)
+        )
 
         return f"""\
 {function_name}(
@@ -270,25 +261,17 @@ namespace fpga_regs
 """
 
     @staticmethod
-    def _field_setter_function_name(
+    def _field_setter_name(
         register: Register,
         register_array: RegisterArray | None,
         field: RegisterField,
         from_raw: bool,
     ) -> str:
-        result = "set"
+        register_array_name = f"_{register_array.name}" if register_array else ""
+        from_raw_name = "_from_raw" if from_raw else ""
+        return f"set{register_array_name}_{register.name}_{field.name}{from_raw_name}"
 
-        if register_array:
-            result += f"_{register_array.name}"
-
-        result += f"_{register.name}_{field.name}"
-
-        if from_raw:
-            result += "_from_raw"
-
-        return result
-
-    def _field_setter_function_signature(
+    def _field_setter_signature(
         self,
         register: Register,
         register_array: RegisterArray | None,
@@ -298,7 +281,7 @@ namespace fpga_regs
     ) -> str:
         indentation = self.get_indentation(indent=indent)
 
-        function_name = self._field_setter_function_name(
+        function_name = self._field_setter_name(
             register=register, register_array=register_array, field=field, from_raw=from_raw
         )
         result = f"{function_name}(\n"
@@ -318,22 +301,36 @@ namespace fpga_regs
 
         return result
 
-    def _get_getter_comment(self, field: RegisterField | None = None) -> str:
+    def _get_getter_comment(self, field: RegisterField | None = None, raw: bool = False) -> str:
         """
         Generate a comment for getter method documentation.
         """
         if field:
+            if raw:
+                raise ValueError("Invalid arguments")
+
             return self.comment(
                 comment=f"Read the register and slice out the '{field.name}' field value.",
             )
 
-        return self.comment(comment="Read the whole register value over the register bus.")
+        comment = ["Read the whole register value over the register bus."]
+        if raw:
+            comment.append(
+                "This method returns the raw register value without any type conversion."
+            )
 
-    def _get_setter_comment(self, register: Register, field: RegisterField | None = None) -> str:
+        return self.comment_block(text=comment)
+
+    def _get_setter_comment(
+        self, register: Register, field: RegisterField | None = None, raw: bool = False
+    ) -> str:
         """
         Generate a comment for setter method documentation.
         """
         if field:
+            if raw:
+                raise ValueError("Invalid arguments")
+
             comment = [f"Write the '{field.name}' field value."]
             if self.field_setter_should_read_modify_write(register=register):
                 comment.append("Will read-modify-write the register.")
@@ -342,7 +339,14 @@ namespace fpga_regs
 
             return self.comment_block(text=comment)
 
-        return self.comment(comment="Write the whole register value over the register bus.")
+        comment = ["Write the whole register value over the register bus."]
+
+        if raw:
+            comment.append(
+                "This method takes a raw register value and does not perform any type conversion."
+            )
+
+        return self.comment_block(text=comment)
 
     def _get_from_raw_comment(self, field: RegisterField) -> str:
         """
