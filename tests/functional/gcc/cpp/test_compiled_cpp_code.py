@@ -179,7 +179,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1241: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1286: Got 'dummies' array index out of range: 3.\n"
     )
 
 
@@ -213,7 +213,7 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:310: Got 'plain_bit_vector' value too many bits used: 16.\n"
+        "caesar.cpp:323: Got 'plain_bit_vector' value too many bits used: 16.\n"
     )
 
 
@@ -228,7 +228,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:343: Got 'plain_integer' value too small: -1024.\n"
+        "caesar.cpp:356: Got 'plain_integer' value too small: -1024.\n"
     )
 
     test_code = """\
@@ -241,7 +241,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:347: Got 'plain_integer' value too large: 110.\n"
+        "caesar.cpp:360: Got 'plain_integer' value too large: 110.\n"
     )
 
 
@@ -278,7 +278,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:186: Got 'plain_integer' value too large: 101.\n"
+        "caesar.cpp:192: Got 'plain_integer' value too large: 101.\n"
     )
 
     test_code = """\
@@ -292,7 +292,7 @@ def test_getting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:182: Got 'plain_integer' value too small: -51.\n"
+        "caesar.cpp:188: Got 'plain_integer' value too small: -51.\n"
     )
 
 

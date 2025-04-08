@@ -86,6 +86,15 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     self._get_register_getter(register=register, register_array=register_array)
                 )
 
+                if register.fields:
+                    # The main getter will perform type conversion.
+                    # Provide a getter that returns the raw value also.
+                    methods_cpp.append(
+                        self._get_register_raw_getter(
+                            register=register, register_array=register_array
+                        )
+                    )
+
                 for field in register.fields:
                     methods_cpp.append(
                         self._get_field_getter(
@@ -100,6 +109,15 @@ class CppImplementationGenerator(CppGeneratorCommon):
                 methods_cpp.append(
                     self._get_register_setter(register=register, register_array=register_array)
                 )
+
+                if register.fields:
+                    # The main getter will perform type conversion.
+                    # Provide a setter that takes a raw value also.
+                    methods_cpp.append(
+                        self._get_register_raw_setter(
+                            register=register, register_array=register_array
+                        )
+                    )
 
                 for field in register.fields:
                     methods_cpp.append(
@@ -174,39 +192,59 @@ class CppImplementationGenerator(CppGeneratorCommon):
         signature = self._register_getter_signature(
             register=register, register_array=register_array
         )
-        raw_value = self._get_read_raw_value(register=register, register_array=register_array)
 
         if register.fields:
+            raw_value = self._get_read_raw_value_call(
+                register=register, register_array=register_array
+            )
+
             fields = ""
             values: list[str] = []
             for field in register.fields:
                 field_type = self._get_field_value_type(
                     register=register, register_array=register_array, field=field
                 )
-                getter_name = self._field_getter_function_name(
+                getter_name = self._field_getter_name(
                     register=register, register_array=register_array, field=field, from_raw=True
                 )
-                fields += f"\n    const {field_type} {field.name}_value = {getter_name}(raw_value);"
+                fields += f"    const {field_type} {field.name}_value = {getter_name}(raw_value);\n"
                 values.append(f"{field.name}_value")
 
-            fields += "\n"
-            return_value = f"{{{', '.join(values)}}}"
+            value = ", ".join(values)
+            result = f"""\
+{raw_value}
+{fields}
+    return {{{value}}};\
+"""
         else:
-            fields = ""
-            return_value = "raw_value"
+            raw_value = self._get_read_raw_value_code(
+                register=register, register_array=register_array
+            )
+            result = f"""\
+{raw_value}
+    return raw_value;\
+"""
 
         return f"""\
 {comment}\
   {return_type} {self._class_name}::{signature}
   {{
-{raw_value}\
-{fields}\
-
-    return {return_value};
+{result}
   }}
 """
 
-    def _get_read_raw_value(
+    def _get_read_raw_value_call(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> str:
+        getter_name = self._register_getter_name(
+            register=register, register_array=register_array, raw=True
+        )
+        array_index = "array_index" if register_array else ""
+        return f"""\
+    const uint32_t raw_value = {getter_name}({array_index});
+"""
+
+    def _get_read_raw_value_code(
         self,
         register: Register,
         register_array: RegisterArray | None,
@@ -243,6 +281,24 @@ class CppImplementationGenerator(CppGeneratorCommon):
     const size_t index = {index};
 """
 
+    def _get_register_raw_getter(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> str:
+        comment = self._get_getter_comment(raw=True)
+        signature = self._register_getter_signature(
+            register=register, register_array=register_array, raw=True
+        )
+        raw_value = self._get_read_raw_value_code(register=register, register_array=register_array)
+
+        return f"""\
+{comment}\
+  uint32_t {self._class_name}::{signature}
+  {{
+{raw_value}
+    return raw_value;
+  }}
+"""
+
     def _get_field_getter(
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
@@ -250,14 +306,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
         field_type = self._get_field_value_type(
             register=register, register_array=register_array, field=field
         )
-        signature = self._field_getter_function_signature(
+        signature = self._field_getter_signature(
             register=register,
             register_array=register_array,
             field=field,
             from_raw=False,
         )
-        raw_value = self._get_read_raw_value(register=register, register_array=register_array)
-        from_raw_name = self._field_getter_function_name(
+        raw_value = self._get_read_raw_value_call(register=register, register_array=register_array)
+        from_raw_name = self._field_getter_name(
             register=register, register_array=register_array, field=field, from_raw=True
         )
 
@@ -280,7 +336,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         field_type = self._get_field_value_type(
             register=register, register_array=register_array, field=field
         )
-        signature = self._field_getter_function_signature(
+        signature = self._field_getter_signature(
             register=register, register_array=register_array, field=field, from_raw=True
         )
         cast = self._get_field_raw_to_native_cast(field=field, field_type=field_type)
@@ -412,16 +468,15 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
     def _get_register_setter(self, register: Register, register_array: RegisterArray | None) -> str:
         comment = self._get_setter_comment(register=register)
-        signature = self._register_setter_function_signature(
+        signature = self._register_setter_signature(
             register=register, register_array=register_array
         )
-        index = self._get_index(register=register, register_array=register_array)
 
         if register.fields:
             cast = ""
             values: list[str] = []
             for field in register.fields:
-                to_raw_name = self._field_to_raw_function_name(
+                to_raw_name = self._field_to_raw_name(
                     register=register, register_array=register_array, field=field
                 )
                 cast += (
@@ -430,19 +485,72 @@ class CppImplementationGenerator(CppGeneratorCommon):
                 )
                 values.append(f"{field.name}_value")
 
-            cast += "\n"
             value = " | ".join(values)
+            cast += f"""\
+    const uint32_t raw_value = {value};
+
+"""
+            set_raw_value = self._get_write_raw_value_call(
+                register=register, register_array=register_array
+            )
         else:
             cast = ""
-            value = "register_value"
+            set_raw_value = self._get_write_raw_value_code(
+                register=register, register_array=register_array
+            )
 
         return f"""\
 {comment}\
   void {self._class_name}::{signature}
   {{
-{index}
 {cast}\
-    m_registers[index] = {value};
+{set_raw_value}\
+  }}
+"""
+
+    def _get_write_raw_value_call(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> str:
+        setter_name = self._register_setter_name(
+            register=register, register_array=register_array, raw=True
+        )
+        array_index = "array_index, " if register_array else ""
+        return f"""\
+    {setter_name}({array_index}raw_value);
+"""
+
+    def _get_write_raw_value_code(
+        self,
+        register: Register,
+        register_array: RegisterArray | None,
+        include_index: bool = True,
+    ) -> str:
+        index = (
+            self._get_index(register=register, register_array=register_array)
+            if include_index
+            else ""
+        )
+        return f"""\
+{index}\
+    m_registers[index] = register_value;
+"""
+
+    def _get_register_raw_setter(
+        self, register: Register, register_array: RegisterArray | None
+    ) -> str:
+        comment = self._get_setter_comment(register=register, raw=True)
+        signature = self._register_setter_signature(
+            register=register, register_array=register_array, raw=True
+        )
+        set_raw_value = self._get_write_raw_value_code(
+            register=register, register_array=register_array
+        )
+
+        return f"""\
+{comment}\
+  void {self._class_name}::{signature}
+  {{
+{set_raw_value}\
   }}
 """
 
@@ -450,7 +558,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         comment = self._get_setter_comment(register=register, field=field)
-        signature = self._field_setter_function_signature(
+        signature = self._field_setter_signature(
             register=register,
             register_array=register_array,
             field=field,
@@ -462,7 +570,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
             namespace = self._get_namespace(
                 register=register, register_array=register_array, field=field
             )
-            raw_value = self._get_read_raw_value(
+            raw_value = self._get_read_raw_value_code(
                 register=register, register_array=register_array, include_index=False
             )
             base_value = f"""\
@@ -486,8 +594,11 @@ class CppImplementationGenerator(CppGeneratorCommon):
     const uint32_t base_value = {default_value};
 """
 
-        to_raw_name = self._field_to_raw_function_name(
+        to_raw_name = self._field_to_raw_name(
             register=register, register_array=register_array, field=field
+        )
+        write_raw_value = self._get_write_raw_value_code(
+            register=register, register_array=register_array, include_index=False
         )
 
         return f"""\
@@ -500,7 +611,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
     const uint32_t field_value_raw = {to_raw_name}(field_value);
     const uint32_t register_value = base_value | field_value_raw;
 
-    m_registers[index] = register_value;
+{write_raw_value}\
   }}
 """
 
@@ -508,7 +619,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         self, register: Register, register_array: RegisterArray | None, field: RegisterField
     ) -> str:
         comment = self._get_to_raw_comment(field=field)
-        signature = self._field_to_raw_function_signature(
+        signature = self._field_to_raw_signature(
             register=register, register_array=register_array, field=field
         )
         value_type = self._get_field_value_type(
