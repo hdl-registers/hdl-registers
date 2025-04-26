@@ -480,6 +480,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         if isinstance(field, Integer):
             # If the maximum value is the natural maximum value of the field, this check is moot.
+            # But only for getters, the setter can still be out of range
+            # unless the field width is 32.
             # Add guard for this in the future.
             # https://github.com/hdl-registers/hdl-registers/issues/169
             max_value = field.max_value
@@ -489,6 +491,11 @@ class CppImplementationGenerator(CppGeneratorCommon):
             # Note that there is the case where the field is unsigned, but has a minimum allowed
             # value that is greater than zero.
             # In that case, the minimum value check is still needed.
+            #
+            # If the minimum value is the natural minimum value of the field, signed or unsigned,
+            # this check is moot.
+            # Add guard for this in the future.
+            # https://github.com/hdl-registers/hdl-registers/issues/169
             min_value = field.min_value if field.is_signed or field.min_value != 0 else None
 
             return self._get_checker(
