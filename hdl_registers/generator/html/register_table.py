@@ -129,15 +129,18 @@ repeated {register_object.length} times.
         array_index_increment: int | None = None,
     ) -> str:
         if register_array_index is None:
+            index = str(register.index)
             address_readable = self._to_hex_string(register.address)
-            index = str(register.address // 4)
         else:
+            index = f"{register_array_index} + i &times; {array_index_increment}"
+
             register_address = self._to_hex_string(4 * register_array_index)
             address_increment = self._to_hex_string(4 * array_index_increment)
             address_readable = f"{register_address} + i &times; {address_increment}"
 
-            index = f"{register_array_index} + i &times; {array_index_increment}"
-
+        default_value = self._to_hex_string(
+            self.register_default_value_uint(register=register), num_nibbles=1
+        )
         description = self._html_translator.translate(register.description)
         html = f"""
   <tr>
@@ -145,7 +148,7 @@ repeated {register_object.length} times.
     <td><p>{index}</p></td>
     <td><p>{address_readable}</p></td>
     <td><p>{register.mode.name}</p></td>
-    <td><p>{self._to_hex_string(register.default_value, num_nibbles=1)}</p></td>
+    <td><p>{default_value}</p></td>
     <td>
 {description}
     </td>

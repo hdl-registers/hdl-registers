@@ -24,8 +24,12 @@ class BitVectorConstant(Constant):
         """
         Arguments:
             name: The name of the constant.
-            value: The constant value. Must start with "0b" or "0x". Must only contain legal binary
-                or hexadecimal characters. Underscore may be used as a separator.
+            value: The constant value.
+                Must start with "0b" or "0x".
+                Must only contain legal binary or hexadecimal characters.
+                Underscore may be used as a separator.
+
+                For example ``0b1111``, ``0x0001_AAFF``, ``0x43C00000``.
             description: Textual description for the constant.
         """
         self.name = name
@@ -121,7 +125,7 @@ description={self.description},\
 
 class UnsignedVector(str):
     """
-    Represent a value that is of type unsigned vector
+    Represent a **value** that is of type unsigned vector
     (as opposed to a **register constant** of the same type, which would use the
     :class:`.UnsignedVectorConstant` class).
     """
@@ -132,7 +136,7 @@ class UnsignedVector(str):
 
 class UnsignedVectorConstant(BitVectorConstant):
     """
-    Represent a register constant that is of type unsigned vector
+    Represent a **register constant** that is of type unsigned vector
     (as opposed to a **plain value** of the same type in Python, which would use the
     :class:`.UnsignedVector` class).
     """
