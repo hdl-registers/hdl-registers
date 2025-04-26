@@ -150,7 +150,6 @@ default_value = "0000000000000011"
     assert registers[0].mode == REGISTER_MODES["w"]
     assert registers[0].index == 0
     assert registers[0].description == ""
-    assert registers[0].default_value == 0
     assert registers[0].fields == []
 
     assert registers[1].name == "status"
@@ -191,19 +190,6 @@ default_value = "0000000000000011"
     assert registers[1].fields[4].max_value == 15
     assert registers[1].fields[4].default_value == -5
 
-    assert registers[1].default_value == (
-        # Enum
-        1 * 2**0
-        # Bit
-        + 0 * 2**2
-        # Bit vector
-        + 6 * 2**3
-        # Bit
-        + 1 * 2**7
-        # Integer, negative value converted to positive
-        + 0b11011 * 2**8
-    )
-
     assert registers[2].name == "conf"
     assert registers[2].length == 3
     assert registers[2].description == "A register array"
@@ -225,20 +211,11 @@ default_value = "0000000000000011"
     assert registers[2].registers[0].fields[2].default_value == 1
     assert registers[2].registers[0].fields[3].name == "size"
     assert registers[2].registers[0].fields[3].default_value.name == "large"
-    assert registers[2].registers[0].default_value == (
-        # First bit
-        1 * 2**0
-        # Integer
-        + 1 * 2**2
-        # Enumeration
-        + 2 * 2**4
-    )
 
     assert registers[2].registers[1].name == "output_settings"
     assert registers[2].registers[1].mode == REGISTER_MODES["w"]
     assert registers[2].registers[1].index == 1
     assert registers[2].registers[1].description == ""
-    assert registers[2].registers[1].default_value == 3
     assert registers[2].registers[1].fields[0].name == "data"
     assert registers[2].registers[1].fields[0].description == "Some data"
     assert registers[2].registers[1].fields[0].width == 16

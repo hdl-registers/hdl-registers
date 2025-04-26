@@ -466,12 +466,15 @@ range {field.width + field.base_index - 1} downto {field.base_index};
         index = 0
 
         def add(register: Register, index_name: str) -> None:
+            utilized_width = self.register_utilized_width(register=register)
             register_definitions.append(
                 f"{index} => (index => {index_name}, "
                 f"mode => {register.mode.shorthand}, "
-                f"utilized_width => {register.utilized_width})"
+                f"utilized_width => {utilized_width})"
             )
-            default_values.append(f'{index} => "{register.default_value:032b}"')
+
+            default_value = self.register_default_value_uint(register=register)
+            default_values.append(f'{index} => "{default_value:032b}"')
 
         for register_object in self.iterate_register_objects():
             if isinstance(register_object, Register):

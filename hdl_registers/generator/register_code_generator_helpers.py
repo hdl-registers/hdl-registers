@@ -38,7 +38,7 @@ class RegisterCodeGeneratorHelpers:
 
     def iterate_constants(self) -> Iterator[Constant]:
         """
-        Iterate of all constants in the register list.
+        Iterate over all constants in the register list.
         """
         yield from self.register_list.constants
 
@@ -111,6 +111,34 @@ class RegisterCodeGeneratorHelpers:
             field=field,
             register_array=register_array,
         )
+
+    @staticmethod
+    def register_utilized_width(register: Register) -> int:
+        """
+        Get the number of bits that are utilized by the fields in the supplied register.
+        Note that this is not always the same as the width of the register.
+        Some generator implementations can be optimized by only taking into account the
+        bits that are actually utilized.
+
+        Note that if the register has no fields, we do not really know what the user is doing with
+        it, and we have to assume that the full width is used.
+        """
+        if not register.fields:
+            return 32
+
+        return register.fields[-1].base_index + register.fields[-1].width
+
+    @staticmethod
+    def register_default_value_uint(register: Register) -> int:
+        """
+        Get the default value of the supplied register, as an unsigned integer.
+        Depends on the default values of the register fields.
+        """
+        default_value = 0
+        for field in register.fields:
+            default_value += field.default_value_uint * 2**field.base_index
+
+        return default_value
 
     def get_indentation(self, indent: int | None = None) -> str:
         """

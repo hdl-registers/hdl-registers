@@ -1,5 +1,9 @@
 Breaking changes
 
+* Move :class:`.Register` properties ``utilized_width`` and ``default_value`` to
+  :meth:`.RegisterCodeGeneratorHelpers.register_utilized_width`
+  and :meth:`.RegisterCodeGeneratorHelpers.register_default_value_uint`.
+
 * Rework generated C++ API to use C++ ``struct`` with field values instead of raw ``uint32_t``.
   See :ref:`generator_cpp` for usage details.
 

@@ -144,27 +144,6 @@ def test_appending_integer_to_full_register():
     assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
 
 
-def test_default_value():
-    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
-    register.append_bit(name="foo", description="", default_value="1")
-    register.append_bit(name="foo", description="", default_value="0")
-    register.append_bit(name="foo", description="", default_value="1")
-    register.append_bit_vector(name="foo", description="", width=4, default_value="0110")
-    register.append_bit_vector(name="foo", description="", width=4, default_value="0101")
-
-    assert register.default_value == 1 * 2**0 + 1 * 2**2 + 6 * 2**3 + 5 * 2**7
-
-
-def test_default_value_can_be_updated():
-    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
-    register.append_bit(name="foo", description="", default_value="1")
-
-    assert register.default_value == 1
-
-    register.fields[0].default_value = "0"
-    assert register.default_value == 0
-
-
 def test_get_field():
     register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     hest = register.append_bit(name="hest", description="", default_value="1")
@@ -176,23 +155,3 @@ def test_get_field():
     with pytest.raises(ValueError) as exception_info:
         assert register.get_field("non existing") is None
     assert str(exception_info.value) == 'Could not find field "non existing" within register "apa"'
-
-
-def test_utilized_width():
-    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
-
-    assert register.utilized_width == 32
-
-    register.append_bit(name="a", description="", default_value="1")
-    assert register.utilized_width == 1
-
-    register.append_bit_vector(name="b", description="", width=2, default_value="11")
-    assert register.utilized_width == 3
-
-    register.append_enumeration(
-        name="c", description="", elements={"d": "", "e": "", "f": ""}, default_value="d"
-    )
-    assert register.utilized_width == 5
-
-    register.append_integer(name="g", description="", min_value=0, max_value=10, default_value=0)
-    assert register.utilized_width == 9
