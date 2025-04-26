@@ -1,9 +1,5 @@
 Breaking changes
 
-* Move :class:`.Register` properties ``utilized_width`` and ``default_value`` to
-  :meth:`.RegisterCodeGeneratorHelpers.register_utilized_width`
-  and :meth:`.RegisterCodeGeneratorHelpers.register_default_value_uint`.
-
 * Rework generated C++ API to use C++ ``struct`` with field values instead of raw ``uint32_t``.
   See :ref:`generator_cpp` for usage details.
 
@@ -20,3 +16,9 @@ Breaking changes
 * Represent :class:`.BitVector` field values with numerical interpretation :class:`.Signed`
   as ``int32_t`` in generated C++ API.
   Also :class:`.UnsignedFixedPoint` and :class:`.SignedFixedPoint` as ``float``/``double``.
+
+Breaking internal API changes
+
+* Move :class:`.Register` properties ``utilized_width`` and ``default_value`` to
+  :meth:`.RegisterCodeGeneratorHelpers.register_utilized_width`
+  and :meth:`.RegisterCodeGeneratorHelpers.register_default_value_uint`.
