@@ -27,7 +27,7 @@ clear list of requirements that was not, and is not, fulfilled by any other proj
 3. Bloat-free.
    Meaning, well-scoped and focused on the important features.
 4. Clean, intuitive, well-documented and easy-to-use API.
-5. Well-tested and reliable code.
+5. Well-tested and reliable.
 
 All of these, but especially points 1. and 2., set this project apart
 from :ref:`others <similar_tools>`.
@@ -60,8 +60,8 @@ and 32 fields.
             cheby (1.6.dev0) |       1.88  s |                            181x |  2120 | 7940 |            1.3x
              corsair (1.0.4) |       2.33  s |                            224x |  3500 | 7700 |            1.4x
              PeakRDL (1.2.3) |       6.98  s |                            672x |  7520 | 7300 |            1.8x
-                rggen (0.34) |       9.68  s |                            932x | 11880 | 6880 |            2.3x
              vhdmmio (0.0.3) |       9.39  s |                            904x |  5700 | 8320 |            1.7x
+                rggen (0.34) |       9.68  s |                            932x | 11880 | 6880 |            2.3x
 
 
 Clearly, only one of these tools is fast enough to run in real time without impacting productivity.

@@ -20,9 +20,7 @@ mode = "r_w"
 # The "description" property is OPTIONAL for a register.
 # Will default to "" if not specified.
 # The value specified MUST be a string.
-description = """
-This is the description of my register.
-"""
+description = "This is the description of my register."
 
 enable.type = "bit"
 enable.description = "Enable operation."
