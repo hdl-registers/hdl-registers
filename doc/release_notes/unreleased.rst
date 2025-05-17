@@ -1,1 +1,3 @@
-Nothing here yet.
+Fixes
+
+* Add missing reserved keyword check.

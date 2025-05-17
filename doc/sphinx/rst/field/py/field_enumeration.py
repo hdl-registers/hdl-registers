@@ -58,7 +58,7 @@ def create_from_api() -> RegisterList:
         elements={
             "streaming": "Process incoming streaming data.",
             "dma": "Read packets from DMA.",
-            "none": "Don't send anything.",
+            "disabled": "Don't send anything.",
         },
         default_value="streaming",
     )
