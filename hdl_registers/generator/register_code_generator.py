@@ -20,6 +20,7 @@ from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_avai
 from tsfpga.system_utils import create_file, read_file
 
 from hdl_registers import __version__ as hdl_registers_version
+from hdl_registers.field.enumeration import Enumeration
 
 from .register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from .reserved_keywords import RESERVED_KEYWORDS
@@ -405,6 +406,10 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
             for field in register.fields:
                 check(name=field.name, description="Field")
+
+                if isinstance(field, Enumeration):
+                    for element in field.elements:
+                        check(name=element.name, description="Enumeration element")
 
         for register_array in self.iterate_register_arrays():
             check(name=register_array.name, description="Register array")

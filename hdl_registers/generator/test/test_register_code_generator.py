@@ -340,6 +340,25 @@ data.for.type = "bit"
     )
 
 
+def test_enumeration_field_element_with_reserved_name_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[test]
+
+mode = "r_w"
+
+apa.type = "enumeration"
+apa.element.okay_name = ""
+apa.element.signed = ""
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create_if_needed()
+    assert str(exception_info.value) == (
+        'Error in register list "sensor": Enumeration element name "signed" is a reserved keyword.'
+    )
+
+
 def test_reserved_name_check_works_even_with_strange_case(generator_from_toml):
     generator = generator_from_toml(
         """
