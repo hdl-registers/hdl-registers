@@ -144,50 +144,41 @@ class CppImplementationGenerator(CppGeneratorCommon):
         return cpp_code_top + self._with_namespace(cpp_code)
 
     def _get_macros(self) -> str:
-        file_name = self.output_file.name
-
         def get_macro(name: str) -> str:
             macro_name = f"_{name}_ASSERT_TRUE"
-            guard_name = f"NO_REGISTER_{name}_ASSERT"
-            name_space = " " * (38 - len(name))
-            file_name_space = " " * (44 - len(file_name))
-            base = """\
-#ifdef {guard_name}
-
-#define {macro_name}(expression, message) ((void)0)
-
-#else // Not {guard_name}.
-
-// This macro is called by the register code to check for runtime errors.
-#define {macro_name}(expression, message) {name_space}\\
-  {{                                                                              \\
-    if (!static_cast<bool>(expression)) {{                                        \\
-      std::ostringstream diagnostics;                                            \\
-      diagnostics << "{file_name}:" << __LINE__ {file_name_space}\\
-                  << ": " << message << ".";                                     \\
-      std::string diagnostic_message = diagnostics.str();                        \\
-      m_assertion_handler(&diagnostic_message);                                  \\
-    }}                                                                            \\
-  }}
-
-#endif // {guard_name}.
+            return f"""\
+#ifdef NO_REGISTER_{name}_ASSERT
+  #define {macro_name}(expression, message) ((void)0)
+#else
+  #define {macro_name}(expression, message) (_ASSERT_TRUE(expression, message))
+#endif
 """
-            return base.format(
-                guard_name=guard_name,
-                macro_name=macro_name,
-                name=name,
-                name_space=name_space,
-                file_name=file_name,
-                file_name_space=file_name_space,
-            )
 
         setter_assert = get_macro(name="SETTER")
         getter_assert = get_macro(name="GETTER")
         array_index_assert = get_macro(name="ARRAY_INDEX")
+
+        file_name = self.output_file.name
+        file_name_space = " " * (31 - len(file_name))
+        assert_true = f"""\
+#define _ASSERT_TRUE(expression, message)                                                      \\
+  {{                                                                                            \\
+    if (!static_cast<bool>(expression)) {{                                                      \\
+      std::ostringstream diagnostics;                                                          \\
+      diagnostics << "{file_name}:" << __LINE__ << ": " << message << "."; {file_name_space}\\
+      std::string diagnostic_message = diagnostics.str();                                      \\
+      m_assertion_handler(&diagnostic_message);                                                \\
+    }}                                                                                          \\
+  }}
+"""
+
         return f"""\
+// Macros called by the register code below to check for runtime errors.
 {setter_assert}
 {getter_assert}
 {array_index_assert}
+// Base macro called by the other macros.
+{assert_true}
 """
 
     def _get_register_getter(self, register: Register, register_array: RegisterArray | None) -> str:
