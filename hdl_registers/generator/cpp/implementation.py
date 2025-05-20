@@ -639,8 +639,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 """
 
         else:
-            # The '0' is needed in case there are no other fields than the one we are writing.
-            default_values = ["0"]
+            default_values = []
             for loop_field in register.fields:
                 if loop_field.name != field.name:
                     namespace = self._get_namespace(
@@ -648,7 +647,8 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     )
                     default_values.append(f"{namespace}default_value_raw")
 
-            default_value = " | ".join(default_values)
+            # The '0' is needed in case there are no fields other than the one we are writing.
+            default_value = " | ".join(default_values) if default_values else "0"
             base_value = f"""\
     const uint32_t base_value = {default_value};
 """
