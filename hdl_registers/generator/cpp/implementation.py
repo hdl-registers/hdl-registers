@@ -430,100 +430,144 @@ class CppImplementationGenerator(CppGeneratorCommon):
     const {field_type} field_value = result_real / {divisor};
 """
 
-    def _get_field_checker(
-        self, field: RegisterField, setter_or_getter: Literal["setter", "getter"]
-    ) -> str:
-        if isinstance(field, Bit):
-            # Values is represented as boolean in C++, and in HDL it is a single bit.
-            # Can not be out of range in either direction.
-            return ""
+    def _get_field_checker(self, field: str, setter_or_getter: Literal["setter", "getter"]) -> str:
+        min_check, max_check = self._get_field_checker_limits(
+            field=field, is_getter_not_setter=setter_or_getter == "getter"
+        )
 
-        if isinstance(field, BitVector):
-            if setter_or_getter == "getter":
-                # HDL can by definition not use bits outside the field.
-                return ""
-
-            # If the maximum value is the natural maximum value of the field, this check is moot.
-            # Add guard for this in the future.
-            # https://github.com/hdl-registers/hdl-registers/issues/169
-            max_value = field.numerical_interpretation.max_value
-
-            # Minimum value check would be moot if unsigned, since the C++ type used will
-            # be 'uint32_t'.
-            min_value = (
-                None
-                if isinstance(field.numerical_interpretation, Unsigned)
-                else field.numerical_interpretation.min_value
-            )
-
-            return self._get_checker(
-                field_name=field.name,
-                setter_or_getter=setter_or_getter,
-                min_value=min_value,
-                max_value=max_value,
-            )
-
-        if isinstance(field, Enumeration):
-            # There should be a check that getter value is within range.
-            # Unless, the maximum value is the natural maximum value of the field.
-            # https://github.com/hdl-registers/hdl-registers/issues/169
-            return ""
-
-        if isinstance(field, Integer):
-            # If the maximum value is the natural maximum value of the field, this check is moot.
-            # But only for getters, the setter can still be out of range
-            # unless the field width is 32.
-            # Add guard for this in the future.
-            # https://github.com/hdl-registers/hdl-registers/issues/169
-            max_value = field.max_value
-
-            # Minimum value check would be moot if unsigned and minimum value zero, since the C++
-            # type used will be 'uint32_t'.
-            # Note that there is the case where the field is unsigned, but has a minimum allowed
-            # value that is greater than zero.
-            # In that case, the minimum value check is still needed.
-            #
-            # If the minimum value is the natural minimum value of the field, signed or unsigned,
-            # this check is moot.
-            # Add guard for this in the future.
-            # https://github.com/hdl-registers/hdl-registers/issues/169
-            min_value = field.min_value if field.is_signed or field.min_value != 0 else None
-
-            return self._get_checker(
-                field_name=field.name,
-                setter_or_getter=setter_or_getter,
-                min_value=min_value,
-                max_value=max_value,
-            )
-
-        raise TypeError(f"Got unexpected field type: {field}")
-
-    def _get_checker(
-        self,
-        field_name: str,
-        setter_or_getter: Literal["setter", "getter"],
-        min_value: str | None = None,
-        max_value: str | None = None,
-    ) -> str:
         checks: list[str] = []
-        if min_value is not None:
-            checks.append(f"field_value >= {min_value}")
-        if max_value is not None:
-            checks.append(f"field_value <= {max_value}")
+        if min_check is not None:
+            checks.append(f"field_value >= {min_check}")
+        if max_check is not None:
+            checks.append(f"field_value <= {max_check}")
         check = " && ".join(checks)
 
         if not check:
             return ""
 
         macro = f"_{setter_or_getter.upper()}_ASSERT_TRUE"
-
         return f"""\
     {macro}(
       {check},
-      "Got '{field_name}' value out of range: " << field_value
+      "Got '{field.name}' value out of range: " << field_value
     );
 
 """
+
+    def _get_field_checker_limits(  # noqa: C901, PLR0911
+        self, field: RegisterField, is_getter_not_setter: bool
+    ) -> tuple[float | None, float | None]:
+        """
+        Return minimum and maximum values for checking.
+        ``None`` if no check is needed.
+        """
+        width_matches_cpp_type = field.width == 32
+
+        if isinstance(field, Bit):
+            # Values is represented as boolean in C++, and in HDL it is a single bit.
+            # Can not be out of range in either direction.
+            return None, None
+
+        if isinstance(field, BitVector):
+            if is_getter_not_setter:
+                # Result of bit slice can not be out of range by definition.
+                return None, None
+
+            if isinstance(field.numerical_interpretation, Unsigned):
+                return (
+                    # Min is always zero, and unsigned type is used in C++.
+                    None,
+                    None if width_matches_cpp_type else field.numerical_interpretation.max_value,
+                )
+
+            if isinstance(field.numerical_interpretation, Signed):
+                return (
+                    None if width_matches_cpp_type else field.numerical_interpretation.min_value,
+                    None if width_matches_cpp_type else field.numerical_interpretation.max_value,
+                )
+
+            if isinstance(field.numerical_interpretation, (UnsignedFixedPoint, SignedFixedPoint)):
+                # Value is represented as floating-point in C++, which is always a signed type.
+                # And we have no guarantees about the range of the type.
+                # Hence we must always check.
+                return (
+                    field.numerical_interpretation.min_value,
+                    field.numerical_interpretation.max_value,
+                )
+
+            raise TypeError(
+                f"Got unexpected numerical interpretation type: {field.numerical_interpretation}"
+            )
+
+        if isinstance(field, Enumeration):
+            max_value = field.elements[-1].value
+
+            _, max_is_native = self._get_checker_limits_are_native(
+                field=field,
+                min_value=0,
+                max_value=max_value,
+                is_signed=False,
+            )
+
+            if is_getter_not_setter:
+                return (
+                    None,
+                    # Result of bit slice can not be out of range if native.
+                    None if max_is_native else max_value,
+                )
+
+            return (
+                # Assume that the C++ type used is unsigned.
+                None,
+                # In C++, while being typed, the setter argument could be out of range, regardless
+                # if native limit or not.
+                # We can not know the width of the C++ type used. Would depend on compiler/platform.
+                max_value,
+            )
+
+        if isinstance(field, Integer):
+            min_is_native, max_is_native = self._get_checker_limits_are_native(
+                field=field,
+                min_value=field.min_value,
+                max_value=field.max_value,
+                is_signed=field.is_signed,
+            )
+
+            if is_getter_not_setter:
+                # Result of bit slice can not be out of range if native.
+                return (
+                    None if min_is_native else field.min_value,
+                    None if max_is_native else field.max_value,
+                )
+
+            if field.is_signed:
+                # Have to be checked in general, except for the corner case where
+                # the field width matches the C++ type.
+                return (
+                    None if min_is_native and width_matches_cpp_type else field.min_value,
+                    None if max_is_native and width_matches_cpp_type else field.max_value,
+                )
+
+            return (
+                # Min is always zero, and unsigned type is used in C++.
+                None,
+                # Has to be checked in general, except for the corner case.
+                None if max_is_native and width_matches_cpp_type else field.max_value,
+            )
+
+        raise TypeError(f"Got unexpected field type: {field}")
+
+    def _get_checker_limits_are_native(
+        self, field: RegisterField, min_value: float, max_value: float, is_signed: bool
+    ) -> tuple[bool, bool]:
+        if is_signed:
+            native_min_value = -(2 ** (field.width - 1))
+            native_max_value = 2 ** (field.width - 1) - 1
+        else:
+            native_min_value = 0
+            native_max_value = 2**field.width - 1
+
+        return min_value == native_min_value, max_value == native_max_value
 
     def _get_register_setter(self, register: Register, register_array: RegisterArray | None) -> str:
         comment = self._get_setter_comment(register=register)

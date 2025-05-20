@@ -185,7 +185,7 @@ def test_setting_register_array_out_of_bounds_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:1223: Got 'dummies' array index out of range: 3.\n"
+        "caesar.cpp:1238: Got 'dummies' array index out of range: 3.\n"
     )
 
 
@@ -219,7 +219,7 @@ def test_setting_bit_vector_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:285: Got 'plain_bit_vector' value out of range: 16.\n"
+        "caesar.cpp:290: Got 'plain_bit_vector' value out of range: 16.\n"
     )
 
 
@@ -248,7 +248,7 @@ def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:2259: Got 'value1' value out of range: 128.\n"
+        "caesar.cpp:2284: Got 'value1' value out of range: 128.\n"
     )
 
     test_code = """\
@@ -260,7 +260,7 @@ def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:2259: Got 'value1' value out of range: -129.\n"
+        "caesar.cpp:2284: Got 'value1' value out of range: -129.\n"
     )
 
 
@@ -289,7 +289,7 @@ def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:2247: Got 'value1' value out of range: 16.\n"
+        "caesar.cpp:2272: Got 'value1' value out of range: 16.\n"
     )
 
     test_code = """\
@@ -301,7 +301,7 @@ def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:2247: Got 'value1' value out of range: -0.5.\n"
+        "caesar.cpp:2272: Got 'value1' value out of range: -0.5.\n"
     )
 
 
@@ -329,7 +329,7 @@ def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(b
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == "caesar.cpp:2262: Got 'value1' value out of range: 8.\n"
+    assert exception_info.value.stderr == "caesar.cpp:2287: Got 'value1' value out of range: 8.\n"
 
     test_code = """\
   caesar.set_apa_value1(-9.125);
@@ -340,7 +340,7 @@ def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(b
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:2262: Got 'value1' value out of range: -9.125.\n"
+        "caesar.cpp:2287: Got 'value1' value out of range: -9.125.\n"
     )
 
 
@@ -355,7 +355,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:317: Got 'plain_integer' value out of range: -1024.\n"
+        "caesar.cpp:322: Got 'plain_integer' value out of range: -1024.\n"
     )
 
     test_code = """\
@@ -368,7 +368,7 @@ def test_setting_integer_field_out_of_range_should_crash(base_cpp_test):
 
     assert exception_info.value.output == ""
     assert exception_info.value.stderr == (
-        "caesar.cpp:317: Got 'plain_integer' value out of range: 110.\n"
+        "caesar.cpp:322: Got 'plain_integer' value out of range: 110.\n"
     )
 
 
