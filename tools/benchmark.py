@@ -133,13 +133,13 @@ def arguments() -> argparse.Namespace:
     parser.add_argument(
         "--skip-time",
         action="store_true",
-        help=("do not benchmark the time take to generate artifacts"),
+        help="do not benchmark the time taken to generate artifacts",
     )
 
     parser.add_argument(
         "--skip-resource-usage",
         action="store_true",
-        help=("do not run synthesis to compare resource usage"),
+        help="do not run synthesis to compare resource usage",
     )
 
     return parser.parse_args()
@@ -275,7 +275,7 @@ def benchmark_hdl_registers(
         time_s = time_taken_s / num_iterations
 
     if skip_resource_usage:
-        (lut, ff) = (1, 1)
+        lut, ff = (1, 1)
     else:
         if test_comparable:
             # Use a register file wrapper that does not route the 'reg_was_read' and
@@ -371,8 +371,7 @@ def benchmark_corsair(
         register_map = corsair.RegisterMap()
         # The JSON file was use was created by running the template
         #   corsair -t json
-        # and then adding dummy registers and fields until it has 21 registers and 56 fields.
-        # So that comparison is fair with the others.
+        # and then updated so that register/field count matches the others.
         register_map.read_file(path=benchmark_folder / "corsair_regs.json")
         # Each register map needs to be validated for user errors.
         register_map.validate()
@@ -395,7 +394,7 @@ def benchmark_corsair(
         time_s = time_taken_s / num_iterations
 
     if skip_resource_usage:
-        (lut, ff) = (1, 1)
+        lut, ff = (1, 1)
     else:
         lut, ff = build(
             registers_folder=registers_folder, build_folder=build_folder, top="corsair_regs"
@@ -430,8 +429,7 @@ def benchmark_cheby(
     def run_test() -> None:
         # The configuration YAML file is based on the example:
         # https://gitlab.cern.ch/be-cem-edl/common/cheby/-/blob/master/doc/srcs/counter.cheby
-        # Registers and fields added so it has 21 registers and 56 fields.
-        # So that comparison is fair with the others.
+        # Updated so that register/field count matches the others.
         command = [
             "cheby",
             "--input",
@@ -456,7 +454,7 @@ def benchmark_cheby(
         time_s = time_taken_s / num_iterations
 
     if skip_resource_usage:
-        (lut, ff) = (1, 1)
+        lut, ff = (1, 1)
     else:
         lut, ff = build(registers_folder=registers_folder, build_folder=build_folder, top="counter")
 
@@ -490,8 +488,7 @@ def benchmark_vhdmmio(
         # YAML file for test based on
         # https://github.com/abs-tudelft/vhdmmio/blob/master/examples/basic/basic.mmio.yaml
         # and https://github.com/abs-tudelft/vhdmmio/blob/master/examples/lpc1313_ssp/
-        # Registers and fields added so it has 21 registers and 56 fields.
-        # So that comparison is fair with the others.
+        # Updated so that register/field count matches the others.
         register_file_config = RegisterFileConfig.load(
             obj=str(BENCHMARK_FOLDER / "vhdmmio" / "vhdmmio_regs.yaml")
         )
@@ -520,7 +517,7 @@ def benchmark_vhdmmio(
         time_s = time_taken_s / num_iterations
 
     if skip_resource_usage:
-        (lut, ff) = (1, 1)
+        lut, ff = (1, 1)
     else:
         git.Repo.clone_from(
             "git@github.com:abs-tudelft/vhdmmio.git",
@@ -565,8 +562,7 @@ def benchmark_rggen(
         # Configuration files adapted from
         # https://github.com/rggen/rggen-sample/blob/master/config.yml
         # https://github.com/rggen/rggen-sample/blob/master/uart_csr.yml
-        # Registers and fields added so it has 21 registers and 56 fields.
-        # So that comparison is fair with the others.
+        # Updated so that register/field count matches the others.
         command = [
             "rggen",
             "--plugin",
@@ -594,7 +590,7 @@ def benchmark_rggen(
         time_s = time_taken_s / num_iterations
 
     if skip_resource_usage:
-        (lut, ff) = (1, 1)
+        lut, ff = (1, 1)
     else:
         # Delete the SystemVerilog file, so the generated VHDL is used.
         # So the comparison is as relevant as possible.
@@ -635,8 +631,7 @@ def benchmark_peakrdl(
     def run_test() -> None:
         # Configuration file adapted from
         # https://github.com/SystemRDL/PeakRDL/blob/main/examples/atxmega_spi.rdl
-        # Registers and fields added so it has 21 registers and 56 fields.
-        # So that comparison is fair with the others.
+        # Updated so that register/field count matches the others.
         command = [
             "peakrdl",
             "regblock",
@@ -663,7 +658,7 @@ def benchmark_peakrdl(
         time_s = time_taken_s / num_iterations
 
     if skip_resource_usage:
-        (lut, ff) = (1, 1)
+        lut, ff = (1, 1)
     else:
         lut, ff = build(
             registers_folder=registers_folder, build_folder=build_folder, top="atxmega_spi"
