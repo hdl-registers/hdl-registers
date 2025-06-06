@@ -227,7 +227,7 @@ def a_value2_class(value_class):
 #
 # Variants:
 # * Array registers, plain registers.
-# * Mode: r, r_w, r_wpulse, wmasked
+# * Mode: r, r_w, r_wpulse
 #
 # 6 tests in total.
 # ==================================================================================================
@@ -287,9 +287,9 @@ def test_read_empty_r_wpulse_register_in_array(default_accessor):
 #
 # Variants:
 # * Array registers, plain registers.
-# * Mode: w, r_w, wpulse, r_wpulse
+# * Mode: w, r_w, wpulse, r_wpulse, wmasked
 #
-# 8 tests in total.
+# 10 tests in total.
 # ==================================================================================================
 
 
@@ -315,6 +315,12 @@ def test_write_empty_r_wpulse_register_plain(default_accessor):
     default_accessor.test_accessor.write_empty_r_wpulse(register_value=SAMPLE_U32_0)
 
     default_accessor.assert_call(write_index=10, write_value=SAMPLE_U32_0)
+
+
+def test_write_empty_wmasked_register_plain(default_accessor):
+    default_accessor.test_accessor.write_empty_wmasked(register_value=SAMPLE_U32_0)
+
+    default_accessor.assert_call(write_index=11, write_value=SAMPLE_U32_0)
 
 
 def test_write_empty_w_register_in_array(default_accessor):
@@ -347,6 +353,14 @@ def test_write_empty_r_wpulse_register_in_array(default_accessor):
     )
 
     default_accessor.assert_call(write_index=17 + 2 * 17 + 10, write_value=SAMPLE_U32_0)
+
+
+def test_write_empty_wmasked_register_in_array(default_accessor):
+    default_accessor.test_accessor.write_reg_array_a_empty_wmasked(
+        register_value=SAMPLE_U32_0, array_index=2
+    )
+
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 11, write_value=SAMPLE_U32_0)
 
 
 # ==================================================================================================
