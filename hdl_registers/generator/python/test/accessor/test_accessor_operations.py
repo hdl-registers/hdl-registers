@@ -296,7 +296,7 @@ def test_read_empty_r_wpulse_register_in_array(default_accessor):
 def test_write_empty_w_register_plain(default_accessor):
     default_accessor.test_accessor.write_empty_w(register_value=SAMPLE_U32_1)
 
-    default_accessor.assert_call(write_index=6, write_value=SAMPLE_U32_1)
+    default_accessor.assert_call(write_index=7, write_value=SAMPLE_U32_1)
 
 
 def test_write_empty_r_w_register_plain(default_accessor):
@@ -308,13 +308,13 @@ def test_write_empty_r_w_register_plain(default_accessor):
 def test_write_empty_wpulse_register_plain(default_accessor):
     default_accessor.test_accessor.write_empty_wpulse(register_value=SAMPLE_U32_1)
 
-    default_accessor.assert_call(write_index=8, write_value=SAMPLE_U32_1)
+    default_accessor.assert_call(write_index=9, write_value=SAMPLE_U32_1)
 
 
 def test_write_empty_r_wpulse_register_plain(default_accessor):
     default_accessor.test_accessor.write_empty_r_wpulse(register_value=SAMPLE_U32_0)
 
-    default_accessor.assert_call(write_index=9, write_value=SAMPLE_U32_0)
+    default_accessor.assert_call(write_index=10, write_value=SAMPLE_U32_0)
 
 
 def test_write_empty_w_register_in_array(default_accessor):
@@ -397,7 +397,7 @@ def test_read_class_r_in_array(default_accessor):
         default_accessor.python_module.TestRegArrayARegRValue
     )
 
-    default_accessor.assert_call(read_index=15 + 2 * 15 + 0)
+    default_accessor.assert_call(read_index=17 + 2 * 17 + 0)
 
 
 def test_read_class_r_w_in_array(default_accessor):
@@ -406,7 +406,7 @@ def test_read_class_r_w_in_array(default_accessor):
         default_accessor.python_module.TestRegArrayARegRWValue
     )
 
-    default_accessor.assert_call(read_index=15 + 2 * 15 + 2)
+    default_accessor.assert_call(read_index=17 + 2 * 17 + 2)
 
 
 def test_read_class_r_wpulse_in_array(default_accessor):
@@ -415,7 +415,7 @@ def test_read_class_r_wpulse_in_array(default_accessor):
         array_index=1
     ) == a_value0_class(default_accessor.python_module.TestRegArrayARegRWpulseValue)
 
-    default_accessor.assert_call(read_index=15 + 1 * 15 + 4)
+    default_accessor.assert_call(read_index=17 + 1 * 17 + 4)
 
 
 # ==================================================================================================
@@ -471,7 +471,7 @@ def test_write_class_w_in_array(default_accessor):
         array_index=2,
     )
 
-    default_accessor.assert_call(write_index=15 + 2 * 15 + 1, write_value=a_value1_int())
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 1, write_value=a_value1_int())
 
 
 def test_write_class_r_w_in_array(default_accessor):
@@ -480,7 +480,7 @@ def test_write_class_r_w_in_array(default_accessor):
         array_index=1,
     )
 
-    default_accessor.assert_call(write_index=15 + 1 * 15 + 2, write_value=a_value2_int())
+    default_accessor.assert_call(write_index=17 + 1 * 17 + 2, write_value=a_value2_int())
 
 
 def test_write_class_wpulse_in_array(default_accessor):
@@ -489,7 +489,7 @@ def test_write_class_wpulse_in_array(default_accessor):
         array_index=2,
     )
 
-    default_accessor.assert_call(write_index=15 + 2 * 15 + 3, write_value=a_value0_int())
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 3, write_value=a_value0_int())
 
 
 def test_write_class_r_wpulse_in_array(default_accessor):
@@ -498,7 +498,7 @@ def test_write_class_r_wpulse_in_array(default_accessor):
         array_index=0,
     )
 
-    default_accessor.assert_call(write_index=15 + 0 * 15 + 4, write_value=a_value1_int())
+    default_accessor.assert_call(write_index=17 + 0 * 17 + 4, write_value=a_value1_int())
 
 
 # ==================================================================================================
@@ -510,7 +510,7 @@ def test_write_class_r_wpulse_in_array(default_accessor):
 #
 # Variants:
 # * Array registers, plain registers.
-# * Mode: w, r_w, wpulse, r_wpulse
+# * Mode: w, r_w, wpulse, r_wpulse, wmasked
 # * Type: bit, unsigned, signed, ufixed, sfixed, enumeration, uint, sint
 #
 # We test a subset of all possible combinations. Most important is to try the different types.
@@ -520,19 +520,19 @@ def test_write_class_r_wpulse_in_array(default_accessor):
 def test_write_field_w_plain_single_bit(default_accessor):
     default_accessor.test_accessor.write_single_w_bit_bit_bb(field_value=1)
 
-    default_accessor.assert_call(write_index=10, write_value=0b1)
+    default_accessor.assert_call(write_index=12, write_value=0b1)
 
 
 def test_write_field_w_plain_single_unsigned(default_accessor):
     default_accessor.test_accessor.write_single_w_unsigned_unsigned_bb(field_value=15)
 
-    default_accessor.assert_call(write_index=11, write_value=0b1111)
+    default_accessor.assert_call(write_index=13, write_value=0b1111)
 
 
 def test_write_field_r_w_plain_single_sfixed(default_accessor):
     default_accessor.test_accessor.write_single_r_w_sfixed_sfixed_bb(field_value=-1.75)
 
-    default_accessor.assert_call(write_index=12, write_value=0b1001)
+    default_accessor.assert_call(write_index=14, write_value=0b1001)
 
 
 def test_write_field_wpulse_plain_single_enumeration(default_accessor):
@@ -543,13 +543,13 @@ def test_write_field_wpulse_plain_single_enumeration(default_accessor):
         field_value=field_value
     )
 
-    default_accessor.assert_call(write_index=13, write_value=0b10)
+    default_accessor.assert_call(write_index=15, write_value=0b10)
 
 
 def test_write_field_r_wpulse_plain_single_uint(default_accessor):
     default_accessor.test_accessor.write_single_r_wpulse_uint_uint_bb(field_value=11)
 
-    default_accessor.assert_call(write_index=14, write_value=0b1011)
+    default_accessor.assert_call(write_index=16, write_value=0b1011)
 
 
 def test_write_field_r_w_in_array_single_sfixed(default_accessor):
@@ -557,7 +557,7 @@ def test_write_field_r_w_in_array_single_sfixed(default_accessor):
         field_value=1.5, array_index=2
     )
 
-    default_accessor.assert_call(write_index=15 + 15 * 2 + 12, write_value=0b0110)
+    default_accessor.assert_call(write_index=17 + 17 * 2 + 14, write_value=0b0110)
 
 
 def test_write_field_wpulse_in_array_single_enumeration(default_accessor):
@@ -567,7 +567,7 @@ def test_write_field_wpulse_in_array_single_enumeration(default_accessor):
         field_value=field_value, array_index=1
     )
 
-    default_accessor.assert_call(write_index=15 + 15 * 1 + 13, write_value=0b01)
+    default_accessor.assert_call(write_index=17 + 17 * 1 + 15, write_value=0b01)
 
 
 # ==================================================================================================
@@ -632,7 +632,7 @@ def test_write_field_r_wpulse_in_array_multiple_enumeration_aa(default_accessor)
     )
 
     default_accessor.assert_call(
-        write_index=15 + 15 * 0 + 4, write_value=get_a_value_int(enumeration_aa=0b10)
+        write_index=17 + 17 * 0 + 4, write_value=get_a_value_int(enumeration_aa=0b10)
     )
 
 
@@ -642,7 +642,7 @@ def test_write_field_r_wpulse_in_array_multiple_uint_aa(default_accessor):
     )
 
     default_accessor.assert_call(
-        write_index=15 + 15 * 1 + 4, write_value=get_a_value_int(uint_aa=0b1010)
+        write_index=17 + 17 * 1 + 4, write_value=get_a_value_int(uint_aa=0b1010)
     )
 
 
@@ -652,7 +652,7 @@ def test_write_field_r_wpulse_in_array_multiple_sint_aa(default_accessor):
     )
 
     default_accessor.assert_call(
-        write_index=15 + 15 * 2 + 4, write_value=get_a_value_int(sint_aa=0b11101)
+        write_index=17 + 17 * 2 + 4, write_value=get_a_value_int(sint_aa=0b11101)
     )
 
 
@@ -716,8 +716,8 @@ def test_write_field_r_w_in_array_multiple_enumeration_aa(default_accessor):
     )
 
     default_accessor.assert_call(
-        read_index=15 + 15 * 0 + 2,
-        write_index=15 + 15 * 0 + 2,
+        read_index=17 + 17 * 0 + 2,
+        write_index=17 + 17 * 0 + 2,
         write_value=a_value2_int(enumeration_aa=0b10),
     )
 
@@ -727,8 +727,8 @@ def test_write_field_r_w_in_array_multiple_uint_aa(default_accessor):
     default_accessor.test_accessor.write_reg_array_a_reg_r_w_uint_aa(field_value=10, array_index=1)
 
     default_accessor.assert_call(
-        read_index=15 + 15 * 1 + 2,
-        write_index=15 + 15 * 1 + 2,
+        read_index=17 + 17 * 1 + 2,
+        write_index=17 + 17 * 1 + 2,
         write_value=a_value2_int(uint_aa=0b1010),
     )
 
@@ -738,8 +738,8 @@ def test_write_field_r_w_in_array_multiple_sint_aa(default_accessor):
     default_accessor.test_accessor.write_reg_array_a_reg_r_w_sint_aa(field_value=-3, array_index=2)
 
     default_accessor.assert_call(
-        read_index=15 + 15 * 2 + 2,
-        write_index=15 + 15 * 2 + 2,
+        read_index=17 + 17 * 2 + 2,
+        write_index=17 + 17 * 2 + 2,
         write_value=a_value2_int(sint_aa=0b11101),
     )
 
@@ -895,10 +895,12 @@ Register 'reg_r' .............................................................. 
         in stdout
     )
 
+    print(stdout)
+
     assert (
         f"""
 Register 'reg_array_a[2].reg_r_wpulse' ........................................ \
-(index 49, address 196):
+(index 55, address 220):
 {values}
 """
         in stdout
@@ -906,7 +908,7 @@ Register 'reg_array_a[2].reg_r_wpulse' ........................................ 
     assert (
         """
 Register 'reg_array_a[2].reg_wpulse' .......................................... \
-(index 48, address 192):
+(index 54, address 216):
   Not readable.
 """
         in stdout
