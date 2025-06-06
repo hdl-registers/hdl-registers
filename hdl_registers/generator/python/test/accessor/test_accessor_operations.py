@@ -227,7 +227,7 @@ def a_value2_class(value_class):
 #
 # Variants:
 # * Array registers, plain registers.
-# * Mode: r, r_w, r_wpulse
+# * Mode: r, r_w, r_wpulse, wmasked
 #
 # 6 tests in total.
 # ==================================================================================================
@@ -237,35 +237,35 @@ def test_read_empty_r_register_plain(default_accessor):
     default_accessor.set_read_value(SAMPLE_U32_0)
     assert default_accessor.test_accessor.read_empty_r() == SAMPLE_U32_0
 
-    default_accessor.assert_call(read_index=5)
+    default_accessor.assert_call(read_index=6)
 
 
 def test_read_empty_r_w_register_plain(default_accessor):
     default_accessor.set_read_value(SAMPLE_U32_1)
     assert default_accessor.test_accessor.read_empty_r_w() == SAMPLE_U32_1
 
-    default_accessor.assert_call(read_index=7)
+    default_accessor.assert_call(read_index=8)
 
 
 def test_read_empty_r_wpulse_register_plain(default_accessor):
     default_accessor.set_read_value(SAMPLE_U32_0)
     assert default_accessor.test_accessor.read_empty_r_wpulse() == SAMPLE_U32_0
 
-    default_accessor.assert_call(read_index=9)
+    default_accessor.assert_call(read_index=10)
 
 
 def test_read_empty_r_register_in_array(default_accessor):
     default_accessor.set_read_value(SAMPLE_U32_0)
     assert default_accessor.test_accessor.read_reg_array_a_empty_r(array_index=2) == SAMPLE_U32_0
 
-    default_accessor.assert_call(read_index=15 + 2 * 15 + 5)
+    default_accessor.assert_call(read_index=17 + 2 * 17 + 6)
 
 
 def test_read_empty_r_w_register_in_array(default_accessor):
     default_accessor.set_read_value(SAMPLE_U32_1)
     assert default_accessor.test_accessor.read_reg_array_a_empty_r_w(array_index=2) == SAMPLE_U32_1
 
-    default_accessor.assert_call(read_index=15 + 2 * 15 + 7)
+    default_accessor.assert_call(read_index=17 + 2 * 17 + 8)
 
 
 def test_read_empty_r_wpulse_register_in_array(default_accessor):
@@ -275,7 +275,7 @@ def test_read_empty_r_wpulse_register_in_array(default_accessor):
         == SAMPLE_U32_0
     )
 
-    default_accessor.assert_call(read_index=15 + 2 * 15 + 9)
+    default_accessor.assert_call(read_index=17 + 2 * 17 + 10)
 
 
 # ==================================================================================================
@@ -302,7 +302,7 @@ def test_write_empty_w_register_plain(default_accessor):
 def test_write_empty_r_w_register_plain(default_accessor):
     default_accessor.test_accessor.write_empty_r_w(register_value=SAMPLE_U32_0)
 
-    default_accessor.assert_call(write_index=7, write_value=SAMPLE_U32_0)
+    default_accessor.assert_call(write_index=8, write_value=SAMPLE_U32_0)
 
 
 def test_write_empty_wpulse_register_plain(default_accessor):
@@ -322,7 +322,7 @@ def test_write_empty_w_register_in_array(default_accessor):
         register_value=SAMPLE_U32_1, array_index=2
     )
 
-    default_accessor.assert_call(write_index=15 + 2 * 15 + 6, write_value=SAMPLE_U32_1)
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 7, write_value=SAMPLE_U32_1)
 
 
 def test_write_empty_r_w_register_in_array(default_accessor):
@@ -330,7 +330,7 @@ def test_write_empty_r_w_register_in_array(default_accessor):
         register_value=SAMPLE_U32_0, array_index=2
     )
 
-    default_accessor.assert_call(write_index=15 + 2 * 15 + 7, write_value=SAMPLE_U32_0)
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 8, write_value=SAMPLE_U32_0)
 
 
 def test_write_empty_wpulse_register_in_array(default_accessor):
@@ -338,7 +338,7 @@ def test_write_empty_wpulse_register_in_array(default_accessor):
         register_value=SAMPLE_U32_1, array_index=2
     )
 
-    default_accessor.assert_call(write_index=15 + 2 * 15 + 8, write_value=SAMPLE_U32_1)
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 9, write_value=SAMPLE_U32_1)
 
 
 def test_write_empty_r_wpulse_register_in_array(default_accessor):
@@ -346,7 +346,7 @@ def test_write_empty_r_wpulse_register_in_array(default_accessor):
         register_value=SAMPLE_U32_0, array_index=2
     )
 
-    default_accessor.assert_call(write_index=15 + 2 * 15 + 9, write_value=SAMPLE_U32_0)
+    default_accessor.assert_call(write_index=17 + 2 * 17 + 10, write_value=SAMPLE_U32_0)
 
 
 # ==================================================================================================
