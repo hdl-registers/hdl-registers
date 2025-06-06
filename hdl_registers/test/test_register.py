@@ -144,6 +144,24 @@ def test_appending_integer_to_full_register():
     assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
 
 
+def test_appending_field_to_masked_regsiter_should_raise_exception():
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["wmasked"], description="")
+
+    with pytest.raises(ValueError) as exception_info:
+        register.append_bit(name="hest", description="", default_value="0")
+    assert (
+        str(exception_info.value)
+        == 'Tried to add field "hest" to register "apa" which does not support fields.'
+    )
+
+    with pytest.raises(ValueError) as exception_info:
+        register.append_bit_vector(name="zebra", description="", width=4, default_value=0)
+    assert (
+        str(exception_info.value)
+        == 'Tried to add field "zebra" to register "apa" which does not support fields.'
+    )
+
+
 def test_get_field():
     register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     hest = register.append_bit(name="hest", description="", default_value="1")

@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from hdl_registers.register_modes import REGISTER_MODES
+
 from .field.bit import Bit
 from .field.bit_vector import BitVector
 from .field.enumeration import Enumeration
@@ -55,6 +57,9 @@ class Register:
         self.description = description
         self.fields: list[RegisterField] = []
         self.bit_index = 0
+
+        # A temporary mechanism while we figure out how to handle fields in masked registers.
+        self._does_not_support_fields = mode == REGISTER_MODES["wmasked"]
 
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """
@@ -146,6 +151,12 @@ class Register:
         return integer
 
     def _append_field(self, field: RegisterField) -> None:
+        if self._does_not_support_fields:
+            raise ValueError(
+                f'Tried to add field "{field.name}" to register "{self.name}" which '
+                "does not support fields."
+            )
+
         self.fields.append(field)
 
         self.bit_index += field.width

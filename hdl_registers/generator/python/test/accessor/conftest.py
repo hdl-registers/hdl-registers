@@ -84,6 +84,9 @@ def setup_test_register(
         f"reg_{mode.shorthand}", mode=mode, description=""
     )
 
+    if register._does_not_support_fields:  # noqa: SLF001
+        return
+
     register.append_bit(name="bit_aa0", description="", default_value="0")
     register.append_bit(name="bit_aa1", description="", default_value="1")
 
