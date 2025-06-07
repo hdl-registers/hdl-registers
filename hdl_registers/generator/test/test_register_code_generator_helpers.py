@@ -34,6 +34,15 @@ def test_register_utilized_width():
     assert RegisterCodeGeneratorHelpers.register_utilized_width(register) == 9
 
 
+def test_register_utilized_width_wmasked():
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["wmasked"], description="")
+
+    assert RegisterCodeGeneratorHelpers.register_utilized_width(register) == 16
+
+    register.append_bit(name="a", description="", default_value="1")
+    assert RegisterCodeGeneratorHelpers.register_utilized_width(register) == 1
+
+
 def test_register_default_value_uint():
     register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
     register.append_bit(name="foo", description="", default_value="1")
@@ -85,7 +94,7 @@ def test_field_setter_should_read_modify_write_raise_exception_if_the_register_i
 
     with pytest.raises(ValueError) as exception_info:
         RegisterCodeGeneratorHelpers.field_setter_should_read_modify_write(register)
-    assert str(exception_info.value).startswith("Got non-writeable register:")
+    assert str(exception_info.value).startswith("Got unexpected/unknown register mode:")
 
 
 def test_to_pascal_case():
