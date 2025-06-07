@@ -20,7 +20,9 @@ from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_avai
 from tsfpga.system_utils import create_file, read_file
 
 from hdl_registers import __version__ as hdl_registers_version
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
+from hdl_registers.register_modes import REGISTER_MODES
 
 from .register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from .reserved_keywords import RESERVED_KEYWORDS
@@ -540,3 +542,27 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
                     raise ValueError(message)
 
                 qualified_names.add(field_name)
+
+    def _add_masked_mask_fields(self) -> None:
+        """
+        For all 'masked'-mode registers in the register list, add a ``mask`` field
+        at the correct location and with the correct width.
+
+        This method should typically be called from software-language generators, where the user
+        should set the value of each field as well as the mask when writing.
+
+        This method should typically NOT be called from hardware-language generators.
+        The ``mask`` is not handled as just another field there, it is done with a special handling.
+        """
+        for register, _ in self.iterate_registers():
+            if register.mode == REGISTER_MODES["wmasked"]:
+                utilized_width = self.register_utilized_width(register=register)
+                register.fields.append(
+                    BitVector(
+                        name="mask",
+                        base_index=register.fields_width,
+                        description="Blyat",
+                        width=utilized_width,
+                        default=0,
+                    )
+                )
