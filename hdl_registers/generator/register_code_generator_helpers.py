@@ -230,7 +230,7 @@ class RegisterCodeGeneratorHelpers:
         ]:
             return False
 
-        raise ValueError(f"Got unknown register mode: {register}")
+        raise ValueError(f"Got unexpected/unknown register mode: {register}")
 
     @staticmethod
     def to_pascal_case(snake_string: str) -> str:

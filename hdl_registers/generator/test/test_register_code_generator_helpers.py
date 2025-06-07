@@ -94,7 +94,7 @@ def test_field_setter_should_read_modify_write_raise_exception_if_the_register_i
 
     with pytest.raises(ValueError) as exception_info:
         RegisterCodeGeneratorHelpers.field_setter_should_read_modify_write(register)
-    assert str(exception_info.value).startswith("Got non-writeable register:")
+    assert str(exception_info.value).startswith("Got unexpected/unknown register mode:")
 
 
 def test_to_pascal_case():

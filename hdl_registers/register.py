@@ -160,7 +160,10 @@ class Register:
 
         self.bit_index += field.width
         if self.bit_index > self.fields_width:
-            raise ValueError(f'Maximum width exceeded for register "{self.name}".')
+            raise ValueError(
+                f'Maximum width exceeded for register "{self.name}". '
+                f'Adding field "{field.name}" makes the total width {self.bit_index}.'
+            )
 
     def get_field(self, name: str) -> RegisterField:
         """
@@ -184,7 +187,8 @@ class Register:
         """
         Byte address, within the register list, of this register.
         """
-        return 4 * self.index
+        width_bytes = self.width // 8
+        return width_bytes * self.index
 
     def __repr__(self) -> str:
         return f"""{self.__class__.__name__}(\
