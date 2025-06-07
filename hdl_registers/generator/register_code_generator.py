@@ -160,7 +160,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
             # Print a shorter path if the output is inside the CWD.
             path_to_print = output_file.relative_to(current_working_directory)
         else:
-            # But don't print a long string of ../../ if it is outside, but instead the full path.
+            # Don't print a long string of ../../ if it is outside, but instead the full path.
             path_to_print = output_file
         print(f"Creating {self.SHORT_DESCRIPTION} file: {path_to_print}")
 
