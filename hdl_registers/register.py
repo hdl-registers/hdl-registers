@@ -29,6 +29,12 @@ class Register:
     Used to represent a register and its fields.
     """
 
+    # The number of bits in the register.
+    width: int = 32
+    # The number of bits in the register that may be used for fields.
+    # Note that this is the same as the 'width' except for some special-mode registers.
+    fields_width: int
+
     def __init__(self, name: str, index: int, mode: RegisterMode, description: str) -> None:
         """
         Arguments:
@@ -58,8 +64,7 @@ class Register:
         self.fields: list[RegisterField] = []
         self.bit_index = 0
 
-        # A temporary mechanism while we figure out how to handle fields in masked registers.
-        self._does_not_support_fields = mode == REGISTER_MODES["wmasked"]
+        self.fields_width = self.width / 2 if mode == REGISTER_MODES["wmasked"] else self.width
 
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """
@@ -151,16 +156,10 @@ class Register:
         return integer
 
     def _append_field(self, field: RegisterField) -> None:
-        if self._does_not_support_fields:
-            raise ValueError(
-                f'Tried to add field "{field.name}" to register "{self.name}" which '
-                "does not support fields."
-            )
-
         self.fields.append(field)
 
         self.bit_index += field.width
-        if self.bit_index > 32:
+        if self.bit_index > self.fields_width:
             raise ValueError(f'Maximum width exceeded for register "{self.name}".')
 
     def get_field(self, name: str) -> RegisterField:

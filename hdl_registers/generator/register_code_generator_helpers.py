@@ -122,9 +122,13 @@ class RegisterCodeGeneratorHelpers:
 
         Note that if the register has no fields, we do not really know what the user is doing with
         it, and we have to assume that the full width is used.
+
+        It should also be noted that 'masked'-mode registers will have the width of the payload
+        as their utilized width, even though bits above that must be taken into account for
+        the mask.
         """
         if not register.fields:
-            return 32
+            return register.fields_width
 
         return register.fields[-1].base_index + register.fields[-1].width
 
@@ -222,10 +226,11 @@ class RegisterCodeGeneratorHelpers:
             REGISTER_MODES["w"],
             REGISTER_MODES["wpulse"],
             REGISTER_MODES["r_wpulse"],
+            REGISTER_MODES["wmasked"],
         ]:
             return False
 
-        raise ValueError(f"Got non-writeable register: {register}")
+        raise ValueError(f"Got unknown register mode: {register}")
 
     @staticmethod
     def to_pascal_case(snake_string: str) -> str:

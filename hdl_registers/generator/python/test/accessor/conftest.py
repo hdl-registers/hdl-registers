@@ -84,11 +84,13 @@ def setup_test_register(
         f"reg_{mode.shorthand}", mode=mode, description=""
     )
 
-    if register._does_not_support_fields:  # noqa: SLF001
-        return
-
     register.append_bit(name="bit_aa0", description="", default_value="0")
     register.append_bit(name="bit_aa1", description="", default_value="1")
+
+    if register.fields_width < 32:
+        # A 'masked' type register can not hold all the fields we want to test.
+        # Hence test a subset for these registers.
+        return
 
     register.append_bit_vector(
         name="unsigned_aa",

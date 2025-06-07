@@ -37,6 +37,9 @@ The "Read, Write-pulse" mode is suitable for interrupt status registers, where a
 read shall show the current status and a write shall clear interrupts.
 Suitable for usage with :ref:`register_file.interrupt_register`.
 
+The "Write-masked" mode can be used to avoid read-modify-write operations in some
+performance-critical cases.
+
 
 Generated code
 --------------
