@@ -11,12 +11,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.register import Register
 from hdl_registers.register_array import RegisterArray
 from hdl_registers.register_modes import REGISTER_MODES
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Iterable, Iterator
 
     from hdl_registers.constant.constant import Constant
     from hdl_registers.field.register_field import RegisterField
@@ -143,6 +144,39 @@ class RegisterCodeGeneratorHelpers:
             default_value += field.default_value_uint * 2**field.base_index
 
         return default_value
+
+    def get_implied_fields(self, register: Register) -> Iterable[RegisterField]:
+        """
+        All 'masked'-mode registers shall have a ``mask`` field at the correct location and with
+        the correct width.
+        When generating code for the fields in a register, add this method call result to the
+        list of fields.
+
+        This method should typically be called from software-language generators, where the user
+        should set the value of each field as well as the mask when writing.
+        This method should typically NOT be called from hardware-language generators.
+        The ``mask`` is not handled as just another field there, it is done with a special handling.
+        """
+        if register.mode != REGISTER_MODES["wmasked"]:
+            return []
+
+        mask_base_index = register.fields_width
+        utilized_width = self.register_utilized_width(register=register)
+
+        return [
+            BitVector(
+                name="mask",
+                base_index=mask_base_index,
+                description="""\
+Write-enable mask for the payload of this masked register.
+Each bit in this field corresponds to a bit in the payload field(s).
+When this register is written, only the payload bits that have their corresponding mask bit asserted
+will be updated in hardware.
+""",
+                width=utilized_width,
+                default_value=0,
+            )
+        ]
 
     def get_indentation(self, indent: int | None = None) -> str:
         """

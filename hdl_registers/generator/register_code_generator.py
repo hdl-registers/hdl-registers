@@ -20,7 +20,6 @@ from tsfpga.svn_utils import get_svn_revision_information, svn_commands_are_avai
 from tsfpga.system_utils import create_file, read_file
 
 from hdl_registers import __version__ as hdl_registers_version
-from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.register_modes import REGISTER_MODES
 
@@ -166,18 +165,12 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
             path_to_print = output_file
         print(f"Creating {self.SHORT_DESCRIPTION} file: {path_to_print}")
 
+        self._sanity_check()
+
         # Constructing the code and creating the file is in a separate method that can
         # be overridden.
         # Everything above should be common though.
-        result = self._create_artifact(output_file=output_file, **kwargs)
-
-        # Perform sanity check AFTER calling the user code, since it is conceivable that a
-        # custom generator adds/removes/renames things.
-        # This means that the artifact will be generated even if there is a name clash.
-        # Not ideal, but we can live with that for now.
-        self._sanity_check()
-
-        return result
+        return self._create_artifact(output_file=output_file, **kwargs)
 
     def _create_artifact(
         self,
@@ -398,8 +391,8 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         To minimize the risk that a generated artifact does not compile.
         """
 
-        def check(name: str, description: str) -> None:
-            if name.lower() in RESERVED_KEYWORDS:
+        def check(name: str, description: str, keywords: set[str] = RESERVED_KEYWORDS) -> None:
+            if name.lower() in keywords:
                 message = (
                     f'Error in register list "{self.name}": '
                     f'{description} name "{name}" is a reserved keyword.'
@@ -414,6 +407,11 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
             for field in register.fields:
                 check(name=field.name, description="Field")
+
+                if register.mode == REGISTER_MODES["wmasked"]:
+                    # The 'mask' field is added by us later in code generation.
+                    # User may not have a manually-added field of the same name.
+                    check(name=field.name, description="Masked-register field", keywords={"mask"})
 
                 if isinstance(field, Enumeration):
                     for element in field.elements:
@@ -548,69 +546,3 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
                     raise ValueError(message)
 
                 qualified_names.add(field_name)
-
-    def _add_masked_mask_fields(self) -> None:
-        """
-        For all 'masked'-mode registers in the register list, add a ``mask`` field
-        at the correct location and with the correct width.
-
-        This method should typically be called from software-language generators, where the user
-        should set the value of each field as well as the mask when writing.
-        This method should typically NOT be called from hardware-language generators.
-        The ``mask`` is not handled as just another field there, it is done with a special handling.
-
-        Possibly in the future we will have some mechanism where this method is called automatically
-        unless the generator is marked as a 'hardware' generator.
-        But for now, it has to be called manually.
-        """
-        for register, register_array in self.iterate_registers():
-            if register.mode == REGISTER_MODES["wmasked"] and len(register.fields) > 0:
-                mask_base_index = register.fields_width
-                utilized_width = self.register_utilized_width(register=register)
-
-                try:
-                    mask_field = register.get_field(name="mask")
-                except ValueError:
-                    # There is no mask field in place. Proceed and add it below.
-                    pass
-                else:
-                    # There is an existing mask field.
-                    # This can either have been added,
-                    # 1. Erroneously by the user.
-                    # 2. by us in a previous call to this method (imagine code from multiple
-                    #    generators being generated, will result in multiple calls to this method)
-                    # This needs to be sanity checked.
-                    other_fields_width = 0
-                    for other_field in register.fields:
-                        if other_field is not mask_field:
-                            other_fields_width += other_field.width
-
-                    if (
-                        mask_field.base_index != mask_base_index
-                        or mask_field.width != other_fields_width
-                    ):
-                        field_description = self.field_description(
-                            register=register, register_array=register_array, field=mask_field
-                        )
-                        raise ValueError(
-                            f'Error in register list "{self.name}": Invalid {field_description}.'
-                        )
-
-                    # If we have gotten this far, it means that there is a correct mask
-                    # field already in place, and we can proceed to the next register.
-                    continue
-
-                register.fields.append(
-                    BitVector(
-                        name="mask",
-                        base_index=mask_base_index,
-                        description="""\
-Write-enable mask for the payload of this masked register.
-Each bit in this field corresponds to a bit in the payload field(s).
-When this register is written, only the payload bits that have their corresponding mask bit asserted
-will be updated in hardware.
-""",
-                        width=utilized_width,
-                        default_value=0,
-                    )
-                )
