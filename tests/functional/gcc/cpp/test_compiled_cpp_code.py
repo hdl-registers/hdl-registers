@@ -248,8 +248,8 @@ def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2284: Got 'value1' value out of range: 128.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: 128.\n", exception_info.value.stderr
     )
 
     test_code = """\
@@ -260,8 +260,8 @@ def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2284: Got 'value1' value out of range: -129.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: -129.\n", exception_info.value.stderr
     )
 
 
@@ -330,7 +330,9 @@ def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(b
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == "caesar.cpp:2287: Got 'value1' value out of range: 8.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: 8.\n", exception_info.value.stderr
+    )
 
     test_code = """\
   caesar.set_apa_value1(-9.125);
@@ -340,8 +342,8 @@ def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(b
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2287: Got 'value1' value out of range: -9.125.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: -9.125.\n", exception_info.value.stderr
     )
 
 
