@@ -15,6 +15,7 @@ from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerat
 from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
 from hdl_registers.parser.toml import from_toml
+from hdl_registers.register_modes import REGISTER_MODES
 
 
 class HtmlTest:
@@ -264,6 +265,14 @@ def test_constants_and_no_registers(html_test):
     assert "<h2>Constants</h2>" in html, html
     html_test.check_constant(name="data_width", value=24, html=html)
     html_test.check_constant(name="decrement", value=-8, html=html)
+
+
+def test_wmasked_register_has_documentation_of_mask_field(tmp_path):
+    test = HtmlTest(tmp_path)
+    test.register_list.append_register(name="apa", mode=REGISTER_MODES["wmasked"], description="")
+
+    html = test.create_html_page()
+    test.check_field(name="mask", index="31:16", default_value="0b0000000000000000", html=html)
 
 
 def test_register_table_is_empty_file_if_no_registers_are_available(html_test):
