@@ -7,6 +7,7 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -288,8 +289,8 @@ def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2272: Got 'value1' value out of range: 16.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: 16.\n", exception_info.value.stderr
     )
 
     test_code = """\
@@ -300,8 +301,8 @@ def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2272: Got 'value1' value out of range: -0.5.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: -0.5.\n", exception_info.value.stderr
     )
 
 
@@ -467,7 +468,7 @@ def test_bit_field_at_the_top(base_cpp_test):
   assert(caesar.get_bit_reg_value() == false);
 
   caesar.set_bit_reg2_pad(3);
-  assert(memory[22] == 0x80000003);
+  assert(memory[fpga_regs::Caesar::num_registers - 1] == 0x80000003);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
@@ -484,8 +485,8 @@ def test_very_wide_bit_vector_fields(base_cpp_test):
     ).append_bit_vector(name="value", description="", width=31, default_value=0)
 
     test_code = """\
-  memory[21] = 0b10000000000000000000000000000001;
-  memory[22] = 0b11000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 2] = 0b10000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 1] = 0b11000000000000000000000000000001;
 
   assert(caesar.get_vector_32_value() == 2147483649);
   assert(caesar.get_vector_31_value() == 1073741825);
@@ -560,7 +561,7 @@ def test_unsigned_fixed_point_bit_vector_field(base_cpp_test):
   caesar.set_apa({21.33203125, 10.6640625});
   assert(caesar.get_apa_value1() == 21.33203125);
   assert(caesar.get_apa_value2() == 10.6640625);
-  assert(memory[21] == 44728320 + 5461);
+  assert(memory[fpga_regs::Caesar::num_registers - 1] == 44728320 + 5461);
 
   // One value is truncated, the other is unchanged.
   caesar.set_apa_value1(21.332031251);
@@ -604,7 +605,7 @@ def test_signed_fixed_point_bit_vector_field(base_cpp_test):
 
   // Values that fit perfectly with no rounding/truncation.
   caesar.set_apa({-53.390625, 74.859375});
-  assert(memory[21] == 78495744 + 12967);
+  assert(memory[fpga_regs::Caesar::num_registers - 1] == 78495744 + 12967);
   assert(caesar.get_apa_value1() == -53.390625);
   assert(caesar.get_apa_value2() == 74.859375);
 
@@ -668,10 +669,10 @@ def test_very_wide_integer_fields(base_cpp_test):
   assert(fpga_regs::caesar::unsigned_31::value::default_value == 1073741824);
   assert(fpga_regs::caesar::unsigned_31::value::default_value_raw == 1073741824);
 
-  memory[21] = 0b10000000000000000000000000000001;
-  memory[22] = 0b10000000000000000000000000000001;
-  memory[23] = 0b11000000000000000000000000000001;
-  memory[24] = 0b11000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 4] = 0b10000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 3] = 0b10000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 2] = 0b11000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 1] = 0b11000000000000000000000000000001;
 
   assert(caesar.get_signed_32_value() == -2147483647);
   assert(caesar.get_unsigned_32_value() == 2147483649);

@@ -12,7 +12,6 @@ from tsfpga.system_utils import read_file
 from hdl_registers import HDL_REGISTERS_TESTS
 from hdl_registers.generator.c.header import CHeaderGenerator
 from hdl_registers.parser.toml import from_toml
-from hdl_registers.register_modes import REGISTER_MODES
 
 
 def test_wmasked_register_has_mask_field(tmp_path):

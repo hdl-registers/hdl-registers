@@ -15,7 +15,6 @@ from hdl_registers.generator.html.constant_table import HtmlConstantTableGenerat
 from hdl_registers.generator.html.page import HtmlPageGenerator
 from hdl_registers.generator.html.register_table import HtmlRegisterTableGenerator
 from hdl_registers.parser.toml import from_toml
-from hdl_registers.register_modes import REGISTER_MODES
 
 
 class HtmlTest:
