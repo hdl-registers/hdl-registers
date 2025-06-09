@@ -188,7 +188,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
     def _field_definitions(self, register: Register, register_array: RegisterArray | None) -> str:
         c_code = ""
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             field_description = self.field_description(
                 register=register, register_array=register_array, field=field
             )
