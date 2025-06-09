@@ -21,7 +21,7 @@ from hdl_registers.field.numerical_interpretation import (
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
-from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+from hdl_registers.generator.vhdl.test.test_vhdl import (
     get_all_doc_register_lists,
     get_strange_register_lists,
 )
