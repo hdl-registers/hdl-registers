@@ -39,6 +39,7 @@ Suitable for usage with :ref:`register_file.interrupt_register`.
 
 The "Write-masked" mode can be used to avoid read-modify-write operations in some
 performance-critical cases.
+A "mask" field will be added automatically at the correct location.
 
 
 Generated code
