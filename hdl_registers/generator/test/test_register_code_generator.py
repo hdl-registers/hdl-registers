@@ -376,6 +376,26 @@ mode = "r_w"
     )
 
 
+def test_wmasked_register_gets_correct_mask(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+
+apa.type = "bit_vector"
+apa.width = 3
+
+hest.type = "bit"
+"""
+    )
+    generator.create()
+
+    assert len(generator.register_list.get_register("instruction").fields) == 3
+    assert generator.register_list.get_register("instruction").get_field("mask").base_index == 16
+    assert generator.register_list.get_register("instruction").get_field("mask").width == 4
+
+
 def test_wmasked_register_with_no_fields_should_not_add_mask(generator_from_toml):
     generator = generator_from_toml(
         """
@@ -384,9 +404,71 @@ def test_wmasked_register_with_no_fields_should_not_add_mask(generator_from_toml
 mode = "wmasked"
 """
     )
-    generator.create_if_needed()
+    generator.create()
 
-    assert generator.register_list.get_register("instruction")
+    assert len(generator.register_list.get_register("instruction").fields) == 0
+
+
+def test_wmasked_register_with_manual_mask_field_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+
+apa.type = "bit_vector"
+apa.width = 3
+
+mask.type = "bit_vector"
+mask.width = 3
+"""
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create()
+    assert (
+        str(exception_info.value)
+        == "Error in register list \"sensor\": Invalid 'mask' field in the 'instruction' register."
+    )
+
+
+def test_wmasked_register_with_only_manual_mask_field_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+
+mask.type = "bit_vector"
+mask.width = 16
+"""
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create()
+    assert (
+        str(exception_info.value)
+        == "Error in register list \"sensor\": Invalid 'mask' field in the 'instruction' register."
+    )
+
+
+def test_wmasked_register_generated_twice_still_has_only_one_mask(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+
+apa.type = "bit_vector"
+apa.width = 3
+
+hest.type = "bit"
+"""
+    )
+
+    generator.create()
+    assert len(generator.register_list.get_register("instruction").fields) == 3
+
+    generator.create()
+    assert len(generator.register_list.get_register("instruction").fields) == 3
 
 
 def test_two_constants_with_the_same_name_should_raise_exception(tmp_path):

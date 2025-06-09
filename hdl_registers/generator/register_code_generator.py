@@ -166,12 +166,18 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
             path_to_print = output_file
         print(f"Creating {self.SHORT_DESCRIPTION} file: {path_to_print}")
 
-        self._sanity_check()
-
         # Constructing the code and creating the file is in a separate method that can
         # be overridden.
         # Everything above should be common though.
-        return self._create_artifact(output_file=output_file, **kwargs)
+        result = self._create_artifact(output_file=output_file, **kwargs)
+
+        # Perform sanity check AFTER calling the user code, since it is conceivable that a
+        # custom generator adds/removes/renames things.
+        # This means that the artifact will be generated even if there is a name clash.
+        # Not ideal, but we can live with that for now.
+        self._sanity_check()
+
+        return result
 
     def _create_artifact(
         self,
@@ -557,13 +563,47 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         unless the generator is marked as a 'hardware' generator.
         But for now, it has to be called manually.
         """
-        for register, _ in self.iterate_registers():
-            if register.mode == REGISTER_MODES["wmasked"]:
+        for register, register_array in self.iterate_registers():
+            if register.mode == REGISTER_MODES["wmasked"] and len(register.fields) > 0:
+                mask_base_index = register.fields_width
                 utilized_width = self.register_utilized_width(register=register)
+
+                try:
+                    mask_field = register.get_field(name="mask")
+                except ValueError:
+                    # There is no mask field in place. Proceed and add it below.
+                    pass
+                else:
+                    # There is an existing mask field.
+                    # This can either have been added,
+                    # 1. Erroneously by the user.
+                    # 2. by us in a previous call to this method (imagine code from multiple
+                    #    generators being generated, will result in multiple calls to this method)
+                    # This needs to be sanity checked.
+                    other_fields_width = 0
+                    for other_field in register.fields:
+                        if other_field is not mask_field:
+                            other_fields_width += other_field.width
+
+                    if (
+                        mask_field.base_index != mask_base_index
+                        or mask_field.width != other_fields_width
+                    ):
+                        field_description = self.field_description(
+                            register=register, register_array=register_array, field=mask_field
+                        )
+                        raise ValueError(
+                            f'Error in register list "{self.name}": Invalid {field_description}.'
+                        )
+
+                    # If we have gotten this far, it means that there is a correct mask
+                    # field already in place, and we can proceed to the next register.
+                    continue
+
                 register.fields.append(
                     BitVector(
                         name="mask",
-                        base_index=register.fields_width,
+                        base_index=mask_base_index,
                         description="Blyat",
                         width=utilized_width,
                         default_value=0,
