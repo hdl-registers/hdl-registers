@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
@@ -128,10 +129,15 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 attributes_cpp.append(
                     self._get_register_array_attributes(register_array=register_object)
                 )
-            elif register_object.fields:
-                attributes_cpp.append(
-                    self._get_register_attributes(register=register_object, indent=4)
-                )
+            else:
+                fields = register_object.fields + self.get_implied_fields(register=register_object)
+
+                if fields:
+                    attributes_cpp.append(
+                        self._get_register_attributes(
+                            register=register_object, fields=fields, indent=4
+                        )
+                    )
 
         attribute_cpp = "\n".join(attributes_cpp)
         return f"""\
@@ -143,8 +149,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
 """
 
-    def _get_register_attributes(self, register: Register, indent: int) -> str:
-        if not register.fields:
+    def _get_register_attributes(
+        self, register: Register, fields: Iterable[RegisterField], indent: int
+    ) -> str:
+        if not fields:
             raise ValueError("Should not end up here if the register has no fields.")
 
         attributes_cpp: list[str] = []

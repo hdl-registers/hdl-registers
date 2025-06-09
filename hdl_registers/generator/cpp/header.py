@@ -171,7 +171,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
@@ -250,7 +250,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             signature = self._field_setter_signature(
                 register=register,
                 register_array=register_array,
