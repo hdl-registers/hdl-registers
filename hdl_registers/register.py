@@ -64,7 +64,7 @@ class Register:
         self.fields: list[RegisterField] = []
         self.bit_index = 0
 
-        self.fields_width = self.width / 2 if mode == REGISTER_MODES["wmasked"] else self.width
+        self.fields_width = self.width // 2 if mode == REGISTER_MODES["wmasked"] else self.width
 
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """

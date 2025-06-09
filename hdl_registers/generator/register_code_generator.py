@@ -550,9 +550,12 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
         This method should typically be called from software-language generators, where the user
         should set the value of each field as well as the mask when writing.
-
         This method should typically NOT be called from hardware-language generators.
         The ``mask`` is not handled as just another field there, it is done with a special handling.
+
+        Possibly in the future we will have some mechanism where this method is called automatically
+        unless the generator is marked as a 'hardware' generator.
+        But for now, it has to be called manually.
         """
         for register, _ in self.iterate_registers():
             if register.mode == REGISTER_MODES["wmasked"]:
@@ -563,6 +566,6 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
                         base_index=register.fields_width,
                         description="Blyat",
                         width=utilized_width,
-                        default=0,
+                        default_value=0,
                     )
                 )

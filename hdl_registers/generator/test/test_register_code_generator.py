@@ -35,6 +35,7 @@ class CustomGenerator(RegisterCodeGenerator):
         self,
         **kwargs,  # noqa: ARG002
     ) -> str:
+        self._add_masked_mask_fields()
         return "Nothing, its a stupid generator."
 
 
@@ -373,6 +374,19 @@ mode = "r_w"
         str(exception_info.value)
         == 'Error in register list "sensor": Register name "FoR" is a reserved keyword.'
     )
+
+
+def test_wmasked_register_with_no_fields_should_not_add_mask(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+"""
+    )
+    generator.create_if_needed()
+
+    assert generator.register_list.get_register("instruction")
 
 
 def test_two_constants_with_the_same_name_should_raise_exception(tmp_path):
