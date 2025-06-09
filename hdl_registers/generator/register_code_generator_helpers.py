@@ -171,7 +171,7 @@ class RegisterCodeGeneratorHelpers:
 Write-enable mask for the payload of this masked register.
 Each bit in this field corresponds to a bit in the payload field(s).
 When this register is written, only the payload bits that have their corresponding mask bit asserted
-will be updated in hardware.
+will have their write-value set in hardware.
 """,
                 width=utilized_width,
                 default_value=0,

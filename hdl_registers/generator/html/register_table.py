@@ -154,7 +154,7 @@ repeated {register_object.length} times.
     </td>
   </tr>"""
 
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             html += self._annotate_field(field)
 
         return html

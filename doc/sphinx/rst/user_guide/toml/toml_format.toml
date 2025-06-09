@@ -14,8 +14,9 @@ type = "register"
 # * "r_w" for Read, Write.
 # * "wpulse" for Write-pulse.
 # * "r_wpulse" for Read, Write-pulse.
+# * "wmasked" for Write-masked.
 # See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html for details.
-mode = "r_w"
+mode = "wmasked"
 
 # The "description" property is OPTIONAL for a register.
 # Will default to "" if not specified.
