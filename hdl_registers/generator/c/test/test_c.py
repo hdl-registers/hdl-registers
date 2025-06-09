@@ -15,7 +15,7 @@ from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-def test_wmasked_register_has_documentation_of_mask_field(tmp_path):
+def test_wmasked_register_has_mask_field(tmp_path):
     register_list = from_toml(name="caesar", toml_file=HDL_REGISTERS_TESTS / "regs_test.toml")
     register_list.append_register(name="apa", mode=REGISTER_MODES["wmasked"], description="")
 

@@ -267,7 +267,7 @@ def test_constants_and_no_registers(html_test):
     html_test.check_constant(name="decrement", value=-8, html=html)
 
 
-def test_wmasked_register_has_documentation_of_mask_field(tmp_path):
+def test_wmasked_register_has_mask_field(tmp_path):
     test = HtmlTest(tmp_path)
     test.register_list.append_register(name="apa", mode=REGISTER_MODES["wmasked"], description="")
 
