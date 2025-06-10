@@ -118,6 +118,26 @@ class RegisterCodeGeneratorHelpers:
         )
 
     @staticmethod
+    def register_utilized_width(register: Register) -> int:
+        """
+        Get the number of bits that are utilized by the fields in the supplied register.
+        Note that this is not always the same as the width of the register.
+        Some generator implementations can be optimized by only taking into account the
+        bits that are actually utilized.
+
+        Note that if the register has no fields, we do not really know what the user is doing with
+        it, and we have to assume that the full width is used.
+
+        It should also be noted that 'masked'-mode registers will have the width of the payload
+        as their utilized width, even though bits above that must be taken into account for
+        the mask.
+        """
+        if not register.fields:
+            return register.fields_width
+
+        return register.fields[-1].base_index + register.fields[-1].width
+
+    @staticmethod
     def register_default_value_uint(register: Register) -> int:
         """
         Get the default value of the supplied register, as an unsigned integer.

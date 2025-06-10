@@ -16,7 +16,7 @@ from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
 from hdl_registers.field.numerical_interpretation import Fixed, Signed, Unsigned
-from hdl_registers.generator.hardware_code_generator import HardwareCodeGenerator
+from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_mode import HardwareAccessDirection, SoftwareAccessDirection
 
 
-class VhdlGeneratorCommon(HardwareCodeGenerator):
+class VhdlGeneratorCommon(RegisterCodeGenerator):
     """
     Common methods for generation of VHDL code.
     """

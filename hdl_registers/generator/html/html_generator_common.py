@@ -7,10 +7,10 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.documentation_code_generator import DocumentationCodeGenerator
 
 
-class HtmlGeneratorCommon(RegisterCodeGenerator):
+class HtmlGeneratorCommon(DocumentationCodeGenerator):
     """
     Common for HTML code generators.
     """
