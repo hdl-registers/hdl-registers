@@ -367,24 +367,25 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields + self.get_implied_fields(register=register):
-            field_type = self._get_field_value_type(
-                register=register, register_array=register_array, field=field
-            )
-
-            signature = self._field_getter_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=False,
-            )
-            cpp_code.append(
-                get_function(
-                    comment=self._get_getter_comment(field=field),
-                    return_type=field_type,
-                    signature=signature,
+        if self.software_should_have_field_accessors(register=register):
+            for field in register.fields + self.get_implied_fields(register=register):
+                field_type = self._get_field_value_type(
+                    register=register, register_array=register_array, field=field
                 )
-            )
+
+                signature = self._field_getter_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
+                    from_raw=False,
+                )
+                cpp_code.append(
+                    get_function(
+                        comment=self._get_getter_comment(field=field),
+                        return_type=field_type,
+                        signature=signature,
+                    )
+                )
 
         return "\n".join(cpp_code)
 
