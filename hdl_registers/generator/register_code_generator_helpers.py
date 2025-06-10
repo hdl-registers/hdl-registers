@@ -11,13 +11,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.register import Register
 from hdl_registers.register_array import RegisterArray
-from hdl_registers.register_modes import REGISTER_MODES
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterator
 
     from hdl_registers.constant.constant import Constant
     from hdl_registers.field.register_field import RegisterField
@@ -27,6 +25,12 @@ if TYPE_CHECKING:
 class RegisterCodeGeneratorHelpers:
     """
     Various helper methods that make register code generation easier.
+    Do not instantiate or inherit this class directly.
+    Inherit your generator class from one of the subclasses of this class.
+
+    This helper class shall only contain methods that are useful for ALL code generators.
+    Meaning, software, hardware, and documentation generators.
+    Methods that are only applicable to one of those shall be placed in other classes.
     """
 
     # Defined in 'RegisterCodeGenerator' class, which shall also be inherited wherever this class
@@ -114,26 +118,6 @@ class RegisterCodeGeneratorHelpers:
         )
 
     @staticmethod
-    def register_utilized_width(register: Register) -> int:
-        """
-        Get the number of bits that are utilized by the fields in the supplied register.
-        Note that this is not always the same as the width of the register.
-        Some generator implementations can be optimized by only taking into account the
-        bits that are actually utilized.
-
-        Note that if the register has no fields, we do not really know what the user is doing with
-        it, and we have to assume that the full width is used.
-
-        It should also be noted that 'masked'-mode registers will have the width of the payload
-        as their utilized width, even though bits above that must be taken into account for
-        the mask.
-        """
-        if not register.fields:
-            return register.fields_width
-
-        return register.fields[-1].base_index + register.fields[-1].width
-
-    @staticmethod
     def register_default_value_uint(register: Register) -> int:
         """
         Get the default value of the supplied register, as an unsigned integer.
@@ -144,53 +128,6 @@ class RegisterCodeGeneratorHelpers:
             default_value += field.default_value_uint * 2**field.base_index
 
         return default_value
-
-    def get_implied_fields(self, register: Register) -> Iterable[RegisterField]:
-        """
-        All 'masked'-mode registers shall have a ``mask`` field at the correct location and with
-        the correct width.
-        When generating code for the fields in a register, add this method call result to the
-        list of fields.
-
-        This method should typically be called from software-language generators, where the user
-        should set the value of each field as well as the mask when writing.
-        This method should typically NOT be called from hardware-language generators.
-        The ``mask`` is not handled as just another field there, it is done with a special handling.
-        """
-        if register.mode != REGISTER_MODES["wmasked"]:
-            return []
-
-        mask_base_index = register.fields_width
-        utilized_width = self.register_utilized_width(register=register)
-
-        return [
-            BitVector(
-                name="mask",
-                base_index=mask_base_index,
-                description="""\
-Write-enable mask for the payload of this masked register.
-Each bit in this field corresponds to a bit in the payload field(s).
-When this register is written, only the payload bits that have their corresponding mask bit asserted
-will have their write-value set in hardware.
-""",
-                width=utilized_width,
-                default_value=0,
-            )
-        ]
-
-    def software_should_have_field_accessors(self, register: Register) -> bool:
-        """
-        All 'masked'-mode registers shall have a ``mask`` field at the correct location and with
-        the correct width.
-        When generating code for the fields in a register, add this method call result to the
-        list of fields.
-
-        This method should typically be called from software-language generators, where the user
-        should set the value of each field as well as the mask when writing.
-        This method should typically NOT be called from hardware-language generators.
-        The ``mask`` is not handled as just another field there, it is done with a special handling.
-        """
-        return register.mode != REGISTER_MODES["wmasked"]
 
     def get_indentation(self, indent: int | None = None) -> str:
         """
@@ -253,32 +190,6 @@ will have their write-value set in hardware.
             register=register, register_array=register_array
         )
         return f"'{field.name}' field in the {register_description}"
-
-    @staticmethod
-    def field_setter_should_read_modify_write(register: Register) -> bool:
-        """
-        Returns True if a field value setter should read-modify-write the register.
-
-        Is only true if the register is of a writeable type where the software can also read back
-        a previously-written value.
-        Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
-        it is a waste of CPU cycles.
-        """
-        if not register.fields:
-            raise ValueError("Should not end up here if the register has no fields.")
-
-        if register.mode == REGISTER_MODES["r_w"]:
-            return len(register.fields) > 1
-
-        if register.mode in [
-            REGISTER_MODES["w"],
-            REGISTER_MODES["wpulse"],
-            REGISTER_MODES["r_wpulse"],
-            REGISTER_MODES["wmasked"],
-        ]:
-            return False
-
-        raise ValueError(f"Got unexpected/unknown register mode: {register}")
 
     @staticmethod
     def to_pascal_case(snake_string: str) -> str:

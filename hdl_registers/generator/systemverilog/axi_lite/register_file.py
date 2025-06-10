@@ -24,7 +24,7 @@ from hdl_registers.field.bit import Bit
 from hdl_registers.field.bit_vector import BitVector
 from hdl_registers.field.enumeration import Enumeration
 from hdl_registers.field.integer import Integer
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.hardware_code_generator import HardwareCodeGenerator
 from hdl_registers.generator.register_code_generator_helpers import (
     iterate_registers,
     qualified_field_name,
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_list import RegisterList
 
 
-class SystemVerilogAxiLiteGenerator(RegisterCodeGenerator):
+class SystemVerilogAxiLiteGenerator(HardwareCodeGenerator):
     """
     Generate a SystemVerilog register file with AXI-Lite interface.
     See the :ref:`generator_systemverilog` article for usage details.
