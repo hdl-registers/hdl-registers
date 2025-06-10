@@ -102,11 +102,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     )
 
                 for field in register.fields + self.get_implied_fields(register=register):
-                    methods_cpp.append(
-                        self._get_field_getter(
-                            register=register, register_array=register_array, field=field
+                    if self.software_should_have_field_accessors(register=register):
+                        methods_cpp.append(
+                            self._get_field_getter(
+                                register=register, register_array=register_array, field=field
+                            )
                         )
-                    )
                     methods_cpp.append(
                         self._get_field_getter_from_raw(register, register_array, field=field)
                     )
@@ -126,11 +127,12 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     )
 
                 for field in register.fields + self.get_implied_fields(register=register):
-                    methods_cpp.append(
-                        self._get_field_setter(
-                            register=register, register_array=register_array, field=field
+                    if self.software_should_have_field_accessors(register=register):
+                        methods_cpp.append(
+                            self._get_field_setter(
+                                register=register, register_array=register_array, field=field
+                            )
                         )
-                    )
                     methods_cpp.append(
                         self._get_field_to_raw(register, register_array, field=field)
                     )

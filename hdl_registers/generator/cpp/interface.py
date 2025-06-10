@@ -129,15 +129,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 attributes_cpp.append(
                     self._get_register_array_attributes(register_array=register_object)
                 )
-            else:
-                fields = register_object.fields + self.get_implied_fields(register=register_object)
-
-                if fields:
-                    attributes_cpp.append(
-                        self._get_register_attributes(
-                            register=register_object, fields=fields, indent=4
-                        )
-                    )
+            elif register_object.fields + self.get_implied_fields(register=register_object):
+                attributes_cpp.append(
+                    self._get_register_attributes(register=register_object, indent=4)
+                )
 
         attribute_cpp = "\n".join(attributes_cpp)
         return f"""\
@@ -149,9 +144,8 @@ class CppInterfaceGenerator(CppGeneratorCommon):
 
 """
 
-    def _get_register_attributes(
-        self, register: Register, fields: Iterable[RegisterField], indent: int
-    ) -> str:
+    def _get_register_attributes(self, register: Register, indent: int) -> str:
+        fields = register.fields + self.get_implied_fields(register=register)
         if not fields:
             raise ValueError("Should not end up here if the register has no fields.")
 
@@ -159,7 +153,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         struct_values_cpp: list[str] = []
         default_values_cpp: list[str] = []
 
-        for field in register.fields:
+        for field in fields:
             indentation = self.get_indentation(indent=indent + 2)
             field_type = self._get_field_value_type(
                 register=register, register_array=None, field=field, include_namespace=False
@@ -270,6 +264,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
 
     def _get_register_array_attributes(self, register_array: RegisterArray) -> str:
+        # TODO
         registers_cpp = [
             self._get_register_attributes(register=register, indent=6)
             for register in register_array.registers
@@ -372,7 +367,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
@@ -422,18 +417,19 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields:
-            signature = self._field_setter_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=False,
-            )
-            cpp_code.append(
-                get_function(
-                    comment=self._get_setter_comment(register=register, field=field),
-                    signature=signature,
+        if self.software_should_have_field_accessors(register=register):
+            for field in register.fields + self.get_implied_fields(register=register):
+                signature = self._field_setter_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
+                    from_raw=False,
                 )
-            )
+                cpp_code.append(
+                    get_function(
+                        comment=self._get_setter_comment(register=register, field=field),
+                        signature=signature,
+                    )
+                )
 
         return "\n".join(cpp_code)

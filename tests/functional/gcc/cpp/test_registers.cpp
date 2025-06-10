@@ -94,11 +94,6 @@ void test_read_write_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
     assert(caesar->get_dummies_first_array_enumeration(0) == fpga_regs::caesar::dummies::first::array_enumeration::default_value);
 }
 
-void test_wmasked_registers()
-{
-    assert(fpga_regs::caesar::instruction::mask::width == 16);
-}
-
 void test_field_getters(uint32_t *memory, fpga_regs::Caesar *caesar)
 {
     // Assert field getters of plain register
@@ -266,7 +261,6 @@ void test_registers(uint32_t *memory, fpga_regs::Caesar *caesar)
 {
     test_register_attributes();
     test_read_write_registers(memory, caesar);
-    test_wmasked_registers();
     test_field_getters(memory, caesar);
     test_field_setters(caesar);
     test_field_setter_on_write_only_register(memory, caesar);

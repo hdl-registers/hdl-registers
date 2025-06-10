@@ -178,6 +178,20 @@ will have their write-value set in hardware.
             )
         ]
 
+    def software_should_have_field_accessors(self, register: Register) -> bool:
+        """
+        All 'masked'-mode registers shall have a ``mask`` field at the correct location and with
+        the correct width.
+        When generating code for the fields in a register, add this method call result to the
+        list of fields.
+
+        This method should typically be called from software-language generators, where the user
+        should set the value of each field as well as the mask when writing.
+        This method should typically NOT be called from hardware-language generators.
+        The ``mask`` is not handled as just another field there, it is done with a special handling.
+        """
+        return register.mode != REGISTER_MODES["wmasked"]
+
     def get_indentation(self, indent: int | None = None) -> str:
         """
         Get the requested indentation in spaces.

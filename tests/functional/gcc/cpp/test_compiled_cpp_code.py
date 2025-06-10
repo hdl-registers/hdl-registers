@@ -750,6 +750,39 @@ def test_very_wide_integer_field_slightly_offset(base_cpp_test):
     run_command(cmd=cmd)
 
 
+def test_wmasked_registers(base_cpp_test):
+    # There is already one 'wmasked' register in the base register list.
+    # Test an empty 'wmasked' register with also, since that is handled differently in the code.
+    base_cpp_test.register_list.append_register(
+        name="instruction2", mode=REGISTER_MODES["wmasked"], description=""
+    )
+
+    # And one in an array also, since that is handled differently in the code.
+    base_cpp_test.register_list.append_register_array(
+        name="instructions", length=2, description=""
+    ).append_register(
+        name="instruction3", mode=REGISTER_MODES["wmasked"], description=""
+    ).append_bit(name="hest", description="", default_value="0")
+
+    test_code = """\
+  assert(fpga_regs::caesar::instruction::a::width == 5);
+  assert(fpga_regs::caesar::instruction::a::shift == 0);
+  assert(fpga_regs::caesar::instruction::mask::width == 5);
+  assert(fpga_regs::caesar::instruction::mask::shift == 16);
+
+  assert(fpga_regs::caesar::instruction2::mask::width == 16);
+  assert(fpga_regs::caesar::instruction2::mask::shift == 16);
+
+  assert(fpga_regs::caesar::instructions::instruction3::hest::width == 1);
+  assert(fpga_regs::caesar::instructions::instruction3::hest::shift == 0);
+  assert(fpga_regs::caesar::instructions::instruction3::mask::width == 1);
+  assert(fpga_regs::caesar::instructions::instruction3::mask::shift == 16);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
 def test_compile_all_register_lists(base_cpp_test):
     """
     Test that all available register lists compile.
