@@ -264,11 +264,10 @@ class CppInterfaceGenerator(CppGeneratorCommon):
         raise ValueError(f'Unknown field type for "{field.name}" field: {type(field)}')
 
     def _get_register_array_attributes(self, register_array: RegisterArray) -> str:
-        # TODO
         registers_cpp = [
             self._get_register_attributes(register=register, indent=6)
             for register in register_array.registers
-            if register.fields
+            if register.fields + self.get_implied_fields(register=register)
         ]
         register_cpp = "\n".join(registers_cpp)
 

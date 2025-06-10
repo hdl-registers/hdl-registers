@@ -757,12 +757,14 @@ def test_wmasked_registers(base_cpp_test):
         name="instruction2", mode=REGISTER_MODES["wmasked"], description=""
     )
 
-    # And one in an array also, since that is handled differently in the code.
-    base_cpp_test.register_list.append_register_array(
+    # And the same in an array also, since that is handled differently in the code.
+    array = base_cpp_test.register_list.append_register_array(
         name="instructions", length=2, description=""
-    ).append_register(
+    )
+    array.append_register(
         name="instruction3", mode=REGISTER_MODES["wmasked"], description=""
     ).append_bit(name="hest", description="", default_value="0")
+    array.append_register(name="instruction4", mode=REGISTER_MODES["wmasked"], description="")
 
     test_code = """\
   assert(fpga_regs::caesar::instruction::a::width == 5);
@@ -777,6 +779,9 @@ def test_wmasked_registers(base_cpp_test):
   assert(fpga_regs::caesar::instructions::instruction3::hest::shift == 0);
   assert(fpga_regs::caesar::instructions::instruction3::mask::width == 1);
   assert(fpga_regs::caesar::instructions::instruction3::mask::shift == 16);
+
+  assert(fpga_regs::caesar::instructions::instruction4::mask::width == 16);
+  assert(fpga_regs::caesar::instructions::instruction4::mask::shift == 16);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
