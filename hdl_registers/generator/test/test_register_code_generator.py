@@ -16,13 +16,13 @@ import pytest
 from tsfpga.system_utils import create_directory, create_file
 
 from hdl_registers import __version__ as hdl_registers_version
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.software_code_generator import SoftwareCodeGenerator
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-class CustomGenerator(RegisterCodeGenerator):
+class CustomGenerator(SoftwareCodeGenerator):
     SHORT_DESCRIPTION = "for test"
     COMMENT_START = "#"
     __version__ = "3.0.1"
@@ -373,6 +373,79 @@ mode = "r_w"
         str(exception_info.value)
         == 'Error in register list "sensor": Register name "FoR" is a reserved keyword.'
     )
+
+
+def test_wmasked_register_gets_correct_mask(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+
+apa.type = "bit_vector"
+apa.width = 3
+
+hest.type = "bit"
+"""
+    )
+    implied_fields = generator.get_implied_fields(
+        register=generator.register_list.get_register("instruction")
+    )
+
+    assert len(implied_fields) == 1
+    assert implied_fields[0].base_index == 16
+    assert implied_fields[0].width == 4
+
+
+def test_wmasked_register_with_no_fields_should_add_default_mask(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+"""
+    )
+    implied_fields = generator.get_implied_fields(
+        register=generator.register_list.get_register("instruction")
+    )
+
+    assert len(implied_fields) == 1
+    assert implied_fields[0].base_index == 16
+    assert implied_fields[0].width == 16
+
+
+def test_wmasked_register_with_mask_field_should_raise_exception(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[instruction]
+
+mode = "wmasked"
+
+apa.type = "bit_vector"
+apa.width = 3
+
+mask.type = "bit_vector"
+mask.width = 3
+"""
+    )
+    with pytest.raises(ValueError) as exception_info:
+        generator.create()
+    assert str(exception_info.value) == (
+        'Error in register list "sensor": Masked-register field name "mask" is a reserved keyword.'
+    )
+
+
+def test_non_masked_register_can_have_mask_field(generator_from_toml):
+    generator = generator_from_toml(
+        """
+[config]
+
+mode = "w"
+
+mask.type = "bit"
+"""
+    )
+    generator.create()
 
 
 def test_two_constants_with_the_same_name_should_raise_exception(tmp_path):
