@@ -752,7 +752,7 @@ def test_very_wide_integer_field_slightly_offset(base_cpp_test):
     run_command(cmd=cmd)
 
 
-def test_wmasked_registers(base_cpp_test):
+def test_wmasked_register_attributes(base_cpp_test):
     # There is already one 'wmasked' register in the base register list.
     # Test an empty 'wmasked' register with also, since that is handled differently in the code.
     base_cpp_test.register_list.append_register(
@@ -794,6 +794,7 @@ def test_wmasked_registers(base_cpp_test):
     # No getter in any form.
     assert "get_instruction" not in cpp
 
+    # Has 1+1 fields, so should have a struct setter and a raw setter.
     assert (
         """virtual void set_instruction(
       caesar::instruction::Value"""
@@ -804,9 +805,10 @@ def test_wmasked_registers(base_cpp_test):
       uint32_t"""
         in cpp
     )
-    assert "set_instruction_a" not in cpp
-    assert "set_instruction_mask" not in cpp
+    # No other register setter, no field setters.
+    assert cpp.count("set_instruction_") == 1
 
+    # Has no field, should only have raw setter.
     assert (
         """virtual void set_instruction2(
       uint32_t"""
@@ -815,7 +817,46 @@ def test_wmasked_registers(base_cpp_test):
     # No other register setter, no field setters.
     assert cpp.count("set_instruction2") == 1
 
-    assert False
+    # Same but in array.
+    # Has 1+1 fields, so should have a struct setter and a raw setter.
+    assert (
+        """virtual void set_instructions_instruction3(
+      size_t array_index,
+      caesar::instructions::instruction3::Value"""
+        in cpp
+    )
+    assert (
+        """virtual void set_instructions_instruction3_raw(
+      size_t array_index,
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instructions_instruction3") == 2
+
+    # Same but in array.
+    # Has no field, should only have raw setter.
+    assert (
+        """virtual void set_instructions_instruction4(
+      size_t array_index,
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instructions_instruction4") == 1
+
+
+def test_wmasked_register_write(base_cpp_test):
+    test_code = """\
+  // First 'a' then 'mask'.
+  const fpga_regs::caesar::instruction::Value value = {0b01010, 0b10101};
+  caesar.set_instruction(value);
+  std::cout << memory[21] << std::endl;
+  assert(memory[21] == 0x0015000A);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
 
 
 def test_compile_all_register_lists(base_cpp_test):
