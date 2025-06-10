@@ -365,7 +365,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
             )
 
-        if self.software_should_have_field_accessors(register=register):
+        if self.should_have_field_accessors(register=register):
             for field in register.fields + self.get_implied_fields(register=register):
                 field_type = self._get_field_value_type(
                     register=register, register_array=register_array, field=field
@@ -416,7 +416,7 @@ class CppInterfaceGenerator(CppGeneratorCommon):
                 )
             )
 
-        if self.software_should_have_field_accessors(register=register):
+        if self.should_have_field_accessors(register=register):
             for field in register.fields + self.get_implied_fields(register=register):
                 signature = self._field_setter_signature(
                     register=register,

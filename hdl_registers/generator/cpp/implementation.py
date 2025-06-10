@@ -102,7 +102,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     )
 
                 for field in register.fields + self.get_implied_fields(register=register):
-                    if self.software_should_have_field_accessors(register=register):
+                    if self.should_have_field_accessors(register=register):
                         methods_cpp.append(
                             self._get_field_getter(
                                 register=register, register_array=register_array, field=field
@@ -128,7 +128,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
                     )
 
                 for field in register.fields + self.get_implied_fields(register=register):
-                    if self.software_should_have_field_accessors(register=register):
+                    if self.should_have_field_accessors(register=register):
                         methods_cpp.append(
                             self._get_field_setter(
                                 register=register, register_array=register_array, field=field

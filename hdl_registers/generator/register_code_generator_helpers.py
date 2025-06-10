@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 
 from hdl_registers.register import Register
 from hdl_registers.register_array import RegisterArray
+from hdl_registers.register_modes import REGISTER_MODES
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -136,6 +137,32 @@ class RegisterCodeGeneratorHelpers:
             return register.fields_width
 
         return register.fields[-1].base_index + register.fields[-1].width
+
+    @staticmethod
+    def field_setter_should_read_modify_write(register: Register) -> bool:
+        """
+        Returns True if a field value setter should read-modify-write the register.
+
+        Is only true if the register is of a writeable type where the software can also read back
+        a previously-written value.
+        Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
+        it is a waste of CPU cycles.
+        """
+        if not register.fields:
+            raise ValueError("Should not end up here if the register has no fields.")
+
+        if register.mode == REGISTER_MODES["r_w"]:
+            return len(register.fields) > 1
+
+        if register.mode in [
+            REGISTER_MODES["w"],
+            REGISTER_MODES["wpulse"],
+            REGISTER_MODES["r_wpulse"],
+            REGISTER_MODES["wmasked"],
+        ]:
+            return False
+
+        raise ValueError(f"Got unexpected/unknown register mode: {register}")
 
     @staticmethod
     def register_default_value_uint(register: Register) -> int:

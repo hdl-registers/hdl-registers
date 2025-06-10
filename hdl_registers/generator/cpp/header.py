@@ -176,7 +176,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 register=register, register_array=register_array, field=field
             )
 
-            if self.software_should_have_field_accessors(register=register):
+            if self.should_have_field_accessors(register=register):
                 signature = self._field_getter_signature(
                     register=register,
                     register_array=register_array,
@@ -252,7 +252,7 @@ class CppHeaderGenerator(CppGeneratorCommon):
             )
 
         for field in register.fields + self.get_implied_fields(register=register):
-            if self.software_should_have_field_accessors(register=register):
+            if self.should_have_field_accessors(register=register):
                 signature = self._field_setter_signature(
                     register=register,
                     register_array=register_array,
