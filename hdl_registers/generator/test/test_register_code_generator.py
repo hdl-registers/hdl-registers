@@ -16,13 +16,13 @@ import pytest
 from tsfpga.system_utils import create_directory, create_file
 
 from hdl_registers import __version__ as hdl_registers_version
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.software_code_generator import SoftwareCodeGenerator
 from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-class CustomGenerator(RegisterCodeGenerator):
+class CustomGenerator(SoftwareCodeGenerator):
     SHORT_DESCRIPTION = "for test"
     COMMENT_START = "#"
     __version__ = "3.0.1"
