@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from tsfpga.system_utils import create_file, run_command
+from tsfpga.system_utils import create_file, read_file, run_command
 
 from hdl_registers.field.numerical_interpretation import (
     Signed,
@@ -63,6 +63,10 @@ int main()
 }}
 """
 
+    @property
+    def interface_cpp(self) -> str:
+        return read_file(self.include_dir / f"i_{self.register_list.name}.h")
+
     def compile(
         self,
         test_code="",
@@ -87,10 +91,8 @@ int main()
         CppInterfaceGenerator(self.register_list, self.include_dir).create()
         CppHeaderGenerator(self.register_list, self.include_dir).create()
         CppImplementationGenerator(self.register_list, self.working_dir).create()
-        cpp_class_file = self.working_dir / "caesar.cpp"
 
         main_file = self.working_dir / "main.cpp"
-
         executable = self.working_dir / "test.o"
 
         compile_command = (
@@ -99,7 +101,7 @@ int main()
                 f"-o{executable}",
                 f"-I{self.include_dir}",
                 main_file,
-                cpp_class_file,
+                self.working_dir / "caesar.cpp",
             ]
             + [f"-I{path}" for path in include_directories]
             + source_files
@@ -763,7 +765,7 @@ def test_wmasked_registers(base_cpp_test):
     )
     array.append_register(
         name="instruction3", mode=REGISTER_MODES["wmasked"], description=""
-    ).append_bit(name="hest", description="", default_value="0")
+    ).append_bit(name="b", description="", default_value="0")
     array.append_register(name="instruction4", mode=REGISTER_MODES["wmasked"], description="")
 
     test_code = """\
@@ -775,8 +777,8 @@ def test_wmasked_registers(base_cpp_test):
   assert(fpga_regs::caesar::instruction2::mask::width == 16);
   assert(fpga_regs::caesar::instruction2::mask::shift == 16);
 
-  assert(fpga_regs::caesar::instructions::instruction3::hest::width == 1);
-  assert(fpga_regs::caesar::instructions::instruction3::hest::shift == 0);
+  assert(fpga_regs::caesar::instructions::instruction3::b::width == 1);
+  assert(fpga_regs::caesar::instructions::instruction3::b::shift == 0);
   assert(fpga_regs::caesar::instructions::instruction3::mask::width == 1);
   assert(fpga_regs::caesar::instructions::instruction3::mask::shift == 16);
 
@@ -786,6 +788,34 @@ def test_wmasked_registers(base_cpp_test):
 
     cmd = base_cpp_test.compile(test_code=test_code)
     run_command(cmd=cmd)
+
+    cpp = base_cpp_test.interface_cpp
+
+    # No getter in any form.
+    assert "get_instruction" not in cpp
+
+    assert (
+        """virtual void set_instruction(
+      caesar::instruction::Value"""
+        in cpp
+    )
+    assert (
+        """virtual void set_instruction_raw(
+      uint32_t"""
+        in cpp
+    )
+    assert "set_instruction_a" not in cpp
+    assert "set_instruction_mask" not in cpp
+
+    assert (
+        """virtual void set_instruction2(
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instruction2") == 1
+
+    assert False
 
 
 def test_compile_all_register_lists(base_cpp_test):

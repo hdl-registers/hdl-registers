@@ -9,7 +9,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any
 
 from hdl_registers.constant.bit_vector_constant import UnsignedVectorConstant
