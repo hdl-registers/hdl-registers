@@ -7,8 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# ruff: noqa: A005
-
 from __future__ import annotations
 
 import json

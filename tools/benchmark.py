@@ -43,6 +43,10 @@ NUM_RUNS = 20
 # The FPGA part name to use for Vivado synthesis.
 PART = "xc7z020clg400-1"
 
+# Things are imported locally in each test function to avoid cluttering the global.
+# And so that users can test a specific tool without having to install all of them.
+# ruff: noqa: PLC0415
+
 
 def main() -> None:
     args = arguments()

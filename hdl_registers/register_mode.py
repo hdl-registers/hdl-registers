@@ -155,8 +155,9 @@ class RegisterMode:
         return repr(self)
 
     def __eq__(self, other: object) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-
         # Same logic as in __repr__.
-        return self.shorthand == other.shorthand
+        return isinstance(other, self.__class__) and other.shorthand == self.shorthand
+
+    def __hash__(self) -> int:
+        # Same logic as in __repr__.
+        return hash(self.shorthand)

@@ -68,3 +68,31 @@ def test_hardware_access_direction():
 
     assert not register_mode.is_hardware_accessible(HardwareAccessDirection.UP)
     assert register_mode.is_software_accessible(HardwareAccessDirection.DOWN)
+
+
+def test_repr_str_eq_hash():
+    def get_mode(shorthand: str) -> RegisterMode:
+        return RegisterMode(
+            shorthand=shorthand,
+            name="b",
+            description="c",
+            software_can_read=True,
+            software_can_write=False,
+            hardware_has_up=False,
+        )
+
+    register_mode_a = get_mode("a")
+    register_mode_b = get_mode("a")
+    register_mode_c = get_mode("c")
+
+    assert repr(register_mode_a) == "RegisterMode(shorthand=a)"
+    assert repr(register_mode_a) == repr(register_mode_b)
+    assert repr(register_mode_a) != repr(register_mode_c)
+
+    assert str(register_mode_a) == repr(register_mode_a)
+
+    assert register_mode_a == register_mode_b
+    assert register_mode_a != register_mode_c
+
+    assert hash(register_mode_a) == hash(register_mode_b)
+    assert hash(register_mode_a) != hash(register_mode_c)
