@@ -7,8 +7,6 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
-# ruff: noqa: A005
-
 import pickle
 from pathlib import Path
 from typing import Any
