@@ -82,6 +82,9 @@ googleanalytics_id = "G-GN3TVQGSHC"
 ogp_site_url = WEBSITE_URL
 ogp_image = "_static/social_media_preview.png"
 
+# Avoid "Git clone too shallow" warning that has occurred in CI.
+suppress_warnings = ["git.too_shallow"]
+
 
 # Make autodoc include __init__ class method.
 # https://stackoverflow.com/a/5599712
