@@ -266,6 +266,12 @@ def test_constants_and_no_registers(html_test):
     html_test.check_constant(name="decrement", value=-8, html=html)
 
 
+def test_wmasked_register_has_mask_field(tmp_path):
+    test = HtmlTest(tmp_path)
+    html = test.create_html_page()
+    test.check_field(name="mask", index="20:16", default_value="0b00000", html=html)
+
+
 def test_register_table_is_empty_file_if_no_registers_are_available(html_test):
     html_test.register_list.register_objects = []
 

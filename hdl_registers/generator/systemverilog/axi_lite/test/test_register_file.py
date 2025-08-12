@@ -303,7 +303,7 @@ def test_constant(tmp_path):
     )
 
 
-def test_register_mode_r_wpulse(tmp_path):
+def test_unsupported_register_mode_should_raise_exception(tmp_path):
     def run_test(mode):
         register_list = get_basic_register_list(path=tmp_path)
         register_list.append_register(
