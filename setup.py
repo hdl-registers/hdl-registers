@@ -10,7 +10,6 @@
 # ruff: noqa: E402, S101
 
 import sys
-from os.path import relpath
 from pathlib import Path
 
 from setuptools import find_packages, setup
@@ -141,19 +140,7 @@ def get_package_data() -> list[str]:
     files = [REQUIREMENTS_TXT, REQUIREMENTS_DEVELOP_TXT, PY_TYPED]
 
     # Specify path relative to the python package folder
-    return [
-        str(path_relative_to(file_path, hdl_registers.HDL_REGISTERS_PATH)) for file_path in files
-    ]
-
-
-# Duplicated system_utils.py since setup.py can not depend on tsfpga
-def path_relative_to(path: Path, other: Path) -> bool:
-    """
-    Note Path.relative_to() does not support the use case where e.g. readme.md should get
-    relative path "../readme.md". Hence we have to use os.path.
-    """
-    assert path.exists(), path
-    return Path(relpath(str(path), str(other)))
+    return [str(file_path.relative_to(hdl_registers.HDL_REGISTERS_PATH)) for file_path in files]
 
 
 if __name__ == "__main__":
