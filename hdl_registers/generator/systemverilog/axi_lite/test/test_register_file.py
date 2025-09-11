@@ -158,22 +158,19 @@ def test_default_values_on_reset(tmp_path):
 
     for register in register_list.register_objects:
         for field in register.fields:
-            default_value_int = (
-                field.default_value.value
-                if isinstance(field, Enumeration)
-                else field.default_value
-                if isinstance(field, Integer)
-                else int(field.default_value, 2)
-            )
-            default_value_hex = hex(default_value_int)[2:]
-
-            print(field)
             reset_assign = f"""
         if(rst) begin
             field_storage.{register.name}.{field.name}.value <="""
 
             if register.mode.software_can_write:
-                assert f"{reset_assign} {field.width}'h{default_value_hex};\n" in sv
+                default_value_int = (
+                    field.default_value.value
+                    if isinstance(field, Enumeration)
+                    else field.default_value
+                    if isinstance(field, Integer)
+                    else int(field.default_value, 2)
+                )
+                assert f"{reset_assign} {field.width}'h{default_value_int:x};\n" in sv
             else:
                 assert reset_assign not in sv
 
