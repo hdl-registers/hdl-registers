@@ -52,7 +52,7 @@ class RegisterList:
 
     @classmethod
     def from_default_registers(
-        cls, name: str, source_definition_file: Path, default_registers: list[Register]
+        cls, name: str, source_definition_file: Path | None, default_registers: list[Register]
     ) -> RegisterList:
         """
         Factory method. Create a ``RegisterList`` object from a plain list of registers.
