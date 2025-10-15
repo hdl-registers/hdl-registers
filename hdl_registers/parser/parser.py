@@ -19,6 +19,12 @@ from tsfpga import DEFAULT_FILE_ENCODING
 
 from hdl_registers.about import WEBSITE_URL
 from hdl_registers.constant.bit_vector_constant import UnsignedVector
+from hdl_registers.field.numerical_interpretation import (
+    Signed,
+    SignedFixedPoint,
+    Unsigned,
+    UnsignedFixedPoint,
+)
 from hdl_registers.register_list import RegisterList
 from hdl_registers.register_modes import REGISTER_MODES
 
@@ -88,7 +94,14 @@ class RegisterParser:
     required_bit_items: ClassVar[list[str]] = []
 
     # Attributes of the "bit_vector" register field.
-    recognized_bit_vector_items: ClassVar = {"type", "description", "width", "default_value"}
+    recognized_bit_vector_items: ClassVar = {
+        "type",
+        "description",
+        "width",
+        "default_value",
+        "numerical_interpretation",
+        "min_bit_index",
+    }
     # Note that "type" being present is implied.
     # We would not be parsing a bit_vector unless we know it to be a "bit_vector" type.
     # So we save some CPU cycles by not checking for it.
@@ -473,8 +486,38 @@ ERROR: Please inspect that file and update your data file to the new format.
         description = field_items.get("description", "")
         default_value = field_items.get("default_value", 0)
 
+        min_bit_index = field_items.get("min_bit_index", 0)
+        max_bit_index = min_bit_index + width - 1
+
+        numerical_interpretation_str = field_items.get("numerical_interpretation", "unsigned")
+
+        if numerical_interpretation_str == "unsigned":
+            numerical_interpretation = Unsigned(width)
+        elif numerical_interpretation_str == "signed":
+            numerical_interpretation = Signed(width)
+        elif numerical_interpretation_str == "ufixed":
+            numerical_interpretation = UnsignedFixedPoint(
+                max_bit_index=max_bit_index, min_bit_index=min_bit_index
+            )
+        elif numerical_interpretation_str == "sfixed":
+            numerical_interpretation = SignedFixedPoint(
+                max_bit_index=max_bit_index, min_bit_index=min_bit_index
+            )
+        else:
+            message = (
+                f'Error while parsing field "{field_name}" in register '
+                f'"{register.name}" in {self._source_definition_file}: '
+                f'Unknown value "{numerical_interpretation_str}" for '
+                and 'property "numerical_interpretation".'
+            )
+            raise ValueError(message)
+
         register.append_bit_vector(
-            name=field_name, description=description, width=width, default_value=default_value
+            name=field_name,
+            description=description,
+            width=width,
+            default_value=default_value,
+            numerical_interpretation=numerical_interpretation,
         )
 
     def _parse_enumeration(

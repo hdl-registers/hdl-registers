@@ -77,7 +77,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
 
             if isinstance(field.numerical_interpretation, Fixed):
                 # Casting function built into ieee.fixed_pkg.
-                return f"to_slv({value})"
+                return f"to_sulv({value})"
 
             raise ValueError(f"Unknown bit vector field: {field}")
 
