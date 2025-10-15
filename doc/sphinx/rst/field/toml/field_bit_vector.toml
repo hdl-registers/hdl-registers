@@ -23,6 +23,21 @@ tuser.description = "Value to set for **TUSER** in the data stream."
 # 2. An unsigned integer. The value's binary representation MUST fit within the field width.
 tuser.default_value = "0101"
 
+# The "numerical_interpretation" property is OPTIONAL for a bit vector field.
+# Will default to "unsigned" if not specified.
+# The value specified MUST be either
+# 1. "unsigned"
+# 2. "signed"
+# 3. "ufixed"
+# 4. "sfixed"
+tuser.numerical_interpretation = "unsigned"
+
+# The "min_bit_index" property is OPTIONAL for a bit vector field.
+# Will default to 0 if not specified.
+# This property is only used when numerical_interpretation is "ufixed" or "sfixed".
+# The property specifies the bit index of the LSB of the fixed point number.
+tuser.min_bit_index = 0
+
 
 tid.type = "bit_vector"
 tid.width = 8
