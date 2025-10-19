@@ -115,7 +115,7 @@ def main() -> None:
         install_requires=read_requirements_file(REQUIREMENTS_TXT),
         extras_require={"develop": read_requirements_file(REQUIREMENTS_DEVELOP_TXT)},
         # ----------------------------------
-        python_requires=">=3.9",
+        python_requires=">=3.10",
         # ----------------------------------
         project_urls={
             "Homepage": WEBSITE_URL,
