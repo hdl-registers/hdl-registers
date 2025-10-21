@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import copy
 import json
+from enum import Enum
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import tomli_w
@@ -103,9 +104,16 @@ class RegisterParser:
         "min_bit_index",
     }
     # Note that "type" being present is implied.
-    # We would not be parsing a bit_vector unless we know it to be a "bit_vector" type.
+    # We would not be parsing a bit vector unless we know it to be a "bit_vector" type.
     # So we save some CPU cycles by not checking for it.
     required_bit_vector_items: ClassVar = ["width"]
+
+    # The "numerical_interpretation" property of a "bit_vector" field may take only these values.
+    class _RecognizedBitVectorNumericalInterpretationItems(Enum):
+        UNSIGNED = "unsigned"
+        SIGNED = "signed"
+        UFIXED = "ufixed"
+        SFIXED = "sfixed"
 
     # Attributes of the "enumeration" register field.
     recognized_enumeration_items: ClassVar = {"type", "description", "default_value", "element"}
@@ -490,27 +498,34 @@ ERROR: Please inspect that file and update your data file to the new format.
         max_bit_index = min_bit_index + width - 1
 
         numerical_interpretation_str = field_items.get("numerical_interpretation", "unsigned")
-
-        if numerical_interpretation_str == "unsigned":
-            numerical_interpretation = Unsigned(width)
-        elif numerical_interpretation_str == "signed":
-            numerical_interpretation = Signed(width)
-        elif numerical_interpretation_str == "ufixed":
-            numerical_interpretation = UnsignedFixedPoint(
-                max_bit_index=max_bit_index, min_bit_index=min_bit_index
-            )
-        elif numerical_interpretation_str == "sfixed":
-            numerical_interpretation = SignedFixedPoint(
-                max_bit_index=max_bit_index, min_bit_index=min_bit_index
-            )
-        else:
-            message = (
-                f'Error while parsing field "{field_name}" in register '
-                f'"{register.name}" in {self._source_definition_file}: '
-                f'Unknown value "{numerical_interpretation_str}" for '
-                and 'property "numerical_interpretation".'
-            )
-            raise ValueError(message)
+        match numerical_interpretation_str:
+            case self._RecognizedBitVectorNumericalInterpretationItems.UNSIGNED.value:
+                numerical_interpretation = Unsigned(bit_width=width)
+            case self._RecognizedBitVectorNumericalInterpretationItems.SIGNED.value:
+                numerical_interpretation = Signed(bit_width=width)
+            case self._RecognizedBitVectorNumericalInterpretationItems.UFIXED.value:
+                numerical_interpretation = UnsignedFixedPoint(
+                    max_bit_index=max_bit_index, min_bit_index=min_bit_index
+                )
+            case self._RecognizedBitVectorNumericalInterpretationItems.SFIXED.value:
+                numerical_interpretation = SignedFixedPoint(
+                    max_bit_index=max_bit_index, min_bit_index=min_bit_index
+                )
+            case _:
+                valid_interpretations_str = ", ".join(
+                    [
+                        f'"{interpretation.value}"'
+                        for interpretation in self._RecognizedBitVectorNumericalInterpretationItems
+                    ]
+                )
+                message = (
+                    f'Error while parsing field "{field_name}" in register '
+                    f'"{register.name}" in {self._source_definition_file}: '
+                    f'Unknown value "{numerical_interpretation_str}" for '
+                    'property "numerical_interpretation". '
+                    f"Expected one of {valid_interpretations_str}."
+                )
+                raise ValueError(message)
 
         register.append_bit_vector(
             name=field_name,

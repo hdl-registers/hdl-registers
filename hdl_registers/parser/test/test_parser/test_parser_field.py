@@ -111,7 +111,7 @@ zebra.width = 4
     )
 
 
-def test_unknown_bit_field_property_should_raise_exception(tmp_path):
+def test_unknown_bit_property_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
@@ -134,7 +134,7 @@ dummy_bit.dummy_integer.max_value = 3
     )
 
 
-def test_unknown_bit_vector_field_property_should_raise_exception(tmp_path):
+def test_unknown_bit_vector_property_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
@@ -165,7 +165,7 @@ height = 4
     )
 
 
-def test_bit_vector_field_without_width_should_raise_exception(tmp_path):
+def test_bit_vector_without_width_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
@@ -207,7 +207,7 @@ my_field.numerical_interpretation = "unsigned"
     )
 
 
-def test_bit_vector_field_different_numerical_interpretations(tmp_path):
+def test_bit_vector_different_numerical_interpretations(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
@@ -279,7 +279,28 @@ sfixed_explicit.min_bit_index = 2
     assert sfixed_explicit.min_bit_index == 2
 
 
-def test_enumeration_field_without_elements_should_raise_exception(tmp_path):
+def test_bit_vector_unknown_numerical_interpretation_should_raise_exception(tmp_path):
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[test_reg]
+mode = "w"
+
+my_field.type = "bit_vector"
+my_field.width = 2
+my_field.numerical_interpretation = "apa"
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(name="", toml_file=toml_path)
+    assert str(exception_info.value) == (
+        f'Error while parsing field "my_field" in register "test_reg" in {toml_path}: '
+        'Unknown value "apa" for property "numerical_interpretation". '
+        'Expected one of "unsigned", "signed", "ufixed", "sfixed".'
+    )
+
+
+def test_enumeration_without_elements_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
@@ -304,7 +325,7 @@ test.type = "enumeration"
     )
 
 
-def test_integer_field_without_max_value_should_raise_exception(tmp_path):
+def test_integer_without_max_value_should_raise_exception(tmp_path):
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
