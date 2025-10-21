@@ -14,18 +14,47 @@ from hdl_registers.parser.toml import from_toml
 from hdl_registers.register_modes import REGISTER_MODES
 
 
-def test_unknown_top_level_property_should_raise_exception(tmp_path):
+def test_property_names_and_values_are_case_sensitive(tmp_path):
+    """
+    Explicitly show that we do not do any case normalization.
+    """
     toml_path = create_file(
         file=tmp_path / "regs.toml",
         contents="""
+[data]
+
 mode = "w"
 """,
     )
+    from_toml(name="", toml_file=toml_path)
 
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[data]
+
+Mode = "w"
+""",
+    )
     with pytest.raises(ValueError) as exception_info:
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
-        f'Error while parsing {toml_path}: Got unknown top-level property "mode".'
+        f'Error while parsing register "data" in {toml_path}: Missing required property "mode".'
+    )
+
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[data]
+
+mode = "W"
+""",
+    )
+    with pytest.raises(ValueError) as exception_info:
+        from_toml(name="", toml_file=toml_path)
+    assert str(exception_info.value) == (
+        f'Error while parsing register "data" in {toml_path}: Got unknown mode "W". '
+        'Expected one of "r", "w", "r_w", "wpulse", "r_wpulse".'
     )
 
 
