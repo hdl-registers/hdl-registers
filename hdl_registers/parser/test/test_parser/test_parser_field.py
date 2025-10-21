@@ -227,20 +227,20 @@ signed.numerical_interpretation = "signed"
 
 ufixed_implied.type = "bit_vector"
 ufixed_implied.width = 4
-ufixed_implied.numerical_interpretation = "ufixed"
+ufixed_implied.numerical_interpretation = "unsigned_fixed_point"
 
 ufixed_explicit.type = "bit_vector"
 ufixed_explicit.width = 5
-ufixed_explicit.numerical_interpretation = "ufixed"
+ufixed_explicit.numerical_interpretation = "unsigned_fixed_point"
 ufixed_explicit.min_bit_index = -2
 
 sfixed_implied.type = "bit_vector"
 sfixed_implied.width = 6
-sfixed_implied.numerical_interpretation = "sfixed"
+sfixed_implied.numerical_interpretation = "signed_fixed_point"
 
 sfixed_explicit.type = "bit_vector"
 sfixed_explicit.width = 7
-sfixed_explicit.numerical_interpretation = "sfixed"
+sfixed_explicit.numerical_interpretation = "signed_fixed_point"
 sfixed_explicit.min_bit_index = 2
 """,
     )
@@ -296,7 +296,7 @@ my_field.numerical_interpretation = "apa"
     assert str(exception_info.value) == (
         f'Error while parsing field "my_field" in register "test_reg" in {toml_path}: '
         'Unknown value "apa" for property "numerical_interpretation". '
-        'Expected one of "unsigned", "signed", "ufixed", "sfixed".'
+        'Expected one of "unsigned", "signed", "unsigned_fixed_point", "signed_fixed_point".'
     )
 
 

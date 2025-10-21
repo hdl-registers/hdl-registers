@@ -28,13 +28,14 @@ tuser.default_value = "0101"
 # The value specified MUST be either
 # 1. "unsigned"
 # 2. "signed"
-# 3. "ufixed"
-# 4. "sfixed"
+# 3. "unsigned_fixed_point"
+# 4. "signed_fixed_point"
 tuser.numerical_interpretation = "unsigned"
 
 # The "min_bit_index" property is OPTIONAL for a bit vector field.
 # Will default to 0 if not specified.
-# This property is only used when "numerical_interpretation" is "ufixed" or "sfixed".
+# This property is only used when "numerical_interpretation" is "unsigned_fixed_point"
+# or "signed_fixed_point".
 # The property specifies the bit index of the LSB of the fixed point number.
 # Set to a negative value to add fractional bits.
 tuser.min_bit_index = 0
