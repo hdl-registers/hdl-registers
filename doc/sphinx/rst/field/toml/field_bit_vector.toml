@@ -34,8 +34,9 @@ tuser.numerical_interpretation = "unsigned"
 
 # The "min_bit_index" property is OPTIONAL for a bit vector field.
 # Will default to 0 if not specified.
-# This property is only used when numerical_interpretation is "ufixed" or "sfixed".
+# This property is only used when "numerical_interpretation" is "ufixed" or "sfixed".
 # The property specifies the bit index of the LSB of the fixed point number.
+# Set to a negative value to add fractional bits.
 tuser.min_bit_index = 0
 
 
