@@ -112,8 +112,8 @@ class RegisterParser:
     class _RecognizedBitVectorNumericalInterpretationItems(Enum):
         UNSIGNED = "unsigned"
         SIGNED = "signed"
-        UFIXED = "ufixed"
-        SFIXED = "sfixed"
+        UNSIGNED_FIXED_POINT = "unsigned_fixed_point"
+        SIGNED_FIXED_POINT = "signed_fixed_point"
 
     # Attributes of the "enumeration" register field.
     recognized_enumeration_items: ClassVar = {"type", "description", "default_value", "element"}
@@ -503,11 +503,11 @@ ERROR: Please inspect that file and update your data file to the new format.
                 numerical_interpretation = Unsigned(bit_width=width)
             case self._RecognizedBitVectorNumericalInterpretationItems.SIGNED.value:
                 numerical_interpretation = Signed(bit_width=width)
-            case self._RecognizedBitVectorNumericalInterpretationItems.UFIXED.value:
+            case self._RecognizedBitVectorNumericalInterpretationItems.UNSIGNED_FIXED_POINT.value:
                 numerical_interpretation = UnsignedFixedPoint(
                     max_bit_index=max_bit_index, min_bit_index=min_bit_index
                 )
-            case self._RecognizedBitVectorNumericalInterpretationItems.SFIXED.value:
+            case self._RecognizedBitVectorNumericalInterpretationItems.SIGNED_FIXED_POINT.value:
                 numerical_interpretation = SignedFixedPoint(
                     max_bit_index=max_bit_index, min_bit_index=min_bit_index
                 )

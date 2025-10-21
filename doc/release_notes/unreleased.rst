@@ -1,7 +1,7 @@
 Added
 
 * Add numerical interpretation for bit vector fields to data file parser
-  (to support signed, ufixed and sfixed).
+  (to support signed, unsigned fixed-point and signed fixed-point).
 
 Fixes
 
