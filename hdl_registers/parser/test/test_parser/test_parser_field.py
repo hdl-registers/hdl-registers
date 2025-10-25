@@ -160,8 +160,8 @@ height = 4
     with pytest.raises(ValueError) as exception_info:
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
-        f'Error while parsing field "dummy_bit_vector" in register "dummy_reg" in '
-        f'{toml_path}: Unknown property "height".'
+        f'Error while parsing field "dummy_bit_vector" in register "dummy_reg" within array "apa" '
+        f'in {toml_path}: Unknown property "height".'
     )
 
 
@@ -320,8 +320,8 @@ test.type = "enumeration"
     with pytest.raises(ValueError) as exception_info:
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
-        f'Error while parsing field "test" in register "test_reg" in {toml_path}: '
-        'Missing required property "element".'
+        'Error while parsing field "test" in register "test_reg" within array "apa" '
+        f'in {toml_path}: Missing required property "element".'
     )
 
 
