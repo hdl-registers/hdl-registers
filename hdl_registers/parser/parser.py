@@ -62,8 +62,8 @@ class RegisterParser:
 
     # Attributes of the constant.
     recognized_constant_items: ClassVar = {"type", "value", "description", "data_type"}
-    # Note that "type" being present is implied. We would not be parsing a constant unless we
-    # know it to be a "constant" type.
+    # Note that "type" being present is implied.
+    # We would not be parsing a constant unless "type" equal to "constant" was seen.
     # So we save some CPU cycles by not checking for it.
     required_constant_items: ClassVar = ["value"]
 
@@ -83,14 +83,14 @@ class RegisterParser:
     # Anything apart from these are names of registers.
     default_register_array_items: ClassVar = {"type", "array_length", "description"}
     # Note that "type" being present is implied.
-    # We would not be parsing a register array unless we know it to be a "register_array" type.
+    # We would not be parsing a register array unless "type" equal to "register_array" was seen.
     # So we save some CPU cycles by not checking for it.
     required_register_array_items: ClassVar = ["array_length"]
 
     # Attributes of the "bit" register field.
     recognized_bit_items: ClassVar = {"type", "description", "default_value"}
     # Note that "type" being present is implied.
-    # We would not be parsing a bit unless we know it to be a "bit" type.
+    # We would not be parsing a bit unless "type" equal to "bit" was seen.
     # So we save some CPU cycles by not checking for it.
     required_bit_items: ClassVar[list[str]] = []
 
@@ -104,7 +104,7 @@ class RegisterParser:
         "min_bit_index",
     }
     # Note that "type" being present is implied.
-    # We would not be parsing a bit vector unless we know it to be a "bit_vector" type.
+    # We would not be parsing a bit vector unless "type" equal to "bit_vector" was seen.
     # So we save some CPU cycles by not checking for it.
     required_bit_vector_items: ClassVar = ["width"]
 
@@ -118,7 +118,7 @@ class RegisterParser:
     # Attributes of the "enumeration" register field.
     recognized_enumeration_items: ClassVar = {"type", "description", "default_value", "element"}
     # Note that "type" being present is implied.
-    # We would not be parsing a enumeration unless we know it to be a "enumeration" type.
+    # We would not be parsing an enumeration unless "type" equal to "enumeration" was seen.
     # So we save some CPU cycles by not checking for it.
     required_enumeration_items: ClassVar = ["element"]
 
@@ -131,7 +131,7 @@ class RegisterParser:
         "default_value",
     }
     # Note that "type" being present is implied.
-    # We would not be parsing a integer unless we know it to be a "integer" type.
+    # We would not be parsing an integer unless "type" equal to "integer" was seen.
     # So we save some CPU cycles by not checking for it.
     required_integer_items: ClassVar = ["max_value"]
 
