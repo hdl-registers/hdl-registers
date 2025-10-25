@@ -53,9 +53,11 @@ class RegisterMode:
       | E.g. CPU, PCIe, etc. |
       |______________________|
                  ||
+                 ||
                  ||         "Register bus"
                  ||         E.g. AXI-Lite.
                  || "read" or "write" transactions.
+                 ||
                  ||
        _______________________      "down"      ______________________________
       |    "Register file"    |--------------->|          "Hardware"          |
@@ -96,7 +98,7 @@ class RegisterMode:
                 False otherwise, which can be due to either
 
                 * mode is not software-readable, or
-                * mode loopbacks a software-written value to the software read value.
+                * mode loopbacks a software-written value to the software-read value.
         """
         if hardware_has_up and not software_can_read:
             raise ValueError(
