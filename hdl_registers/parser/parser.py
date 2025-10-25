@@ -358,7 +358,10 @@ ERROR: Please inspect that file and update your data file to the new format.
                 raise ValueError(message)
 
             parser_methods[field_type](
-                register=register, field_name=item_name, field_items=item_value
+                register=register,
+                field_name=item_name,
+                field_items=item_value,
+                register_array_note=register_array_note,
             )
 
     def _parse_register_array(self, name: str, items: dict[str, Any]) -> None:
@@ -442,6 +445,7 @@ ERROR: Please inspect that file and update your data file to the new format.
         field_items: dict[str, Any],
         recognized_items: set[str],
         required_items: list[str],
+        register_array_note: str,
     ) -> None:
         """
         Will raise exception if anything is wrong.
@@ -449,8 +453,8 @@ ERROR: Please inspect that file and update your data file to the new format.
         for item_name in required_items:
             if item_name not in field_items:
                 message = (
-                    f'Error while parsing field "{field_name}" in register "{register_name}" in '
-                    f"{self._source_definition_file}: "
+                    f'Error while parsing field "{field_name}" in register '
+                    f'"{register_name}"{register_array_note} in {self._source_definition_file}: '
                     f'Missing required property "{item_name}".'
                 )
                 raise ValueError(message)
@@ -459,18 +463,25 @@ ERROR: Please inspect that file and update your data file to the new format.
             if item_name not in recognized_items:
                 message = (
                     f'Error while parsing field "{field_name}" in register '
-                    f'"{register_name}" in {self._source_definition_file}: '
+                    f'"{register_name}"{register_array_note} in {self._source_definition_file}: '
                     f'Unknown property "{item_name}".'
                 )
                 raise ValueError(message)
 
-    def _parse_bit(self, register: Register, field_name: str, field_items: dict[str, Any]) -> None:
+    def _parse_bit(
+        self,
+        register: Register,
+        field_name: str,
+        field_items: dict[str, Any],
+        register_array_note: str,
+    ) -> None:
         self._check_field_items(
             register_name=register.name,
             field_name=field_name,
             field_items=field_items,
             recognized_items=self.recognized_bit_items,
             required_items=self.required_bit_items,
+            register_array_note=register_array_note,
         )
 
         description = field_items.get("description", "")
@@ -479,7 +490,11 @@ ERROR: Please inspect that file and update your data file to the new format.
         register.append_bit(name=field_name, description=description, default_value=default_value)
 
     def _parse_bit_vector(
-        self, register: Register, field_name: str, field_items: dict[str, Any]
+        self,
+        register: Register,
+        field_name: str,
+        field_items: dict[str, Any],
+        register_array_note: str,
     ) -> None:
         self._check_field_items(
             register_name=register.name,
@@ -487,6 +502,7 @@ ERROR: Please inspect that file and update your data file to the new format.
             field_items=field_items,
             recognized_items=self.recognized_bit_vector_items,
             required_items=self.required_bit_vector_items,
+            register_array_note=register_array_note,
         )
 
         width = field_items["width"]
@@ -536,7 +552,11 @@ ERROR: Please inspect that file and update your data file to the new format.
         )
 
     def _parse_enumeration(
-        self, register: Register, field_name: str, field_items: dict[str, Any]
+        self,
+        register: Register,
+        field_name: str,
+        field_items: dict[str, Any],
+        register_array_note: str,
     ) -> None:
         self._check_field_items(
             register_name=register.name,
@@ -550,6 +570,7 @@ ERROR: Please inspect that file and update your data file to the new format.
             # However, this particular check is needed here also since the logic for default
             # value below does not work if there are no elements.
             required_items=self.required_enumeration_items,
+            register_array_note=register_array_note,
         )
 
         description = field_items.get("description", "")
@@ -570,7 +591,11 @@ ERROR: Please inspect that file and update your data file to the new format.
         )
 
     def _parse_integer(
-        self, register: Register, field_name: str, field_items: dict[str, Any]
+        self,
+        register: Register,
+        field_name: str,
+        field_items: dict[str, Any],
+        register_array_note: str,
     ) -> None:
         self._check_field_items(
             register_name=register.name,
@@ -578,6 +603,7 @@ ERROR: Please inspect that file and update your data file to the new format.
             field_items=field_items,
             recognized_items=self.recognized_integer_items,
             required_items=self.required_integer_items,
+            register_array_note=register_array_note,
         )
 
         max_value = field_items["max_value"]
