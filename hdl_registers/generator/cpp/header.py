@@ -171,24 +171,25 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             field_type = self._get_field_value_type(
                 register=register, register_array=register_array, field=field
             )
 
-            signature = self._field_getter_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=False,
-            )
-            public_cpp.append(
-                self._get_override_function(
-                    comment=self._get_getter_comment(field=field),
-                    return_type=field_type,
-                    signature=signature,
+            if self.should_have_field_accessors(register=register):
+                signature = self._field_getter_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
+                    from_raw=False,
                 )
-            )
+                public_cpp.append(
+                    self._get_override_function(
+                        comment=self._get_getter_comment(field=field),
+                        return_type=field_type,
+                        signature=signature,
+                    )
+                )
 
             signature = self._field_getter_signature(
                 register=register,
@@ -250,20 +251,21 @@ class CppHeaderGenerator(CppGeneratorCommon):
                 )
             )
 
-        for field in register.fields:
-            signature = self._field_setter_signature(
-                register=register,
-                register_array=register_array,
-                field=field,
-                from_raw=False,
-            )
-            public_cpp.append(
-                self._get_override_function(
-                    comment=self._get_setter_comment(register=register, field=field),
-                    return_type="void",
-                    signature=signature,
+        for field in register.fields + self.get_implied_fields(register=register):
+            if self.should_have_field_accessors(register=register):
+                signature = self._field_setter_signature(
+                    register=register,
+                    register_array=register_array,
+                    field=field,
+                    from_raw=False,
                 )
-            )
+                public_cpp.append(
+                    self._get_override_function(
+                        comment=self._get_setter_comment(register=register, field=field),
+                        return_type="void",
+                        signature=signature,
+                    )
+                )
 
             signature = self._field_to_raw_signature(
                 register=register, register_array=register_array, field=field

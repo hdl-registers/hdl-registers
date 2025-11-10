@@ -220,7 +220,7 @@ mode = "rw"
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value) == (
         f'Error while parsing register "test_reg" in {toml_path}: '
-        'Got unknown mode "rw". Expected one of "r", "w", "r_w", "wpulse", "r_wpulse".'
+        'Got unknown mode "rw". Expected one of "r", "w", "r_w", "wpulse", "r_wpulse", "wmasked".'
     )
 
 
@@ -243,5 +243,6 @@ mode = "r_pulse"
         from_toml(name="", toml_file=toml_path)
     assert (
         str(exception_info.value) == f'Error while parsing register "hest" in {toml_path}: '
-        'Got unknown mode "r_pulse". Expected one of "r", "w", "r_w", "wpulse", "r_wpulse".'
+        'Got unknown mode "r_pulse". '
+        'Expected one of "r", "w", "r_w", "wpulse", "r_wpulse", "wmasked".'
     )

@@ -117,7 +117,9 @@ def test_appending_bit_to_full_register():
 
     with pytest.raises(ValueError) as exception_info:
         register.append_bit(name="bar", description="", default_value="0")
-    assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
+    assert str(exception_info.value) == (
+        'Maximum width exceeded for register "apa". Adding field "bar" makes the total width 33.'
+    )
 
 
 def test_appending_bit_vector_to_full_register():
@@ -126,7 +128,9 @@ def test_appending_bit_vector_to_full_register():
 
     with pytest.raises(ValueError) as exception_info:
         register.append_bit_vector(name="bar", description="", width=3, default_value="000")
-    assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
+    assert str(exception_info.value) == (
+        'Maximum width exceeded for register "apa". Adding field "bar" makes the total width 33.'
+    )
 
 
 def test_appending_integer_to_full_register():
@@ -135,13 +139,22 @@ def test_appending_integer_to_full_register():
 
     with pytest.raises(ValueError) as exception_info:
         register.append_integer(
-            name="zebra",
-            description="",
-            min_value=0,
-            max_value=4,
-            default_value=0,
+            name="bar", description="", min_value=0, max_value=4, default_value=0
         )
-    assert str(exception_info.value) == 'Maximum width exceeded for register "apa".'
+    assert str(exception_info.value) == (
+        'Maximum width exceeded for register "apa". Adding field "bar" makes the total width 33.'
+    )
+
+
+def test_appending_integer_to_full_masked_register():
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["wmasked"], description="")
+    register.append_bit_vector(name="foo", width=16, description="", default_value=0)
+
+    with pytest.raises(ValueError) as exception_info:
+        register.append_bit(name="bar", description="", default_value="0")
+    assert str(exception_info.value) == (
+        'Maximum width exceeded for register "apa". Adding field "bar" makes the total width 17.'
+    )
 
 
 def test_get_field():

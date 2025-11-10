@@ -23,6 +23,12 @@ library bfm;
 
 library register_file;
 
+use work.all_modes_register_check_pkg.all;
+use work.all_modes_register_read_write_pkg.all;
+use work.all_modes_register_record_pkg.all;
+use work.all_modes_register_wait_until_pkg.all;
+use work.all_modes_regs_pkg.all;
+
 use work.array_only_up_register_check_pkg.all;
 use work.array_only_up_register_read_write_pkg.all;
 use work.array_only_up_register_record_pkg.all;
@@ -34,6 +40,10 @@ use work.array_only_down_register_read_write_pkg.all;
 use work.array_only_down_register_record_pkg.all;
 use work.array_only_down_register_wait_until_pkg.all;
 use work.array_only_down_regs_pkg.all;
+
+use work.empty_regs_pkg.all;
+
+use work.only_constants_regs_pkg.all;
 
 use work.plain_and_array_only_up_register_check_pkg.all;
 use work.plain_and_array_only_up_register_read_write_pkg.all;
@@ -58,10 +68,6 @@ use work.plain_only_down_register_read_write_pkg.all;
 use work.plain_only_down_register_record_pkg.all;
 use work.plain_only_down_register_wait_until_pkg.all;
 use work.plain_only_down_regs_pkg.all;
-
-use work.only_constants_regs_pkg.all;
-
-use work.empty_regs_pkg.all;
 
 
 entity tb_instantiate_strange_register_maps is
@@ -89,6 +95,49 @@ begin
 
     test_runner_cleanup(runner);
   end process;
+
+
+
+  ------------------------------------------------------------------------------
+  all_modes_block : block
+    signal axi_lite_m2s : axi_lite_m2s_t := axi_lite_m2s_init;
+    signal axi_lite_s2m : axi_lite_s2m_t := axi_lite_s2m_init;
+
+    signal regs_up : all_modes_regs_up_t := all_modes_regs_up_init;
+    signal regs_down : all_modes_regs_down_t := all_modes_regs_down_init;
+
+    signal reg_was_read : all_modes_reg_was_read_t := all_modes_reg_was_read_init;
+    signal reg_was_written : all_modes_reg_was_written_t := all_modes_reg_was_written_init;
+  begin
+
+    ------------------------------------------------------------------------------
+    axi_lite_master_inst : entity bfm.axi_lite_master
+      port map (
+        clk => clk,
+        --
+        axi_lite_m2s => axi_lite_m2s,
+        axi_lite_s2m => axi_lite_s2m
+      );
+
+
+    ------------------------------------------------------------------------------
+    all_modes_register_file_axi_lite_inst : entity work.all_modes_register_file_axi_lite
+      port map(
+        clk => clk,
+        --
+        axi_lite_m2s => axi_lite_m2s,
+        axi_lite_s2m => axi_lite_s2m,
+        --
+        regs_up => regs_up,
+        regs_down => regs_down,
+        --
+        reg_was_read => reg_was_read,
+        reg_was_written => reg_was_written
+      );
+
+  end block;
+
+
 
 
   ------------------------------------------------------------------------------
