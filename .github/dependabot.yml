@@ -3,7 +3,9 @@ updates:
   - package-ecosystem: "pip"
     directory: "/hdl_registers"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    cooldown:
+      default-days: 7
     labels:
       - Dependencies
     reviewers:
@@ -13,6 +15,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     labels:
       - Dependencies
     reviewers:
