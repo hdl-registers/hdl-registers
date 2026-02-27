@@ -38,7 +38,7 @@ REGISTER_MODES = {
         ),
         software_can_read=True,
         software_can_write=True,
-        hardware_has_up=False,
+        hardware_has_up=True,
     ),
     "wpulse": RegisterMode(
         shorthand="wpulse",
