@@ -251,6 +251,9 @@ jobs:
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
+    strategy:
+        matrix:
+          py: ['3.10', '3.11', '3.12', '3.13']
     steps:
 
       - name: Checkout
@@ -258,6 +261,8 @@ jobs:
 
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: ${{ matrix.py }}
 
       - name: Install latest release
         run: python3 -m pip install hdl-registers
