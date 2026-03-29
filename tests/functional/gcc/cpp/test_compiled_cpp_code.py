@@ -7,11 +7,12 @@
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
 
+import re
 import subprocess
 from pathlib import Path
 
 import pytest
-from tsfpga.system_utils import create_file, run_command
+from tsfpga.system_utils import create_file, read_file, run_command
 
 from hdl_registers.field.numerical_interpretation import (
     Signed,
@@ -21,7 +22,7 @@ from hdl_registers.field.numerical_interpretation import (
 from hdl_registers.generator.cpp.header import CppHeaderGenerator
 from hdl_registers.generator.cpp.implementation import CppImplementationGenerator
 from hdl_registers.generator.cpp.interface import CppInterfaceGenerator
-from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+from hdl_registers.generator.vhdl.test.test_vhdl import (
     get_all_doc_register_lists,
     get_strange_register_lists,
 )
@@ -62,6 +63,10 @@ int main()
 }}
 """
 
+    @property
+    def interface_cpp(self) -> str:
+        return read_file(self.include_dir / f"i_{self.register_list.name}.h")
+
     def compile(
         self,
         test_code="",
@@ -86,10 +91,8 @@ int main()
         CppInterfaceGenerator(self.register_list, self.include_dir).create()
         CppHeaderGenerator(self.register_list, self.include_dir).create()
         CppImplementationGenerator(self.register_list, self.working_dir).create()
-        cpp_class_file = self.working_dir / "caesar.cpp"
 
         main_file = self.working_dir / "main.cpp"
-
         executable = self.working_dir / "test.o"
 
         compile_command = (
@@ -98,7 +101,7 @@ int main()
                 f"-o{executable}",
                 f"-I{self.include_dir}",
                 main_file,
-                cpp_class_file,
+                self.working_dir / "caesar.cpp",
             ]
             + [f"-I{path}" for path in include_directories]
             + source_files
@@ -127,7 +130,7 @@ def base_cpp_test(tmp_path):
 
 class CppTest(BaseCppTest):
     def compile_and_run(self, test_constants, test_registers):
-        test_code = f"  assert(fpga_regs::Caesar::num_registers == {21 * test_registers});\n"
+        test_code = f"  assert(fpga_regs::Caesar::num_registers == {22 * test_registers});\n"
 
         tests = ["test_constants"] if test_constants else []
         tests += ["test_registers"] if test_registers else []
@@ -247,8 +250,8 @@ def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2284: Got 'value1' value out of range: 128.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: 128.\n", exception_info.value.stderr
     )
 
     test_code = """\
@@ -259,8 +262,8 @@ def test_setting_bit_vector_signed_field_out_of_range_should_crash(base_cpp_test
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2284: Got 'value1' value out of range: -129.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: -129.\n", exception_info.value.stderr
     )
 
 
@@ -288,8 +291,8 @@ def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2272: Got 'value1' value out of range: 16.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: 16.\n", exception_info.value.stderr
     )
 
     test_code = """\
@@ -300,8 +303,8 @@ def test_setting_bit_vector_unsigned_fixed_point_field_out_of_range_should_crash
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2272: Got 'value1' value out of range: -0.5.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: -0.5.\n", exception_info.value.stderr
     )
 
 
@@ -329,7 +332,9 @@ def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(b
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == "caesar.cpp:2287: Got 'value1' value out of range: 8.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: 8.\n", exception_info.value.stderr
+    )
 
     test_code = """\
   caesar.set_apa_value1(-9.125);
@@ -339,8 +344,8 @@ def test_setting_bit_vector_signed_fixed_point_field_out_of_range_should_crash(b
         run_command(cmd=cmd, capture_output=True)
 
     assert exception_info.value.output == ""
-    assert exception_info.value.stderr == (
-        "caesar.cpp:2287: Got 'value1' value out of range: -9.125.\n"
+    assert re.fullmatch(
+        "caesar.cpp:\\d+: Got 'value1' value out of range: -9.125.\n", exception_info.value.stderr
     )
 
 
@@ -467,7 +472,7 @@ def test_bit_field_at_the_top(base_cpp_test):
   assert(caesar.get_bit_reg_value() == false);
 
   caesar.set_bit_reg2_pad(3);
-  assert(memory[22] == 0x80000003);
+  assert(memory[fpga_regs::Caesar::num_registers - 1] == 0x80000003);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)
@@ -484,8 +489,8 @@ def test_very_wide_bit_vector_fields(base_cpp_test):
     ).append_bit_vector(name="value", description="", width=31, default_value=0)
 
     test_code = """\
-  memory[21] = 0b10000000000000000000000000000001;
-  memory[22] = 0b11000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 2] = 0b10000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 1] = 0b11000000000000000000000000000001;
 
   assert(caesar.get_vector_32_value() == 2147483649);
   assert(caesar.get_vector_31_value() == 1073741825);
@@ -560,7 +565,7 @@ def test_unsigned_fixed_point_bit_vector_field(base_cpp_test):
   caesar.set_apa({21.33203125, 10.6640625});
   assert(caesar.get_apa_value1() == 21.33203125);
   assert(caesar.get_apa_value2() == 10.6640625);
-  assert(memory[21] == 44728320 + 5461);
+  assert(memory[fpga_regs::Caesar::num_registers - 1] == 44728320 + 5461);
 
   // One value is truncated, the other is unchanged.
   caesar.set_apa_value1(21.332031251);
@@ -604,7 +609,7 @@ def test_signed_fixed_point_bit_vector_field(base_cpp_test):
 
   // Values that fit perfectly with no rounding/truncation.
   caesar.set_apa({-53.390625, 74.859375});
-  assert(memory[21] == 78495744 + 12967);
+  assert(memory[fpga_regs::Caesar::num_registers - 1] == 78495744 + 12967);
   assert(caesar.get_apa_value1() == -53.390625);
   assert(caesar.get_apa_value2() == 74.859375);
 
@@ -668,10 +673,10 @@ def test_very_wide_integer_fields(base_cpp_test):
   assert(fpga_regs::caesar::unsigned_31::value::default_value == 1073741824);
   assert(fpga_regs::caesar::unsigned_31::value::default_value_raw == 1073741824);
 
-  memory[21] = 0b10000000000000000000000000000001;
-  memory[22] = 0b10000000000000000000000000000001;
-  memory[23] = 0b11000000000000000000000000000001;
-  memory[24] = 0b11000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 4] = 0b10000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 3] = 0b10000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 2] = 0b11000000000000000000000000000001;
+  memory[fpga_regs::Caesar::num_registers - 1] = 0b11000000000000000000000000000001;
 
   assert(caesar.get_signed_32_value() == -2147483647);
   assert(caesar.get_unsigned_32_value() == 2147483649);
@@ -741,6 +746,113 @@ def test_very_wide_integer_field_slightly_offset(base_cpp_test):
 
   caesar.set_unsigned_31_value(0b1010101010101010101010101010101);
   assert(caesar.get_unsigned_31_value() == 0b1010101010101010101010101010101);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+
+def test_wmasked_register_attributes(base_cpp_test):
+    # There is already one 'wmasked' register in the base register list.
+    # Test an empty 'wmasked' register with also, since that is handled differently in the code.
+    base_cpp_test.register_list.append_register(
+        name="instruction2", mode=REGISTER_MODES["wmasked"], description=""
+    )
+
+    # And the same in an array also, since that is handled differently in the code.
+    array = base_cpp_test.register_list.append_register_array(
+        name="instructions", length=2, description=""
+    )
+    array.append_register(
+        name="instruction3", mode=REGISTER_MODES["wmasked"], description=""
+    ).append_bit(name="b", description="", default_value="0")
+    array.append_register(name="instruction4", mode=REGISTER_MODES["wmasked"], description="")
+
+    test_code = """\
+  assert(fpga_regs::caesar::instruction::a::width == 5);
+  assert(fpga_regs::caesar::instruction::a::shift == 0);
+  assert(fpga_regs::caesar::instruction::mask::width == 5);
+  assert(fpga_regs::caesar::instruction::mask::shift == 16);
+
+  assert(fpga_regs::caesar::instruction2::mask::width == 16);
+  assert(fpga_regs::caesar::instruction2::mask::shift == 16);
+
+  assert(fpga_regs::caesar::instructions::instruction3::b::width == 1);
+  assert(fpga_regs::caesar::instructions::instruction3::b::shift == 0);
+  assert(fpga_regs::caesar::instructions::instruction3::mask::width == 1);
+  assert(fpga_regs::caesar::instructions::instruction3::mask::shift == 16);
+
+  assert(fpga_regs::caesar::instructions::instruction4::mask::width == 16);
+  assert(fpga_regs::caesar::instructions::instruction4::mask::shift == 16);
+"""
+
+    cmd = base_cpp_test.compile(test_code=test_code)
+    run_command(cmd=cmd)
+
+    cpp = base_cpp_test.interface_cpp
+
+    # No getter in any form.
+    assert "get_instruction" not in cpp
+
+    # Has 1+1 fields, so should have a struct setter and a raw setter.
+    assert (
+        """virtual void set_instruction(
+      caesar::instruction::Value"""
+        in cpp
+    )
+    assert (
+        """virtual void set_instruction_raw(
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instruction_") == 1
+
+    # Has no field, should only have raw setter.
+    assert (
+        """virtual void set_instruction2(
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instruction2") == 1
+
+    # Same but in array.
+    # Has 1+1 fields, so should have a struct setter and a raw setter.
+    assert (
+        """virtual void set_instructions_instruction3(
+      size_t array_index,
+      caesar::instructions::instruction3::Value"""
+        in cpp
+    )
+    assert (
+        """virtual void set_instructions_instruction3_raw(
+      size_t array_index,
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instructions_instruction3") == 2
+
+    # Same but in array.
+    # Has no field, should only have raw setter.
+    assert (
+        """virtual void set_instructions_instruction4(
+      size_t array_index,
+      uint32_t"""
+        in cpp
+    )
+    # No other register setter, no field setters.
+    assert cpp.count("set_instructions_instruction4") == 1
+
+
+def test_wmasked_register_write(base_cpp_test):
+    test_code = """\
+  // First 'a' then 'mask'.
+  const fpga_regs::caesar::instruction::Value value = {0b01010, 0b10101};
+  caesar.set_instruction(value);
+  std::cout << memory[21] << std::endl;
+  assert(memory[21] == 0x0015000A);
 """
 
     cmd = base_cpp_test.compile(test_code=test_code)

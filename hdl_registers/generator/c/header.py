@@ -17,7 +17,7 @@ from hdl_registers.constant.float_constant import FloatConstant
 from hdl_registers.constant.integer_constant import IntegerConstant
 from hdl_registers.constant.string_constant import StringConstant
 from hdl_registers.field.enumeration import Enumeration
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.software_code_generator import SoftwareCodeGenerator
 from hdl_registers.register import Register
 
 if TYPE_CHECKING:
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 # That test is considered more meaningful and exhaustive than a unit test would be.
 
 
-class CHeaderGenerator(RegisterCodeGenerator):
+class CHeaderGenerator(SoftwareCodeGenerator):
     """
     Generate a C header.
     See the :ref:`generator_c` article for usage details.
@@ -188,7 +188,7 @@ class CHeaderGenerator(RegisterCodeGenerator):
 
     def _field_definitions(self, register: Register, register_array: RegisterArray | None) -> str:
         c_code = ""
-        for field in register.fields:
+        for field in register.fields + self.get_implied_fields(register=register):
             field_description = self.field_description(
                 register=register, register_array=register_array, field=field
             )

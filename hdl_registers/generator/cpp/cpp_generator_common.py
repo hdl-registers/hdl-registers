@@ -21,7 +21,7 @@ from hdl_registers.field.numerical_interpretation import (
     Unsigned,
     UnsignedFixedPoint,
 )
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.software_code_generator import SoftwareCodeGenerator
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_list import RegisterList
 
 
-class CppGeneratorCommon(RegisterCodeGenerator):
+class CppGeneratorCommon(SoftwareCodeGenerator):
     """
     Class with common methods for generating C++ code.
     """
