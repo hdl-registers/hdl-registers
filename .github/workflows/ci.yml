@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-24.04', 'windows-latest', 'macos-latest']
-        py: ['3.10', '3.11', '3.12', '3.13']
+        py: ['3.10', '3.11', '3.12', '3.13', '3.14']
     runs-on: ${{ matrix.os }}
     steps:
 
@@ -66,26 +66,26 @@ jobs:
     # Run only the UNIT tests on most Python versions in the matrix.
     # This is very fast (2-3 s).
     - name: Run unit tests
-      if: matrix.os != 'ubuntu-24.04' || matrix.py != '3.13'
+      if: matrix.os != 'ubuntu-24.04' || matrix.py != '3.14'
       run: |
         python3 -m pytest --verbose hdl_registers
 
     # On one Python version however, we run ALL the Python-based tests, which requires a few more
     # dependencies, and then we collect coverage from this run.
     - name: Setup GHDL
-      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
       uses: ghdl/setup-ghdl@09e61b6db92fe2766a0b0a4b82505a47d67570be # v1.2.1
 
     - name: Setup Verilator
-      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
       uses: veryl-lang/setup-verilator@b155747595eb4b817473a83045ba1da581c4084b # v1.0.3
 
     - name: Install further Python packages
-      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
       run: |
         python3 -m pip install \
           GitPython \
-          pybadges \
+          git+https://github.com/ProsePal/py-badge@6e137cf13d8453ff085aab90cf1535fb58a1785a \
           pytest-cov \
           pytest-xdist \
           requests \
@@ -95,7 +95,7 @@ jobs:
     # Run ALL tests, including unit, lint and functional ones.
     # The execution time goes from 1:13 -> 0:50 when two threads are used.
     - name: Run all tests
-      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
       run: |
         python3 -m pytest \
           --verbose \
@@ -107,7 +107,7 @@ jobs:
           tests
 
     - name: Upload coverage artifacts
-      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.13'
+      if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
       uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         name: coverage
@@ -129,7 +129,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       with:
-        python-version: '3.11'
+        python-version: '3.14'
         cache: pip
         cache-dependency-path: hdl_registers/requirements_develop.txt
 
@@ -140,11 +140,11 @@ jobs:
           docutils \
           GitPython \
           peakrdl-regblock \
-          pybadges \
+          git+https://github.com/ProsePal/py-badge@6e137cf13d8453ff085aab90cf1535fb58a1785a \
           PyYAML \
           rtoml \
           setuptools \
-          sphinx \
+          "sphinx<9" \
           sphinx_sitemap \
           sphinx-rtd-theme \
           sphinx-toolbox \
@@ -222,7 +222,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
-          python-version: '3.13'
+          python-version: '3.14'
           cache: pip
           cache-dependency-path: hdl_registers/requirements_develop.txt
 
@@ -253,7 +253,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
         matrix:
-          py: ['3.10', '3.11', '3.12', '3.13']
+          py: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
 
       - name: Checkout
