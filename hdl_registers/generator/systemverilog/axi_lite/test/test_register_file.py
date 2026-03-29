@@ -193,11 +193,11 @@ def test_field_bit_indexes(tmp_path):
                 ) in sv
 
             if register.mode.software_can_read:
+                bits_single_adjusted = bits if field.width > 1 else str(field.base_index)
                 value_source = "field_storage" if register.mode.software_can_write else "hwif_in"
                 assert (
-                    f"[{bits}] = (decoded_reg_strb.{register.name} && !decoded_req_is_wr) ? "
-                    f"{value_source}.{register.name}.{field.name}."
-                ) in sv
+                    f"[{bits_single_adjusted}] = {value_source}.{register.name}.{field.name}" in sv
+                )
 
 
 def test_enumeration_naming_and_encoding(tmp_path):
