@@ -78,7 +78,7 @@ jobs:
 
     - name: Setup Verilator
       if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
-      uses: veryl-lang/setup-verilator@b155747595eb4b817473a83045ba1da581c4084b # v1.0.3
+      uses: veryl-lang/setup-verilator@7464f6aacf42efab9a92b9138e9ce16ff1135f69 # v2.0.0
 
     - name: Install further Python packages
       if: matrix.os == 'ubuntu-24.04' && matrix.py == '3.14'
