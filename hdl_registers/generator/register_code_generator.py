@@ -21,6 +21,7 @@ from tsfpga.system_utils import create_file, read_file
 
 from hdl_registers import __version__ as hdl_registers_version
 from hdl_registers.field.enumeration import Enumeration
+from hdl_registers.register_modes import REGISTER_MODES
 
 from .register_code_generator_helpers import RegisterCodeGeneratorHelpers
 from .reserved_keywords import RESERVED_KEYWORDS
@@ -160,7 +161,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
             # Print a shorter path if the output is inside the CWD.
             path_to_print = output_file.relative_to(current_working_directory)
         else:
-            # But don't print a long string of ../../ if it is outside, but instead the full path.
+            # Don't print a long string of ../../ if it is outside, but instead the full path.
             path_to_print = output_file
         print(f"Creating {self.SHORT_DESCRIPTION} file: {path_to_print}")
 
@@ -390,8 +391,8 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         To minimize the risk that a generated artifact does not compile.
         """
 
-        def check(name: str, description: str) -> None:
-            if name.lower() in RESERVED_KEYWORDS:
+        def check(name: str, description: str, keywords: set[str] = RESERVED_KEYWORDS) -> None:
+            if name.lower() in keywords:
                 message = (
                     f'Error in register list "{self.name}": '
                     f'{description} name "{name}" is a reserved keyword.'
@@ -406,6 +407,11 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
 
             for field in register.fields:
                 check(name=field.name, description="Field")
+
+                if register.mode == REGISTER_MODES["wmasked"]:
+                    # The 'mask' field is added by us later in code generation.
+                    # User may not have a manually-added field of the same name.
+                    check(name=field.name, description="Masked-register field", keywords={"mask"})
 
                 if isinstance(field, Enumeration):
                     for element in field.elements:

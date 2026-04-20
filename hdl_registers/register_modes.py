@@ -59,4 +59,17 @@ REGISTER_MODES = {
         software_can_write=True,
         hardware_has_up=True,
     ),
+    "wmasked": RegisterMode(
+        shorthand="wmasked",
+        name="Write-masked",
+        description=(
+            "Software can write a value that is available for hardware usage. "
+            "The upper half (MSB) of the write value is a mask while the lower half "
+            "is the payload. "
+            "Only the bits whose mask is asserted will have its payload value set in hardware."
+        ),
+        software_can_read=False,
+        software_can_write=True,
+        hardware_has_up=False,
+    ),
 }

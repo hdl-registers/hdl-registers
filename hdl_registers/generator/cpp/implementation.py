@@ -101,12 +101,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
                         )
                     )
 
-                for field in register.fields:
-                    methods_cpp.append(
-                        self._get_field_getter(
-                            register=register, register_array=register_array, field=field
+                for field in register.fields + self.get_implied_fields(register=register):
+                    if self.should_have_field_accessors(register=register):
+                        methods_cpp.append(
+                            self._get_field_getter(
+                                register=register, register_array=register_array, field=field
+                            )
                         )
-                    )
+
                     methods_cpp.append(
                         self._get_field_getter_from_raw(register, register_array, field=field)
                     )
@@ -125,12 +127,14 @@ class CppImplementationGenerator(CppGeneratorCommon):
                         )
                     )
 
-                for field in register.fields:
-                    methods_cpp.append(
-                        self._get_field_setter(
-                            register=register, register_array=register_array, field=field
+                for field in register.fields + self.get_implied_fields(register=register):
+                    if self.should_have_field_accessors(register=register):
+                        methods_cpp.append(
+                            self._get_field_setter(
+                                register=register, register_array=register_array, field=field
+                            )
                         )
-                    )
+
                     methods_cpp.append(
                         self._get_field_to_raw(register, register_array, field=field)
                     )
@@ -197,7 +201,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
             fields = ""
             values: list[str] = []
-            for field in register.fields:
+            for field in register.fields + self.get_implied_fields(register=register):
                 field_type = self._get_field_value_type(
                     register=register, register_array=register_array, field=field
                 )
@@ -578,7 +582,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
         if register.fields:
             cast = ""
             values: list[str] = []
-            for field in register.fields:
+            for field in register.fields + self.get_implied_fields(register=register):
                 to_raw_name = self._field_to_raw_name(
                     register=register, register_array=register_array, field=field
                 )
@@ -684,7 +688,7 @@ class CppImplementationGenerator(CppGeneratorCommon):
 
         else:
             default_values = []
-            for loop_field in register.fields:
+            for loop_field in register.fields + self.get_implied_fields(register=register):
                 if loop_field.name != field.name:
                     namespace = self._get_namespace(
                         register=register, register_array=register_array, field=loop_field
