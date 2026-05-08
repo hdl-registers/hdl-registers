@@ -101,7 +101,7 @@ __________________________
 
     git push origin vX.Y.Z
 
-**WARNING:** Avoid the "git push --tags" command, which is dangerous since it pushes all your
+**WARNING:** Avoid the ``git push --tags`` command, which is dangerous since it pushes all your
 local tags.
 
 Pushing a tag will create a special Actions run on GitHub:
