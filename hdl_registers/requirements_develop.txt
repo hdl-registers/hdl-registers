@@ -18,3 +18,4 @@ sphinxcontrib-wavedrom
 sphinxext-opengraph
 twine
 vunit_hdl
+vunit-vivado
