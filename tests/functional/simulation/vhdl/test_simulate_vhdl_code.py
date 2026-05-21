@@ -36,7 +36,7 @@ from hdl_registers.field.numerical_interpretation import (
     Unsigned,
     UnsignedFixedPoint,
 )
-from hdl_registers.generator.vhdl.test.test_register_vhdl_generator import (
+from hdl_registers.generator.vhdl.test.test_vhdl import (
     generate_all_vhdl_artifacts,
     generate_strange_register_maps,
 )

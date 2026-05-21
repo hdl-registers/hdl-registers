@@ -24,7 +24,7 @@ from hdl_registers.field.numerical_interpretation import (
     Unsigned,
     UnsignedFixedPoint,
 )
-from hdl_registers.generator.register_code_generator import RegisterCodeGenerator
+from hdl_registers.generator.software_code_generator import SoftwareCodeGenerator
 from hdl_registers.register import Register
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ if TYPE_CHECKING:
     from hdl_registers.register_array import RegisterArray
 
 
-class PythonAccessorGenerator(RegisterCodeGenerator):
+class PythonAccessorGenerator(SoftwareCodeGenerator):
     """
     Generate a Python class to read/write/print register and field values on a target device.
     Field and register values are represented using their native Python types, for easy handling.

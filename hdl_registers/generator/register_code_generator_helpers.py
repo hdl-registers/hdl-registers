@@ -26,6 +26,12 @@ if TYPE_CHECKING:
 class RegisterCodeGeneratorHelpers:
     """
     Various helper methods that make register code generation easier.
+    Do not instantiate or inherit this class directly.
+    Inherit your generator class from one of the subclasses of this class.
+
+    This helper class shall only contain methods that are useful for ALL code generators.
+    Meaning, software, hardware, and documentation generators.
+    Methods that are only applicable to one of those shall be placed in other classes.
     """
 
     # Defined in 'RegisterCodeGenerator' class, which shall also be inherited wherever this class
@@ -122,11 +128,41 @@ class RegisterCodeGeneratorHelpers:
 
         Note that if the register has no fields, we do not really know what the user is doing with
         it, and we have to assume that the full width is used.
+
+        It should also be noted that 'masked'-mode registers will have the width of the payload
+        as their utilized width, even though bits above that must be taken into account for
+        the mask.
         """
         if not register.fields:
-            return 32
+            return register.fields_width
 
         return register.fields[-1].base_index + register.fields[-1].width
+
+    @staticmethod
+    def field_setter_should_read_modify_write(register: Register) -> bool:
+        """
+        Returns True if a field value setter should read-modify-write the register.
+
+        Is only true if the register is of a writeable type where the software can also read back
+        a previously-written value.
+        Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
+        it is a waste of CPU cycles.
+        """
+        if not register.fields:
+            raise ValueError("Should not end up here if the register has no fields.")
+
+        if register.mode == REGISTER_MODES["r_w"]:
+            return len(register.fields) > 1
+
+        if register.mode in [
+            REGISTER_MODES["w"],
+            REGISTER_MODES["wpulse"],
+            REGISTER_MODES["r_wpulse"],
+            REGISTER_MODES["wmasked"],
+        ]:
+            return False
+
+        raise ValueError(f"Got unexpected/unknown register mode: {register}")
 
     @staticmethod
     def register_default_value_uint(register: Register) -> int:
@@ -201,31 +237,6 @@ class RegisterCodeGeneratorHelpers:
             register=register, register_array=register_array
         )
         return f"'{field.name}' field in the {register_description}"
-
-    @staticmethod
-    def field_setter_should_read_modify_write(register: Register) -> bool:
-        """
-        Returns True if a field value setter should read-modify-write the register.
-
-        Is only true if the register is of a writeable type where the software can also read back
-        a previously-written value.
-        Furthermore, read-modify-write only makes sense if there is more than one field, otherwise
-        it is a waste of CPU cycles.
-        """
-        if not register.fields:
-            raise ValueError("Should not end up here if the register has no fields.")
-
-        if register.mode == REGISTER_MODES["r_w"]:
-            return len(register.fields) > 1
-
-        if register.mode in [
-            REGISTER_MODES["w"],
-            REGISTER_MODES["wpulse"],
-            REGISTER_MODES["r_wpulse"],
-        ]:
-            return False
-
-        raise ValueError(f"Got non-writeable register: {register}")
 
     @staticmethod
     def to_pascal_case(snake_string: str) -> str:

@@ -16,8 +16,8 @@ from hdl_registers.register_modes import REGISTER_MODES
 
 
 def main(output_folder: Path) -> None:
-    rst = """
-.. list-table:: All available register modes.
+    base_rst = """
+.. list-table::
    :header-rows: 1
 
    * - Shorthand
@@ -25,15 +25,22 @@ def main(output_folder: Path) -> None:
      - Description
 
 """
+    typical_rst = base_rst
+    special_rst = base_rst
 
-    for key, mode in REGISTER_MODES.items():
-        rst += f"""\
-   * - **{key}**
+    for shorthand_key, mode in REGISTER_MODES.items():
+        rst = f"""\
+   * - **{shorthand_key}**
      - {mode.name}
      - {mode.description}
 """
+        if shorthand_key in ["r", "w", "r_w"]:
+            typical_rst += rst
+        else:
+            special_rst += rst
 
-    create_file(file=output_folder / "modes_table.rst", contents=rst)
+    create_file(file=output_folder / "typical_modes.rst", contents=typical_rst)
+    create_file(file=output_folder / "special_modes.rst", contents=special_rst)
 
 
 if __name__ == "__main__":

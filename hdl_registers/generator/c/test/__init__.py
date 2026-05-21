@@ -6,14 +6,3 @@
 # https://hdl-registers.com
 # https://github.com/hdl-registers/hdl-registers
 # --------------------------------------------------------------------------------------------------
-
-from hdl_registers.generator.software_code_generator import SoftwareCodeGenerator
-
-
-class HtmlGeneratorCommon(SoftwareCodeGenerator):
-    """
-    Common for HTML code generators.
-    """
-
-    COMMENT_START = "<!--"
-    COMMENT_END = " -->"

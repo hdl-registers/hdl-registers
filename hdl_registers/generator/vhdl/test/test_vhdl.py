@@ -125,6 +125,11 @@ def get_strange_register_lists() -> list[RegisterList]:
 
     result.append(RegisterList(name="empty"))
 
+    register_list = RegisterList(name="all_modes")
+    for mode in REGISTER_MODES.values():
+        register_list.append_register(name=f"register_{mode.shorthand}", mode=mode, description="")
+    result.append(register_list)
+
     return result
 
 

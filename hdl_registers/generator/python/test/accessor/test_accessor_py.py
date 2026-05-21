@@ -50,3 +50,7 @@ def test_correct_methods_for_r_wpulse_register(default_accessor_py):
     assert "def read_reg_r_wpulse(" in default_accessor_py
     assert "def write_reg_r_wpulse(" in default_accessor_py
     assert "def write_reg_r_wpulse_bit_aa0(" in default_accessor_py
+
+
+def test_correct_methods_for_wmasked_register(default_accessor_py):
+    assert "def read_reg_wmasked(" in default_accessor_py
