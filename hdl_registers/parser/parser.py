@@ -69,12 +69,7 @@ class RegisterParser:
 
     # Attributes of the register.
     # Anything apart from these are names of fields.
-    default_register_items: ClassVar = {
-        "type",
-        "mode",
-        "description",
-        "default_value"
-    }
+    default_register_items: ClassVar = {"type", "mode", "description", "default_value"}
     # While a 'mode' is required for a register, it may NOT be specified/changed in the data file
     # for a default register.
     # Hence this property is handled separately.
@@ -425,8 +420,10 @@ ERROR: Please inspect that file and update your data file to the new format.
             register_default_value = item_value.get("default_value", 0)
 
             register = register_array.append_register(
-                name=item_name, mode=register_mode, description=register_description,
-                default_value = register_default_value
+                name=item_name,
+                mode=register_mode,
+                description=register_description,
+                default_value=register_default_value,
             )
 
             self._parse_register_fields(
