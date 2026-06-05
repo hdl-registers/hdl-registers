@@ -132,8 +132,12 @@ class RegisterCodeGeneratorHelpers:
     def register_default_value_uint(register: Register) -> int:
         """
         Get the default value of the supplied register, as an unsigned integer.
-        Depends on the default values of the register fields.
+        If the register has fields, the value is computed from the field default values.
+        Otherwise, the register-level default value is used.
         """
+        if not register.fields:
+            return register.default_value
+
         default_value = 0
         for field in register.fields:
             default_value += field.default_value_uint * 2**field.base_index

@@ -73,6 +73,7 @@ class RegisterParser:
         "type",
         "mode",
         "description",
+        "default_value"
     }
     # While a 'mode' is required for a register, it may NOT be specified/changed in the data file
     # for a default register.
@@ -265,6 +266,7 @@ ERROR: Please inspect that file and update your data file to the new format.
 
     def _parse_plain_register(self, name: str, items: dict[str, Any]) -> None:
         description = items.get("description", "")
+        default_value = items.get("default_value", 0)
 
         if name in self._default_register_names:
             # Default registers can be "updated" in the sense that the user can set a custom
@@ -279,7 +281,7 @@ ERROR: Please inspect that file and update your data file to the new format.
 
             register = self._register_list.get_register(register_name=name)
             register.description = description
-
+            register.default_value = default_value
         else:
             # If it is a new register however, the 'mode' has to be specified.
             if "mode" not in items:
@@ -292,7 +294,7 @@ ERROR: Please inspect that file and update your data file to the new format.
             mode = self._get_mode(mode_name=items["mode"], register_name=name)
 
             register = self._register_list.append_register(
-                name=name, mode=mode, description=description
+                name=name, mode=mode, description=description, default_value=default_value
             )
 
         self._parse_register_fields(register=register, register_items=items, register_array_note="")
@@ -420,9 +422,11 @@ ERROR: Please inspect that file and update your data file to the new format.
             register_mode = self._get_mode(mode_name=item_value["mode"], register_name=item_name)
 
             register_description = item_value.get("description", "")
+            register_default_value = item_value.get("default_value", 0)
 
             register = register_array.append_register(
-                name=item_name, mode=register_mode, description=register_description
+                name=item_name, mode=register_mode, description=register_description,
+                default_value = register_default_value
             )
 
             self._parse_register_fields(
