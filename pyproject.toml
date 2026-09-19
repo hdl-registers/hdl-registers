@@ -62,6 +62,8 @@ ignore = [
     "PLR2004",
     # Printouts are okay.
     "T201",
+    # We handle copyright header with our own lint tests.
+    "CPY001",
 ]
 
 per-file-ignores."tools/**/*.py" = [
@@ -78,6 +80,7 @@ per-file-ignores."**/test_*.py" = [
     "PT011",
     # Allow a little more sloppy code.
     "PLR0913",
+    "PLR0917",
     # Are not run with optimization.
     "S101",
     # Some helper debug code is commented out.
