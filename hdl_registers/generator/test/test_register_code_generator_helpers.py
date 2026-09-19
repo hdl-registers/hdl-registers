@@ -58,6 +58,18 @@ def test_default_value_can_be_updated():
     assert RegisterCodeGeneratorHelpers.register_default_value_uint(register) == 0
 
 
+def test_register_default_value_uint_without_fields():
+    register = Register(
+        name="apa", index=0, mode=REGISTER_MODES["r"], description="", default_value=0xDEAD
+    )
+    assert RegisterCodeGeneratorHelpers.register_default_value_uint(register) == 0xDEAD
+
+
+def test_register_default_value_uint_without_fields_defaults_to_zero():
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
+    assert RegisterCodeGeneratorHelpers.register_default_value_uint(register) == 0
+
+
 def test_field_setter_should_read_modify_write():
     register = Register(name="", index=0, mode=REGISTER_MODES["r_w"], description="")
 

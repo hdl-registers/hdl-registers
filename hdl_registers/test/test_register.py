@@ -155,3 +155,13 @@ def test_get_field():
     with pytest.raises(ValueError) as exception_info:
         assert register.get_field("non existing") is None
     assert str(exception_info.value) == 'Could not find field "non existing" within register "apa"'
+
+
+def test_default_value():
+    register = Register(name="apa", index=0, mode=REGISTER_MODES["r"], description="")
+    assert register.default_value == 0
+
+    register = Register(
+        name="apa", index=0, mode=REGISTER_MODES["r"], description="", default_value=42
+    )
+    assert register.default_value == 42
