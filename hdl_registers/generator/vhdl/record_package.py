@@ -190,11 +190,19 @@ end package body;
         """
         vhdl = ""
 
+        vhdl += self._array_records(direction=None)
+        vhdl += self._register_record(direction=None)
+        vhdl += f"""\
+  -- Convert record to SLV register list.
+  function to_slv(data : {self.name}_registers_t) return {self.name}_regs_t;
+
+"""
+
         direction = HardwareAccessDirection.UP
 
         if self.has_any_hardware_accessible_register(direction=direction):
-            vhdl += self._array_field_records(direction=direction)
-            vhdl += self._get_register_record(direction=direction)
+            vhdl += self._array_records(direction=direction)
+            vhdl += self._register_record(direction=direction)
             vhdl += f"""\
   -- Convert record with everything in the '{direction.name.lower()}' direction to SLV \
 register list.
@@ -205,8 +213,8 @@ register list.
         direction = HardwareAccessDirection.DOWN
 
         if self.has_any_hardware_accessible_register(direction=direction):
-            vhdl += self._array_field_records(direction=direction)
-            vhdl += self._get_register_record(direction=direction)
+            vhdl += self._array_records(direction=direction)
+            vhdl += self._register_record(direction=direction)
             vhdl += f"""\
   -- Convert SLV register list to record with everything in the \
 '{direction.name.lower()}' direction.
@@ -217,7 +225,7 @@ return {self.name}_regs_{direction.name.lower()}_t;
 
         return vhdl
 
-    def _array_field_records(self, direction: HardwareAccessDirection) -> str:
+    def _array_records(self, direction: HardwareAccessDirection | None) -> str:
         """
         For every register array that has at least one register in the specified direction:
 
@@ -227,13 +235,17 @@ return {self.name}_regs_{direction.name.lower()}_t;
 
         This function assumes that the register last has registers in the given direction.
         """
+        comment_suffix = (
+            f" that are in the '{direction.name.lower()}' direction" if direction else ""
+        )
+        type_suffix = f"_{direction.name.lower()}" if direction else ""
         vhdl = ""
 
         for array in self.iterate_hardware_accessible_register_arrays(direction=direction):
             array_name = self.qualified_register_array_name(register_array=array)
             vhdl += f"""\
-  -- Registers of the '{array.name}' array that are in the '{direction.name.lower()}' direction.
-  type {array_name}_{direction.name.lower()}_t is record
+  -- Registers of the '{array.name}' array{comment_suffix}.
+  type {array_name}{type_suffix}_t is record
 """
 
             vhdl_array_init = []
@@ -254,49 +266,48 @@ return {self.name}_regs_{direction.name.lower()}_t;
             vhdl += f"""\
   end record;
   -- Default value of the above record.
-  constant {array_name}_{direction.name.lower()}_init : {array_name}_{direction.name.lower()}_t := (
+  constant {array_name}{type_suffix}_init : {array_name}{type_suffix}_t := (
 {init}
   );
-  -- VHDL array of the above record, ranged per the length of the '{array.name}' \
-register array.
-  type {array_name}_{direction.name.lower()}_vec_t is array (0 to {array.length - 1}) of \
-{array_name}_{direction.name.lower()}_t;
+  -- VHDL array of the above record.
+  type {array_name}{type_suffix}_vec_t is array ({array_name}_range) of {array_name}{type_suffix}_t;
 
 """
 
         heading = f"""\
   -- -----------------------------------------------------------------------------
   -- Below is a record with correctly typed and ranged members for all registers, register arrays
-  -- and fields that are in the '{direction.name.lower()}' direction.
+  -- and fields{comment_suffix}.
 """
         if vhdl:
             heading += f"""\
-  -- But first, records for the registers of each register array the are in \
-the '{direction.name.lower()}' direction.
+  -- But first, records for the registers of each register array{comment_suffix}.
 """
 
         return f"{heading}{vhdl}"
 
-    def _get_register_record(self, direction: HardwareAccessDirection) -> str:
+    def _register_record(self, direction: HardwareAccessDirection | None) -> str:
         """
         Get the record that contains all registers and arrays in the specified direction.
         Also default value constant for this record.
 
         This function assumes that the register list has registers in the given direction.
         """
+        comment_suffix = f" in the '{direction.name.lower()}' direction" if direction else ""
+        type_suffix = f"_{direction.name.lower()}" if direction else ""
+        regs_type_suffix = f"regs_{direction.name.lower()}" if direction else "registers"
+
         record_init = []
         vhdl = f"""\
-  -- Record with everything in the '{direction.name.lower()}' direction.
-  type {self.name}_regs_{direction.name.lower()}_t is record
+  -- Record with everything{comment_suffix}.
+  type {self.name}_{regs_type_suffix}_t is record
 """
 
         for array in self.iterate_hardware_accessible_register_arrays(direction=direction):
             array_name = self.qualified_register_array_name(register_array=array)
 
-            vhdl += f"    {array.name} : {array_name}_{direction.name.lower()}_vec_t;\n"
-            record_init.append(
-                f"{array.name} => (others => {array_name}_{direction.name.lower()}_init)"
-            )
+            vhdl += f"    {array.name} : {array_name}{type_suffix}_vec_t;\n"
+            record_init.append(f"{array.name} => (others => {array_name}{type_suffix}_init)")
 
         for register in self.iterate_hardware_accessible_plain_registers(direction=direction):
             vhdl += self._record_member_declaration_for_register(register=register)
@@ -313,8 +324,7 @@ the '{direction.name.lower()}' direction.
 {vhdl}\
   end record;
   -- Default value of the above record.
-  constant {self.name}_regs_{direction.name.lower()}_init : \
-{self.name}_regs_{direction.name.lower()}_t := (
+  constant {self.name}_{regs_type_suffix}_init : {self.name}_{regs_type_suffix}_t := (
 {init}
   );
 """
@@ -491,15 +501,16 @@ to the record above.
         """
         vhdl = ""
 
-        if self.has_any_hardware_accessible_register(direction=HardwareAccessDirection.UP):
-            vhdl += self._register_record_up_to_slv()
+        for direction in [None, HardwareAccessDirection.UP]:
+            if self.has_any_hardware_accessible_register(direction=direction):
+                vhdl += self._register_record_to_slv(direction=direction)
 
         if self.has_any_hardware_accessible_register(direction=HardwareAccessDirection.DOWN):
             vhdl += self._get_registers_down_to_record_function()
 
         return vhdl
 
-    def _register_record_up_to_slv(self) -> str:
+    def _register_record_to_slv(self, direction: HardwareAccessDirection | None) -> str:
         """
         Conversion function implementation for converting a record of all the 'up' registers
         to a register SLV list.
@@ -509,7 +520,7 @@ to the record above.
         to_slv = ""
 
         for register, register_array in self.iterate_hardware_accessible_registers(
-            direction=HardwareAccessDirection.UP
+            direction=direction
         ):
             register_name = self.qualified_register_name(
                 register=register, register_array=register_array
@@ -534,8 +545,9 @@ to the record above.
                     else:
                         to_slv += f"{result} := {record};\n"
 
+        type_suffix = f"regs_{direction.name}" if direction else "registers"
         return f"""\
-  function to_slv(data : {self.name}_regs_up_t) return {self.name}_regs_t is
+  function to_slv(data : {self.name}_{type_suffix}_t) return {self.name}_regs_t is
     variable result : {self.name}_regs_t := {self.name}_regs_init;
   begin
 {to_slv}
