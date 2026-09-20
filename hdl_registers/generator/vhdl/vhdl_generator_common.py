@@ -180,7 +180,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
         return False
 
     def iterate_hardware_accessible_registers(
-        self, direction: HardwareAccessDirection
+        self, direction: HardwareAccessDirection | None
     ) -> Iterator[tuple[Register, RegisterArray | None]]:
         """
         Iterate all registers in the register list, plain or in array, that are hardware-accessible
@@ -191,7 +191,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
                 yield register, register_array
 
     def iterate_hardware_accessible_plain_registers(
-        self, direction: HardwareAccessDirection
+        self, direction: HardwareAccessDirection | None
     ) -> Iterator[Register]:
         """
         Iterate all plain registers in the register list that are hardware-accessible in the
@@ -202,7 +202,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
                 yield register
 
     def iterate_hardware_accessible_array_registers(
-        self, register_array: RegisterArray, direction: HardwareAccessDirection
+        self, register_array: RegisterArray, direction: HardwareAccessDirection | None
     ) -> Iterator[Register]:
         """
         Iterate all registers in the register array that are hardware-accessible in the
@@ -213,7 +213,7 @@ class VhdlGeneratorCommon(RegisterCodeGenerator):
                 yield register
 
     def iterate_hardware_accessible_register_arrays(
-        self, direction: HardwareAccessDirection
+        self, direction: HardwareAccessDirection | None
     ) -> Iterator[RegisterArray]:
         """
         Iterate all register arrays in the register list that contain at least one register that

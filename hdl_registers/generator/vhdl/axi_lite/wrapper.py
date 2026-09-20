@@ -93,6 +93,9 @@ class VhdlAxiLiteWrapperGenerator(VhdlGeneratorCommon):
         # Hence it is safe to always end the 'regs_up'/'regs_down' ports with a semicolon.
         entity = f"""\
 entity {entity_name} is
+  generic (
+    default_values : {self.name}_registers_t := {self.name}_registers_init
+  );
   port (
     clk : in std_ulogic;
     -- Active-high synchronous reset.
@@ -187,6 +190,8 @@ use work.{self.name}_register_record_pkg.all;
 {entity}
 architecture a of {entity_name} is
 
+  constant default_values_slv : {self.name}_regs_t := to_slv(default_values);
+
   signal regs_up_slv, regs_down_slv : {self.name}_regs_t := {self.name}_regs_init;
 
   signal reg_was_read_slv, reg_was_written_slv : {self.name}_reg_was_accessed_t := (
@@ -203,7 +208,7 @@ axi_lite_register_file.vhd
   axi_lite_register_file_inst : entity register_file.axi_lite_register_file
     generic map (
       registers => {self.name}_register_map,
-      default_values => {self.name}_regs_init
+      default_values => default_values_slv
     )
     port map(
       clk => clk,

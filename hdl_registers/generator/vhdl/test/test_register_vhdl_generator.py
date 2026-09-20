@@ -149,7 +149,7 @@ def generate_strange_register_maps(output_path):
 
 def _get_register_arrays_record_string(direction):
     return (
-        f"records for the registers of each register array the are in the '{direction}' direction"
+        f"records for the registers of each register array that are in the '{direction}' direction"
     )
 
 

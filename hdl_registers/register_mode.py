@@ -135,11 +135,14 @@ class RegisterMode:
 
         return self.software_can_write
 
-    def is_hardware_accessible(self, direction: HardwareAccessDirection) -> bool:
+    def is_hardware_accessible(self, direction: HardwareAccessDirection | None) -> bool:
         """
         Test if this mode is hardware-accessible in the given ``direction``.
         Method is just a simple wrapper around the already-existing attributes.
         """
+        if direction is None:
+            return True
+
         if direction == HardwareAccessDirection.UP:
             return self.hardware_has_up
 
