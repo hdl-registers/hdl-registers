@@ -245,3 +245,46 @@ mode = "r_pulse"
         str(exception_info.value) == f'Error while parsing register "hest" in {toml_path}: '
         'Got unknown mode "r_pulse". Expected one of "r", "w", "r_w", "wpulse", "r_wpulse".'
     )
+
+
+def test_register_default_value(tmp_path):
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[apa]
+
+mode = "r_w"
+default_value = 42
+
+[hest]
+
+mode = "r"
+""",
+    )
+    register_list = from_toml(name="", toml_file=toml_path)
+
+    assert register_list.get_register("apa").default_value == 42
+    assert register_list.get_register("hest").default_value == 0
+
+
+def test_register_array_register_default_value(tmp_path):
+    toml_path = create_file(
+        file=tmp_path / "regs.toml",
+        contents="""
+[apa]
+
+type = "register_array"
+array_length = 3
+
+[apa.hest]
+
+mode = "r_w"
+default_value = 123
+""",
+    )
+    register_list = from_toml(name="", toml_file=toml_path)
+
+    assert (
+        register_list.get_register(register_name="hest", register_array_name="apa").default_value
+        == 123
+    )

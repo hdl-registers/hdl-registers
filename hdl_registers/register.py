@@ -27,7 +27,9 @@ class Register:
     Used to represent a register and its fields.
     """
 
-    def __init__(self, name: str, index: int, mode: RegisterMode, description: str) -> None:
+    def __init__(
+        self, name: str, index: int, mode: RegisterMode, description: str, default_value: int = 0
+    ) -> None:
         """
         Arguments:
             name: The name of the register.
@@ -40,6 +42,8 @@ class Register:
                 See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
                 for more information about the different modes.
             description: Textual register description.
+            default_value (optional): Default value of the register.
+                Used for registers without fields
         """
         if not isinstance(mode, RegisterMode):
             # This check should be removed eventually.
@@ -55,6 +59,7 @@ class Register:
         self.description = description
         self.fields: list[RegisterField] = []
         self.bit_index = 0
+        self.default_value = default_value
 
     def append_bit(self, name: str, description: str, default_value: str) -> Bit:
         """
@@ -182,5 +187,6 @@ name={self.name},\
 index={self.index},\
 mode={self.mode},\
 description={self.description},\
+default_value={self.default_value},\
 fields={",".join([repr(field) for field in self.fields])},\
 )"""

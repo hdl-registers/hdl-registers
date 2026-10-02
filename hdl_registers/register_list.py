@@ -83,7 +83,9 @@ class RegisterList:
 
         return register_list
 
-    def append_register(self, name: str, mode: RegisterMode, description: str) -> Register:
+    def append_register(
+        self, name: str, mode: RegisterMode, description: str, default_value: int = 0
+    ) -> Register:
         """
         Append a register to this register list.
 
@@ -93,12 +95,16 @@ class RegisterList:
                 See https://hdl-registers.com/rst/basic_feature/basic_feature_register_modes.html
                 for more information about the different modes.
             description: Textual register description.
+            default_value (optional): Default value of the register.
+                Typically used for registers without fields.
 
         Return:
             The register object that was created.
         """
         index = self.register_objects[-1].index + 1 if self.register_objects else 0
-        register = Register(name=name, index=index, mode=mode, description=description)
+        register = Register(
+            name=name, index=index, mode=mode, description=description, default_value=default_value
+        )
 
         self.register_objects.append(register)
         return register
