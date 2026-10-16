@@ -38,7 +38,7 @@ b.value = "2"
         from_toml(name="", toml_file=toml_path)
     assert str(exception_info.value).startswith(
         f"Error while parsing TOML file {toml_path}:\n"
-        "expected an equals, found eof at line 7 column 8"
+        "key with no value, expected `=` at line 7 column 8"
     )
 
 
@@ -88,10 +88,7 @@ mode = "w"
 
     with pytest.raises(ValueError) as exception_info:
         from_toml(name="", toml_file=toml_path)
-    expected = (
-        f"Error while parsing TOML file {toml_path}:\n"
-        "redefinition of table `status` for key `status` at line 6 column 1"
-    )
+    expected = f"Error while parsing TOML file {toml_path}:\nduplicate key at line 6 column 2"
     assert str(exception_info.value).startswith(expected)
 
 
@@ -117,9 +114,5 @@ description = "Declaration 2"
 
     with pytest.raises(ValueError) as exception_info:
         from_toml(name="", toml_file=toml_path)
-    expected = (
-        f"Error while parsing TOML file {toml_path}:\n"
-        "redefinition of table `test_reg.test_bit` for key "
-        "`test_reg.test_bit` at line 11 column 1"
-    )
+    expected = f"Error while parsing TOML file {toml_path}:\nduplicate key at line 11 column 11"
     assert str(exception_info.value).startswith(expected)
