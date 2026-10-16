@@ -9,7 +9,7 @@
 
 from __future__ import annotations
 
-import datetime
+import datetime as dt
 import re
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -321,7 +321,7 @@ class RegisterCodeGenerator(ABC, RegisterCodeGeneratorHelpers):
         # the date information is not critical in any way.
         # It is just there for extra info.
         # https://docs.astral.sh/ruff/rules/call-datetime-now-without-tzinfo/
-        time_info = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")  # noqa: DTZ005
+        time_info = dt.datetime.now().strftime("%Y-%m-%d %H:%M")  # noqa: DTZ005
 
         annotation = "``" if use_rst_annotation else ""
 
